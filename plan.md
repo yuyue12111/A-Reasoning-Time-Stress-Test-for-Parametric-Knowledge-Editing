@@ -4,9 +4,10 @@
 - **目标**: AAAI-27（2027-02-16/23, 蒙特利尔）。首选 **AI Alignment track**（编辑作为安全干预在 test-time compute 下失效），备选 Main Track
 - **硬截止**: abstract **2026-07-20**，全文 **2026-07-27**，补充材料 +3 天（均 UTC-12；以官方 CFP 页为准，本周内再核对一次 track 专属日期）
 - **页数约束**: 正文 7 页 + 参考文献；两阶段评审（Phase 1 两人工评审 + 一份 AI 生成非决策评审），故 **摘要/引言/图 1 必须在 Phase 1 就能独立讲完整个故事**
-- **版本**: v1.1 (2026-06-10)。决策记录：方向 B′ 经地毯式查新确认窄切口可行（见 `analysis/00_shortlist.md`）；复现队列 7 项已确认；pilot go/no-go 机制生效
+- **版本**: v1.3 (2026-06-10)。决策记录：方向 B′ 经地毯式查新确认窄切口可行（见 `analysis/00_shortlist.md`）；复现队列 7 项已确认；pilot go/no-go 机制生效
 - **v1.1 变更**: ① 新增 §2.6 第 4 项混杂（批量编辑干扰）并确立**单条编辑为主协议**；② §5 算力账按单条编辑协议重算（70 → ~400 GPU·h，原估计依赖批量编辑+vLLM 假设，与主协议冲突）；③ 风险表补 R1-Distill-Qwen-7B 基座为 Qwen2.5-**Math**-7B 的超参移植风险与层扫描预案；④ 新增 §11 源码实测附录（hparams 路径、prefill 模板字符串、CPU 冒烟脚本，全部为 2026-06-10 源码确认）
 - **v1.2 变更 (2026-06-10)**: ① **单条编辑协议获用户签字确认**（算力 420 GPU·h 预算生效）；② EasyEdit 权重还原机制审计完成（精确逐元素拷回，循环正确性成立，证据见 `analysis/01_easyedit.md` §3）；③ CPU 冒烟因容器磁盘/无 torch 改在本地执行（命令在 01 笔记 §1）；④ 新增 §12 Pilot harness 三模块完整实现代码
+- **v1.3 变更 (2026-06-10)**: ① Phase 0 第 3 张复现笔记 `analysis/03_rtofu.md` 完成（R-TOFU 解码协议 + 口径审计）；②【§12.1 注意点② 定案】`<think>`/`</think>` 在 R1-Distill-Qwen-7B 与 -Llama-8B 的 tokenizer 中均**非**特殊 token（查 HF `tokenizer_config.json` 之 `added_tokens_decoder`）→ `</think>` 走文本检测，无需 token-id StoppingCriteria；③ `src/think_budget.py` 用 R-TOFU 逐字 prefill（ZeroThink/LessThink/DefaultCoT，byte-for-byte 校验）替换 v0 占位，`_gen` 解码改 `skip_special_tokens=True`；④【待用户拍板】预算档定义在 §2.4（6 档）与 §12.1 代码（B0–B4 5 档）间不自洽，详见 03 笔记 §9
 
 ---
 
@@ -275,6 +276,7 @@ arXiv 关键词组：`knowledge editing + reasoning model`；`edit + chain-of-th
 - 聊天模板（`test_cot.py:243-245`，注意全角竖线）：`<｜User｜>{prompt}<｜Assistant｜><think>\n`，无 system prompt
 - ZeroThink/LessThink 的 prefill 实现在 `test.py:15-20`（闭合 think 块预填充）；CoT 抽取按 `<think>…</think>` 切片（`test_cot.py:250-253`）
 - ExtendThink 实现要点（s1 式）：流式监测 `</think>`，命中即替换为 `\nWait, let me double-check this.` 续写，最多 2 次
+- **(v1.3 补)** base 模型 = `DeepSeek-R1-Distill-Llama-8B`（**非 Qwen**，`config/tofu.yaml:2`）；上述三 prefill 串已逐字校验进 `src/think_budget.py`；`<think>`/`</think>` 两模型均非特殊 token，B4 走文本检测——详见 `analysis/03_rtofu.md` §3–§4
 
 ### 11.3 Phase 0 容器冒烟脚本（完整代码，落 `src/smoke_rome_gpt2.py`）
 
@@ -306,6 +308,8 @@ print(metrics)
 约定：分片并行按 `case_id % 8 == GPU_RANK` 切 8 片，每片独占 1 卡；jsonl 追加写 + 启动时跳过已完成 case_id（可中断续跑）。代码以 §11 实测 API 为准，跑通后 `pip freeze > env.lock`。
 
 ### 12.1 `src/think_budget.py` — 思考预算控制器（B0–B4）
+
+> **v1.3 注**：下方为 v0 基线快照；现行实现以 `src/think_budget.py` 为准（已按 `analysis/03_rtofu.md` §3–§4 用 R-TOFU 逐字 prefill 替换占位、`_gen` 解码改 `skip_special_tokens=True`）。
 
 ```python
 import torch
@@ -347,7 +351,7 @@ def generate_with_budget(model, tok, q, budget):
     return cot, ans, text + ans
 ```
 
-注意点：① DeepSeek tokenizer 可能将 `<think>`/`</think>` 编为特殊 token，`skip_special_tokens=False` 保留；② B4 的 `</think>` 替换基于解码文本检测，若特殊 token 化需改为 token-id 级 StoppingCriteria（01 笔记实跑后回填决议）。
+注意点（v1.3 定案，证据见 `analysis/03_rtofu.md` §4）：① 已查实 `<think>`/`</think>` **非**特殊 token（不在 R1-Distill-Qwen-7B / -Llama-8B 的 `added_tokens_decoder`），原 `skip_special_tokens=False` 的理由（怕被剥）作废，现行 `think_budget.py` 解码改 `skip_special_tokens=True`（顺带滤 EOS，避免污染规则判分）；② B4 的 `</think>` 检测**确定走文本**（`THINK_END in chunk`），无需 token-id 级 StoppingCriteria。
 
 ### 12.2 `src/edit_loop.py` — 单条编辑协议主循环
 
