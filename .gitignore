@@ -28,3 +28,10 @@ env/
 *.npz
 mom2_stats/
 stats/
+
+# --- Cleaned datasets: regenerable via `python src/build_dataset.py` (raw via memit download).
+#     aliases.json + sample_records.jsonl stay tracked (small, curated). ---
+/data/raw/
+/data/counterfact.jsonl
+/data/zsre.jsonl
+/data/mquake_cf_3k.jsonl
