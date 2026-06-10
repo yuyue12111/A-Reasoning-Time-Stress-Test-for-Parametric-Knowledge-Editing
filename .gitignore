@@ -1,0 +1,30 @@
+# --- macOS / editor junk ---
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+.pytest_cache/
+
+# --- Conda / venv created inside the repo (env.lock IS tracked, see CLAUDE.md §6) ---
+.venv/
+venv/
+env/
+
+# --- Third-party clones & downloaded PDFs: regenerable via `bash setup_workspace.sh`,
+#     read-only per CLAUDE.md, and too large / nested-git to version here. Keep the dirs via .gitkeep. ---
+/source/*
+!/source/.gitkeep
+/papers/*
+!/papers/.gitkeep
+
+# --- Large runtime artifacts (created later; CoT jsonl is anonymized & shipped at submission, not in main history) ---
+*.pt
+*.npz
+mom2_stats/
+stats/
