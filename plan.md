@@ -8,6 +8,7 @@
 - **v1.1 变更**: ① 新增 §2.6 第 4 项混杂（批量编辑干扰）并确立**单条编辑为主协议**；② §5 算力账按单条编辑协议重算（70 → ~400 GPU·h，原估计依赖批量编辑+vLLM 假设，与主协议冲突）；③ 风险表补 R1-Distill-Qwen-7B 基座为 Qwen2.5-**Math**-7B 的超参移植风险与层扫描预案；④ 新增 §11 源码实测附录（hparams 路径、prefill 模板字符串、CPU 冒烟脚本，全部为 2026-06-10 源码确认）
 - **v1.2 变更 (2026-06-10)**: ① **单条编辑协议获用户签字确认**（算力 420 GPU·h 预算生效）；② EasyEdit 权重还原机制审计完成（精确逐元素拷回，循环正确性成立，证据见 `analysis/01_easyedit.md` §3）；③ CPU 冒烟因容器磁盘/无 torch 改在本地执行（命令在 01 笔记 §1）；④ 新增 §12 Pilot harness 三模块完整实现代码
 - **v1.3 变更 (2026-06-10)**: ① Phase 0 第 3 张复现笔记 `analysis/03_rtofu.md` 完成（R-TOFU 解码协议 + 口径审计）；②【§12.1 注意点② 定案】`<think>`/`</think>` 在 R1-Distill-Qwen-7B 与 -Llama-8B 的 tokenizer 中均**非**特殊 token（查 HF `tokenizer_config.json` 之 `added_tokens_decoder`）→ `</think>` 走文本检测，无需 token-id StoppingCriteria；③ `src/think_budget.py` 用 R-TOFU 逐字 prefill（ZeroThink/LessThink/DefaultCoT，byte-for-byte 校验）替换 v0 占位，`_gen` 解码改 `skip_special_tokens=True`；④【待用户拍板】预算档定义在 §2.4（6 档）与 §12.1 代码（B0–B4 5 档）间不自洽，详见 03 笔记 §9
+- **v1.4 变更 (2026-06-10)**: ① task#02 AlphaEdit 笔记 `analysis/02_alphaedit.md` 完成——两实现算法逐行同构，唯一实质超参差异 **L2（EasyEdit=1 vs 官方=10）**；发现 **EasyEdit 内置版 P 预分配缺 qwen 分支的崩溃 bug**（上 Qwen/R1-Distill-Qwen 主模型前必打 vendor_patch，见 02 §4）；P 与 MEMIT 共享 mom2（task#04 一次 cov 喂两编辑器）；② task#07 `src/test_think_budget.py` 写好——mock 控制流 6 测全过（B0 空/截断 CAP/单调/B4 WAIT≤2，think_budget.py **首次实跑**通过），真模型长度分布层待 H200；③ task#03 本地环境就位（Miniconda+editrev py3.10，EasyEdit 全依赖装通，`env.lock` 105 包），踩坑见 01 §6（conda ToS / conda-forge 无 pip / easyeditor 需 PYTHONPATH）；冒烟（GPT-2-XL ROME）进行中；④ task#04（mom2@8×H200）按用户决定**延后**（需实验室专网）
 
 ---
 
