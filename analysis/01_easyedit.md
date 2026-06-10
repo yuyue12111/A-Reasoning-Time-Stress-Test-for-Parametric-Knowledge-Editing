@@ -57,8 +57,40 @@ hparams/{ROME,MEMIT,AlphaEdit}/qwen2.5-7b.yaml   # 已确认存在
 - `nethook.get_parameter`（机理章节 logit lens 的 hook 也用它）
 - Dockerfile（扩展为项目镜像）
 
-## 6. 待办（实跑后回填）
+## 6. 环境实跑记录（task 3，2026-06-10，本地 macOS arm64 / 26.5.1）
 
-- [ ] 本地 CPU 冒烟 rewrite_acc 结果
-- [ ] H200 上 R1-Distill-Qwen-7B 单条 ROME + layers 三组扫描结果（plan §7 风险表合格线：ES≥90%, Locality≥85%）
-- [ ] batch_edit 分支还原语义确认
+**最终可用环境**：Miniconda + conda env `editrev`(py3.10.20) + EasyEdit 全依赖（torch 2.9.1 / transformers 5.5.4 / … 共 105 包），`env.lock` 已落仓库根并 commit（CLAUDE.md 硬约束 6）。
+
+**可复制的建环境 + 冒烟命令（已实跑、踩坑修正版）**：
+```bash
+# 1) Miniconda（batch，不改 shell profile）
+curl -fsSL -o /tmp/mc.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh
+bash /tmp/mc.sh -b -p ~/miniconda3
+# 2) env：从 conda-forge 建 + 显式带 pip（见坑 ①②）
+~/miniconda3/bin/conda create -n editrev python=3.10 pip -y -c conda-forge --override-channels
+PY=~/miniconda3/envs/editrev/bin/python
+# 3) 依赖
+$PY -m pip install -r source/EasyEdit/requirements.txt
+# 4) 冒烟：PYTHONPATH=. 必需（坑 ④）；脚本内已 override model_name（坑 ⑤）
+cd source/EasyEdit && PYTHONPATH=. $PY ../../src/smoke_rome_gpt2.py
+$PY -m pip freeze > ../../env.lock
+```
+
+**冒烟结果**：ROME 单条编辑（`The Eiffel Tower is located in`，Paris→Rome）on GPT-2-XL @ CPU —— `rewrite_acc` = **运行中待回填**（GPT-2-XL 6.4GB 下载 + CPU ROME 进行中；预期 1.0，完成即回填本行并 commit）。
+
+**依赖坑登记（5 个，全部已修，建环境照此避）**：
+
+| # | 现象 | 根因 | 修法 |
+|---|---|---|---|
+| ① | `conda create` 报 ToS 未接受、退出码非 0 | 近期 Miniconda 把 defaults 频道 ToS 设为前置门槛 | `conda tos accept --override-channels --channel .../pkgs/main`（+`/pkgs/r`），或直接 `-c conda-forge --override-channels` 绕开 |
+| ② | env 建好但 `No module named pip` | conda-forge 最小 python 不自带 pip | create 时显式列 `pip`，或 `$PY -m ensurepip --upgrade`（自带 wheel、免网） |
+| ③ | 本机 system python 3.9.6 装不了依赖 | torch2.9 / transformers5.5 需 py≥3.10 | 必须 conda/pyenv 建 ≥3.10 env（本机无 conda/pyenv，故装 Miniconda） |
+| ④ | `from easyeditor import …` → ModuleNotFoundError | easyeditor 是**本地包、非 pip 安装**；`python <脚本>` 只把脚本目录(src/)入 sys.path、不含 source/EasyEdit；且 EasyEdit **无 setup.py**，`pip install -e .` 也走不了 | 在 source/EasyEdit 下用 `PYTHONPATH=.` 运行（plan §11.3 命令已更正） |
+| ⑤ | 加载模型 `HFValidationError: ./hugging_cache/gpt2-xl` | `hparams/ROME/gpt2-xl.yaml` 的 `model_name` 写死成本地缓存路径（不存在） | 脚本里 `hparams.model_name='gpt2-xl'` 覆盖、改从 HF Hub 拉（已落 `src/smoke_rome_gpt2.py`） |
+
+## 7. H200 待回填（GPU 窗口）
+
+- [ ] R1-Distill-Qwen-7B 单条 ROME + layers ∈ {[4-8],[6-10],[8-12]} 三组扫描（plan §7 合格线 ES≥90% & Locality≥85%）
+- [ ] batch_edit 分支还原语义确认（pilot 前）
+- [ ] AlphaEdit 上 Qwen 前先打 02 笔记的 P 预分配 qwen 补丁（否则首跑 P 崩）
+- [x] §3 源码行号抽验（2026-06-10, HEAD 6a164f9）：`rome_main.py:50` clone、`editor.py:265/408/460` 还原、`editor.py:288` return triple **均未漂移**，与交接审计一致
