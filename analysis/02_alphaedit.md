@@ -117,3 +117,17 @@ z*（compute_z）、K（compute_ks）、残差分摊 `resid/(L-i)`、`cache_c +=
 - [ ] 打 qwen P 补丁后，R1-Distill-Qwen-7B 上首跑生成 `null_space_project.pt`（依赖 task 4 mom2 先就位）
 - [ ] 同 100 条编辑：EasyEdit 内置（L2=1）vs 官方（L2 对齐）ES 差 <2pp 验证
 - [ ] L2∈{1,10} 敏感性小扫（顺带，判断哪个更适配 R1-Distill）
+
+## 9. 论文宣称 vs 代码现实（读 PDF 2410.02355 后补，Prompt2「从代码出发不被包装影响」）
+
+论文包装极强：「**One Line of Code, Transformative Performance**」「+36.7% over MEMIT」「理论证明保留知识输出不变」（Fig 2 / Abstract）。逐条对代码核：
+
+| 论文宣称（包装） | 代码现实 | 判定 |
+|---|---|---|
+| 零空间阈值（脚注 1）「remove eigenvectors with eigenvalues **above 10⁻²**」 | 代码（官方 `experiments/evaluate.py:440` + EasyEdit/官方 yaml）`nullspace_threshold` 实为 **2e-2**，即 **2×** 脚注值（`S < 2e-2` 选零空间） | **代码≠脚注**，差 2×，影响零空间维度。**以代码为准**，论文复现要对齐到 2e-2 |
+| 「**one line** of additional code for projection」 | 投影应用确实一行（`P @ …`，solve 里）；但**生成 P 不是一行**：需对 100k wikipedia 样本的 mom2 协方差做 SVD（`get_project`，=我们 task#04 + 一次 SVD）。营销把 P 的预算成本藏了 | **半真**：投影是一行，P 预计算不是 |
+| 「理论证明保留知识输出**不变**」(W+Δ')K₀=WK₀ (eq 7/10) | 数学成立且代码忠实实现（`P=ÛÛᵀ`，§4）；**但零空间是近似**——脚注自承"eigenvalues rarely strictly zero"，靠阈值切。故"不变"是**阈值近似**，阈值(2e-2)直接决定保留 vs 扰动的折中 | **真但近似**，非严格不变 |
+| 「+36.7%」头条 | 是**sequential editing（2000 连续编辑）**场景的提升（Fig 2）。**我们走单条编辑协议、每条还原**，根本不吃这个 sequential 红利；反而其 `cache_c`（连续保留累加器）在单条协议下要每条 `reset`（§5），否则批量污染 | **与我们用法正交**：我们当它单条编辑器用，不为 sequential 而用 |
+| 闭式解 (eq 6) `(K₀K₀ᵀ+K₁K₁ᵀ)⁻¹` 干净 | 代码额外加 `+ L2·I` 数值正则（主文未突出）；且**两实现 L2 不一致**（EasyEdit=1 vs 官方=10，§3） | 论文数学**省略了 L2**，复现需显式对齐 |
+
+**一句话**：AlphaEdit 的核心机理（零空间投影保留知识）代码忠实、可信可用；但"一行代码""输出不变""+36.7%"是包装——一行藏了 P 预计算、不变是阈值近似、头条是 sequential 场景。对我们：① 阈值用代码的 2e-2、② L2 复现需对齐、③ 单条协议下 `reset_cache` 必加、④ 不为它的 sequential 长板买单（我们要的是它作为强单条编辑器 + 可解析的零空间）。

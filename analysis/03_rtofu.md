@@ -116,3 +116,18 @@ R-TOFU 是 **unlearning** 基准，其 forget 指标全部是"被遗忘知识在
 
 - **预算档定义在 plan 内部不自洽**（需用户拍板，属 plan 级改动）：plan §2.4 列 6 档 `{0, 256, 1024, 4096, natural, extend}`，而 plan §12.1 的 harness 代码（=现 `think_budget.py`）是 B0–B4 五档 `{Zero, 256, 1024, 8192, 8192+extend}`，且 task 7 写"5 档"。差异：①§2.4 的 **4096** 在代码里没有独立档；②§2.4 的 **natural** 被 B3(cap=8192) 近似吞掉（CounterFact 类事实 CoT 通常远短于 8192，故 B3 实质≈natural，但它是"高上限截断"不是"真自然长度"）。**建议**：要么把代码对齐成 §2.4 的 6 档（加独立 4096 与真 natural=无上限），要么把 §2.4 改为与代码一致的 5 档——任选其一但需 +0.1 改 plan。本笔记暂不动 enum。
 - §4 的 H200 回填留点（tokenizer piece 数、循环 EOS 兜底）——task 7 顺带验。
+
+## 10. 论文宣称 vs 代码现实（读 PDF 2505.15214 后补，Prompt2「从代码出发不被包装影响」）
+
+R-TOFU 包装：「**首个** LRM unlearning 基准」「step-wise 指标暴露 answer-level 看不见的残留」「发现 ZeroThink/LessThink 暴露被遗忘内容的失效模式」（Abstract）。逐条核：
+
+| 论文宣称（包装） | 代码 / 原文现实 | 对我们的意义 |
+|---|---|---|
+| ZeroThink/LessThink（其卖点失效模式的载体） | **不是 R-TOFU 原创**：原文 §2/§Abstract 明确引 **Jiang et al., 2025**；R-TOFU 只是把它们当解码鲁棒性探针用 | **引用要分清**：ZeroThink/LessThink 源头引 Jiang et al. 2025，R-TOFU 引其"LRM unlearning 残留"应用。我们 `think_budget` 的串从 R-TOFU 代码逐字取，但方法出处是 Jiang et al. |
+| 「decoding 暴露残留」失效模式 | 方向 = **少思考(Zero/Less) → 暴露被删内容**（unlearning 不彻底） | **与我们镜像成对**（plan §1.4）：我们是**多思考(extend) → 推翻编辑**。论文 claim 核实无误，互补关系成立 |
+| 「LRM unlearning」 | 对象是 **unlearning**（删知识，失效=泄漏被删内容） | 我们是 **editing**（改知识，失效=回退旧答）——失效模式本质不同，别混 |
+| 「**step-wise** 指标」 | 代码现实=**句级** ROUGE-L recall + cosine（`PunktSentenceTokenizer` 切句 vs **参考 CoT** 比相似度，`test_cot.py:61-88`）+ GPT-4o judge | 是"与参考 CoT 的句级相似度"，**不是逐推理步语义核**；与我们 CLR（o_old 子串命中 CoT）**不同口径**，不可混排 |
+| "LRM" 泛化 | 原文 §2：「We use **DeepSeek-R1-Distill-Llama-8B**」——只在**一个 Llama 基座**上验 | 我们主模型是 Qwen，跨基座别默认平移；`<think>` 非特殊 token 已对 Qwen **单独**核过（§4） |
+| 基准构造 | TOFU=200 合成作者×20 QA，**保证不在预训练里**；R-TOFU 加合成 CoT | 是"虚构知识"的可控 unlearning 设定，与我们用 CounterFact/zsRE 的**真实事实反事实编辑**不同源 |
+
+**一句话**：R-TOFU 我们只借**解码协议**（其实源自 Jiang et al. 2025）与**句级抽 CoT 的思路**，已落 `think_budget` + 验过 Qwen tokenizer；它的 unlearning 口径/对象/单一基座都与我们 editing 路线不同，是**互补近邻**而非可照搬——写作时方向成对、口径分名、出处给对。

@@ -94,3 +94,18 @@ $PY -m pip freeze > ../../env.lock
 - [ ] batch_edit 分支还原语义确认（pilot 前）
 - [ ] AlphaEdit 上 Qwen 前先打 02 笔记的 P 预分配 qwen 补丁（否则首跑 P 崩）
 - [x] §3 源码行号抽验（2026-06-10, HEAD 6a164f9）：`rome_main.py:50` clone、`editor.py:265/408/460` 还原、`editor.py:288` return triple **均未漂移**，与交接审计一致
+
+## 8. 论文宣称 vs 代码现实（读 PDF 2308.07269 后补，Prompt2「从代码出发不被包装影响」）
+
+论文把 EasyEdit 包装成「**易用 + 统一**的编辑框架」，并称「editing 在 reliability/generalization 上**超过 fine-tuning**」（LLaMA-2，§Abstract/§1）。逐条对代码核：
+
+| 论文宣称（包装） | 代码现实（我审计所得） | 判定 |
+|---|---|---|
+| "easy-to-use / 开箱即用" | Editor/Method/Hparams/Evaluate 统一接口属实（矩阵实验零胶水，本笔记 §3/§5）；但**开箱有三处摩擦**：本地包需 `PYTHONPATH=.`（坑④）、hparams 的 `model_name` 写死不存在的本地路径（坑⑤）、requirements 无版本上限会漂移破 hook（§4 雷点 3） | **半真**：统一是真，frictionless 不是 |
+| "modular / 自由组合" | hparams 体系确实把 ROME/MEMIT/AlphaEdit 收一个接口（改 model_name 即用） | 真 |
+| Reliability 指标（其 `rewrite_acc`） | 是 **logits/prefix 匹配**口径（§4 雷点 2），不是生成式；与我们的 `ES_b`（生成式 + think 模板）**不同口径，永不混排**（CLAUDE.md 约束 4） | 真但**口径不可平移** |
+| "editing **surpasses fine-tuning** in reliability/generalization"（LLaMA-2） | 这是 **no-think / 标准评测**下、用其口径得出的结论。**我们整个项目就在证伪它在 LRM think 场景下的'可靠'**——编辑随思考预算回退。论文的"可靠"不涉 test-time compute | **正是我们的张力点/卖点**：不被其"可靠"宣称带偏 |
+| Table 1：方法能力/开销 | ROME **不支持 batch**（单条）、MEMIT 支持——**印证我们 ROME 走单条编辑协议合理**；Time/VRAM（LLaMA-7B,10 edits）：ROME 187.9s/31GB、MEMIT 169.3s/33GB，给 §5 算力账参照 | 真，可复用 |
+| `keep_original_weight` 单条还原 | 还原精确（逐元素拷回，§3 已审计）；**但 batch 分支还原语义仍待验**（§7） | 单条真，batch 待验 |
+
+**一句话**：EasyEdit 的"易用"是统一接口为真、开箱摩擦不少；"可靠超过 FT"是特定口径 + 非 LRM-think 场景下的宣称——恰是我们要在思考预算维度上系统反证的对象。作为**工具**可信（还原机制、hparams 体系扎实），作为**结论**不照搬。
