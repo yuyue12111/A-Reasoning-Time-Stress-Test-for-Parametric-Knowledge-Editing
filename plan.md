@@ -15,6 +15,7 @@
 - **v1.8 变更 (2026-06-11)**: ① 新增 `RUNBOOK.md`——算卡/内网窗口**自助操作手册**（环境→数据→mom2→pilot→打分→go/no-go + AlphaEdit/think_budget 预备 + 雷点速查 + §9 待拍板决策），内网无 Claude 也能照跑完 pilot；② `src/score_pilot.py` 一键打分（glob 分片→ES/RR/CLR，复用已测 metrics，附 go/no-go 判据）；③ CLAUDE.md 指向 RUNBOOK + plan 版本号订正
 - **v1.9 变更 (2026-06-11)**: 按 Prompt2「读原文 + 从代码出发」给 01/02/03 各补「论文宣称 vs 代码现实」一节——① EasyEdit：易用=统一接口真但开箱有摩擦，"editing 超 FT reliability" 正是我们要在 think 预算下反证的对象；② AlphaEdit：**零空间阈值 论文脚注 10⁻² vs 代码 2e-2（2×）**、"一行代码"藏了 P 预计算、"+36.7%" 是 sequential（我们单条用不上）、L2 论文省略且两实现不一致；③ R-TOFU：**ZeroThink/LessThink 实为 Jiang et al. 2025 非 R-TOFU 原创**、方向与我们镜像成对、step-wise=句级参考 CoT 相似度、单 Llama 基座。Phase 0 复现笔记余 04(ThinkEdit)/05(R²MU)
 - **v1.10 变更 (2026-06-11)**: task#04 ThinkEdit 完成（读 PDF 2503.22048 + 代码）——① 笔记 `analysis/04_thinkedit.md`（方向抽取 Eq1 / steering hook Eq2 / 权重编辑 Eq6 三机制 + 论文宣称 vs 代码现实）；② 通用 steering 工具 `src/steer.py`（`Steerer` 残差流方向注入 hook + 位置掩码条件化 + `extract_direction`，改造自 ThinkEdit 并推广出 F1 要的条件注入）+ `src/test_steer.py` 4 测过（editrev）；③ 关键雷点：ThinkEdit base **无 7B**，方向/头不可跨模型复用，我们 7B 须重抽。**Phase 0 复现笔记余 05(R²MU) 一张**
+- **v1.11 变更 (2026-06-11)**: task#05 R²MU 审计完成（读 PDF 2506.12963 + 代码）——`analysis/05_r2mu.md`：① 代码健康度审计（无 requirements/README、自有 8 py vs vendored lm-eval 571 py、judge `temperature=0.0` 被注释→非定温、openai 旧 SDK、judge 模型 gpt-4o/o3/claude 三处不一致）；② 残留口径=LLM-judge **1–4**「推理链是否支持 gold」+ mismatch；③ 结论：口径**定义一致但数值不可独立复现**，只引定义不采数字；④ 三方残留口径分名（R²MU judge1–4 / R-TOFU judge0–1 / 我们 CLR 子串）。**Phase 0 六份复现笔记 01–06 全齐（W1 硬节点 6/17 提前达成）**
 
 ---
 
