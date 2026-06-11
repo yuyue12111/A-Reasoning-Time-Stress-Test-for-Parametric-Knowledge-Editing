@@ -4,7 +4,7 @@
 
 AAAI-27 投稿项目，代号「越想越退」(Thinking Undoes Editing)：量化参数知识编辑（ROME/MEMIT/AlphaEdit）在 R1 式推理模型上随思考预算增加而被推翻的现象 + 机理 + training-free 修补。
 
-**先读 `plan.md`（当前 v1.2，本项目唯一权威计划），再读 `analysis/00_shortlist.md` 与 `analysis/01_easyedit.md`。** 与 plan 冲突的一切行为都需要先改 plan（版本号 +0.1 并写变更记录），再执行。
+**先读 `plan.md`（当前 v1.7，本项目唯一权威计划），再读 `analysis/00_shortlist.md` 与 `analysis/01_easyedit.md`。** 与 plan 冲突的一切行为都需要先改 plan（版本号 +0.1 并写变更记录），再执行。**算卡/内网窗口照 `RUNBOOK.md` 自助执行（脚本已就位、过 mock 单测，无 Claude 也能跑完 pilot）。**
 
 ## 硬约束（不可违反）
 
