@@ -3,14 +3,15 @@ import json, collections
 
 def hit(text, target, aliases):
     cands = [target] + aliases.get(target, [])
-    return any(c.lower() in (text or "").lower() for c in cands)
+    t = (text or "").lower()
+    return any(c and c.lower() in t for c in cands)   # 跳过 None/空候选（如 zsRE o_old 缺失）
 
 def score(jsonl_path, cases, aliases):
     cmap = {c["case_id"]: c for c in cases}
     by = collections.defaultdict(dict)       # case_id -> budget -> efficacy行
     for line in open(jsonl_path):
         r = json.loads(line)
-        if r["probe"] == "efficacy":
+        if r.get("probe") == "efficacy":     # .get：跳过 edit_loop 的错误标记行（无 probe 键）
             by[r["case_id"]][r["budget"]] = r
     es = collections.Counter(); rr = collections.Counter()
     clr = collections.Counter(); n = collections.Counter(); n_b0 = 0
