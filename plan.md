@@ -16,6 +16,7 @@
 - **v1.9 变更 (2026-06-11)**: 按 Prompt2「读原文 + 从代码出发」给 01/02/03 各补「论文宣称 vs 代码现实」一节——① EasyEdit：易用=统一接口真但开箱有摩擦，"editing 超 FT reliability" 正是我们要在 think 预算下反证的对象；② AlphaEdit：**零空间阈值 论文脚注 10⁻² vs 代码 2e-2（2×）**、"一行代码"藏了 P 预计算、"+36.7%" 是 sequential（我们单条用不上）、L2 论文省略且两实现不一致；③ R-TOFU：**ZeroThink/LessThink 实为 Jiang et al. 2025 非 R-TOFU 原创**、方向与我们镜像成对、step-wise=句级参考 CoT 相似度、单 Llama 基座。Phase 0 复现笔记余 04(ThinkEdit)/05(R²MU)
 - **v1.10 变更 (2026-06-11)**: task#04 ThinkEdit 完成（读 PDF 2503.22048 + 代码）——① 笔记 `analysis/04_thinkedit.md`（方向抽取 Eq1 / steering hook Eq2 / 权重编辑 Eq6 三机制 + 论文宣称 vs 代码现实）；② 通用 steering 工具 `src/steer.py`（`Steerer` 残差流方向注入 hook + 位置掩码条件化 + `extract_direction`，改造自 ThinkEdit 并推广出 F1 要的条件注入）+ `src/test_steer.py` 4 测过（editrev）；③ 关键雷点：ThinkEdit base **无 7B**，方向/头不可跨模型复用，我们 7B 须重抽。**Phase 0 复现笔记余 05(R²MU) 一张**
 - **v1.11 变更 (2026-06-11)**: task#05 R²MU 审计完成（读 PDF 2506.12963 + 代码）——`analysis/05_r2mu.md`：① 代码健康度审计（无 requirements/README、自有 8 py vs vendored lm-eval 571 py、judge `temperature=0.0` 被注释→非定温、openai 旧 SDK、judge 模型 gpt-4o/o3/claude 三处不一致）；② 残留口径=LLM-judge **1–4**「推理链是否支持 gold」+ mismatch；③ 结论：口径**定义一致但数值不可独立复现**，只引定义不采数字；④ 三方残留口径分名（R²MU judge1–4 / R-TOFU judge0–1 / 我们 CLR 子串）。**Phase 0 六份复现笔记 01–06 全齐（W1 硬节点 6/17 提前达成）**
+- **v1.12 变更 (2026-06-11)**: 【用户拍板取 B】预算档 §2.4（原 6 档）与 §12.1 代码不自洽问题**对齐代码定为 5 档 B0–B4**（去独立 4096、natural≈B3 的 cap8192）：§2.4 重写 + Phase0#03/Phase1/Phase2/§5 的"6 档 / {0,natural,extend}"统一改"5 档 / {B0,B3,B4}"；`analysis/03_rtofu.md` §9、`RUNBOOK.md` §9、`experiments/pilot.yaml` 的"待拍板"注记标结案。**路线确认：先复现 + 写分析笔记（Phase 0 已毕）**
 
 ---
 
@@ -89,14 +90,16 @@
 
 **预过滤（关键）**: 仅保留"模型在编辑前确实知道旧事实"的条目（pre-edit 对 (s,r) 的 greedy 输出 = o_old），否则"回退"无从定义。预计过滤后存活率 40–60%，故原始抽样×2 冗余。
 
-### 2.4 思考预算操纵协议（自变量 b，6 档）
+### 2.4 思考预算操纵协议（自变量 b，**5 档 B0–B4，与 `src/think_budget.py` 一致**）
+
+> **v1.12 决议（用户拍板取 B）**：原 6 档（含独立 4096 与"真 natural"）与 §12.1 代码（B0–B4）不自洽 → **plan 对齐代码的 5 档**：去掉独立 4096，natural 由 B3 的 cap=8192 近似（事实类 CoT 通常远短于 8192，模型多自行收尾）。
 
 | 档位 | 实现 | 来源 |
 |---|---|---|
-| b=0 (ZeroThink) | 强制注入空思考块后直接答 | R-TOFU 协议 |
-| b=256 / 1024 / 4096 (LessThink 系列) | 思考至 N token 截断，强制 `</think>` 收尾作答 | R-TOFU LessThink 推广 |
-| b=natural | 自然解码 | — |
-| b=extend (≈2×natural) | 抑制 `</think>`，注入 "Wait," 续写（budget forcing） | s1 (Muennighoff et al. 2025) |
+| **B0** (ZeroThink) | 注入空思考块 `<think>\n\n</think>` 后直接答 | Jiang et al. 2025（经 R-TOFU `test.py:16`） |
+| **B1 / B2** (LessThink 截断) | 思考至 **256 / 1024** token 截断、强制 `</think>` 收尾作答 | R-TOFU LessThink 的 token-预算推广 |
+| **B3** (≈natural) | cap=**8192** 高上限，模型自行 `</think>` 收尾（事实类 CoT 通常远短于此，故 ≈自然解码） | — |
+| **B4** (extend) | 命中 `</think>` 即替换为 `\nWait, …` 续写、最多 2 次（budget forcing） | s1 (Muennighoff et al. 2025) |
 
 ### 2.5 指标定义
 
@@ -140,14 +143,14 @@ flowchart LR
 |---|---|---|---|---|
 | 01 | EasyEdit | 装环境；GPT-2-XL 上 CPU 跑通 ROME 单条编辑全流程；通读 `easyeditor/models/{rome,memit}` 与 hparams 体系；确认 Qwen2.5 hparams 模板存在 | R1-Distill-Qwen-7B 单条 ROME 编辑 + mom2 缓存生成 | 笔记 + 可直接排队的编辑脚本 `src/edit_runner.py` |
 | 02 | AlphaEdit | 对照 EasyEdit 内置 AlphaEdit 与官方仓库超参差异；审计零空间投影实现是否与论文公式一致 | 同一 100 条编辑两实现 ES 差 <2pp | 实现选型决议写入笔记 |
-| 03 | R-TOFU | 精读 `test_cot.py` 与解码控制；提取 ZeroThink/LessThink 实现为独立模块 `src/think_budget.py`；审计其指标与论文表格口径 | 在未编辑 R1-7B 上验证 6 档预算控制器产出预期长度 | 预算控制器单测通过 |
+| 03 | R-TOFU | 精读 `test_cot.py` 与解码控制；提取 ZeroThink/LessThink 实现为独立模块 `src/think_budget.py`；审计其指标与论文表格口径 | 在未编辑 R1-7B 上验证 5 档预算控制器产出预期长度 | 预算控制器单测通过 |
 | 04 | ThinkEdit | 通读方向抽取与 head 定位代码；改造为通用 steering 工具 `src/steer.py`（任意方向、条件化注入） | 复现其 GSM8K 短思考缓解的方向有效性（抽样 100 题） | steering 工具可用 |
 | 05 | R²MU | **审计级**：核对其评测脚本与论文表格口径；记录其 CoT 残留度量定义以便对比章节引用 | 不跑训练 | 口径核对结论（一致/不一致及证据） |
 | 06 | MQuAKE/memit | 数据提取：CounterFact、zsRE、MQuAKE-CF-3k 清洗为统一 jsonl schema `{case_id, s, r, o_old, o_new, paraphrases[], neighborhood[], hops[]}` | — | `data/` 下三个清洗后数据集 + 数据卡 |
 
 ### Phase 1 · Pilot 与 go/no-go（6/18–6/22，硬节点 **6/22**）
 
-- 配置: R1-Distill-Qwen-7B × {ROME, MEMIT} × CounterFact-200（预过滤后）× b∈{0, natural, extend} × {greedy, 0.6×3}
+- 配置: R1-Distill-Qwen-7B × {ROME, MEMIT} × CounterFact-200（预过滤后）× b∈{B0, B3, B4} × {greedy, 0.6×3}
 - 产出: ES/RR/Leak 三指标初表 + 30 条回退样本人工审计（审计字段：case_id, b, FlipPoint, 触发片段类型∈{自验证, 关联回忆, 重述质疑, 其他}, 摘录）
 - **go 判据（两条同时满足）**: ① RR(natural) ≥ 20pp 或 ES 降幅 ≥20pp，至少在一个编辑器上成立且另一个方向一致；② 人工审计中 ≥60% 回退案例可归因于反思/自验证片段
 - no-go → 当日启动 §9 fallback，沉没成本封顶 12 天
@@ -155,7 +158,7 @@ flowchart LR
 
 ### Phase 2 · 主实验矩阵（6/23–7/3）
 
-- 全矩阵: 3 模型 × 4 编辑器（ROME/MEMIT/AlphaEdit/FT-L）+ ICE 对照 × 6 档预算 × CounterFact-1000 + zsRE-500
+- 全矩阵: 3 模型 × 4 编辑器（ROME/MEMIT/AlphaEdit/FT-L）+ ICE 对照 × 5 档预算（B0–B4）× CounterFact-1000 + zsRE-500
 - 每个 cell 产出标准 jsonl（含完整 CoT 文本，供 Phase 3 复用，**只生成一次**）
 - 锁定主图: 图1 ES(b) 多编辑器曲线；图2 RR(b) + 未编辑对照；图3 Leak(b) 与 FlipPoint 分布
 - 周中检查点 6/27: 若 Qwen3-8B 编辑兼容性失败（mom2/层定位问题），降级为 R1-Distill 双架构故事，Qwen3 仅 ICE 对照
@@ -203,7 +206,7 @@ flowchart LR
 
 ## 5. 算力计划（8×H200 共享，排队不保证；v1.1 按单条编辑协议重算）
 
-主矩阵规模控制（与协议联动的网格裁剪）：完整 6 档预算网格只给 **MEMIT 与 AlphaEdit**（headline 编辑器）；ROME / FT-L 跑 3 档（b∈{0, natural, extend}）；zsRE 只跑 MEMIT+AlphaEdit。单条 case 成本 ≈ 编辑 0.5–1 min + 生成（5 探针 × 档数，CapThink 档天然短，均摊 ≈2.5k token/条，HF batched generate）≈ 2–4 min。
+主矩阵规模控制（与协议联动的网格裁剪）：完整 5 档预算网格只给 **MEMIT 与 AlphaEdit**（headline 编辑器）；ROME / FT-L 跑 3 档（b∈{B0, B3, B4}）；zsRE 只跑 MEMIT+AlphaEdit。单条 case 成本 ≈ 编辑 0.5–1 min + 生成（5 探针 × 档数，CapThink 档天然短，均摊 ≈2.5k token/条，HF batched generate）≈ 2–4 min。
 
 | 任务 | 估算 | 形态 |
 |---|---|---|

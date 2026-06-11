@@ -130,16 +130,13 @@ cd source/EasyEdit && PYTHONPATH=. python ../../src/smoke_rome_gpt2.py   # 预�
 | stats_dir 分目录 | R1-Distill 用 `./data/stats_r1qwen`，勿与 Qwen2.5 混（run_pilot 已设） |
 | model_name override | hparams 默认指向 Qwen2.5，run_pilot 自动改 R1-Distill |
 | AlphaEdit qwen P + cache_c | §5：先 gen P；接入时 reset_cache |
-| 预算档 6 vs 5 | §9，待拍板 |
+| 预算档 5 档 B0–B4 | §9 已定（v1.12）；pilot 用 B0/B3/B4 |
 | 口径不混 | 生成式 ES_b ≠ EasyEdit rewrite_acc |
 | `finally restore` | edit_loop 已保证异常也还原，勿删 |
 
-## 9. 跑前要你拍板的决策
+## 9. 预算档决议（v1.12 已结案，跑前无待拍板项）
 
-**思考预算档定义在 plan 内部不自洽**（`analysis/03_rtofu.md` §9）：§2.4 写 6 档 `{0,256,1024,4096,natural,extend}`，§12.1 代码是 5 档 `B0–B4`（缺独立 4096，natural 被 B3 cap=8192 近似吞掉）。两条路任选其一，改 plan +0.1：
-- (A) 代码补成 6 档（加独立 4096 与真 natural=无上限）；
-- (B) §2.4 改成与代码一致的 5 档。
-`pilot.yaml` 现用 `B0/B3/B4`（≈ 0/natural/extend），pilot 够用；定主矩阵前需定。
+**✅ 已结案（plan v1.12，用户取 B）**：预算档统一为 **5 档 B0–B4**，与 `src/think_budget.py` 一致（去掉独立 4096，natural≈B3 的 cap=8192）。`pilot.yaml` 用 `B0/B3/B4`（≈ 0/natural/extend）；主矩阵 5 档全给 MEMIT/AlphaEdit、ROME/FT-L 跑 B0/B3/B4（plan §5）。**跑前已无待拍板项。**
 
 ## 10. 产出回传与记录
 

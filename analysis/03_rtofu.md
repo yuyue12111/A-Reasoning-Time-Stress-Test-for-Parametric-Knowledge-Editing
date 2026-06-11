@@ -1,6 +1,6 @@
 # 03 · R-TOFU 复现笔记（思考预算控制器的口径地基）
 
-- **日期**: 2026-06-10 ｜ **状态**: 源码审计完成 ✅；tokenizer 特殊 token 问题已用 HF 配置离线定案 ✅；GPU 实跑（6 档长度分布）留待 task 7
+- **日期**: 2026-06-10 ｜ **状态**: 源码审计完成 ✅；tokenizer 特殊 token 问题已用 HF 配置离线定案 ✅；GPU 实跑（5 档长度分布）留待 task 7
 - **仓库**: `source/R-TOFU`（ssangyeon，EMNLP'25，14 py，结构干净）
 - **base 模型**: `deepseek-ai/DeepSeek-R1-Distill-Llama-8B`（`config/tofu.yaml:2`、`config/model_config.yaml:9`、`scripts/tofu/finetune.sh:17`）——**注意是 Llama-8B 蒸馏版，不是我们主模型 Qwen-7B**，tokenizer 不同，下文 §4 已分别核对
 - **本笔记对应 plan**: §11.2（prefill 模板）、§12.1 注意点②（`<think>` 是否特殊 token → B4 检测走文本还是 token-id）；产出已回填进 `src/think_budget.py`
@@ -9,7 +9,7 @@
 
 ## 1. 环境与实跑决策
 
-无需建环境即可完成 task 5 的两件事：①prefill 精确字符串——纯文本，读源码即得；②`<think>` 是否特殊 token——直接拉两个模型的 `tokenizer_config.json`（公开 JSON，无需下权重、无需 torch）核对 `added_tokens_decoder`。本机 system python 3.9.6 + 无 conda，装不了 EasyEdit/R-TOFU 的依赖（torch 2.9 / transformers 5.5 需 py≥3.10），故 R-TOFU 自身的 GPU 评测不在本机跑；6 档长度分布验证见 task 7（H200 窗口）。
+无需建环境即可完成 task 5 的两件事：①prefill 精确字符串——纯文本，读源码即得；②`<think>` 是否特殊 token——直接拉两个模型的 `tokenizer_config.json`（公开 JSON，无需下权重、无需 torch）核对 `added_tokens_decoder`。本机 system python 3.9.6 + 无 conda，装不了 EasyEdit/R-TOFU 的依赖（torch 2.9 / transformers 5.5 需 py≥3.10），故 R-TOFU 自身的 GPU 评测不在本机跑；5 档长度分布验证见 task 7（H200 窗口）。
 
 ## 2. 代码结构（与本项目相关的最小地图）
 
@@ -114,7 +114,7 @@ R-TOFU 是 **unlearning** 基准，其 forget 指标全部是"被遗忘知识在
 
 ## 9. 遗留 / 待用户或后续阶段决策
 
-- **预算档定义在 plan 内部不自洽**（需用户拍板，属 plan 级改动）：plan §2.4 列 6 档 `{0, 256, 1024, 4096, natural, extend}`，而 plan §12.1 的 harness 代码（=现 `think_budget.py`）是 B0–B4 五档 `{Zero, 256, 1024, 8192, 8192+extend}`，且 task 7 写"5 档"。差异：①§2.4 的 **4096** 在代码里没有独立档；②§2.4 的 **natural** 被 B3(cap=8192) 近似吞掉（CounterFact 类事实 CoT 通常远短于 8192，故 B3 实质≈natural，但它是"高上限截断"不是"真自然长度"）。**建议**：要么把代码对齐成 §2.4 的 6 档（加独立 4096 与真 natural=无上限），要么把 §2.4 改为与代码一致的 5 档——任选其一但需 +0.1 改 plan。本笔记暂不动 enum。
+- **预算档定义在 plan 内部不自洽**（需用户拍板，属 plan 级改动）：plan §2.4 列 6 档 `{0, 256, 1024, 4096, natural, extend}`，而 plan §12.1 的 harness 代码（=现 `think_budget.py`）是 B0–B4 五档 `{Zero, 256, 1024, 8192, 8192+extend}`，且 task 7 写"5 档"。差异：①§2.4 的 **4096** 在代码里没有独立档；②§2.4 的 **natural** 被 B3(cap=8192) 近似吞掉（CounterFact 类事实 CoT 通常远短于 8192，故 B3 实质≈natural，但它是"高上限截断"不是"真自然长度"）。**建议**：要么把代码对齐成 §2.4 的 6 档（加独立 4096 与真 natural=无上限），要么把 §2.4 改为与代码一致的 5 档——任选其一但需 +0.1 改 plan。**✅ v1.12 已结案：用户拍板取 (B)——§2.4 改为与代码一致的 5 档 B0–B4（去独立 4096、natural≈B3 cap8192）；`think_budget.py` 不变。**
 - §4 的 H200 回填留点（tokenizer piece 数、循环 EOS 兜底）——task 7 顺带验。
 
 ## 10. 论文宣称 vs 代码现实（读 PDF 2505.15214 后补，Prompt2「从代码出发不被包装影响」）

@@ -36,4 +36,4 @@ editors:
 # 待办（接线/算卡时）：
 # - layers 扫描：合格线 B0 下 ES≥90% & Locality≥85% (plan §7)
 # - 采样：think_budget 当前仅 greedy；temp0.6×3 seeds 待加 (plan §2.5)
-# - 预算档 §2.4(6) vs §12.1(5) 不自洽待用户拍板 (03 笔记 §9)；本 yaml 暂用 B0/B3/B4
+# - 预算档已定 5 档 B0–B4 (plan v1.12, 用户取 B)；pilot 用 B0/B3/B4
