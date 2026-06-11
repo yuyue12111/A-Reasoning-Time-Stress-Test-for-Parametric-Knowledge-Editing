@@ -4,7 +4,7 @@
 - **目标**: AAAI-27（2027-02-16/23, 蒙特利尔）。首选 **AI Alignment track**（编辑作为安全干预在 test-time compute 下失效），备选 Main Track
 - **硬截止**: abstract **2026-07-20**，全文 **2026-07-27**，补充材料 +3 天（均 UTC-12；以官方 CFP 页为准，本周内再核对一次 track 专属日期）
 - **页数约束**: 正文 7 页 + 参考文献；两阶段评审（Phase 1 两人工评审 + 一份 AI 生成非决策评审），故 **摘要/引言/图 1 必须在 Phase 1 就能独立讲完整个故事**
-- **版本**: v1.3 (2026-06-10)。决策记录：方向 B′ 经地毯式查新确认窄切口可行（见 `analysis/00_shortlist.md`）；复现队列 7 项已确认；pilot go/no-go 机制生效
+- **版本**: v1.13 (2026-06-11)。决策记录：方向 B′ 经地毯式查新确认窄切口可行（见 `analysis/00_shortlist.md`）；复现队列 7 项已确认；pilot go/no-go 机制生效。**阶段交接见 `phase-1.md`**
 - **v1.1 变更**: ① 新增 §2.6 第 4 项混杂（批量编辑干扰）并确立**单条编辑为主协议**；② §5 算力账按单条编辑协议重算（70 → ~400 GPU·h，原估计依赖批量编辑+vLLM 假设，与主协议冲突）；③ 风险表补 R1-Distill-Qwen-7B 基座为 Qwen2.5-**Math**-7B 的超参移植风险与层扫描预案；④ 新增 §11 源码实测附录（hparams 路径、prefill 模板字符串、CPU 冒烟脚本，全部为 2026-06-10 源码确认）
 - **v1.2 变更 (2026-06-10)**: ① **单条编辑协议获用户签字确认**（算力 420 GPU·h 预算生效）；② EasyEdit 权重还原机制审计完成（精确逐元素拷回，循环正确性成立，证据见 `analysis/01_easyedit.md` §3）；③ CPU 冒烟因容器磁盘/无 torch 改在本地执行（命令在 01 笔记 §1）；④ 新增 §12 Pilot harness 三模块完整实现代码
 - **v1.3 变更 (2026-06-10)**: ① Phase 0 第 3 张复现笔记 `analysis/03_rtofu.md` 完成（R-TOFU 解码协议 + 口径审计）；②【§12.1 注意点② 定案】`<think>`/`</think>` 在 R1-Distill-Qwen-7B 与 -Llama-8B 的 tokenizer 中均**非**特殊 token（查 HF `tokenizer_config.json` 之 `added_tokens_decoder`）→ `</think>` 走文本检测，无需 token-id StoppingCriteria；③ `src/think_budget.py` 用 R-TOFU 逐字 prefill（ZeroThink/LessThink/DefaultCoT，byte-for-byte 校验）替换 v0 占位，`_gen` 解码改 `skip_special_tokens=True`；④【待用户拍板】预算档定义在 §2.4（6 档）与 §12.1 代码（B0–B4 5 档）间不自洽，详见 03 笔记 §9
