@@ -1,0 +1,39 @@
+# Pilot 配置 (plan Phase 1, 6/22 go/no-go)。
+# 跑法 (每卡一进程，8 卡)：
+#   cd source/EasyEdit
+#   for r in $(seq 0 7); do
+#     PYTHONPATH=. python ../../src/run_pilot.py --config ../../experiments/pilot.yaml \
+#       --editor ROME --rank $r --world 8 &
+#   done; wait
+# 先跑预过滤 (§2.3，生成 dataset.path)：
+#   PYTHONPATH=. python ../../src/prefilter.py --config ../../experiments/pilot.yaml
+
+model_tag: r1qwen7b
+seed: 42
+out_dir: results/pilot
+
+# 覆盖 EasyEdit qwen2.5-7b.yaml 里不适用于我们主模型的字段（run_pilot 注入到 hparams）
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-7B   # 原 yaml 指向 ./hugging_cache/Qwen2.5-7B
+  stats_dir: ./data/stats_r1qwen                         # 与 Qwen2.5 mom2 分目录 (01 笔记雷点 4)
+
+dataset:
+  tag: cf200
+  path: data/counterfact.prefiltered.jsonl   # 预过滤产物 (src/prefilter.py)
+  fallback_path: data/counterfact.jsonl      # 没预过滤就回退到清洗后全量 (会打警告)
+  n: 200                                      # 抽样数
+
+budgets: [B0, B3, B4]    # plan Phase 1 的 {0, natural≈B3(cap8192), extend=B4}
+
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [5]              # plan §7 待扫 {[4-8],[6-10],[8-12]}；先用 EasyEdit 默认起步
+  MEMIT:
+    hparams: source/EasyEdit/hparams/MEMIT/qwen2.5-7b.yaml
+    layers: [4, 5, 6, 7, 8]
+
+# 待办（接线/算卡时）：
+# - layers 扫描：合格线 B0 下 ES≥90% & Locality≥85% (plan §7)
+# - 采样：think_budget 当前仅 greedy；temp0.6×3 seeds 待加 (plan §2.5)
+# - 预算档 §2.4(6) vs §12.1(5) 不自洽待用户拍板 (03 笔记 §9)；本 yaml 暂用 B0/B3/B4

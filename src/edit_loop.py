@@ -33,11 +33,13 @@ def probes(case):                            # 探针：efficacy/paraphrase/loca
     yield "open", f"Tell me about {case['s']}."
 
 
-def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1):
+def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1, overrides=None):
     done = set()
     if os.path.exists(out_path):
         done = {json.loads(l)["case_id"] for l in open(out_path)}
     hp = HP_CLS[editor_name].from_hparams(hparams_path)
+    for k, v in (overrides or {}).items():   # run_pilot 覆盖 model_name/stats_dir/device/layers
+        setattr(hp, k, v)
     ed = BaseEditor.from_hparams(hp)
     model, tok = ed.model, ed.tok
     with open(out_path, "a") as f:

@@ -30,8 +30,11 @@ mom2_stats/
 stats/
 
 # --- Cleaned datasets: regenerable via `python src/build_dataset.py` (raw via memit download).
-#     aliases.json + sample_records.jsonl stay tracked (small, curated). ---
+#     aliases.json + sample_records.jsonl + *.prefiltered.jsonl stay tracked (small / pins pilot set). ---
 /data/raw/
 /data/counterfact.jsonl
 /data/zsre.jsonl
 /data/mquake_cf_3k.jsonl
+
+# --- Pilot/main results: CoT jsonl, large, regenerable on GPU (anonymized & shipped at submission) ---
+/results/
