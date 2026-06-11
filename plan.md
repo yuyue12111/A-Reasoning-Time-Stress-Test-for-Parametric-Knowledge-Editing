@@ -14,6 +14,7 @@
 - **v1.7 变更 (2026-06-11)**: 算卡前 pilot harness 串通（开窗即跑）——① `experiments/pilot.yaml`（R1-Distill-Qwen-7B × {ROME,MEMIT} × CF-200 × {B0,B3,B4}，8 卡分片）；② `src/run_pilot.py` 入口（seed42 确定性抽样、enumerate 分片、续跑、`--dry-run`；用 overrides 把 EasyEdit qwen2.5 yaml 的 model_name→R1-Distill + stats_dir 分目录 + 按 rank 设 device）；③ `src/prefilter.py`（§2.3 预过滤，复用已测 metrics.hit）；④ `edit_loop.run` 加 `overrides` 注入；⑤ `src/test_run_pilot.py`(4 测) + 干跑真配置通过；`results/` gitignore
 - **v1.8 变更 (2026-06-11)**: ① 新增 `RUNBOOK.md`——算卡/内网窗口**自助操作手册**（环境→数据→mom2→pilot→打分→go/no-go + AlphaEdit/think_budget 预备 + 雷点速查 + §9 待拍板决策），内网无 Claude 也能照跑完 pilot；② `src/score_pilot.py` 一键打分（glob 分片→ES/RR/CLR，复用已测 metrics，附 go/no-go 判据）；③ CLAUDE.md 指向 RUNBOOK + plan 版本号订正
 - **v1.9 变更 (2026-06-11)**: 按 Prompt2「读原文 + 从代码出发」给 01/02/03 各补「论文宣称 vs 代码现实」一节——① EasyEdit：易用=统一接口真但开箱有摩擦，"editing 超 FT reliability" 正是我们要在 think 预算下反证的对象；② AlphaEdit：**零空间阈值 论文脚注 10⁻² vs 代码 2e-2（2×）**、"一行代码"藏了 P 预计算、"+36.7%" 是 sequential（我们单条用不上）、L2 论文省略且两实现不一致；③ R-TOFU：**ZeroThink/LessThink 实为 Jiang et al. 2025 非 R-TOFU 原创**、方向与我们镜像成对、step-wise=句级参考 CoT 相似度、单 Llama 基座。Phase 0 复现笔记余 04(ThinkEdit)/05(R²MU)
+- **v1.10 变更 (2026-06-11)**: task#04 ThinkEdit 完成（读 PDF 2503.22048 + 代码）——① 笔记 `analysis/04_thinkedit.md`（方向抽取 Eq1 / steering hook Eq2 / 权重编辑 Eq6 三机制 + 论文宣称 vs 代码现实）；② 通用 steering 工具 `src/steer.py`（`Steerer` 残差流方向注入 hook + 位置掩码条件化 + `extract_direction`，改造自 ThinkEdit 并推广出 F1 要的条件注入）+ `src/test_steer.py` 4 测过（editrev）；③ 关键雷点：ThinkEdit base **无 7B**，方向/头不可跨模型复用，我们 7B 须重抽。**Phase 0 复现笔记余 05(R²MU) 一张**
 
 ---
 
