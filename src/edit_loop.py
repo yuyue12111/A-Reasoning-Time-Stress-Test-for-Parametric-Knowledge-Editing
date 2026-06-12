@@ -5,10 +5,12 @@
 续跑: out_path 里已出现的 case_id 跳过（含失败标记，避免无限重试）。
 韧性: 单条 case 出错只记错误标记并继续，不拖垮整片（集群随时杀任务）。
 """
-import json, os, torch
+import json, os, subprocess, torch
+from datetime import datetime, timezone
 from easyeditor import (BaseEditor, ROMEHyperParams, MEMITHyperParams,
                         AlphaEditHyperParams, FTHyperParams)
 from easyeditor.util import nethook
+import think_budget
 from think_budget import generate_with_budget
 
 HP_CLS = {"ROME": ROMEHyperParams, "MEMIT": MEMITHyperParams,
@@ -16,6 +18,30 @@ HP_CLS = {"ROME": ROMEHyperParams, "MEMIT": MEMITHyperParams,
 # 注：AlphaEdit 的 cache_c 是进程级全局且跨 edit() 累积（02 笔记 §5）——单条协议下接
 # AlphaEdit 须每条 case 重置 cache_c，否则批量干扰从后门进来。pilot 只用 ROME/MEMIT，
 # 故此处先不特判；接 AlphaEdit 时在这里加 reset。
+
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # src/ 的上一级=项目根
+
+
+def git_provenance():
+    """项目根的 git 提交哈希 + 脏标记（plan §6 可复现三件套）。失败回退 'unknown'/None。
+
+    注意 cwd 可能在 source/EasyEdit（它自己也是 git 仓）——故显式 `git -C <项目根>`，否则记成 EasyEdit 的哈希。
+    """
+    def _g(*a):
+        return subprocess.check_output(["git", "-C", _PROJECT_ROOT, *a],
+                                       stderr=subprocess.DEVNULL, text=True).strip()
+    try:
+        return {"git": _g("rev-parse", "HEAD"), "git_dirty": bool(_g("status", "--porcelain"))}
+    except Exception:
+        return {"git": "unknown", "git_dirty": None}
+
+
+def provenance_header(extra=None):
+    """jsonl 首行溯源头（plan §6：git hash + 配置摘要 + seed，须在第一批分片产出前就位，事后补不了）。
+    `_meta:true` 标记 → metrics/score 按 `.get('probe')` 自动跳过、续跑按 `.get('case_id')` 自动跳过。"""
+    return {"_meta": True, **git_provenance(),
+            "created": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "think_budget_cap": getattr(think_budget, "CAP", None), **(extra or {})}
 
 
 def restore(model, weights_copy):           # editor.py:265 同款
@@ -46,10 +72,11 @@ def decode_arms(sampling):
 
 
 def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1,
-        overrides=None, sampling=None):
+        overrides=None, sampling=None, meta=None):
     done = set()
-    if os.path.exists(out_path):
-        done = {json.loads(l)["case_id"] for l in open(out_path)}
+    if os.path.exists(out_path):             # 续跑跳过；用 .get 兼容 _meta 头行（无 case_id）
+        done = {cid for l in open(out_path) if (cid := json.loads(l).get("case_id"))}
+    had_content = os.path.exists(out_path) and os.path.getsize(out_path) > 0
     hp = HP_CLS[editor_name].from_hparams(hparams_path)
     for k, v in (overrides or {}).items():   # run_pilot 覆盖 model_name/stats_dir/device/layers
         setattr(hp, k, v)
@@ -61,6 +88,11 @@ def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1,
     model, tok = ed.model, ed.tok
     arms = decode_arms(sampling)                  # greedy(+采样臂)；每臂一行 jsonl
     with open(out_path, "a") as f:
+        if not had_content:                       # 新分片：先写溯源头（plan §6，事后补不了）
+            hdr = provenance_header({"editor": editor_name, "budgets": budgets,
+                                     "rank": rank, "world": world, "overrides": overrides,
+                                     "sampling": sampling, **(meta or {})})
+            f.write(json.dumps(hdr, ensure_ascii=False) + "\n"); f.flush()
         for i, c in enumerate(cases):
             if i % world != rank or c["case_id"] in done:
                 continue

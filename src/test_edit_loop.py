@@ -52,6 +52,7 @@ def _gwb(model, tok, q, b, do_sample=False, temperature=0.6, seed=None):
     tag = f"s{seed}" if do_sample else "greedy"
     return (f"cot[{b}|{tag}]", f"ans[{b}|{tag}]", "full")
 _tb.generate_with_budget = _gwb
+_tb.CAP = {"B1": 256, "B2": 1024, "B3": 8192, "B4": 8192}   # provenance_header 记录用
 sys.modules["think_budget"] = _tb
 
 # qwen 路由补丁（edit_loop.run 在 from_hparams 前调 apply()）——stub 成 no-op，
@@ -85,7 +86,7 @@ def _run(**kw):
     edit_loop.run(**defaults)
     rows = [json.loads(l) for l in open(defaults["out_path"])]
     os.remove(defaults["out_path"])
-    return rows, defaults["out_path"]
+    return [r for r in rows if not r.get("_meta")], defaults["out_path"]   # 过滤溯源头行
 
 
 # ============ 测试 ============
@@ -141,10 +142,30 @@ def test_edit_error_skips_restore_and_continues():
     assert any(r["case_id"] == "cf_2" for r in rows), "edit 出错后应继续处理 cf_2"
 
 
+def test_provenance_header_written_once_and_resume_no_dup():
+    _reset()
+    fd, path = tempfile.mkstemp(suffix=".jsonl"); os.close(fd); os.remove(path)
+    edit_loop.run(_cases(2), "ROME", "x", ["B0"], path, rank=0, world=1,
+                  meta={"model_tag": "r1qwen7b", "seed": 42})
+    raw = [json.loads(l) for l in open(path)]
+    hdr = raw[0]
+    assert hdr.get("_meta") is True, "首行应为溯源头"
+    assert hdr["editor"] == "ROME" and hdr["budgets"] == ["B0"], "头应含 editor/budgets"
+    assert hdr["model_tag"] == "r1qwen7b" and hdr["seed"] == 42, "头应含 caller meta"
+    assert "git" in hdr and "created" in hdr, "头应含 git/created"
+    assert sum(r.get("_meta") is True for r in raw) == 1, "应只有一行溯源头"
+    # 续跑（同 cases 全 done）→ 不应重复写头，且 metrics 续跑跳过逻辑能容忍 _meta 行（无 case_id）
+    edit_loop.run(_cases(2), "ROME", "x", ["B0"], path, rank=0, world=1, meta={"model_tag": "x"})
+    raw2 = [json.loads(l) for l in open(path)]
+    os.remove(path)
+    assert sum(r.get("_meta") is True for r in raw2) == 1, "续跑不应重复写溯源头"
+
+
 TESTS = [test_sharding_partitions_by_index, test_subject_and_s_field_passed,
          test_open_probe_uses_s, test_restore_called_every_case, test_resume_skips_done,
          test_generation_error_still_restores_and_continues,
-         test_edit_error_skips_restore_and_continues]
+         test_edit_error_skips_restore_and_continues,
+         test_provenance_header_written_once_and_resume_no_dup]
 
 
 def _main():

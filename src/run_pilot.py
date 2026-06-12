@@ -67,9 +67,12 @@ def main():
     if not R["prefiltered"]:
         print("[warn] 未找到预过滤数据，先跑 src/prefilter.py 更干净（plan §2.3）")
     os.makedirs(cfg["out_dir"], exist_ok=True)
+    meta = {"config": args.config, "model_tag": cfg["model_tag"], "seed": cfg.get("seed", 42),
+            "hparams": R["hparams"], "dataset": {"tag": cfg["dataset"]["tag"], "src": R["path"],
+            "prefiltered": R["prefiltered"], "n": cfg["dataset"].get("n")}}   # 溯源头配置摘要(plan §6)
     from edit_loop import run
-    run(R["cases"], args.editor, R["hparams"], R["budgets"], R["out"],
-        rank=args.rank, world=args.world, overrides=R["overrides"], sampling=R["sampling"])
+    run(R["cases"], args.editor, R["hparams"], R["budgets"], R["out"], rank=args.rank,
+        world=args.world, overrides=R["overrides"], sampling=R["sampling"], meta=meta)
 
 
 if __name__ == "__main__":
