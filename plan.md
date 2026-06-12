@@ -4,7 +4,7 @@
 - **目标**: AAAI-27（2027-02-16/23, 蒙特利尔）。首选 **AI Alignment track**（编辑作为安全干预在 test-time compute 下失效），备选 Main Track
 - **硬截止**: abstract **2026-07-20**，全文 **2026-07-27**，补充材料 +3 天（均 UTC-12；以官方 CFP 页为准，本周内再核对一次 track 专属日期）
 - **页数约束**: 正文 7 页 + 参考文献；两阶段评审（Phase 1 两人工评审 + 一份 AI 生成非决策评审），故 **摘要/引言/图 1 必须在 Phase 1 就能独立讲完整个故事**
-- **版本**: v1.15 (2026-06-12)。决策记录：方向 B′ 经地毯式查新确认窄切口可行（见 `analysis/00_shortlist.md`）；复现队列 7 项已确认；pilot go/no-go 机制生效。**阶段交接见 `phase-1.md`，进度总结与作战计划见 `sumandplan1.md`**
+- **版本**: v1.16 (2026-06-12)。决策记录：方向 B′ 经地毯式查新确认窄切口可行（见 `analysis/00_shortlist.md`）；复现队列 7 项已确认；pilot go/no-go 机制生效。**阶段交接见 `phase-1.md`，进度总结与作战计划见 `sumandplan1.md`，组内启智平台开窗操作见 `interplan.md`**
 - **v1.1 变更**: ① 新增 §2.6 第 4 项混杂（批量编辑干扰）并确立**单条编辑为主协议**；② §5 算力账按单条编辑协议重算（70 → ~400 GPU·h，原估计依赖批量编辑+vLLM 假设，与主协议冲突）；③ 风险表补 R1-Distill-Qwen-7B 基座为 Qwen2.5-**Math**-7B 的超参移植风险与层扫描预案；④ 新增 §11 源码实测附录（hparams 路径、prefill 模板字符串、CPU 冒烟脚本，全部为 2026-06-10 源码确认）
 - **v1.2 变更 (2026-06-10)**: ① **单条编辑协议获用户签字确认**（算力 420 GPU·h 预算生效）；② EasyEdit 权重还原机制审计完成（精确逐元素拷回，循环正确性成立，证据见 `analysis/01_easyedit.md` §3）；③ CPU 冒烟因容器磁盘/无 torch 改在本地执行（命令在 01 笔记 §1）；④ 新增 §12 Pilot harness 三模块完整实现代码
 - **v1.3 变更 (2026-06-10)**: ① Phase 0 第 3 张复现笔记 `analysis/03_rtofu.md` 完成（R-TOFU 解码协议 + 口径审计）；②【§12.1 注意点② 定案】`<think>`/`</think>` 在 R1-Distill-Qwen-7B 与 -Llama-8B 的 tokenizer 中均**非**特殊 token（查 HF `tokenizer_config.json` 之 `added_tokens_decoder`）→ `</think>` 走文本检测，无需 token-id StoppingCriteria；③ `src/think_budget.py` 用 R-TOFU 逐字 prefill（ZeroThink/LessThink/DefaultCoT，byte-for-byte 校验）替换 v0 占位，`_gen` 解码改 `skip_special_tokens=True`；④【待用户拍板】预算档定义在 §2.4（6 档）与 §12.1 代码（B0–B4 5 档）间不自洽，详见 03 笔记 §9
@@ -26,6 +26,10 @@
   ④ **P1④ FlipPoint**：`metrics.flip_analysis`（first/last 立场 + flip_pos）+ `score()` 增 `ESf`/`Flip` 列（§2.5 FlipPoint 给字符级近似，Phase 3 升级 token 级 logit-lens）+ 10% 边界样本校准流程（`analysis/09`，进 RUNBOOK §4e 窗口剧本）；
   ⑤ **文档同步**：CLAUDE.md（状态/任务队列/防雷清单→现状）、RUNBOOK（qwen 自动修/合格线判生成式/采样臂/校准步/雷点表）、phase-1.md（3 处事实订正）、03 笔记 §4 + think_budget docstring（added_tokens 订正，实测复核）；新增 `analysis/08`(ROME-on-MPS)、`analysis/09`(FlipPoint 校准)
   ⑥ **P2 起步**：`metrics.score_bootstrap`（§2.5 的 95% bootstrap CI，按编辑条目重采样 n=10000，纯 stdlib）+ `score_pilot --boot` 出 ES/RR/CLR CI + 单测。**⑥ 余项待后续**：GSM8K-200/MATH500-100 子集（ThinkEdit `math_grader.py` 可借，需下载）、Qwen3 预研（think_budget enable_thinking 分支 + hparams，6/27 前置）、aliases Wikidata 富集、steer 1.5B 方向抽取试跑、`src/plots.py` 主图骨架
+- **v1.16 变更 (2026-06-12)**: **组内算力（启智平台 qz.sii.edu.cn）开通在望**——
+  ① 新增 **`interplan.md`**（内网侧 agent 作战简报 = RUNBOOK 的平台适配层：可上网 workspace 备料 → 单卡冒烟 → 1 节点×8 卡分布式 pilot → 打分/校准/审计 → 回传上报；蒸馏自仓库根两份组内教程《交互式建模》《分布式训练》，教程一并入库）；
+  ② **新抓一只 MEMIT/AlphaEdit-blocker 并修掉**：EasyEdit mom2 语料 `load_dataset("wikipedia","20200501.en")`（layer_stats.py:104）为脚本式数据集，在 editrev 的 datasets 4.8.5 下**必崩**（实测 RuntimeError），mom2 协方差一步全断 → `src/vendor_patches/easyedit_mom2_dataset.py` 映射到现行 parquet 仓 `wikimedia/wikipedia/20231101.en`（builder 实测可解析；4 mock 测 + 真模块校验；`edit_loop` 自动接入）。**口径注记：协方差语料 dump 2020-05→2023-11**，论文 reproducibility 如实写明；
+  ③ 平台作业纪律与我们设计的呼应已写入 interplan §1（jsonl 续跑⇄训练容错自动重启、单进程 mom2 预热防 8 分片并发竞争、网盘挂载持久化、离线 env 三件套）
 
 ---
 

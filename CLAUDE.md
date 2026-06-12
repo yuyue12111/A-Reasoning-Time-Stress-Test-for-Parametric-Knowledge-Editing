@@ -39,11 +39,12 @@ data/     清洗数据(大文件 gitignore,     results/ 实验 jsonl（gitignor
 作战序列与日期敏感项全在 `sumandplan1.md` §6.1（本地）/§6.2（行政）/§6.3（GPU 窗口剧本）。当前剩余主线：
 - **§6.1-⑤ 文档同步**（本轮进行中）→ **§6.1-⑥ P2**（GSM8K-200/MATH500-100 子集、Qwen3 预研、aliases 富集、steer 方向抽取、bootstrap CI + plots 骨架）
 - **行政线（用户负责，提醒即可）**：OpenReview 注册（隐形死线）、CFP 核对、H200 排队申请；**每周一 plan §8 增量查新**（≥6/15）
-- **GPU 窗口**：照 `RUNBOOK.md`（mom2→预过滤→layer 小扫→pilot→打分→**10% 边界校准**→审计→6/22 go/no-go）
+- **GPU 窗口**：照 `RUNBOOK.md`（mom2→预过滤→layer 小扫→pilot→打分→**10% 边界校准**→审计→6/22 go/no-go）；**组内启智平台的开窗操作（建实例/备料/离线/表单）见 `interplan.md`**
 
 ## 防雷清单（前人血泪，违反必翻车）
 
 - **EasyEdit 把含 'qwen' 不含 'qwen2' 的 model_name 路由进老 Qwen1 分支**（`editor.py:122`：fp32 kwarg TypeError + 错 eos）→ **已由 `edit_loop` 自动接入的 `vendor_patches/easyedit_qwen2_loader.py`(方案A) 修掉**；任何新入口加载 R1-Distill-Qwen 前须确保 `apply()` 生效（pilot 主路径已自动）
+- **EasyEdit mom2 语料 id 在 datasets≥3 已死**（`layer_stats.py:104` 脚本式 `wikipedia/20200501.en` 必崩，MEMIT/AlphaEdit 前置全断）→ 已由 `vendor_patches/easyedit_mom2_dataset.py` 映射 `wikimedia/wikipedia/20231101.en`（edit_loop 自动接入；不走 edit_loop 的入口须自调 `apply()`）；8 分片**并发首跑会重复触发 mom2**——先单进程预热（RUNBOOK §3）
 - **口径：layer 扫合格线判 `生成式 ES_b(B0)`，不判 `rewrite_acc`**——08 实证 rewrite_acc post=6/8 但生成式 ES_b=0/8，两者脱节；rewrite_acc 会"通过"生成不动的层
 - R1-Distill-Qwen-7B 基座是 Qwen2.5-**Math**-7B：现成 qwen2.5-7b hparams 仅架构兼容，layers 需 {[4-8],[6-10],[8-12]} 扫描（合格线 ES≥90% & Locality≥85%，**生成式口径**）；1.5B@默认超参编辑不进生成（08）→ 主结果须 7B
 - DeepSeek 模板用**全角竖线** `<｜User｜>`(U+FF5C)，复制时极易被替换成半角导致静默错误；真 eos 是 `<｜end▁of▁sentence｜>`(151643)，`<think>`/`</think>` 是 special=false 原子 token(151648/151649)

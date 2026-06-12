@@ -3,12 +3,13 @@
 > 用途：拿到 8×H200 / 内网窗口时，**按本手册顺序执行即可**，不需要 Claude。
 > 脚本已写好、核心件过 mock 单测（覆盖见 §0）；本手册只讲「怎么按顺序跑 + 别踩哪些坑」。
 > 命令默认在仓库根执行；凡涉及 `easyeditor` 的都要 `PYTHONPATH=.` 且 cwd 在 `source/EasyEdit`（见坑①）。
+> **组内启智平台（qz.sii.edu.cn）**：建实例/表单速填/备料/离线纪律/mom2 预热等平台操作见 **`interplan.md`**——本手册讲科学序列，那份讲平台怎么用。
 
 ---
 
 ## 0. 现状（跑之前先知道）
 
-- **已就位（本地、无需 GPU）**：数据清洗（`src/build_dataset.py`）、harness（`edit_loop`/`metrics`/`think_budget`/`run_pilot`/`steer` 有**专属 mock 单测**；`prefilter`/`score_pilot` 复用已测件 + 合成 smoke、**无专属单测**）、`experiments/pilot.yaml`、AlphaEdit P 生成脚本、**qwen 路由修复 `vendor_patches/easyedit_qwen2_loader.py`（pilot 自动接入）**、`env.lock`。
+- **已就位（本地、无需 GPU）**：数据清洗（`src/build_dataset.py`）、harness（`edit_loop`/`metrics`/`think_budget`/`run_pilot`/`steer` 有**专属 mock 单测**；`prefilter`/`score_pilot` 复用已测件 + 合成 smoke、**无专属单测**）、`experiments/pilot.yaml`、AlphaEdit P 生成脚本、**qwen 路由修复 + mom2 语料修复（`vendor_patches/easyedit_{qwen2_loader,mom2_dataset}.py`，pilot 自动接入）**、`env.lock`。
 - **新增已就位（2026-06-12）**：0.6×3 采样臂（`pilot.yaml` 的 `sampling`，默认 greedy）、Locality/Paraphrase 判分 + FlipPoint（`metrics`，`score_pilot` 出 ES/ESf/RR/CLR/Flip/PS/Loc）、jsonl 溯源头（每分片首行 git/配置/seed）、10% 边界校准流程（`analysis/09`）。
 - **真权重已验**：think_budget 长度分布 + 参数版 ROME-on-MPS 端到端（1.5B，`analysis/07`/`08`，无算子墙）。
 - **本手册覆盖的 GPU 步骤**：环境 → 数据 → mom2 → 预过滤 → layer 小扫 → **pilot（关键路径）** → 打分 → **10% 边界校准** → 审计 → go/no-go；以及 Phase 2 的 AlphaEdit 预备、think_budget 7B 真模型验证。
@@ -40,11 +41,17 @@ python src/build_dataset.py     # → data/{counterfact,zsre,mquake_cf_3k}.jsonl
 ```
 （MQuAKE-CF-3k 随仓库克隆在 `source/MQuAKE/datasets/`。schema 与决策见 `analysis/06_data.md`。）
 
-## 3. mom2 协方差统计（task#04，一次性/模型；约 4–6 GPU·h）
+## 3. mom2 协方差统计（task#04，一次性/模型；约 4–6 GPU·h；**MEMIT/AlphaEdit 需要，ROME 不需要**）
 
-ROME/MEMIT 首次 `edit()` 会**自动**触发并缓存到 `stats_dir`。我们已把 R1-Distill 的 stats_dir
-设为 `./data/stats_r1qwen`（与 Qwen2.5 分目录，**01 雷点 4**，勿混）。所以**不必单独跑** mom2——
-跑 §4c 第一条 case 时自动算好；只是第一条会慢。若想预热，先用任意一条 case 单跑一次即可。
+MEMIT 首次 `edit()` 会**自动**触发并缓存到 `stats_dir`。我们已把 R1-Distill 的 stats_dir
+设为 `./data/stats_r1qwen`（与 Qwen2.5 分目录，**01 雷点 4**，勿混）。
+- ⚠️ **语料加载雷（已修）**：EasyEdit 写死的 `load_dataset("wikipedia","20200501.en")` 在
+  datasets≥3 必崩——`vendor_patches/easyedit_mom2_dataset.py` 已自动映射到
+  `wikimedia/wikipedia/20231101.en`（~20GB，**离线窗口须预下载**，见 `interplan.md` §3-⑥；
+  机理与口径注记见 `src/vendor_patches/README.md` §3）。
+- ⚠️ **并发预热雷**：8 分片并发首跑会**同时**触发 mom2（浪费 + 可能写坏缓存）——先单进程预热：
+  `PYTHONPATH=. python ../../src/run_pilot.py --config ../../experiments/pilot.yaml --editor MEMIT --rank 0 --world 200 --device 0`
+  （world=200 → 只跑 1 条 case，顺带算好 mom2；**跑完删掉热身分片** `results/pilot/*_r0of200.jsonl`，防混入打分 glob），然后再开 8 分片。
 
 ## 4. Pilot（关键路径，6/22 go/no-go）
 
@@ -132,6 +139,8 @@ GPT-2-XL 冒烟 `src/smoke_rome_gpt2.py`（之前被杀）降为可选：`cd sou
 | 坑 | 说明 |
 |---|---|
 | **qwen 路由 bug** | 含 'qwen' 不含 'qwen2' → 老 Qwen1 分支（fp32 TypeError + 错 eos）。**`edit_loop` 自动 `apply()` 修**（§4），新入口手动加载 R1-Distill 前须自调 `vendor_patches.easyedit_qwen2_loader.apply()` |
+| **mom2 语料 id 已死** | datasets≥3 拒绝脚本式 `wikipedia/20200501.en` → `edit_loop` 自动 patch 映射 `wikimedia/wikipedia/20231101.en`（§3）；离线窗口须预下载；`gen_alphaedit_P.py` 等不走 edit_loop 的入口须自调 `easyedit_mom2_dataset.apply()` |
+| **mom2 并发首跑** | 8 分片同时触发协方差计算 → 先单进程预热再开分片（§3），热身分片删除 |
 | **合格线判生成式 ES_b** | layer 扫 / 编辑质量一律看 `score_pilot` 的 `ES`/`Loc`，**不看 rewrite_acc**（08：rewrite_acc 6/8 但生成式 0/8） |
 | 全角竖线 `<｜User｜>` U+FF5C | 模板里勿替换成半角 `|`；真 eos `<｜end▁of▁sentence｜>`(151643)，`<think>`/`</think>` 是 special=false 原子 token(151648/151649) |
 | `PYTHONPATH=.` | easyeditor 本地包，否则 ModuleNotFoundError |
