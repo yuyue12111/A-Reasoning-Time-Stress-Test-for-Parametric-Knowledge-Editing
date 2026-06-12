@@ -136,9 +136,34 @@ def test_score_esf_and_flip():
     assert out["B3"]["Flip"] == 1.0, f"Flip 应 1（两立场都现）: {out['B3']}"
 
 
+def test_score_bootstrap():
+    # 复用 _scenario 的 cf_0/cf_1：B0 ES 点估=1.0；B1 ES 点估=0.5；CI 含点估、且确定性(同 seed 同值)
+    fd, path = tempfile.mkstemp(suffix=".jsonl"); os.close(fd)
+    _scenario(path)
+    cases = [{"case_id": "cf_0", "o_old": "Paris", "o_new": "Rome"},
+             {"case_id": "cf_1", "o_old": "French", "o_new": "English"}]
+    aliases = {"Rome": ["Roma"]}
+    bs = metrics.score_bootstrap(path, cases, aliases, n_boot=500, seed=1)
+    bs2 = metrics.score_bootstrap(path, cases, aliases, n_boot=500, seed=1)
+    os.remove(path)
+    # 点估与 metrics.score 一致
+    assert abs(bs["B0"]["ES"][0] - 1.0) < 1e-9, f"B0 ES 点估应 1.0: {bs['B0']['ES']}"
+    assert abs(bs["B1"]["ES"][0] - 0.5) < 1e-9, f"B1 ES 点估应 0.5: {bs['B1']['ES']}"
+    # CI 区间含点估、lo≤hi、∈[0,1]
+    for b in bs:
+        for m in ("ES", "RR", "CLR"):
+            t = bs[b][m]
+            if t is None:
+                continue
+            pt, lo, hi = t
+            assert 0 <= lo <= pt <= hi <= 1, f"{b}.{m} CI 异常(应 0≤lo≤点估≤hi≤1): {t}"
+    # 确定性：同 seed 同结果
+    assert bs == bs2, "同 seed 的 bootstrap 应可复现"
+
+
 TESTS = [test_hit_alias_case_and_none, test_score_exact,
          test_paraphrase_locality_and_decode_filter, test_none_metrics_when_probe_absent,
-         test_flip_analysis, test_score_esf_and_flip]
+         test_flip_analysis, test_score_esf_and_flip, test_score_bootstrap]
 
 
 def _main():

@@ -25,6 +25,7 @@
   ③ **P0③ 参数版 ROME-on-MPS 端到端跑通**（`src/rome_mps_probe.py`，1.5B，8 编辑 0 算子墙，`analysis/08`）——**关键发现 → 本版纳入计划口径**：EasyEdit `rewrite_acc` post=6/8 但**生成式 ES_b=0/8**，两口径在弱模型上脱节，且多层{3,5,8,12,16}皆然 → **§2.5 指标 & §7/Phase1 的 layer 扫合格线（ES≥90% & Loc≥85%）明确判生成式 ES_b、不判 rewrite_acc**；1.5B@默认超参编辑不进生成 → 主结果须 7B（基座 Math，layers 要扫，必要时调 v_lr/v_num_grad_steps）；
   ④ **P1④ FlipPoint**：`metrics.flip_analysis`（first/last 立场 + flip_pos）+ `score()` 增 `ESf`/`Flip` 列（§2.5 FlipPoint 给字符级近似，Phase 3 升级 token 级 logit-lens）+ 10% 边界样本校准流程（`analysis/09`，进 RUNBOOK §4e 窗口剧本）；
   ⑤ **文档同步**：CLAUDE.md（状态/任务队列/防雷清单→现状）、RUNBOOK（qwen 自动修/合格线判生成式/采样臂/校准步/雷点表）、phase-1.md（3 处事实订正）、03 笔记 §4 + think_budget docstring（added_tokens 订正，实测复核）；新增 `analysis/08`(ROME-on-MPS)、`analysis/09`(FlipPoint 校准)
+  ⑥ **P2 起步**：`metrics.score_bootstrap`（§2.5 的 95% bootstrap CI，按编辑条目重采样 n=10000，纯 stdlib）+ `score_pilot --boot` 出 ES/RR/CLR CI + 单测。**⑥ 余项待后续**：GSM8K-200/MATH500-100 子集（ThinkEdit `math_grader.py` 可借，需下载）、Qwen3 预研（think_budget enable_thinking 分支 + hparams，6/27 前置）、aliases Wikidata 富集、steer 1.5B 方向抽取试跑、`src/plots.py` 主图骨架
 
 ---
 

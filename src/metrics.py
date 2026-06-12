@@ -117,3 +117,53 @@ def score(jsonl_path, cases, aliases, decode="greedy"):
                 "PS": rate(ps[b], ps_n[b]), "Loc": rate(loc[b], loc_n[b]),
                 "n": n[b], "n_para": ps_n[b], "n_loc": loc_n[b]}
             for b in sorted(set(n) | set(ps_n) | set(loc_n))}
+
+
+def _indicators(jsonl_path, cases, aliases, decode):
+    """逐 case 指标（供 bootstrap 重采样，plan §2.5「按编辑条目重采样」）。
+    返回 budgets + 三个 dict：eff_es[b]/eff_clr[b]（该档 efficacy 案例的 0/1），rr_rev[b]（B0 成功案例的回退 0/1）。"""
+    cmap = {c["case_id"]: c for c in cases}
+    by = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(list)))
+    for line in open(jsonl_path):
+        r = json.loads(line)
+        p = r.get("probe")
+        if p and r.get("decode", "greedy") == decode:
+            by[r["case_id"]][r["budget"]][p].append(r)
+    eff_es = collections.defaultdict(list); eff_clr = collections.defaultdict(list)
+    rr_rev = collections.defaultdict(list)
+    for cid, buds in by.items():
+        c = cmap[cid]; o_new, o_old = c["o_new"], c["o_old"]
+        eff0 = buds.get("B0", {}).get("efficacy", [])
+        b0ok = (bool(eff0) and hit(eff0[0]["answer"], o_new, aliases)
+                and not hit(eff0[0]["answer"], o_old, aliases))
+        for b, probe_rows in buds.items():
+            for e in probe_rows.get("efficacy", []):
+                eff_es[b].append(1 if (hit(e["answer"], o_new, aliases)
+                                       and not hit(e["answer"], o_old, aliases)) else 0)
+                eff_clr[b].append(1 if hit(e["cot"], o_old, aliases) else 0)
+                if b0ok:
+                    rr_rev[b].append(1 if hit(e["answer"], o_old, aliases) else 0)
+    budgets = sorted(set(eff_es) | set(eff_clr) | set(rr_rev))
+    return budgets, eff_es, eff_clr, rr_rev
+
+
+def score_bootstrap(jsonl_path, cases, aliases, n_boot=10000, seed=42, decode="greedy", ci=0.95):
+    """ES/RR/CLR 的 95% bootstrap CI（plan §2.5：按编辑条目重采样，n=10,000）。纯 stdlib(无 numpy)，
+    与 metrics 的零重依赖一致。返回 {budget: {metric: (point, lo, hi)|None}}。
+    ES/CLR 在该档 efficacy 案例上重采样；RR 在 B0 成功(b0ok)案例上重采样（分子分母同采）。
+    单一 rng（seed 固定）顺序抽样 → 可复现；不同 metric 用不同抽样（顺序推进），互不耦合。"""
+    import random
+    budgets, eff_es, eff_clr, rr_rev = _indicators(jsonl_path, cases, aliases, decode)
+    rng = random.Random(seed)
+    lo_q, hi_q = (1 - ci) / 2, (1 + ci) / 2
+
+    def ci_of(xs):
+        m = len(xs)
+        if not m:
+            return None
+        point = sum(xs) / m
+        means = sorted(sum(xs[rng.randrange(m)] for _ in range(m)) / m for _ in range(n_boot))
+        return (point, means[int(lo_q * n_boot)], means[min(int(hi_q * n_boot), n_boot - 1)])
+
+    return {b: {"ES": ci_of(eff_es[b]), "CLR": ci_of(eff_clr[b]), "RR": ci_of(rr_rev[b])}
+            for b in budgets}
