@@ -56,14 +56,15 @@ R-TOFU/
 
 ## 4. ⭐ `<think>` 是否特殊 token —— plan §12.1 注意点② 定案
 
-**结论：`<think>` 和 `</think>` 在两个模型上都不是特殊 token，B4 的 `</think>` 检测走文本即可，无需 token-id StoppingCriteria。**
+**结论（依据经 v1.14 核查订正，结论不变）：`<think>`/`</think>` 不是**特殊** token，B4 的 `</think>` 检测走文本即可，无需 token-id StoppingCriteria。** ⚠️ 但它们也**不是"普通 BPE 文本"**——而是 `added_tokens` 在册的**原子 token（id 151648/151649，单 token），只是 `special=false`**。关键后果不变：`skip_special_tokens=True` 不剥离 special=false 的 token，故文本检测成立；又因是单原子 token，**token-id 检测亦可行**（留作 B4 备选）。
 
-证据链（两条独立佐证，互相印证）：
+证据链（两条独立佐证 + v1.14 实测复核）：
 
-1. **HF tokenizer 配置（直接证据，离线可查）**：拉 `tokenizer_config.json` 检查 `added_tokens_decoder`——
-   - `deepseek-ai/DeepSeek-R1-Distill-Qwen-7B`（**我们的主模型**）：`<think>`/`</think>` **不在** `added_tokens_decoder`；在册的特殊 token 是 `<｜begin▁of▁sentence｜>`(bos)、`<｜end▁of▁sentence｜>`(eos)、`<｜User｜>`、`<｜Assistant｜>` 等。`<think>` 只作为普通文本出现在 `chat_template` 字符串里。
-   - `deepseek-ai/DeepSeek-R1-Distill-Llama-8B`（R-TOFU 的 base）：同上，`<think>`/`</think>` 也不是特殊 token。
-   - ⇒ 普通 BPE 文本，`skip_special_tokens` 取 True/False 都**不会**把 `<think>`/`</think>` 剥掉。
+1. **HF tokenizer 配置（直接证据，离线可查）+ 实测（2026-06-12 在 R1-Distill-Qwen-1.5B 上跑通，与 08 笔记同环境同架构同分词器）**：
+   - `<think>` → `encode(add_special_tokens=False)=[151648]`（单 token）；`</think>`→`[151649]`（单 token）；二者**都在** `added_tokens_decoder`，为 `AddedToken(..., special=False)`。
+   - 实测 `decode("a<think>b</think>c", skip_special_tokens=True) == "a<think>b</think>c"` —— **special=false → 不被剥离**。
+   - 在册的**特殊** token（special=true）是 `<｜begin▁of▁sentence｜>`(bos)、`<｜end▁of▁sentence｜>`(eos, 151643)、`<｜User｜>`、`<｜Assistant｜>` 等。
+   - ⇒ **订正**：前稿误记"不在 added_tokens_decoder / 普通 BPE 文本"；正解为**在册的非特殊原子 token**，`skip_special_tokens` 取 True/False 都不剥 `<think>`/`</think>`。
 
 2. **R-TOFU 行为（间接佐证）**：`test.py:39`/`test_cot.py:272` 用 `skip_special_tokens=True` 解码**整段** `output_ids[0]`（含被 prefill 进 prompt 的 `<think>`），随后 `test.py:41-45` 仍能 `find("<think>")`/`find("</think>")` 切片。若它们是特殊 token，`skip_special_tokens=True` 会先剥掉、切片必然失败；R-TOFU 全流程依赖切片成功 ⇒ 反推它们是普通文本。两条证据一致。
 
@@ -71,9 +72,9 @@ R-TOFU/
 - B4/截断检测保持 `THINK_END in chunk` 文本判断（与 R-TOFU 一致，已被其证明可用）；
 - `_gen` 的解码从 v0 的 `skip_special_tokens=False` 改为 **`True`**：v0 当初设 False 的理由（"怕 `<think>` 被当特殊 token 剥掉"，plan §12.1 注意点①）已被上面证据证伪；改 True 可顺带滤掉 `<｜end▁of▁sentence｜>` 等，避免污染 answer 的规则判分（`metrics.hit` 子串匹配），且与 R-TOFU `test.py:39` 对齐。
 
-**仍需在 H200 回填的留点**（非阻塞，task 7 顺带做）：
-- 在真·R1-Distill-Qwen-7B tokenizer 上跑一句 `tok("</think>", add_special_tokens=False)` 看它切成几个 piece——只为登记，不影响文本检测正确性；
-- 确认迭代式 think 循环里"模型自发 EOS 但未出 `</think>`"是否出现（skip_special_tokens=True 时 EOS 不在文本里，靠 `CAP` 兜底）；R1 系几乎必出 `</think>` 再作答，预计非问题。
+**留点**（非阻塞）：
+- ~~在真 tokenizer 上跑 `tok("</think>", add_special_tokens=False)` 看切几片~~ **已做（2026-06-12, 1.5B）**：`</think>`=单 token `[151649]`、`<think>`=`[151648]`（见上 §4 点 1 实测）。7B 同分词器，预期一致，H200 顺带再确认一次即可。
+- 确认迭代式 think 循环里"模型自发 EOS 但未出 `</think>`"是否出现（skip_special_tokens=True 时 EOS 不在文本里，靠 `CAP` 兜底）；R1 系几乎必出 `</think>` 再作答，预计非问题。（08 笔记 1.5B 实测：B0 注空块后正常作答、未见无 `</think>` 挂死。）
 
 ## 5. 评测口径审计（防"被包装"，对照章节引用用）
 
