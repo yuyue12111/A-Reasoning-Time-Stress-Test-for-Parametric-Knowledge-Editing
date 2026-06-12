@@ -40,13 +40,16 @@ def main():
     res = metrics.score(merged, cases, aliases)
     os.remove(merged)
 
-    print(f"# editor={args.editor}  shards={len(shards)}  错误行={n_err}  o_old/o_new 源={src}")
-    print(f"{'budget':<8}{'n':>6}{'ES':>9}{'RR':>9}{'CLR':>9}")
+    fmt = lambda x: f"{x:>9.3f}" if isinstance(x, float) else f"{'—':>9}"   # None → 占位（该档无该探针）
+    print(f"# editor={args.editor}  shards={len(shards)}  错误行={n_err}  解码臂=greedy  o_old/o_new 源={src}")
+    print(f"{'budget':<8}{'n':>6}{'ES':>9}{'RR':>9}{'CLR':>9}{'PS':>9}{'Loc':>9}  (n_para/n_loc)")
     for b in res:
         r = res[b]
-        print(f"{b:<8}{r['n']:>6}{r['ES']:>9.3f}{r['RR']:>9.3f}{r['CLR']:>9.3f}")
+        print(f"{b:<8}{r['n']:>6}{fmt(r['ES'])}{fmt(r['RR'])}{fmt(r['CLR'])}{fmt(r['PS'])}{fmt(r['Loc'])}"
+              f"  ({r['n_para']}/{r['n_loc']})")
     print("\ngo/no-go (plan §Phase 1): RR(natural=B3)≥0.20 或 ES 自 B0 降幅≥0.20pp，"
           "且 ≥60% 回退案例可归因反思片段（人工审计 30 条）。")
+    print("layer 扫合格线 (plan §7): B0 下 ES≥0.90 & Loc≥0.85，否则该编辑器结果整体作废。")
 
 
 if __name__ == "__main__":

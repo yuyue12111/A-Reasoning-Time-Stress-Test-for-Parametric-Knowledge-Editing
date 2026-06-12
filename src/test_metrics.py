@@ -54,7 +54,58 @@ def test_score_exact():
             assert abs(out[b][k] - v) < 1e-9, f"{b}.{k} 期望 {v} 得 {out[b][k]}"
 
 
-TESTS = [test_hit_alias_case_and_none, test_score_exact]
+def _scenario_pl(path):
+    """带 para/locality + 采样臂的场景，手算核对 PS/Loc 与 decode 过滤（o_old=Paris, o_new=Rome）。"""
+    rows = [
+        # cf_0 greedy: efficacy 成功; para0 成功(Rome)/para1 回退(Paris); locality 未泄漏(Paris 不含 Rome)
+        {"case_id": "cf_0", "budget": "B0", "probe": "efficacy", "decode": "greedy", "answer": "Rome",          "cot": ""},
+        {"case_id": "cf_0", "budget": "B0", "probe": "para0",    "decode": "greedy", "answer": "It is Rome",     "cot": ""},
+        {"case_id": "cf_0", "budget": "B0", "probe": "para1",    "decode": "greedy", "answer": "Paris actually", "cot": ""},
+        {"case_id": "cf_0", "budget": "B0", "probe": "locality", "decode": "greedy", "answer": "Paris",          "cot": ""},
+        # cf_0 采样臂: 应被 decode=greedy 过滤（否则 n/n_para 变大）
+        {"case_id": "cf_0", "budget": "B0", "probe": "efficacy", "decode": "sample", "seed": 0, "answer": "Paris", "cot": ""},
+        {"case_id": "cf_0", "budget": "B0", "probe": "para0",    "decode": "sample", "seed": 0, "answer": "Paris", "cot": ""},
+        # cf_1 greedy: efficacy 成功; locality **泄漏**(answer 含 o_new=Rome) → Loc 不保持
+        {"case_id": "cf_1", "budget": "B0", "probe": "efficacy", "decode": "greedy", "answer": "Rome",        "cot": ""},
+        {"case_id": "cf_1", "budget": "B0", "probe": "locality", "decode": "greedy", "answer": "Now Rome too", "cot": ""},
+    ]
+    with open(path, "w", encoding="utf-8") as f:
+        for r in rows:
+            f.write(json.dumps(r) + "\n")
+
+
+def test_paraphrase_locality_and_decode_filter():
+    fd, path = tempfile.mkstemp(suffix=".jsonl"); os.close(fd)
+    _scenario_pl(path)
+    cases = [{"case_id": "cf_0", "o_old": "Paris", "o_new": "Rome"},
+             {"case_id": "cf_1", "o_old": "Paris", "o_new": "Rome"}]
+    out = metrics.score(path, cases, {})                 # 默认 greedy
+    out_s = metrics.score(path, cases, {}, decode="sample")
+    os.remove(path)
+
+    # greedy: ES 两条都成功(n=2); PS=para0 成功/para1 失败=0.5(n_para=2); Loc=cf_0 保持/cf_1 泄漏=0.5(n_loc=2)
+    assert out["B0"]["n"] == 2 and abs(out["B0"]["ES"] - 1.0) < 1e-9, f"ES/n: {out['B0']}"
+    assert out["B0"]["n_para"] == 2 and abs(out["B0"]["PS"] - 0.5) < 1e-9, f"PS: {out['B0']}"
+    assert out["B0"]["n_loc"] == 2 and abs(out["B0"]["Loc"] - 0.5) < 1e-9, f"Loc: {out['B0']}"
+    # decode 过滤：sample 行只在 decode='sample' 时计入（cf_0 一条 sample efficacy，答 Paris → ES=0）
+    assert out_s["B0"]["n"] == 1 and out_s["B0"]["ES"] == 0.0, f"sample 臂: {out_s['B0']}"
+    assert out_s["B0"]["n_para"] == 1, f"sample para: {out_s['B0']}"
+
+
+def test_none_metrics_when_probe_absent():
+    # 只有 efficacy、无 para/locality（如 MQuAKE）→ PS/Loc 应为 None，不报错
+    fd, path = tempfile.mkstemp(suffix=".jsonl"); os.close(fd)
+    with open(path, "w") as f:
+        f.write(json.dumps({"case_id": "m_0", "budget": "B0", "probe": "efficacy",
+                            "answer": "Croatia", "cot": ""}) + "\n")
+    out = metrics.score(path, [{"case_id": "m_0", "o_old": "USA", "o_new": "Croatia"}], {})
+    os.remove(path)
+    assert out["B0"]["PS"] is None and out["B0"]["Loc"] is None, f"无探针应 None: {out['B0']}"
+    assert out["B0"]["n_para"] == 0 and out["B0"]["n_loc"] == 0
+
+
+TESTS = [test_hit_alias_case_and_none, test_score_exact,
+         test_paraphrase_locality_and_decode_filter, test_none_metrics_when_probe_absent]
 
 
 def _main():
