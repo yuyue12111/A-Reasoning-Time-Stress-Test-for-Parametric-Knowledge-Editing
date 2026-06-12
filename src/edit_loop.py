@@ -33,7 +33,20 @@ def probes(case):                            # 探针：efficacy/paraphrase/loca
     yield "open", f"Tell me about {case['s']}."
 
 
-def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1, overrides=None):
+def decode_arms(sampling):
+    """解码臂列表 [(decode, seed, temperature, gen_kwargs), ...]（plan §2.5「greedy + temp0.6×3 seeds」）。
+    greedy 臂恒在（首窗主口径，sumandplan §6.3）；sampling={'temperature':t,'seeds':[..]} 时每 seed 追加采样臂。
+    """
+    arms = [("greedy", None, None, {})]
+    if sampling:
+        t = sampling.get("temperature", 0.6)
+        for s in sampling.get("seeds", []):
+            arms.append(("sample", s, t, {"do_sample": True, "temperature": t, "seed": s}))
+    return arms
+
+
+def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1,
+        overrides=None, sampling=None):
     done = set()
     if os.path.exists(out_path):
         done = {json.loads(l)["case_id"] for l in open(out_path)}
@@ -46,6 +59,7 @@ def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1, ov
     apply_qwen_loader_patch()
     ed = BaseEditor.from_hparams(hp)
     model, tok = ed.model, ed.tok
+    arms = decode_arms(sampling)                  # greedy(+采样臂)；每臂一行 jsonl
     with open(out_path, "a") as f:
         for i, c in enumerate(cases):
             if i % world != rank or c["case_id"] in done:
@@ -59,11 +73,13 @@ def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1, ov
                                       sequential_edit=False)
                 for b in budgets:
                     for ptype, q in probes(c):
-                        cot, ans, _ = generate_with_budget(model, tok, q, b)
-                        f.write(json.dumps({"case_id": c["case_id"],
-                            "editor": editor_name, "budget": b, "probe": ptype,
-                            "q": q, "cot": cot, "answer": ans},
-                            ensure_ascii=False) + "\n")
+                        for decode, seed, temp, gk in arms:
+                            cot, ans, _ = generate_with_budget(model, tok, q, b, **gk)
+                            f.write(json.dumps({"case_id": c["case_id"],
+                                "editor": editor_name, "budget": b, "probe": ptype,
+                                "decode": decode, "seed": seed, "temperature": temp,
+                                "q": q, "cot": cot, "answer": ans},
+                                ensure_ascii=False) + "\n")
                 f.flush()
             except Exception as e:               # 坏 case 记标记后继续；续跑时被 done 跳过
                 f.write(json.dumps({"case_id": c["case_id"], "error": repr(e)},

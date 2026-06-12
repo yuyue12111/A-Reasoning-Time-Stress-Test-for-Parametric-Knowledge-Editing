@@ -25,6 +25,14 @@ dataset:
 
 budgets: [B0, B3, B4]    # plan Phase 1 的 {0, natural≈B3(cap8192), extend=B4}
 
+# 解码臂 (plan §2.5「每条 greedy + temperature 0.6 × 3 seeds」)。
+# 首窗 greedy 先行 (sumandplan §6.3：结论须在 greedy 下成立)，故 enabled 默认 false。
+# 开采样：enabled=true → 每 (case,budget,probe) 额外产出 len(seeds) 行 decode=sample（jsonl 记 seed/temperature）。
+sampling:
+  enabled: false
+  temperature: 0.6
+  seeds: [0, 1, 2]
+
 editors:
   ROME:
     hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
@@ -34,6 +42,6 @@ editors:
     layers: [4, 5, 6, 7, 8]
 
 # 待办（接线/算卡时）：
-# - layers 扫描：合格线 B0 下 ES≥90% & Locality≥85% (plan §7)
-# - 采样：think_budget 当前仅 greedy；temp0.6×3 seeds 待加 (plan §2.5)
+# - layers 扫描：合格线 B0 下 ES≥90% & Locality≥85% (plan §7；判分见 metrics.score 的 Loc)
+# - 采样臂已就位（上方 sampling 块，默认 greedy）；开窗补跑 0.6×3 时把 enabled 设 true
 # - 预算档已定 5 档 B0–B4 (plan v1.12, 用户取 B)；pilot 用 B0/B3/B4

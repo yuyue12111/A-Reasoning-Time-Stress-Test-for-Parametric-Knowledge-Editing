@@ -27,10 +27,12 @@ THINK_END = "</think>"
 WAIT = "\nWait, let me double-check this."
 CAP = {"B1": 256, "B2": 1024, "B3": 8192, "B4": 8192}
 
-def _gen(model, tok, text, max_new):
+def _gen(model, tok, text, max_new, do_sample=False, temperature=0.6):
     ids = tok(text, return_tensors="pt").to(model.device)
-    out = model.generate(**ids, max_new_tokens=max_new, do_sample=False,
-                         pad_token_id=tok.eos_token_id)
+    kw = dict(max_new_tokens=max_new, pad_token_id=tok.eos_token_id, do_sample=do_sample)
+    if do_sample:                           # 采样臂 (plan §2.5)：仅采样时才传 temperature
+        kw["temperature"] = temperature
+    out = model.generate(**ids, **kw)
     # skip_special_tokens=True：<think>/</think> 非特殊 token 不会被剥离 (03_rtofu.md §4)，
     # 同时滤掉 <｜end▁of▁sentence｜> 等，避免污染 answer 的规则判分（与 R-TOFU test.py:39 一致）。
     return tok.decode(out[0][ids["input_ids"].shape[1]:],
@@ -39,16 +41,26 @@ def _gen(model, tok, text, max_new):
 def _ntok(tok, s):
     return len(tok(s, add_special_tokens=False)["input_ids"])
 
-def generate_with_budget(model, tok, q, budget):
-    """返回 (cot, answer, full_text)。budget ∈ {B0,B1,B2,B3,B4}"""
+def generate_with_budget(model, tok, q, budget, do_sample=False, temperature=0.6, seed=None):
+    """返回 (cot, answer, full_text)。budget ∈ {B0,B1,B2,B3,B4}。
+
+    解码臂 (plan §2.5「每条 greedy + temperature 0.6 × 3 seeds」)：
+      · do_sample=False（默认）→ greedy；首窗主口径，go/no-go 结论须在 greedy 下成立 (sumandplan §6.3)。
+      · do_sample=True + seed → temperature 采样；seed 不为 None 时生成前 torch.manual_seed(seed)，
+        使整条轨迹（CoT 截断循环 + B4 延长 + 作答）确定可复现（同 seed 同输入 → 同输出）。
+    seed 仅控可复现性；3 个 seed = 每条 3 个采样样本（bootstrap CI 的重采样单元，plan §2.5）。
+    """
+    if seed is not None:
+        torch.manual_seed(seed)
+    def g(text, mx):                        # 闭包固化本次调用的解码臂，三处生成口径统一
+        return _gen(model, tok, text, mx, do_sample=do_sample, temperature=temperature)
     if budget == "B0":                      # ZeroThink: 逐字复用 R-TOFU 闭合空思考块
         text = ZEROTHINK.format(q=q)
-        ans = _gen(model, tok, text, 256)
+        ans = g(text, 256)
         return "", ans, text + ans
     prefix, cot, waits = TPL.format(q=q), "", 0
     while True:
-        chunk = _gen(model, tok, prefix + cot,
-                     max(64, CAP[budget] - _ntok(tok, cot)))
+        chunk = g(prefix + cot, max(64, CAP[budget] - _ntok(tok, cot)))
         if THINK_END in chunk:              # 模型自行结束思考
             head = chunk.split(THINK_END)[0]
             if budget == "B4" and waits < 2:       # s1 式强制延长
@@ -57,5 +69,5 @@ def generate_with_budget(model, tok, q, budget):
         cot += chunk
         if _ntok(tok, cot) >= CAP[budget]: break   # B1/B2 截断 / 预算耗尽
     text = prefix + cot + "\n" + THINK_END + "\n\n"
-    ans = _gen(model, tok, text, 256)
+    ans = g(text, 256)
     return cot, ans, text + ans

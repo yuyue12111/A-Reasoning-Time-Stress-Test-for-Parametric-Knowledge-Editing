@@ -83,11 +83,40 @@ def R_stop(prompt, max_new):
     return "alpha beta gamma </think> the final answer"
 
 
+class RecordingMockModel:
+    """记录每次 generate 收到的解码 kwargs；采样(do_sample)时产出**依赖 torch 全局 RNG** 的文本，
+    从而 seed 决定输出 → 测采样臂的 do_sample/temperature 透传与 seed 可复现性 (plan §2.5)。"""
+    device = "cpu"
+
+    def __init__(self, tok):
+        self.tok, self.calls = tok, []
+
+    def generate(self, input_ids=None, attention_mask=None, max_new_tokens=None,
+                 do_sample=False, temperature=None, **kw):
+        self.calls.append({"do_sample": do_sample, "temperature": temperature})
+        prompt_ids = input_ids[0].tolist()
+        if do_sample:
+            r = int(torch.randint(0, 100000, (1,)).item())   # 仅此消费全局 RNG → seed 决定
+            new_text = f"tok{r} </think> ans{r}"
+        else:
+            new_text = "greedy think </think> the answer"
+        new_ids = self.tok(new_text)["input_ids"][:max_new_tokens]
+        return torch.tensor([prompt_ids + new_ids], dtype=torch.long)
+
+
 def _run(responder, budget, q="solve this problem"):
     tok = MockTok()
     model = MockModel(tok, responder)
     cot, ans, _ = tb.generate_with_budget(model, tok, q, budget)
     return cot, ans, tb._ntok(tok, cot)
+
+
+def _run_decode(budget, seed, do_sample=True, temperature=0.6, q="solve this problem"):
+    tok = MockTok()
+    model = RecordingMockModel(tok)
+    cot, ans, _ = tb.generate_with_budget(model, tok, q, budget,
+                                          do_sample=do_sample, temperature=temperature, seed=seed)
+    return cot, ans, model.calls
 
 
 # -- pytest-discoverable 断言（也被下方手动 runner 复用）--
@@ -135,9 +164,29 @@ def test_b4_geq_b3_and_extends():
     assert _run(R_nostop, "B4")[2] == _run(R_nostop, "B3")[2], "无 </think> 时 B4 应与 B3 同为 CAP"
 
 
+def test_decode_kwargs_greedy_vs_sample():
+    # greedy（默认）：全程 do_sample=False，不传 temperature
+    _, _, calls = _run_decode("B3", seed=None, do_sample=False)
+    assert calls and all(c["do_sample"] is False for c in calls), "greedy 应全程 do_sample=False"
+    assert all(c["temperature"] is None for c in calls), "greedy 不应传 temperature"
+    # 采样：全程 do_sample=True，temperature 透传
+    _, _, calls = _run_decode("B3", seed=1, do_sample=True, temperature=0.6)
+    assert calls and all(c["do_sample"] is True for c in calls), "采样应全程 do_sample=True"
+    assert all(abs(c["temperature"] - 0.6) < 1e-9 for c in calls), "temperature 应=0.6 透传"
+
+
+def test_sampling_seed_reproducible():
+    a = _run_decode("B3", seed=7)[:2]
+    b = _run_decode("B3", seed=7)[:2]
+    c = _run_decode("B3", seed=8)[:2]
+    assert a == b, f"同 seed 应可复现: {a!r} != {b!r}"
+    assert a != c, f"异 seed 应不同(极大概率): {a!r} == {c!r}"
+
+
 MOCK_TESTS = [
     test_b0_zerothink_empty, test_truncation_hits_cap_nostop, test_truncation_monotone_nostop,
     test_stop_closes_at_first_think_end, test_b4_injects_wait_then_stops, test_b4_geq_b3_and_extends,
+    test_decode_kwargs_greedy_vs_sample, test_sampling_seed_reproducible,
 ]
 
 

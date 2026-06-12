@@ -33,8 +33,12 @@ def resolve(cfg, editor, rank, world, device=None):
         overrides["layers"] = ed["layers"]
     out = os.path.join(cfg["out_dir"],
                        f"{cfg['model_tag']}_{editor}_{ds['tag']}_r{rank}of{world}.jsonl")
-    return dict(path=path, prefiltered=prefiltered, cases=cases,
-                hparams=ed["hparams"], overrides=overrides, out=out, budgets=cfg["budgets"])
+    samp = cfg.get("sampling")               # plan §2.5 采样臂；enabled=false 时 None（首窗 greedy 先行 §6.3）
+    sampling = None
+    if samp and samp.get("enabled"):
+        sampling = {"temperature": samp.get("temperature", 0.6), "seeds": samp.get("seeds", [0, 1, 2])}
+    return dict(path=path, prefiltered=prefiltered, cases=cases, hparams=ed["hparams"],
+                overrides=overrides, out=out, budgets=cfg["budgets"], sampling=sampling)
 
 
 def main():
@@ -53,6 +57,7 @@ def main():
     print(f"[pilot] editor={args.editor} src={R['path']} "
           f"{'(预过滤)' if R['prefiltered'] else '(⚠未预过滤, 回退全量)'} "
           f"n={len(R['cases'])} 本片={len(mine)} budgets={R['budgets']} "
+          f"decode={'greedy+sample'+str(R['sampling']['seeds']) if R['sampling'] else 'greedy'} "
           f"dev={R['overrides']['device']} out={R['out']}")
     if args.dry_run:
         print(f"[dry] overrides={R['overrides']}")
@@ -64,7 +69,7 @@ def main():
     os.makedirs(cfg["out_dir"], exist_ok=True)
     from edit_loop import run
     run(R["cases"], args.editor, R["hparams"], R["budgets"], R["out"],
-        rank=args.rank, world=args.world, overrides=R["overrides"])
+        rank=args.rank, world=args.world, overrides=R["overrides"], sampling=R["sampling"])
 
 
 if __name__ == "__main__":
