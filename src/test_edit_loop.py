@@ -46,12 +46,21 @@ sys.modules["easyeditor"] = _ee
 
 _RAISE_GEN_ON = {"sub": None}       # 置某 prompt 子串则生成时抛错
 _tb = types.ModuleType("think_budget")
-def _gwb(model, tok, q, b):
+def _gwb(model, tok, q, b, do_sample=False, temperature=0.6, seed=None):
     if _RAISE_GEN_ON["sub"] and _RAISE_GEN_ON["sub"] in q:
         raise RuntimeError("gen-boom")
-    return (f"cot[{b}]", f"ans[{b}]", "full")
+    tag = f"s{seed}" if do_sample else "greedy"
+    return (f"cot[{b}|{tag}]", f"ans[{b}|{tag}]", "full")
 _tb.generate_with_budget = _gwb
 sys.modules["think_budget"] = _tb
+
+# qwen 路由补丁（edit_loop.run 在 from_hparams 前调 apply()）——stub 成 no-op，
+# 保持本测无 transformers 依赖（system python3 可跑）；补丁自身逻辑见 vendor_patches/test_qwen2_loader.py。
+_vp_pkg = types.ModuleType("vendor_patches")
+_vp_mod = types.ModuleType("vendor_patches.easyedit_qwen2_loader")
+_vp_mod.apply = lambda: None
+sys.modules["vendor_patches"] = _vp_pkg
+sys.modules["vendor_patches.easyedit_qwen2_loader"] = _vp_mod
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import edit_loop  # noqa: E402
