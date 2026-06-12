@@ -84,6 +84,10 @@ def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1,
     # （fp32 kwarg + 错 eos）。方案 A monkeypatch 必须在 from_hparams 加载模型之前生效（sumandplan §5）。
     from vendor_patches.easyedit_qwen2_loader import apply as apply_qwen_loader_patch
     apply_qwen_loader_patch()
+    # MEMIT/AlphaEdit-blocker 修复：layer_stats 写死的脚本式数据集 id 在 datasets≥3 必崩
+    # （mom2 协方差语料）→ 映射到现行 parquet 仓。须在首次触发 mom2 的 edit() 前生效。
+    from vendor_patches.easyedit_mom2_dataset import apply as apply_mom2_dataset_patch
+    apply_mom2_dataset_patch()
     ed = BaseEditor.from_hparams(hp)
     model, tok = ed.model, ed.tok
     arms = decode_arms(sampling)                  # greedy(+采样臂)；每臂一行 jsonl

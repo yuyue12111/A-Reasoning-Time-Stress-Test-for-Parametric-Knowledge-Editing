@@ -84,3 +84,38 @@ C（fork BaseEditor 子类）最显式但上游更新要人工对齐。
 
 **何时用**: 任何加载 R1-Distill-Qwen（ROME/MEMIT/AlphaEdit/FT 任一编辑器、pilot 与本地 MPS 冒烟）之前。
 pilot 主路径已自动接入，无需手动调用。
+
+---
+
+## 3. EasyEdit mom2 语料加载在 datasets≥3 下必崩（MEMIT/AlphaEdit-blocker）
+
+- **文件**: `source/EasyEdit/easyeditor/models/rome/layer_stats.py`
+- **位置**: `layer_stats()` 内 `get_ds()`，L104–106：`load_dataset("wikipedia","20200501.en")`（wikitext 同理）。
+- **现象**（2026-06-12 editrev/datasets 4.8.5 实测）：`wikipedia` 是脚本式数据集 →
+  `RuntimeError: Dataset scripts are no longer supported`；裸名 `wikitext` 解析报 `HfUriError`。
+  即 **mom2 协方差一步必崩** —— MEMIT/AlphaEdit 的前置（ROME qwen yaml `mom2_adjustment:false` 不受影响）。
+- **影响面收敛**: ROME/MEMIT/AlphaEdit 的 `get_cov` 全部 `from ..rome.layer_stats import layer_stats`，
+  函数体内 `load_dataset` 按定义模块全局名解析 → **patch 一处全覆盖**。
+
+### 上游等价 diff（仅作记录，source/ 只读不改）
+```diff
+  # layer_stats.py  get_ds()  ~L104
+- raw_ds = load_dataset(ds_name, dict(wikitext="wikitext-103-raw-v1", wikipedia="20200501.en")[ds_name])
++ raw_ds = load_dataset(*{"wikitext": ("Salesforce/wikitext", "wikitext-103-raw-v1"),
++                         "wikipedia": ("wikimedia/wikipedia", "20231101.en")}[ds_name])
+```
+
+### 采用的修法（不改 source/）：`easyedit_mom2_dataset.py`
+模块属性级 monkeypatch：把 `rome.layer_stats` 内引用的 `load_dataset` 换成 shim，
+将老 (name, config) 映射到现行 parquet 仓（无需脚本/trust_remote_code，builder 实测可解析）：
+`("wikipedia","20200501.en")→("wikimedia/wikipedia","20231101.en")`(20.2GB)、
+`("wikitext","wikitext-103-raw-v1")→("Salesforce/wikitext","wikitext-103-raw-v1")`(549MB 轻量备选)；
+其余透传。两替代源行字段均含 `"text"`（`TokenizedDataset` 默认 `field="text"`）→ drop-in。
+
+- **口径注记**: 协方差语料 2020-05 dump → 2023-11 dump（与 MEMIT 原文不同 dump，统计量级一致；
+  论文 reproducibility 一节如实写明）。stats 缓存名由 ds_name 派生 → 命名不变。
+- **接入**: `edit_loop.run` 与 qwen 路由补丁一并自动 `apply()`（幂等，首次 mom2 触发前生效）。
+- **mock 单测**: `test_mom2_dataset.py`（4 测，全 stub，system python3 即过）；真模块校验已在 editrev 过。
+
+**何时用**: MEMIT/AlphaEdit 任何会触发 mom2 的跑（pilot MEMIT 首条 edit / `gen_alphaedit_P.py`）。
+pilot 主路径已自动接入。注意 `gen_alphaedit_P.py` 不走 edit_loop —— 用前需自行先调本补丁 `apply()`。
