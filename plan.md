@@ -4,7 +4,7 @@
 - **目标**: AAAI-27（2027-02-16/23, 蒙特利尔）。首选 **AI Alignment track**（编辑作为安全干预在 test-time compute 下失效），备选 Main Track
 - **硬截止**: abstract **2026-07-20**，全文 **2026-07-27**，补充材料 +3 天（均 UTC-12；以官方 CFP 页为准，本周内再核对一次 track 专属日期）
 - **页数约束**: 正文 7 页 + 参考文献；两阶段评审（Phase 1 两人工评审 + 一份 AI 生成非决策评审），故 **摘要/引言/图 1 必须在 Phase 1 就能独立讲完整个故事**
-- **版本**: v1.14 (2026-06-12)。决策记录：方向 B′ 经地毯式查新确认窄切口可行（见 `analysis/00_shortlist.md`）；复现队列 7 项已确认；pilot go/no-go 机制生效。**阶段交接见 `phase-1.md`，进度总结与作战计划见 `sumandplan1.md`**
+- **版本**: v1.15 (2026-06-12)。决策记录：方向 B′ 经地毯式查新确认窄切口可行（见 `analysis/00_shortlist.md`）；复现队列 7 项已确认；pilot go/no-go 机制生效。**阶段交接见 `phase-1.md`，进度总结与作战计划见 `sumandplan1.md`**
 - **v1.1 变更**: ① 新增 §2.6 第 4 项混杂（批量编辑干扰）并确立**单条编辑为主协议**；② §5 算力账按单条编辑协议重算（70 → ~400 GPU·h，原估计依赖批量编辑+vLLM 假设，与主协议冲突）；③ 风险表补 R1-Distill-Qwen-7B 基座为 Qwen2.5-**Math**-7B 的超参移植风险与层扫描预案；④ 新增 §11 源码实测附录（hparams 路径、prefill 模板字符串、CPU 冒烟脚本，全部为 2026-06-10 源码确认）
 - **v1.2 变更 (2026-06-10)**: ① **单条编辑协议获用户签字确认**（算力 420 GPU·h 预算生效）；② EasyEdit 权重还原机制审计完成（精确逐元素拷回，循环正确性成立，证据见 `analysis/01_easyedit.md` §3）；③ CPU 冒烟因容器磁盘/无 torch 改在本地执行（命令在 01 笔记 §1）；④ 新增 §12 Pilot harness 三模块完整实现代码
 - **v1.3 变更 (2026-06-10)**: ① Phase 0 第 3 张复现笔记 `analysis/03_rtofu.md` 完成（R-TOFU 解码协议 + 口径审计）；②【§12.1 注意点② 定案】`<think>`/`</think>` 在 R1-Distill-Qwen-7B 与 -Llama-8B 的 tokenizer 中均**非**特殊 token（查 HF `tokenizer_config.json` 之 `added_tokens_decoder`）→ `</think>` 走文本检测，无需 token-id StoppingCriteria；③ `src/think_budget.py` 用 R-TOFU 逐字 prefill（ZeroThink/LessThink/DefaultCoT，byte-for-byte 校验）替换 v0 占位，`_gen` 解码改 `skip_special_tokens=True`；④【待用户拍板】预算档定义在 §2.4（6 档）与 §12.1 代码（B0–B4 5 档）间不自洽，详见 03 笔记 §9
@@ -19,6 +19,12 @@
 - **v1.12 变更 (2026-06-11)**: 【用户拍板取 B】预算档 §2.4（原 6 档）与 §12.1 代码不自洽问题**对齐代码定为 5 档 B0–B4**（去独立 4096、natural≈B3 的 cap8192）：§2.4 重写 + Phase0#03/Phase1/Phase2/§5 的"6 档 / {0,natural,extend}"统一改"5 档 / {B0,B3,B4}"；`analysis/03_rtofu.md` §9、`RUNBOOK.md` §9、`experiments/pilot.yaml` 的"待拍板"注记标结案。**路线确认：先复现 + 写分析笔记（Phase 0 已毕）**
 - **v1.13 变更 (2026-06-11)**: 组里算力暂不可用，改本机 M5 Pro 24G/MPS 跑迷你彩排（`src/local_probe.py` + `analysis/07_local_probe.md`）——① **Part A：`think_budget` B0–B4 在真 R1-Distill-Qwen-1.5B 上长度分布验证通过**（B0 空/B1 截断/B2-B3 natural/B4 延长，单调，与 mock 一致 → task#07 part B 在 1.5B 落地）；② **Part B：ICE 现象探针诚实负结果**——1.5B 在 B0 即拒绝上下文注入、直接答参数 o_old（10/12），无编辑可回退 → ICE 测不出"越想越退"，恰**反证项目须用参数编辑而非上下文注入**；③ 方法学教训：预过滤口径成立、判分需 FlipPoint（非仅子串）、ICE 不能替代参数编辑做自变量。下一步本地可试 EasyEdit ROME on MPS（参数版，cuda 假设或需补丁）
 - **v1.14 变更 (2026-06-12)**: 新增 `sumandplan1.md`（进度总结 + 下一步作战计划，初稿经 4 视角对抗核查修订）。核查 round 三条新知识：①【升级】EasyEdit qwen 路由 bug（`editor.py:122` 裸 'qwen' 分支传 `fp32` kwarg）按 model_name 字符串触发、与硬件无关——**H200 pilot 同样必撞，定性为 pilot-blocker**（修复=方案 A monkeypatch 进 vendor_patches，eos 覆盖经核证为潜在隐患而非现行污染：generate 停止判据来自模型 generation_config(151643)，think_budget 未传 eos_token_id）；②【订正】`<think>`/`</think>` 实为 tokenizer.json added_tokens 在册的**非特殊原子 token**（151648/151649），并非"普通 BPE 文本"——文本检测结论不变，03 笔记 §4 与 think_budget docstring 依据待订正；③【新列 P0 工具缺口】0.6×3 采样臂（think_budget 写死 greedy）与 Locality/Paraphrase 判分（metrics 只消费 efficacy，layer 扫合格线判不了）+ jsonl 溯源头——全部离线可补，列入开窗前必做（sumandplan1 §4.2-②/§6.1-②）
+- **v1.15 变更 (2026-06-12)**: sumandplan1 §6.1 的 P0①②③+P1④ 全部落地（5 commit）+ 文档同步：
+  ① **P0① qwen 路由修复**：`src/vendor_patches/easyedit_qwen2_loader.py`（方案 A monkeypatch）+ 4 mock 测 + `edit_loop` 自动接入 + README §2 + 真模块校验（editrev）——**pilot-blocker 清除**；
+  ② **P0② 开窗前三件**：0.6×3 采样臂（`think_budget` do_sample/temperature/seed 通道，`pilot.yaml` `sampling` 默认 greedy）；Locality/Paraphrase 判分（`metrics` 消费 para/locality 探针，出 ES/PS/Loc + decode 过滤）；jsonl 溯源头（`edit_loop` 每分片首行 git/配置/seed，`git -C 项目根` 避 EasyEdit 自带 .git）；
+  ③ **P0③ 参数版 ROME-on-MPS 端到端跑通**（`src/rome_mps_probe.py`，1.5B，8 编辑 0 算子墙，`analysis/08`）——**关键发现 → 本版纳入计划口径**：EasyEdit `rewrite_acc` post=6/8 但**生成式 ES_b=0/8**，两口径在弱模型上脱节，且多层{3,5,8,12,16}皆然 → **§2.5 指标 & §7/Phase1 的 layer 扫合格线（ES≥90% & Loc≥85%）明确判生成式 ES_b、不判 rewrite_acc**；1.5B@默认超参编辑不进生成 → 主结果须 7B（基座 Math，layers 要扫，必要时调 v_lr/v_num_grad_steps）；
+  ④ **P1④ FlipPoint**：`metrics.flip_analysis`（first/last 立场 + flip_pos）+ `score()` 增 `ESf`/`Flip` 列（§2.5 FlipPoint 给字符级近似，Phase 3 升级 token 级 logit-lens）+ 10% 边界样本校准流程（`analysis/09`，进 RUNBOOK §4e 窗口剧本）；
+  ⑤ **文档同步**：CLAUDE.md（状态/任务队列/防雷清单→现状）、RUNBOOK（qwen 自动修/合格线判生成式/采样臂/校准步/雷点表）、phase-1.md（3 处事实订正）、03 笔记 §4 + think_budget docstring（added_tokens 订正，实测复核）；新增 `analysis/08`(ROME-on-MPS)、`analysis/09`(FlipPoint 校准)
 
 ---
 
@@ -110,8 +116,8 @@
 - **ES(b)** = E_e[ 1{A(e,b)=o*} ]，编辑成功率曲线（主图 1）
 - **RR(b)** = P( A(e,b)=o_old | A(e,0)=o* )，**条件回退率**——零思考下成功的编辑中，b 预算下回到旧答案的比例（主指标，剔除"本来就没编成功"的噪声）
 - **Leak(b)** = P( o_old ∈ C(e,b) )，链内旧知识提及率
-- **FlipPoint**: C 中模型立场从 o* 翻向 o_old 的首个 token 位置（机理用）
-- **Locality / Portability**: CounterFact 标准 Neighborhood / Paraphrase 指标，确认编辑本身质量达标（达不到则该编辑器结果整体作废）
+- **FlipPoint**: C 中模型立场从 o* 翻向 o_old 的首个 token 位置（机理用）。已实现字符级近似 `metrics.flip_analysis`（first/last 立场 + flip_pos）+ 答案口径 `ESf`(首段断言)/`Flip`(两立场都现)（v1.15，07 教训：子串判分分不出"先新后旧"）；Phase 3 升 token 级 logit-lens。
+- **Locality / Portability**: CounterFact 标准 Neighborhood / Paraphrase 指标，确认编辑本身质量达标（达不到则该编辑器结果整体作废）。**判生成式口径**（`metrics` 的 `Loc`/`PS`，非 EasyEdit rewrite_acc——v1.15/`analysis/08` 实证两者脱节）。
 - **ΔReason**: 修补前后 GSM8K-200 与 MATH500-100 准确率变化（修补副作用）
 - 统计：每条 greedy + temperature 0.6 × 3 seeds；置信区间 95% bootstrap（按编辑条目重采样，n=10,000）
 
@@ -251,7 +257,7 @@ why-aaai/
 |---|---|---|
 | 撞车（6/10 后出现同命题论文） | 高 | 每周一 arXiv 增量扫描（§8 关键词）；若被抢现象，pivot 强调机理+修补（方法论文化）；若机理也被抢，剩余素材转 workshop |
 | pilot 不成立 | 中 | §9 fallback，12 天沉没成本封顶 |
-| ROME/MEMIT 在 R1-Distill 上编辑质量本身不达标（Locality 崩） | 中 | 注意 R1-Distill-Qwen-7B 基座是 Qwen2.5-**Math**-7B（非通用版），EasyEdit qwen2.5-7b hparams 仅架构兼容、超参未必最优：冒烟期做 layers ∈ {[4-8],[6-10],[8-12]} 小扫描，以 B0 下 ES≥90% 且 Locality≥85% 为合格线；仍不达标则先以 Qwen2.5-7B-Instruct（同架构非推理版）验证编辑质量基线，主模型改 Qwen3-8B |
+| ROME/MEMIT 在 R1-Distill 上编辑质量本身不达标（Locality 崩） | 中 | 注意 R1-Distill-Qwen-7B 基座是 Qwen2.5-**Math**-7B（非通用版），EasyEdit qwen2.5-7b hparams 仅架构兼容、超参未必最优：冒烟期做 layers ∈ {[4-8],[6-10],[8-12]} 小扫描，以 B0 下 ES≥90% 且 Locality≥85% 为合格线（**判生成式 ES_b，不判 EasyEdit rewrite_acc**——v1.15/`analysis/08` 实证两者脱节：1.5B 上 rewrite_acc post=6/8 但生成式 ES_b=0/8）；仍不达标则先调 `v_lr/v_num_grad_steps` 或换层，再不行以 Qwen2.5-7B-Instruct（同架构非推理版）验证编辑质量基线，主模型改 Qwen3-8B |
 | 排队完全拿不到卡 | 中 | 云端逃生 $400 预算；pilot 仅需一个 4–6h 窗口，优先抢 |
 | Qwen3 编辑不兼容 | 中 | 6/27 检查点降级预案已写入 Phase 2 |
 | 7 页装不下三段式 | 低 | 机理细节与第二数据集进附录；正文保 RQ1+RQ3 完整 |

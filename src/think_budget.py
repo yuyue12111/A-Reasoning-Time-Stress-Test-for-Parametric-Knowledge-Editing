@@ -8,9 +8,12 @@
 模板全角竖线 U+FF5C，与 DeepSeek 官方 chat_template 的 add_generation_prompt 分支
 ('<｜Assistant｜><think>\\n') 逐字一致。
 
-注意点② 定案 (plan §12.1)：<think>/</think> 在 R1-Distill-Qwen-7B 与 -Llama-8B 的
-tokenizer 里均**不是**特殊 token（不在 added_tokens_decoder；User/Assistant/BOS/EOS 才是），
-故 </think> 走**文本检测**即可，无需 token-id StoppingCriteria。证据见 03_rtofu.md §4。
+注意点② 定案 (plan §12.1，依据经 v1.14 核查订正)：<think>/</think> 在 R1-Distill-Qwen-7B
+与 -Llama-8B 的 tokenizer 里是 **added_tokens 在册的原子 token（id 151648/151649，单 token），
+但 special=false** —— 并非"普通 BPE 文本"，也并非特殊 token。关键后果不变：`skip_special_tokens=True`
+**不剥离** special=false 的它们（实测 `decode("a<think>b</think>c", skip_special_tokens=True)` 原样保留），
+故 </think> 走**文本检测**成立，无需 token-id StoppingCriteria。（既是单原子 token，token-id 检测**亦可行**，
+留作 B4 备选。）真 eos 是 `<｜end▁of▁sentence｜>`(151643)。证据见 03_rtofu.md §4。
 """
 import torch  # 保留：B4 若日后改 token-id StoppingCriteria / 下游 steering 钩子需要
 

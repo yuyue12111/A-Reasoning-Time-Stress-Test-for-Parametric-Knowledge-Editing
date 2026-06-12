@@ -1,6 +1,6 @@
 # phase-1.md · 阶段性总结 / 交接（给下一个 session）
 
-> 本文件是**换 session 的 handoff**。下一个 session 没有上一段对话的上下文，照本文件 + 下面的读单即可无缝接手。
+> 本文件是**换 session 的 handoff**，快照于 **2026-06-11**（plan v1.13）。**6/11 之后的进度以 `sumandplan1.md` 为准**（含 6/12 的 P0 qwen 修复/采样臂/判分/溯源头/ROME-on-MPS、P1 FlipPoint）；本文仅订正 3 处事实错（mock 测计数、prefilter/score_pilot 状态、R²MU vendored 数），不回填新进度。
 > 截至 **2026-06-11**，仓库从空目录推到「**Phase 0 复现全齐 + pilot harness 开窗即跑 + 本地真权重验证**」。plan 已到 **v1.13**，14 个 commit（`fd009c8`→`0af7a50`）。
 
 ---
@@ -32,7 +32,7 @@
 ## 3. 已完成（14 commit）
 
 - **Phase 0 复现六笔记齐**（W1 硬节点 6/17 提前达成）：`analysis/01`EasyEdit·`02`AlphaEdit·`03`R-TOFU·`04`ThinkEdit·`05`R²MU·`06`数据。每张都「读 PDF + 从代码出发 + 论文宣称 vs 代码现实」。
-- **Harness 全就位 + 21 mock 测全绿（无 GPU）**：见 §4。
+- **Harness 全就位 + mock 测全绿（无 GPU）**：6/11 时 **24 个测函数（23 本地可绿 + 1 真模型测按设计门控 skip）**（前稿"21"误记）；见 §4。
 - **数据**：`src/build_dataset.py` 清洗 CF(21919)/zsRE(18377)/MQuAKE(3000) 为统一 jsonl + `data/aliases.json`(1285) + 数据卡 `06`。
 - **算卡自助手册** `RUNBOOK.md` + 一键打分 `src/score_pilot.py`。
 - **本地 M5/MPS 迷你彩排**（`07` + `src/local_probe.py`）：预算控制器真权重验证 ✅ + ICE 现象探针（诚实负）。
@@ -45,8 +45,8 @@
 | `src/edit_loop.py` | 单条编辑主循环（分片/续跑/总还原） | ✅ 修 5 坑 + 7 mock 测 |
 | `src/metrics.py` | ES/RR/CLR 规则判分 + 别名 | ✅ 加固 + 2 测（手算核对） |
 | `src/run_pilot.py` | pilot 入口（抽样/分片/overrides/--dry-run） | ✅ 4 测 + 干跑真配置过 |
-| `src/prefilter.py` | §2.3 预过滤（GPU） | ✅ 复用已测 metrics；待 GPU 跑 |
-| `src/score_pilot.py` | 分片 jsonl → ES/RR/CLR | ✅ 合成数据验证过 |
+| `src/prefilter.py` | §2.3 预过滤（GPU） | 🟨 复用已测 metrics.hit；**无专属单测**，待 GPU 实跑 |
+| `src/score_pilot.py` | 分片 jsonl → ES/RR/CLR | 🟨 合成数据 smoke 过；**无专属单测**；bootstrap CI 待加 |
 | `src/steer.py` | 通用引导（Steerer hook + extract_direction，F1 地基） | ✅ 4 mock 测 |
 | `src/local_probe.py` | 本地 MPS 彩排（Part A 长度 + Part B ICE） | ✅ 跑过（1.5B） |
 | `src/build_dataset.py` | 三源清洗 | ✅ |
@@ -60,7 +60,7 @@
 
 - **AlphaEdit**（02）：内置 vs 官方算法**逐行同构**；唯一实质超参差异 **L2(内置=1 vs 官方=10)**；**零空间阈值论文脚注 10⁻² vs 代码 2e-2(2×)**；**内置版 P 预分配缺 qwen 分支→上 Qwen 首跑必崩**（绕过脚本已备）；P 与 MEMIT 共享 mom2。
 - **R-TOFU**（03）：**ZeroThink/LessThink 实为 Jiang et al. 2025**（非 R-TOFU 原创，引用分清）；方向与我们**镜像成对**；`<think>`/`</think>` 经查 HF tokenizer_config 在 R1-Distill-Qwen-7B 与 -Llama-8B **均非特殊 token**→走文本检测。
-- **R²MU**（05）：judge `temperature=0.0` **被注释→非定温不可复现**；真代码仅 8 py（579 是 vendored lm-eval 假象）；残留口径=LLM-judge 1–4。
+- **R²MU**（05）：judge `temperature=0.0` **被注释→非定温不可复现**；真代码仅 8 py（**571** 是 vendored lm-eval 假象）；残留口径=LLM-judge 1–4。
 - **ThinkEdit**（04）：steering 机制已改造进 `steer.py`；其 base **无 7B**，方向/头不可跨模型复用；效果 model/task 依赖。
 - **EasyEdit**（01）：易用=统一接口真但**开箱摩擦**（PYTHONPATH/model_name 本地路径/版本漂移）；"超 FT reliability" 是 no-think 口径——正是我们要在 think 预算下反证的对象。
 - **本地实验**（07）：**ICE 上下文注入压不动 1.5B 参数知识**（B0 即答真事实），无编辑可回退 → 反证**必须用参数编辑**；判分要 **FlipPoint**（非仅子串）。
