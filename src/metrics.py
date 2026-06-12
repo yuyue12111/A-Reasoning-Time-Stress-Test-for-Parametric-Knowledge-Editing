@@ -12,6 +12,46 @@ def hit(text, target, aliases):
     return any(c and c.lower() in t for c in cands)   # 跳过 None/空候选（如 zsRE o_old 缺失）
 
 
+def first_mention(text, target, aliases):
+    """target(含别名)在 text 中最早出现的字符位置；无则 -1。大小写不敏感。"""
+    t = (text or "").lower()
+    best = -1
+    for c in [target] + aliases.get(target, []):
+        if not c:
+            continue
+        i = t.find(c.lower())
+        if i >= 0 and (best < 0 or i < best):
+            best = i
+    return best
+
+
+def flip_analysis(text, o_new, o_old, aliases):
+    """立场翻转分析 (plan §2.5 FlipPoint；07 教训：子串判分分不出"先新后旧"翻转，
+    如『Mars. However…Jupiter』子串同时命中 o_new/o_old，纯 hit 判不出落定立场)。
+
+    返回 dict：
+      first/last ∈ {'new','old',None}  —— 链内/答案里最先/最后出现的立场（last=落定立场）
+      flipped: bool                    —— o_new 与 o_old 都出现（链内立场翻转过）
+      flip_pos: int|None               —— 翻转点=对立项(后现者)首现的字符位（机理 FlipPoint 的字符级近似）
+      new_pos/old_pos: int|None        —— 各自首现位
+    用途：CoT 上跑=机理片段归因(Phase 3 找回退发生位)；answer 上跑=首段断言判分 + 审计字段。
+    """
+    np_ = first_mention(text, o_new, aliases)
+    op_ = first_mention(text, o_old, aliases)
+    has_new, has_old = np_ >= 0, op_ >= 0
+    none = {"first": None, "last": None, "flipped": False, "flip_pos": None, "new_pos": None, "old_pos": None}
+    if not has_new and not has_old:
+        return none
+    if has_new and not has_old:
+        return {**none, "first": "new", "last": "new", "new_pos": np_}
+    if has_old and not has_new:
+        return {**none, "first": "old", "last": "old", "old_pos": op_}
+    first = "new" if np_ < op_ else "old"        # 先现者=首段立场
+    last = "new" if np_ > op_ else "old"          # 后现者=落定立场（与 first 相反）
+    return {"first": first, "last": last, "flipped": True,
+            "flip_pos": max(np_, op_), "new_pos": np_, "old_pos": op_}
+
+
 def score(jsonl_path, cases, aliases, decode="greedy"):
     """每预算档返回 ES/RR/CLR + PS + Loc 及各自分母 n/n_para/n_loc。
 
@@ -41,6 +81,7 @@ def score(jsonl_path, cases, aliases, decode="greedy"):
         by[r["case_id"]][r["budget"]][p].append(r)
 
     es = collections.Counter(); rr = collections.Counter(); clr = collections.Counter()
+    esf = collections.Counter(); flip = collections.Counter()
     ps = collections.Counter(); loc = collections.Counter()
     n = collections.Counter(); ps_n = collections.Counter(); loc_n = collections.Counter()
     n_b0 = 0
@@ -55,6 +96,9 @@ def score(jsonl_path, cases, aliases, decode="greedy"):
                 n[b] += 1
                 es[b] += hit(e["answer"], o_new, aliases) and not hit(e["answer"], o_old, aliases)
                 clr[b] += hit(e["cot"], o_old, aliases)
+                fa = flip_analysis(e["answer"], o_new, o_old, aliases)   # 07 教训：首段断言 + 翻转
+                esf[b] += (fa["first"] == "new")     # ESf: 答案首段立场=编辑（容忍后续翻转）
+                flip[b] += fa["flipped"]             # Flip: 答案内 o_new/o_old 都现（先新后旧/先旧后新）
                 if b0ok and hit(e["answer"], o_old, aliases):
                     rr[b] += 1                       # 条件回退（plan §2.5 定义）
             for pname, rows in probe_rows.items():
@@ -67,7 +111,9 @@ def score(jsonl_path, cases, aliases, decode="greedy"):
                 loc[b] += not hit(lr["answer"], o_new, aliases)   # 编辑未泄漏到邻域=局部性保持
 
     rate = lambda num, den: (num / den if den else None)
+    # ESf(首段断言) vs ES(严格)的差 + Flip 揭示"答案内越想越退"（首段是编辑、落定回旧）。
     return {b: {"ES": rate(es[b], n[b]), "RR": rr[b] / max(n_b0, 1), "CLR": rate(clr[b], n[b]),
+                "ESf": rate(esf[b], n[b]), "Flip": rate(flip[b], n[b]),
                 "PS": rate(ps[b], ps_n[b]), "Loc": rate(loc[b], loc_n[b]),
                 "n": n[b], "n_para": ps_n[b], "n_loc": loc_n[b]}
             for b in sorted(set(n) | set(ps_n) | set(loc_n))}

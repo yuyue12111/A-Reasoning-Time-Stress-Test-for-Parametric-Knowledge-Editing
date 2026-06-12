@@ -104,8 +104,41 @@ def test_none_metrics_when_probe_absent():
     assert out["B0"]["n_para"] == 0 and out["B0"]["n_loc"] == 0
 
 
+def test_flip_analysis():
+    al = {"Mars": ["the Red Planet"]}
+    # 07 案例：先新后旧（『Mars. However…Jupiter』）→ first=new,last=old,flipped,flip_pos 指向 Jupiter
+    fa = metrics.flip_analysis("Mars. However the largest is Jupiter", "Mars", "Jupiter", al)
+    assert fa["first"] == "new" and fa["last"] == "old" and fa["flipped"], f"先新后旧: {fa}"
+    assert fa["flip_pos"] == fa["old_pos"] > fa["new_pos"], f"flip_pos 应=后现的 Jupiter 位: {fa}"
+    # 先旧后新（链内自我纠正）→ first=old,last=new
+    fb = metrics.flip_analysis("Jupiter, wait no, it is Mars", "Mars", "Jupiter", al)
+    assert fb["first"] == "old" and fb["last"] == "new" and fb["flipped"], f"先旧后新: {fb}"
+    # 干净命中 o_new（含别名）/ 干净命中 o_old / 都无
+    assert metrics.flip_analysis("It is the Red Planet", "Mars", "Jupiter", al) \
+        == {"first": "new", "last": "new", "flipped": False, "flip_pos": None,
+            "new_pos": 6, "old_pos": None}, "别名命中 o_new 应 first=last=new 不翻转"
+    fc = metrics.flip_analysis("definitely Jupiter", "Mars", "Jupiter", al)
+    assert fc["first"] == "old" and not fc["flipped"], f"仅 o_old: {fc}"
+    fd = metrics.flip_analysis("I have no idea", "Mars", "Jupiter", al)
+    assert fd["first"] is None and not fd["flipped"], f"都无: {fd}"
+
+
+def test_score_esf_and_flip():
+    # 答案『Mars. However…Jupiter』：严格 ES=0（含 o_old），但 ESf=1（首段=Mars），Flip=1
+    fd, path = tempfile.mkstemp(suffix=".jsonl"); os.close(fd)
+    with open(path, "w") as f:
+        f.write(json.dumps({"case_id": "c0", "budget": "B3", "probe": "efficacy",
+                            "answer": "Mars. However the largest is Jupiter", "cot": ""}) + "\n")
+    out = metrics.score(path, [{"case_id": "c0", "o_old": "Jupiter", "o_new": "Mars"}], {})
+    os.remove(path)
+    assert out["B3"]["ES"] == 0.0, f"严格 ES 应 0（答案含 o_old）: {out['B3']}"
+    assert out["B3"]["ESf"] == 1.0, f"ESf 应 1（首段=Mars）: {out['B3']}"
+    assert out["B3"]["Flip"] == 1.0, f"Flip 应 1（两立场都现）: {out['B3']}"
+
+
 TESTS = [test_hit_alias_case_and_none, test_score_exact,
-         test_paraphrase_locality_and_decode_filter, test_none_metrics_when_probe_absent]
+         test_paraphrase_locality_and_decode_filter, test_none_metrics_when_probe_absent,
+         test_flip_analysis, test_score_esf_and_flip]
 
 
 def _main():
