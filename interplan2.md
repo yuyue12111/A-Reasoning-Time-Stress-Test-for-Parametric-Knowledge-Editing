@@ -1,0 +1,196 @@
+# interplan2.md · 启智**全离线**部署作战 v2 —— 给内网侧 agent/执行者
+
+> **本文取代 `interplan.md` 的 §2–§7**（现场摸底推翻了 v1 的关键假设）；v1 仍有效的部分：§1 平台机制速览、§9 OpenAPI、§10 升级路径。科学序列权威照旧是 `RUNBOOK.md`，硬约束照旧 `CLAUDE.md`。
+> **变了什么**：v1 假设存在「可上网 notebook-workspace」可在线备料——**现场证实整个平台完全无外网（HF/PyPI 全不通）**。部署改为**全离线**：Mac 侧打包 → 平台上传 → 解包落环境。现场实测全记录在 `report.md`（本文的事实基础，HEAD `5b4c2ef` 时点）。
+> 读单：本文 → `report.md`（平台实测）→ `RUNBOOK.md`（跑什么/什么顺序/什么合格线）→ `CLAUDE.md`。
+
+---
+
+## 0. 态势速览（已核实事实，本节即真源）
+
+**平台（report §1）**：
+
+| 项 | 值 |
+|---|---|
+| 空间/挂载 | 教育大模型-独立空间；`$W = /inspire/qb-ilm/project/ai4education/ky26140`（可用 529T） |
+| 外网 | **完全无**（两种作业形态都没有；v1 的「可上网空间」不存在） |
+| 基础镜像 | 已存为 **`whyaaai-base`**：python 3.12.3 + torch 2.8.0a0+nv25.6 + CUDA 12.9 + git 2.43；pip 包近裸机 |
+| Wikipedia | **平台已挂载** `/inspire/dataset/wikipedia/20231101/20231101.en/train-*-of-00041.parquet`（41 分片，正是我们 mom2 要的 dump）→ **不用上传 20GB 语料** |
+| 模型 | 平台**没有** R1-Distill（注册表还没搜过——上场先搜，命中可省 11GB 上传，见 §6-④） |
+
+**资产就位状态（Mac 侧）**：
+
+| 资产 | 状态 |
+|---|---|
+| `_upload/models-7B.tar.gz` | ✅ 11.3GB（7B 完整 snapshot：2 个 safetensors 分片 + tokenizer/config） |
+| `_upload/wheels/`（cp312 linux） | ✅ 101 个文件 182MB，**但有 3 处必修**（§1-②，不修平台上 `import datasets` 直接崩） |
+| 仓库 tar | ⬜ §1-① 打包（**保留根 `.git`**，平台侧才能照常 commit + 溯源头记 hash） |
+| `env.platform.lock` | ⬜ §1-③ 生成（平台专用安装清单；**不要**直接用 env.lock 装） |
+| mom2 补丁离线分支 | ✅ 本轮已修：`vendor_patches/easyedit_mom2_dataset.py` **v2** 自动探测 `/inspire/dataset/wikipedia/...` 本地 parquet 直读、完全不碰 HF hub（report §7 问题 A 的修复；env `WHYAAAI_WIKI_PARQUET` 可显式指路径） |
+| 1.5B 模型 | ⬜ 可选（3.6GB；只为平台上做小模型对照，pilot 不需要） |
+
+**与 v1 的差异一览**：备料阶段从「平台可上网实例里下载」全部改到 Mac；环境从「pip install -r env.lock」改为「离线 wheels + env.platform.lock」；wiki 从「HF 下载」改为「平台挂载直读（patch v2）」；模型接线从 HF 缓存改为**绝对路径 override**。
+
+## 1. Mac 侧收尾（上传前必做；有网环境）
+
+### ① 仓库打包（修正 report 步骤 A：保留根 .git）
+```bash
+cd /Users/whyu/GitProjects/why-aaai27
+# 预检：source/ 七仓齐全（report 问题 C 是虚惊——本仓 source/ 一直完整，仍留此一行防呆）
+ls source/EasyEdit/easyeditor source/AlphaEdit source/R-TOFU source/ThinkEdit \
+   source/Unlearn-R2MU source/MQuAKE/datasets source/memit >/dev/null && echo SOURCE-OK
+tar czf _upload/why-aaai27.tar.gz \
+    --exclude='./source/*/.git' --exclude='./_upload' --exclude='./.obsidian' \
+    --exclude='__pycache__' --exclude='*.pyc' --exclude='.DS_Store' \
+    --exclude='./results' --exclude='./logs' --exclude='./whyaaai.bundle' .
+```
+要点：**根 `.git` 必须在包里**（平台侧 jsonl 溯源头 `git -C` 取 hash、跑完照常 commit、回传用 `git bundle`）；`source/*/.git` 剔除（几百 MB 且无用——EasyEdit 等的 HEAD 已记录在各 analysis 笔记）；`data/`（raw 51MB + 清洗 jsonl 26MB）与 `papers/` 随包带走，平台免再生。
+
+### ② wheels 修正三件（🔴 必做；机理见下表）
+```bash
+cd /Users/whyu/GitProjects/why-aaai27/_upload
+rm -f wheels/pyarrow-20.0.0*.whl wheels/antlr4_python3_runtime-4.13*.whl
+# pyarrow ≥21：用 manylinux_2_28 平台标签重下（平台 Ubuntu24.04/glibc2.39 完全兼容）
+pip download pyarrow==24.0.0 --platform manylinux_2_28_x86_64 --python-version 312 \
+    --implementation cp --only-binary=:all: --no-deps -d wheels/
+# antlr4 4.9.3：纯 Python 无 cp312 wheel → 本地从 sdist 打 py3-none-any wheel（任何平台可装）
+pip wheel antlr4-python3-runtime==4.9.3 --no-deps -w wheels/
+# av + opencv：env.lock 在册而上轮被 manylinux2014 约束挡掉；easyeditor import 链是否触达未做静态
+# 证明 → ~90MB 当保险，彻底消除平台上 ImportError 的可能
+pip download av==14.2.0 opencv-python==4.12.0.88 --platform manylinux_2_28_x86_64 \
+    --python-version 312 --implementation cp --only-binary=:all: --no-deps -d wheels/
+```
+
+| 修正 | 为什么必须 |
+|---|---|
+| pyarrow 20.0.0 → **24.0.0** | `datasets==4.8.5` 硬性要求 **`pyarrow>=21.0.0`**（dist-info 实查）；20.0.0 装上后 `import datasets` 即崩。上轮误降级根因=`--platform manylinux2014` 太老（pyarrow≥21 只发 manylinux_2_28 wheel） |
+| antlr4 4.13.2 → **4.9.3** | `omegaconf==2.3.0`（env.lock 在册）锁 `antlr4-python3-runtime==4.9.*`，4.13 运行时 API 不匹配 |
+| 补 av + opencv | env.lock 在册；缺了万一在 easyeditor import 链上就是平台现场 ImportError，离线无解 |
+
+### ③ 生成 `env.platform.lock`（平台安装清单 = wheels 实况 + 平台预装件说明）
+```bash
+cd /Users/whyu/GitProjects/why-aaai27
+python3 - <<'PY'
+import glob, os, re
+rows = []
+for w in sorted(glob.glob("_upload/wheels/*.whl")):
+    name, ver = os.path.basename(w).split("-")[:2]
+    rows.append(f"{name.replace('_','-')}=={ver}")
+hdr = """# env.platform.lock — 启智离线安装清单（由 _upload/wheels/ 实况生成，勿手编）
+# 用法(平台): python -m pip install --no-index --find-links $W/wheels -r env.platform.lock
+# 不装(镜像预装): torch==2.8.0a0+nv25.6 (env.lock 原 pin 2.9.1, 接受镜像版), torchvision
+# 与 env.lock 的偏差: pyarrow 24.0.0(=lock), PyYAML 6.0->6.0.3(6.0 无 cp312 wheel), antlr4 4.9.3(=lock)
+"""
+open("env.platform.lock","w").write(hdr + "\n".join(rows) + "\n")
+print(f"env.platform.lock: {len(rows)} 包")
+PY
+git add env.platform.lock && git commit -m "feat: env.platform.lock (启智离线安装清单)"
+# ⚠️ commit 后重新跑 ①的 tar（让包里带上本文件与最新 HEAD）
+```
+
+### ④ 校验和 + 分卷预案（report 问题 D：单文件上限未知）
+```bash
+cd _upload && shasum -a 256 *.tar.gz wheels/*.whl > MANIFEST.sha256   # 格式与 Linux sha256sum -c 互通
+# 若平台单文件上限 <12GB（先试传小文件探路）：
+split -b 5G models-7B.tar.gz models-7B.tar.gz.part_   # 平台侧: cat models-7B.tar.gz.part_* > models-7B.tar.gz
+```
+
+### ⑤ 最终上传清单 → 目标皆 `$W`
+| 文件 | 大小 | 平台落点 |
+|---|---|---|
+| `why-aaai27.tar.gz` | ~0.3–0.5GB | 解到 `$W/why-aaai27/` |
+| `models-7B.tar.gz`（或分卷） | 11.3GB | 解到 `$W/models/` |
+| `wheels/` 整目录（含修正后 ~104 whl） | ~0.3GB | `$W/wheels/` |
+| `MANIFEST.sha256` | KB | `$W/`（解包前校验） |
+
+## 2. 平台侧落地（交互式建模，镜像 `whyaaai-base`，无 GPU 规格即可）
+
+```bash
+W=/inspire/qb-ilm/project/ai4education/ky26140
+cd $W && sha256sum -c MANIFEST.sha256                            # 先校验再解包（应全 OK）
+mkdir -p $W/why-aaai27 $W/models                                 # tar 无外层目录（report 问题 F）
+tar xzf why-aaai27.tar.gz -C $W/why-aaai27
+tar xzf models-7B.tar.gz  -C $W/models                           # → $W/models/DeepSeek-R1-Distill-Qwen-7B
+# 装环境（⚠️ 用 env.platform.lock，不是 env.lock）：
+python -m pip install --no-index --find-links $W/wheels -r $W/why-aaai27/env.platform.lock
+python -m pip freeze > $W/why-aaai27/env.qz.lock                 # 平台环境留档，跑完随包回传
+```
+
+**接线三件**（一次性）：
+1. **模型=绝对路径 override**：编辑 `$W/why-aaai27/experiments/pilot.yaml`：
+   `hparams_overrides.model_name: /inspire/qb-ilm/project/ai4education/ky26140/models/DeepSeek-R1-Distill-Qwen-7B`
+   （路径小写后仍含 `qwen` → qwen 路由 vendor patch 照常命中并修复；这正是设计内行为。）
+2. **wiki**：patch v2 自动探测 `/inspire/dataset/wikipedia/20231101/20231101.en`；若实际挂载路径不同：
+   `export WHYAAAI_WIKI_PARQUET=<实际目录或 glob>`（写进每个作业命令）。
+3. **离线三件套**（写进**每个**作业命令行首）：
+   `export HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1`
+
+**自检五连（全过才算落地；CPU 即可）**：
+```bash
+cd $W/why-aaai27 && export HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+python -c "import torch,transformers,datasets,pyarrow;print(torch.__version__,transformers.__version__,datasets.__version__,pyarrow.__version__)"
+python -c "from transformers import AutoTokenizer; t=AutoTokenizer.from_pretrained('$W/models/DeepSeek-R1-Distill-Qwen-7B'); assert t('</think>',add_special_tokens=False)['input_ids']==[151649]; print('MODEL OK')"
+python -c "import sys;sys.path.insert(0,'src');from vendor_patches.easyedit_mom2_dataset import local_wiki_files as f;fs=f();assert fs and len(fs)==41,fs;print('WIKI OK',len(fs),'shards')"
+for t in metrics edit_loop run_pilot; do python src/test_$t.py; done
+python src/vendor_patches/test_qwen2_loader.py && python src/vendor_patches/test_mom2_dataset.py
+python src/test_think_budget.py && python src/test_steer.py
+cd source/EasyEdit && PYTHONPATH=.:$W/why-aaai27/src python -c "from vendor_patches.easyedit_qwen2_loader import apply as a1; from vendor_patches.easyedit_mom2_dataset import apply as a2; a1(); a2(); print('PATCH OK')"
+```
+**收尾**：实例「保存镜像并停止」→ 存为 **`whyaaai-env`**；后续所有作业用它（环境步永久免做）。
+
+## 3. 单卡冒烟（交互式建模，1×GPU，镜像 `whyaaai-env`，≤4h）
+
+照 `interplan.md` §4 的三步，路径替换为本文实况：
+```bash
+cd $W/why-aaai27 && export HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+# ① 7B 全量档长度分布（task#07 欠账顺手清）：
+python src/test_think_budget.py --model $W/models/DeepSeek-R1-Distill-Qwen-7B --device cuda
+# ② 端到端 2 条 ROME（与 pilot 完全同路径，双 patch 自动生效；看 7B 生成式 B0 编不编得进）：
+PYTHONPATH=source/EasyEdit python src/rome_mps_probe.py \
+    --model $W/models/DeepSeek-R1-Distill-Qwen-7B --device cuda:0 --cases 2 --budgets B0 --fresh
+# ③ mom2 预热（⚠️ 单进程！首条 MEMIT edit 触发 ~6 GPU·h 协方差，这里同时首验 wiki parquet 直读）：
+cd source/EasyEdit && PYTHONPATH=. python ../../src/run_pilot.py \
+    --config ../../experiments/pilot.yaml --editor MEMIT --rank 0 --world 200 --device 0
+rm ../../results/pilot/r1qwen7b_MEMIT_cf200_r0of200.jsonl        # 删热身分片，防混入打分 glob
+```
+
+## 4. 正式跑（分布式训练，1 节点 × 8 卡，镜像 `whyaaai-env`）
+
+科学序列与命令块照 `RUNBOOK.md` §4 + `interplan.md` §5（C1 预过滤 → C2 layer 小扫 6 组 → C3 pilot ROME/MEMIT），仅两处替换：每个命令块行首加 `W=/inspire/qb-ilm/project/ai4education/ky26140` 与离线三件套 export；表单照 v1 §5 模板（容错开/时长上限 C1=2h C2=3h C3=8h/飞书开/优先级取项目上限）。
+合格线与口径纪律不变：**生成式 ES≥0.90 & Loc≥0.85 @B0 判 layer**，永不混 rewrite_acc；被抢占/重启同命令重跑即续。
+
+## 5. 打分→校准→审计→回传
+
+打分/校准/审计照 `interplan.md` §6（`score_pilot --boot 10000` → `analysis/09` 10% 校准 → 30 条审计）。
+**回传包**（平台下载通道带出）：`results/pilot/*.jsonl` 全部分片｜`data/counterfact.prefiltered.jsonl`｜两张打分表｜`calibration_*.md`｜审计记录｜`env.qz.lock`｜内网侧 commit 后 `git -C $W/why-aaai27 bundle create whyaaai-back.bundle main`（根 .git 随 tar 已就位）。上报格式照 v1 §7（不替用户下 go/no-go 结论）。
+
+## 6. 雷点增补（v2 特有；v1 §8 表仍全部有效）
+
+| 雷 | 处置 |
+|---|---|
+| **pyarrow≥21 硬地板** | `datasets 4.8.5` import 即检查；env.platform.lock 已钉 24.0.0——**绝不**装回 wheels 里的旧 20.0.0 |
+| **torch 2.8 vs env.lock 2.9.1** | 接受镜像预装 2.8（transformers 5.5/accelerate 1.13 下限远低于此）；遇 torch API 缺口→存 incident 上报，**别**尝试离线装 torch |
+| py3.12 vs 本地 py3.10 | wheels 全 cp312 已对齐；个别包 import 报 ABI/语法错→incident 上报 |
+| antlr4 必须 4.9.3 | omegaconf 2.3.0 锁版；wheels 已含本地打的 py3-none-any |
+| 装环境用错清单 | 平台只认 `env.platform.lock`；原 `env.lock` 是 Mac/py3.10 口径（torch pin 装不上） |
+| tar 无外层目录 | 解包前 `mkdir -p`（§2 已含） |
+| 上传损坏 | 解包前 `sha256sum -c MANIFEST.sha256` |
+| **mom2 并发首跑** | 照 §3-③ 单进程预热；预热同时是 wiki parquet 直读的首次真验 |
+| wiki 挂载路径变动 | `WHYAAAI_WIKI_PARQUET` 显式指（目录或 glob 均可） |
+| 模型路径 override | 必须**绝对路径**（作业 cwd 在 source/EasyEdit，相对路径会解错） |
+
+## 7. 现场仍需核实（v1 §2 清单的存量项）
+
+① GPU 型号/单任务卡数上限/剩余卡时/优先级上限（建作业表单可见）→ 记现场笔记；② **数据集注册表搜 `DeepSeek`/`Qwen`**（命中 7B 则 §1 的 11GB 上传可免，model_name 直接指 `/inspire/dataset/...`）；③ 单文件上传上限（先小文件探路，决定是否启用 §1-④ 分卷）；④ 分布式训练作业是否挂同一块 `$W` 网盘（教程暗示同项目即同盘，首个 C1 作业开头 `ls $W/why-aaai27` 验证）。
+
+---
+
+## 现场笔记（执行中回填）
+
+- GPU 型号/上限/卡时/优先级：
+- 数据集注册表 DeepSeek 搜索结果：
+- 单文件上传上限：｜分卷启用：☐
+- 各阶段实际耗时：解包/装环境＝｜冒烟＝｜mom2＝｜C1＝｜C2＝｜C3-ROME＝｜C3-MEMIT＝
+- 异常与处置：
+
+*本文落笔 2026-06-12 晚（基于 report.md 18:12–19:30 实测 + 本轮 patch v2/wheels 修正方案）。与 report.md 冲突处以本文为准（report 是摸底快照，本文是修订后的作战版）。*

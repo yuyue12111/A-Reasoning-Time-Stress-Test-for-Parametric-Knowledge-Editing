@@ -3,7 +3,7 @@
 > 用途：拿到 8×H200 / 内网窗口时，**按本手册顺序执行即可**，不需要 Claude。
 > 脚本已写好、核心件过 mock 单测（覆盖见 §0）；本手册只讲「怎么按顺序跑 + 别踩哪些坑」。
 > 命令默认在仓库根执行；凡涉及 `easyeditor` 的都要 `PYTHONPATH=.` 且 cwd 在 `source/EasyEdit`（见坑①）。
-> **组内启智平台（qz.sii.edu.cn）**：建实例/表单速填/备料/离线纪律/mom2 预热等平台操作见 **`interplan.md`**——本手册讲科学序列，那份讲平台怎么用。
+> **组内启智平台（qz.sii.edu.cn）**：平台**完全无外网**→全离线部署，照 **`interplan2.md`**（上传/解包/env.platform.lock/接线/自检；实测见 `report.md`；interplan.md 仅 §1 平台机制/§8 雷点/§9 OpenAPI 仍有效）——本手册讲科学序列，那两份讲平台怎么用。
 
 ---
 
@@ -45,10 +45,11 @@ python src/build_dataset.py     # → data/{counterfact,zsre,mquake_cf_3k}.jsonl
 
 MEMIT 首次 `edit()` 会**自动**触发并缓存到 `stats_dir`。我们已把 R1-Distill 的 stats_dir
 设为 `./data/stats_r1qwen`（与 Qwen2.5 分目录，**01 雷点 4**，勿混）。
-- ⚠️ **语料加载雷（已修）**：EasyEdit 写死的 `load_dataset("wikipedia","20200501.en")` 在
-  datasets≥3 必崩——`vendor_patches/easyedit_mom2_dataset.py` 已自动映射到
-  `wikimedia/wikipedia/20231101.en`（~20GB，**离线窗口须预下载**，见 `interplan.md` §3-⑥；
-  机理与口径注记见 `src/vendor_patches/README.md` §3）。
+- ⚠️ **语料加载雷（已修，v2）**：EasyEdit 写死的 `load_dataset("wikipedia","20200501.en")` 在
+  datasets≥3 必崩——`vendor_patches/easyedit_mom2_dataset.py` 已修：**本地 parquet 优先直读**
+  （启智挂载 `/inspire/dataset/wikipedia/20231101/`，自动探测，离线安全；`WHYAAAI_WIKI_PARQUET`
+  可显式指路径），无本地分片再回落 `wikimedia/wikipedia/20231101.en` hub 映射（有网时 ~20GB）。
+  机理与口径注记见 `src/vendor_patches/README.md` §3、平台接线见 `interplan2.md` §2。
 - ⚠️ **并发预热雷**：8 分片并发首跑会**同时**触发 mom2（浪费 + 可能写坏缓存）——先单进程预热：
   `PYTHONPATH=. python ../../src/run_pilot.py --config ../../experiments/pilot.yaml --editor MEMIT --rank 0 --world 200 --device 0`
   （world=200 → 只跑 1 条 case，顺带算好 mom2；**跑完删掉热身分片** `results/pilot/*_r0of200.jsonl`，防混入打分 glob），然后再开 8 分片。

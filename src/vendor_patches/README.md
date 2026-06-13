@@ -105,17 +105,22 @@ pilot 主路径已自动接入，无需手动调用。
 +                         "wikipedia": ("wikimedia/wikipedia", "20231101.en")}[ds_name])
 ```
 
-### 采用的修法（不改 source/）：`easyedit_mom2_dataset.py`
-模块属性级 monkeypatch：把 `rome.layer_stats` 内引用的 `load_dataset` 换成 shim，
-将老 (name, config) 映射到现行 parquet 仓（无需脚本/trust_remote_code，builder 实测可解析）：
-`("wikipedia","20200501.en")→("wikimedia/wikipedia","20231101.en")`(20.2GB)、
-`("wikitext","wikitext-103-raw-v1")→("Salesforce/wikitext","wikitext-103-raw-v1")`(549MB 轻量备选)；
-其余透传。两替代源行字段均含 `"text"`（`TokenizedDataset` 默认 `field="text"`）→ drop-in。
+### 采用的修法（不改 source/）：`easyedit_mom2_dataset.py`（v2 含离线平台分支）
+模块属性级 monkeypatch：把 `rome.layer_stats` 内引用的 `load_dataset` 换成 shim，按优先级：
+1. **本地 parquet 直读（v2，离线平台）**：请求是 wikipedia 类（老 id 或已映射 id）且本地分片存在 →
+   `load_dataset("parquet", data_files={"train":[分片...]})`，**完全不碰 hub**（`HF_*_OFFLINE=1` 下安全，
+   report.md §7 问题 A 的修复）。位置 = 环境变量 `WHYAAAI_WIKI_PARQUET`（目录或 glob，优先）或启智
+   默认挂载 `/inspire/dataset/wikipedia/20231101/20231101.en`；wikitext 请求**不**被此分支劫持。
+2. **id 映射（有网/有缓存）**：`("wikipedia","20200501.en")→("wikimedia/wikipedia","20231101.en")`(20.2GB)、
+   `("wikitext","wikitext-103-raw-v1")→("Salesforce/wikitext","wikitext-103-raw-v1")`(549MB 轻量备选)。
+3. 其余透传。所有数据源行字段均含 `"text"`（`TokenizedDataset` 默认 `field="text"`）→ drop-in。
 
-- **口径注记**: 协方差语料 2020-05 dump → 2023-11 dump（与 MEMIT 原文不同 dump，统计量级一致；
-  论文 reproducibility 一节如实写明）。stats 缓存名由 ds_name 派生 → 命名不变。
+- **口径注记**: 协方差语料统一 2023-11 dump（启智挂载与 wikimedia/wikipedia/20231101.en 同 dump；
+  与 MEMIT 原文 2020-05 不同，统计量级一致；论文 reproducibility 一节如实写明）。stats 缓存名由
+  ds_name 派生 → 命名不变。
 - **接入**: `edit_loop.run` 与 qwen 路由补丁一并自动 `apply()`（幂等，首次 mom2 触发前生效）。
-- **mock 单测**: `test_mom2_dataset.py`（4 测，全 stub，system python3 即过）；真模块校验已在 editrev 过。
+- **mock 单测**: `test_mom2_dataset.py`（5 测，全 stub + 临时目录，system python3 即过：映射×2/透传/
+  apply 幂等/本地 parquet 直读+wikitext 不受影响+回落）；真模块校验已在 editrev 过。
 
 **何时用**: MEMIT/AlphaEdit 任何会触发 mom2 的跑（pilot MEMIT 首条 edit / `gen_alphaedit_P.py`）。
 pilot 主路径已自动接入。注意 `gen_alphaedit_P.py` 不走 edit_loop —— 用前需自行先调本补丁 `apply()`。

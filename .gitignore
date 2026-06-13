@@ -41,3 +41,9 @@ stats/
 
 # --- EasyEdit runtime logs (make_logs() writes logs/run.log + results.json whenever an editor runs) ---
 /logs/
+
+# --- Offline-deploy staging for the intranet (qizhi) platform: huge tars/wheels, regenerable
+#     per interplan2.md §1; the bundle is a transfer artifact, .obsidian is editor junk ---
+/_upload/
+/whyaaai.bundle
+.obsidian/
