@@ -23,10 +23,10 @@
 
 | 资产 | 状态 |
 |---|---|
-| `_upload/models-7B.tar.gz` | ✅ 11.3GB（7B 完整 snapshot：2 个 safetensors 分片 + tokenizer/config） |
+| `_upload/models-7B.tar.gz` + `_upload/model_parts/` | ✅ 11.3GB 整包 + **6×2G 分片(part_aa..af)+PARTS.sha256**（整包上传实测**静默损坏**→必走分片逐片校验，§1-④/§2） |
 | `_upload/wheels/`（cp312 linux） | ✅ **已修正**（100 wheel：pyarrow 24/antlr 4.9.3/av 17.1/opencv-headless 4.13；§1-② 三处坑已解，实测验证） |
 | `env.platform.lock` | ✅ **已生成并入库**（repo 根，100 包；平台装环境**只认它**，别用 env.lock） |
-| 仓库 tar | ⬜ §1-① 打包（**保留根 `.git`**，平台侧才能照常 commit + 溯源头记 hash；含已就位的 env.platform.lock） |
+| `_upload/why-aaai27.tar.gz` | ✅ 185M（含根 `.git`+source 七仓+数据+论文+qz_quickstart；HEAD `ab07da5`；已验证解开即用） |
 | mom2 补丁离线分支 | ✅ 本轮已修：`vendor_patches/easyedit_mom2_dataset.py` **v2** 自动探测 `/inspire/dataset/wikipedia/...` 本地 parquet 直读、完全不碰 HF hub（report §7 问题 A 的修复；env `WHYAAAI_WIKI_PARQUET` 可显式指路径） |
 | 1.5B 模型 | ⬜ 可选（3.6GB；只为平台上做小模型对照，pilot 不需要） |
 
@@ -70,32 +70,34 @@ pip download av opencv-python-headless --platform manylinux_2_28_x86_64 --python
 平台安装清单（由 wheels 实况生成 + 平台预装件/版本偏差说明）。**装环境只认它，别用 env.lock**（后者是 Mac/py3.10 口径、torch pin 2.9.1 装不上）。重新生成法见仓库 `env.platform.lock` 头注。
 > commit 后须重跑 ①的 tar，让包里带上 `env.platform.lock` 与最新 HEAD。
 
-### ④ 校验和 + 分卷预案（report 问题 D：单文件上限未知）
-```bash
-cd _upload && shasum -a 256 *.tar.gz wheels/*.whl > MANIFEST.sha256   # 格式与 Linux sha256sum -c 互通
-# 若平台单文件上限 <12GB（先试传小文件探路）：
-split -b 5G models-7B.tar.gz models-7B.tar.gz.part_   # 平台侧: cat models-7B.tar.gz.part_* > models-7B.tar.gz
-```
+### ④ 校验和 + 模型分片 — ✅ **已生成**（11G 整包上传实测会**静默损坏**，故模型必走分片）
+- `MANIFEST.sha256`（repo tar + model tar + 100 wheel 的 sha256，平台解包前 `sha256sum -c` 总校验）。
+- `_upload/model_parts/`：`models-7B.tar.gz` 切成 **6 个 2G 片 `part_aa..af` + `PARTS.sha256`**（Mac 已验 `cat` 还原 byte 级一致）。
+  分片的意义：坏了能定位到 2G 的片、**只重传那片**，不赌 11G 一次成功。重建法：`cd _upload && split -b 2000m models-7B.tar.gz model_parts/models-7B.tar.gz.part_ && cd model_parts && shasum -a256 *.part_* > PARTS.sha256`。
 
 ### ⑤ 最终上传清单 → 目标皆 `$W`
 | 文件 | 大小 | 平台落点 |
 |---|---|---|
-| `why-aaai27.tar.gz` | ~0.3–0.5GB | 解到 `$W/why-aaai27/` |
-| `models-7B.tar.gz`（或分卷） | 11.3GB | 解到 `$W/models/` |
-| `wheels/` 整目录（修正后 100 whl） | ~0.3GB | `$W/wheels/` |
-| `MANIFEST.sha256` | KB | `$W/`（解包前校验） |
+| `why-aaai27.tar.gz` | 185M | 解到 `$W/why-aaai27/` |
+| `model_parts/`（6 片 + PARTS.sha256） | 11.3G | `$W/model_parts/` → 校验后 `cat` 成 `$W/models-7B.tar.gz` |
+| `wheels/` 整目录（修正后 100 whl） | 279M | `$W/wheels/` |
+| `MANIFEST.sha256` | 12K | `$W/`（解包前总校验） |
 
 ## 2. 平台侧落地（交互式建模，镜像 `whyaaai-base`，无 GPU 规格即可）
 
 ```bash
 W=/inspire/qb-ilm/project/ai4education/ky26140
-cd $W && sha256sum -c MANIFEST.sha256                            # 先校验再解包（应全 OK）
-mkdir -p $W/why-aaai27 $W/models                                 # tar 无外层目录（report 问题 F）
+# ① 模型分片：逐片校验→只重传坏片→合并→总校验（详见 qz_quickstart.md 第 1 步）
+cd $W/model_parts && sha256sum -c PARTS.sha256          # 哪片 FAILED 只重传那片，直到 6 片全 OK
+cat models-7B.tar.gz.part_* > $W/models-7B.tar.gz
+# ② 总校验 + 解包（tar 无外层目录，先建目录）
+cd $W && sha256sum -c MANIFEST.sha256                   # why-aaai27 + models-7B 都应 OK
+mkdir -p $W/why-aaai27 $W/models
 tar xzf why-aaai27.tar.gz -C $W/why-aaai27
-tar xzf models-7B.tar.gz  -C $W/models                           # → $W/models/DeepSeek-R1-Distill-Qwen-7B
-# 装环境（⚠️ 用 env.platform.lock，不是 env.lock）：
+tar xzf models-7B.tar.gz  -C $W/models                  # → $W/models/DeepSeek-R1-Distill-Qwen-7B
+# ③ 装环境（⚠️ 用 env.platform.lock，不是 env.lock）：
 python -m pip install --no-index --find-links $W/wheels -r $W/why-aaai27/env.platform.lock
-python -m pip freeze > $W/why-aaai27/env.qz.lock                 # 平台环境留档，跑完随包回传
+python -m pip freeze > $W/why-aaai27/env.qz.lock        # 平台环境留档，跑完随包回传
 ```
 
 **接线三件**（一次性）：
@@ -120,26 +122,38 @@ cd source/EasyEdit && PYTHONPATH=.:$W/why-aaai27/src python -c "from vendor_patc
 ```
 **收尾**：实例「保存镜像并停止」→ 存为 **`whyaaai-env`**；后续所有作业用它（环境步永久免做）。
 
-## 3. 单卡冒烟（交互式建模，1×GPU，镜像 `whyaaai-env`，≤4h）
+## 3. 跑 pilot —— **全程一个 8×H200 实例，一个终端走完（用户定：不切换、更快）**
 
-照 `interplan.md` §4 的三步，路径替换为本文实况：
+**首选形态**：建**一个 8×H200 交互式建模实例**（镜像 `whyaaai-env`），冒烟→mom2→预过滤→layer 扫→pilot→打分**全在同一 Jupyter 终端顺序跑**。自动停止设够长（如 24h）；GPU 长期忙→不会被低利用率回收；万一停了同命令重跑即续。
+> 前提：项目配额允许交互式 8 卡（建实例表单「单任务最大可用资源」≥8 GPU）。**仅当交互式不给 8 卡**才回退：pilot 用**分布式训练**作业（1 节点×8 卡，命令同，贴「执行命令」框，容错开/时长上限 8h），冒烟/mom2/打分仍小交互式实例——这才需要切换。
+
+⚠️ **8 卡只加速 pilot 的 case 分片；mom2 是单 GPU 单进程的一次性活，必须先单进程喂出缓存再开 8 进程**，否则 8 进程各自重算协方差（每个数 GPU·h）+ 写坏缓存。顺序（行首均 `cd`+离线 export，`M=$W/models/DeepSeek-R1-Distill-Qwen-7B`）：
+
 ```bash
-cd $W/why-aaai27 && export HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1
-# ① 7B 全量档长度分布（task#07 欠账顺手清）：
-python src/test_think_budget.py --model $W/models/DeepSeek-R1-Distill-Qwen-7B --device cuda
-# ② 端到端 2 条 ROME（与 pilot 完全同路径，双 patch 自动生效；看 7B 生成式 B0 编不编得进）：
-PYTHONPATH=source/EasyEdit python src/rome_mps_probe.py \
-    --model $W/models/DeepSeek-R1-Distill-Qwen-7B --device cuda:0 --cases 2 --budgets B0 --fresh
-# ③ mom2 预热（⚠️ 单进程！首条 MEMIT edit 触发 ~6 GPU·h 协方差，这里同时首验 wiki parquet 直读）：
-cd source/EasyEdit && PYTHONPATH=. python ../../src/run_pilot.py \
-    --config ../../experiments/pilot.yaml --editor MEMIT --rank 0 --world 200 --device 0
-rm ../../results/pilot/r1qwen7b_MEMIT_cf200_r0of200.jsonl        # 删热身分片，防混入打分 glob
+W=/inspire/qb-ilm/project/ai4education/ky26140; cd $W/why-aaai27
+export HF_HOME=$W/hf HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1; M=$W/models/DeepSeek-R1-Distill-Qwen-7B
+
+# ① 冒烟（~15min，用 1 张卡；先确认 7B 真能编+整链通，别让 pilot 跑一半才暴雷）
+python src/test_think_budget.py --model $M --device cuda
+PYTHONPATH=source/EasyEdit python src/rome_mps_probe.py --model $M --device cuda:0 --cases 2 --budgets B0 --fresh
+
+# ② mom2 预热（⚠️ 单进程 1 卡！world=200 → 只跑 1 条 case，触发并缓存 mom2；H200 估 2–4h）
+cd source/EasyEdit
+PYTHONPATH=. python ../../src/run_pilot.py --config ../../experiments/pilot.yaml --editor MEMIT --rank 0 --world 200 --device 0
+rm ../../results/pilot/r1qwen7b_MEMIT_cf200_r0of200.jsonl   # 删热身分片，防混入打分 glob
+
+# ③ 预过滤（1 卡，~0.5–1h）
+PYTHONPATH=. python ../../src/prefilter.py --config ../../experiments/pilot.yaml --device 0
+
+# ④ layer 小扫（6 组：ROME [5]/[7]/[10]、MEMIT [4-8]/[6-10]/[8-12]；各 n=50 只 B0）+ ⑤ pilot —— **8 卡全开**：
+for r in $(seq 0 7); do
+  PYTHONPATH=. python ../../src/run_pilot.py --config ../../experiments/pilot.yaml --editor ROME --rank $r --world 8 --device $r &
+done; wait
+for r in $(seq 0 7); do
+  PYTHONPATH=. python ../../src/run_pilot.py --config ../../experiments/pilot.yaml --editor MEMIT --rank $r --world 8 --device $r &
+done; wait
 ```
-
-## 4. 正式跑（分布式训练，1 节点 × 8 卡，镜像 `whyaaai-env`）
-
-科学序列与命令块照 `RUNBOOK.md` §4 + `interplan.md` §5（C1 预过滤 → C2 layer 小扫 6 组 → C3 pilot ROME/MEMIT），仅两处替换：每个命令块行首加 `W=/inspire/qb-ilm/project/ai4education/ky26140` 与离线三件套 export；表单照 v1 §5 模板（容错开/时长上限 C1=2h C2=3h C3=8h/飞书开/优先级取项目上限）。
-合格线与口径纪律不变：**生成式 ES≥0.90 & Loc≥0.85 @B0 判 layer**，永不混 rewrite_acc；被抢占/重启同命令重跑即续。
+layer 扫的 6 组配置怎么造、合格线判据、定稿回写 `pilot.yaml`——照 `RUNBOOK.md` §4b（**判生成式 ES≥0.90 & Loc≥0.85 @B0，永不混 rewrite_acc**）。pilot 跑完进 §5 打分。被抢占/超时同命令重跑即续。
 
 ## 5. 打分→校准→审计→回传
 

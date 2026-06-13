@@ -25,16 +25,18 @@
 
 1. 浏览器开 **qz.sii.edu.cn**，登录（空间：教育大模型-独立空间）。
 2. **先建一个最小的交互式建模实例当「搬运+解包工」**（见第 2 步，GPU 选「无」或最小规格即可，省卡时）。
-3. 实例跑起来后进 Jupyter（第 3 步），用**上传按钮**或平台**文件管理**把 4 个文件传到 `$W`：
+3. 实例跑起来后进 Jupyter（第 3 步），用**上传按钮**或平台**文件管理**把文件传到 `$W`：
    - 小的先传：`why-aaai27.tar.gz`(185M)、`wheels/`整目录、`MANIFEST.sha256`。
-   - **`models-7B.tar.gz`(11G) 最后传**：浏览器上传大文件易断。**先试传一个小文件确认通道没问题**；若平台单文件上限 <11G（传到一半失败），回 Mac 把它切片再传：
-     ```bash
-     # Mac _upload/ 下切 5G 一片：
-     split -b 5G models-7B.tar.gz models-7B.tar.gz.part_
-     # 平台上传所有 part_ 后，在 $W 里合回去：
-     cat models-7B.tar.gz.part_* > models-7B.tar.gz && rm models-7B.tar.gz.part_*
-     ```
-   > 上传中可在 Jupyter Notebook 页面底部看进度，显示 "Complete!" 才算完。
+   - **11G 模型必须用分片传**（⚠️ 实测：整包上传「不报错」也会静默损坏——`sha256sum -c` 那次 `models-7B.tar.gz: FAILED` 就是这么来的）。Mac `_upload/model_parts/` 已切好 **6 个 2G 分片 + `PARTS.sha256`**，照下面走：
+     1. 把 `model_parts/` 整目录（6 个 `models-7B.tar.gz.part_a?` + `PARTS.sha256`）传到 `$W/model_parts/`；
+     2. **逐片校验，找出坏片**：`cd $W/model_parts && sha256sum -c PARTS.sha256` → 哪片 `FAILED` 就**只重传那一片**，再校验，直到 6 片全 `OK`；
+     3. **合并 + 总校验**：
+        ```bash
+        cat $W/model_parts/models-7B.tar.gz.part_* > $W/models-7B.tar.gz
+        cd $W && sha256sum -c MANIFEST.sha256   # 这次 models-7B.tar.gz 应 OK
+        ```
+   > 分片的意义：坏了能定位到 2G 的片、只重传那片，不用赌 11G 一次成功。原来那个损坏的整包可先 `rm $W/models-7B.tar.gz` 删掉（你有 529T，删不删都行）。
+   > 上传中可在 Jupyter 页面底部看进度，显示 "Complete!" 才算这一片传完——但**完整性以 `sha256sum -c` 为准，别信"没报错"**。
 
 ---
 
@@ -117,19 +119,57 @@ python src/test_think_budget.py && python src/test_steer.py
 
 ## 第 5 步 · 保存镜像，以后免装环境
 
-自检全过后，**停止这个实例时选「保存镜像并停止」**，命名 **`whyaaai-env`**。
-以后建任何实例（冒烟、正式跑）都在「镜像」里选 `whyaaai-env`（个人可见镜像）——第 4 步的 ③ 装环境就永久免做了。
+自检全过后，**停止这个 prep 实例时选「保存镜像并停止」**，命名 **`whyaaai-env`**。
+下一步建 8 卡实例时在「镜像」里选 `whyaaai-env`（个人可见镜像）——第 4 步的 ③ 装环境就永久免做了。
 
 ---
 
-## 第 6 步 · 开跑（到这就「能跑」了）
+## 第 6 步 · 开跑 —— **全程一个 8×H200 实例，一个 Jupyter 终端搞定（不切换）**
 
-环境就位后照 `interplan2.md`：
-- **单卡冒烟**（interplan2 §3）：再建一个交互式实例，镜像选 `whyaaai-env`、规格 **1 GPU**，跑 7B 长度分布 + 2 条 ROME 端到端 + **mom2 单进程预热**（⚠️ 必须单进程先跑，别 8 卡并发，否则重复算 6 小时协方差）。
-- **正式 8 卡跑**（interplan2 §4 / RUNBOOK §4）：用**分布式训练**作业（不是交互式建模），1 节点×8 卡，预过滤 → layer 小扫 → pilot。命令块整段贴进作业表单的「执行命令」。
-- **打分/审计/回传**（interplan2 §5）：CPU 即可，交互式实例里跑 `score_pilot.py`。
+你定了全程 8 卡。**首选：建一个 8×H200 的交互式建模实例**，冒烟→mom2→pilot→打分全在同一个 Jupyter 终端里跑，不用在交互式/分布式之间来回切。
 
-被打断/超时/被抢占都不怕：**同命令重跑即自动续跑**（已完成的 case 自动跳过）。
+**建实例**：作业中心 → 交互式建模 → 新建。镜像选 **`whyaaai-env`**；计算资源规格选 **8×H200**；自动停止设**长一点（如 24h，或够跑完 pilot）**；共享内存 ≥32G；Slurm 关；飞书开；优先级取最高。
+> 前提：项目配额允许交互式 8 卡（建实例表单的「单任务最大可用资源」要 ≥8 GPU）。**若交互式不给 8 卡**：pilot 改用**分布式训练**作业（1 节点×8 卡，命令完全相同，贴进「执行命令」框），冒烟/mom2/打分仍在小交互式实例——只有这种情况才需要切换。
+
+**进 Jupyter 终端，按顺序跑**（全程 `cd $W/why-aaai27` + 离线三件套 export）：
+
+```bash
+W=/inspire/qb-ilm/project/ai4education/ky26140
+cd $W/why-aaai27
+export HF_HOME=$W/hf HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+M=$W/models/DeepSeek-R1-Distill-Qwen-7B    # (勾了官方数据集模型则改 /inspire/dataset/... 路径)
+
+# ① 冒烟（可选但强烈建议，~15min，用 8 卡里的 1 张；先确认 7B 真能编+整条链通，别让 pilot 跑一半才发现）
+python src/test_think_budget.py --model $M --device cuda
+PYTHONPATH=source/EasyEdit python src/rome_mps_probe.py --model $M --device cuda:0 --cases 2 --budgets B0 --fresh
+
+# ② mom2 预热 —— ⚠️ 关键：**必须单进程先跑**（用 1 张卡），别直接开 8 进程！
+#    8 进程并发首跑会各自重算协方差(每个 ~几 GPU·h)、还可能写坏缓存。预热只跑 1 条 case 把 mom2 算好缓存。
+#    （8 卡是给 pilot 并行用的；mom2 本身是单 GPU 活，开 8 卡也不会更快，所以先单进程喂出缓存。）
+cd source/EasyEdit
+PYTHONPATH=. python ../../src/run_pilot.py --config ../../experiments/pilot.yaml \
+    --editor MEMIT --rank 0 --world 200 --device 0          # world=200 → 只跑 1 条，触发并缓存 mom2
+rm ../../results/pilot/r1qwen7b_MEMIT_cf200_r0of200.jsonl   # 删热身分片（别混进打分）
+cd ../..
+
+# ③ 预过滤（1 卡即可，~0.5–1h）
+cd source/EasyEdit
+PYTHONPATH=. python ../../src/prefilter.py --config ../../experiments/pilot.yaml --device 0
+cd ../..
+
+# ④ layer 小扫 + ⑤ pilot 正式跑 —— **8 卡全开**，照 RUNBOOK.md §4b/§4c（每段 8 进程、--world 8 --device $r）。
+#    合格线判生成式 ES≥0.90 & Loc≥0.85 @B0（不看 rewrite_acc）。命令块见 RUNBOOK §4 / interplan2 §4。
+
+# ⑥ 打分（CPU，同终端）
+cd $W/why-aaai27 && python src/score_pilot.py --config experiments/pilot.yaml --editor ROME
+python src/score_pilot.py --config experiments/pilot.yaml --editor MEMIT
+```
+
+**要点**：
+- mom2 预热那步**与 8 卡无关**——它是单 GPU 单进程的一次性活（H200 上估 2–4h），跑完缓存好，后面 8 卡 pilot 才并行得起来。**别跳过、别 8 进程并发。**
+- pilot 真正吃 8 卡：8 个进程各占一张 H200、按 case 分片并行，这就是「全程 8 卡更快」的来源。
+- 长跑期间 GPU 一直忙 → 不会被「低利用率」回收；但**自动停止时长要设够**，万一停了，**同命令重跑自动续**（已完成 case 跳过，不浪费）。
+- 详细命令序列与合格线照 `interplan2.md` §3 + `RUNBOOK.md` §4；打分/校准/审计照 `interplan2.md` §5。
 
 ---
 
