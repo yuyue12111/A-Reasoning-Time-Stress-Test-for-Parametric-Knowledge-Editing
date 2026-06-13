@@ -39,7 +39,7 @@ data/     清洗数据(大文件 gitignore,     results/ 实验 jsonl（gitignor
 作战序列与日期敏感项全在 `sumandplan1.md` §6.1（本地）/§6.2（行政）/§6.3（GPU 窗口剧本）。当前剩余主线：
 - **§6.1-⑤ 文档同步**（本轮进行中）→ **§6.1-⑥ P2**（GSM8K-200/MATH500-100 子集、Qwen3 预研、aliases 富集、steer 方向抽取、bootstrap CI + plots 骨架）
 - **行政线（用户负责，提醒即可）**：OpenReview 注册（隐形死线）、CFP 核对、H200 排队申请；**每周一 plan §8 增量查新**（≥6/15）
-- **GPU 窗口**：照 `RUNBOOK.md`（mom2→预过滤→layer 小扫→pilot→打分→**10% 边界校准**→审计→6/22 go/no-go）；**组内启智平台＝全离线部署，照 `interplan2.md`**（平台实测在 `report.md`；interplan.md 仅 §1/§8/§9 仍有效）
+- **GPU 窗口**：照 `RUNBOOK.md`（mom2→预过滤→layer 小扫→pilot→打分→**10% 边界校准**→审计→6/22 go/no-go）；**组内启智平台＝全离线部署：人工 UI 操作看 `qz_quickstart.md`，技术作战层看 `interplan2.md`**（平台实测在 `report.md`；interplan.md 仅 §1/§8/§9 仍有效）
 
 ## 防雷清单（前人血泪，违反必翻车）
 

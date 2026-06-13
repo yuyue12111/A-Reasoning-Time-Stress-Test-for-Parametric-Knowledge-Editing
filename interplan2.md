@@ -1,5 +1,6 @@
 # interplan2.md · 启智**全离线**部署作战 v2 —— 给内网侧 agent/执行者
 
+> 👤 **人工操作（登录/上传/建 Jupyter 实例/保存镜像）看 [`qz_quickstart.md`](qz_quickstart.md)**——那份是「切到内网照着点鼠标」的快速上手；本文是给 agent/执行者的技术作战层（Mac 打包细节 + 平台命令序列 + 雷点）。两者内容不重复、互指。
 > **本文取代 `interplan.md` 的 §2–§7**（现场摸底推翻了 v1 的关键假设）；v1 仍有效的部分：§1 平台机制速览、§9 OpenAPI、§10 升级路径。科学序列权威照旧是 `RUNBOOK.md`，硬约束照旧 `CLAUDE.md`。
 > **变了什么**：v1 假设存在「可上网 notebook-workspace」可在线备料——**现场证实整个平台完全无外网（HF/PyPI 全不通）**。部署改为**全离线**：Mac 侧打包 → 平台上传 → 解包落环境。现场实测全记录在 `report.md`（本文的事实基础，HEAD `5b4c2ef` 时点）。
 > 读单：本文 → `report.md`（平台实测）→ `RUNBOOK.md`（跑什么/什么顺序/什么合格线）→ `CLAUDE.md`。
