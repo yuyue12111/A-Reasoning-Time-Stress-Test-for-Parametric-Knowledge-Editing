@@ -96,6 +96,8 @@ tar xzf models-7B.tar.gz  -C $W/models          # → $W/models/DeepSeek-R1-Dist
 # ③ 离线装 Python 环境（只认 env.platform.lock，别用 env.lock！torch 用镜像自带的）
 cd $W/why-aaai27
 python -m pip install --no-index --find-links $W/wheels -r env.platform.lock
+# 若报 ResolutionImpossible(NGC 容器钉死 nvidia-ml-py 等)：忽略容器约束重装（我们不装 torch，安全）
+#   PIP_CONSTRAINT= python -m pip install --no-index --find-links $W/wheels -r env.platform.lock
 python -m pip freeze > env.qz.lock              # 平台实际环境留档，跑完随结果带回
 
 # ④ 离线开关（写进以后每个跑命令的开头，强制不连网）

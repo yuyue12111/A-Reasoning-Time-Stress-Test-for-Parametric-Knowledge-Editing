@@ -164,6 +164,7 @@ layer 扫的 6 组配置怎么造、合格线判据、定稿回写 `pilot.yaml`�
 
 | 雷 | 处置 |
 |---|---|
+| **NGC 容器 PIP_CONSTRAINT** | 镜像(torch nv25.6)钉死 `nvidia-ml-py==12.575.51` 配驱动 → 装 env.platform.lock 报 `ResolutionImpossible`。已从 lock 移除 nvidia-ml-py(只被 gpustat 用，容器自带)。若仍冲突：`PIP_CONSTRAINT= python -m pip install --no-index --find-links $W/wheels -r env.platform.lock`（忽略容器约束；我们不装 torch，安全） |
 | **pyarrow≥21 硬地板** | `datasets 4.8.5` import 即检查；env.platform.lock 已钉 24.0.0——**绝不**装回 wheels 里的旧 20.0.0 |
 | **torch 2.8 vs env.lock 2.9.1** | 接受镜像预装 2.8（transformers 5.5/accelerate 1.13 下限远低于此）；遇 torch API 缺口→存 incident 上报，**别**尝试离线装 torch |
 | py3.12 vs 本地 py3.10 | wheels 全 cp312 已对齐；个别包 import 报 ABI/语法错→incident 上报 |
