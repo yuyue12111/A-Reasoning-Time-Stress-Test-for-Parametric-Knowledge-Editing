@@ -23,9 +23,9 @@
 | 资产 | 状态 |
 |---|---|
 | `_upload/models-7B.tar.gz` | ✅ 11.3GB（7B 完整 snapshot：2 个 safetensors 分片 + tokenizer/config） |
-| `_upload/wheels/`（cp312 linux） | ✅ 101 个文件 182MB，**但有 3 处必修**（§1-②，不修平台上 `import datasets` 直接崩） |
-| 仓库 tar | ⬜ §1-① 打包（**保留根 `.git`**，平台侧才能照常 commit + 溯源头记 hash） |
-| `env.platform.lock` | ⬜ §1-③ 生成（平台专用安装清单；**不要**直接用 env.lock 装） |
+| `_upload/wheels/`（cp312 linux） | ✅ **已修正**（100 wheel：pyarrow 24/antlr 4.9.3/av 17.1/opencv-headless 4.13；§1-② 三处坑已解，实测验证） |
+| `env.platform.lock` | ✅ **已生成并入库**（repo 根，100 包；平台装环境**只认它**，别用 env.lock） |
+| 仓库 tar | ⬜ §1-① 打包（**保留根 `.git`**，平台侧才能照常 commit + 溯源头记 hash；含已就位的 env.platform.lock） |
 | mom2 补丁离线分支 | ✅ 本轮已修：`vendor_patches/easyedit_mom2_dataset.py` **v2** 自动探测 `/inspire/dataset/wikipedia/...` 本地 parquet 直读、完全不碰 HF hub（report §7 问题 A 的修复；env `WHYAAAI_WIKI_PARQUET` 可显式指路径） |
 | 1.5B 模型 | ⬜ 可选（3.6GB；只为平台上做小模型对照，pilot 不需要） |
 
@@ -46,47 +46,28 @@ tar czf _upload/why-aaai27.tar.gz \
 ```
 要点：**根 `.git` 必须在包里**（平台侧 jsonl 溯源头 `git -C` 取 hash、跑完照常 commit、回传用 `git bundle`）；`source/*/.git` 剔除（几百 MB 且无用——EasyEdit 等的 HEAD 已记录在各 analysis 笔记）；`data/`（raw 51MB + 清洗 jsonl 26MB）与 `papers/` 随包带走，平台免再生。
 
-### ② wheels 修正三件（🔴 必做；机理见下表）
+### ② wheels 修正三件 — ✅ **已在 Mac 侧执行并验证**（2026-06-12，结果已落 `_upload/wheels/` + `env.platform.lock`）
+执行结果：pyarrow 24.0.0 ✅、antlr4 4.9.3 ✅、av 17.1.0 + opencv-python-headless 4.13 ✅（共 **100 wheel**）。
+重做命令（仅当需重建 wheels 时）：
 ```bash
 cd /Users/whyu/GitProjects/why-aaai27/_upload
-rm -f wheels/pyarrow-20.0.0*.whl wheels/antlr4_python3_runtime-4.13*.whl
-# pyarrow ≥21：用 manylinux_2_28 平台标签重下（平台 Ubuntu24.04/glibc2.39 完全兼容）
+rm -f wheels/pyarrow-20*.whl wheels/antlr4_python3_runtime-4.1[0-9]*.whl
 pip download pyarrow==24.0.0 --platform manylinux_2_28_x86_64 --python-version 312 \
     --implementation cp --only-binary=:all: --no-deps -d wheels/
-# antlr4 4.9.3：纯 Python 无 cp312 wheel → 本地从 sdist 打 py3-none-any wheel（任何平台可装）
-pip wheel antlr4-python3-runtime==4.9.3 --no-deps -w wheels/
-# av + opencv：env.lock 在册而上轮被 manylinux2014 约束挡掉；easyeditor import 链是否触达未做静态
-# 证明 → ~90MB 当保险，彻底消除平台上 ImportError 的可能
-pip download av==14.2.0 opencv-python==4.12.0.88 --platform manylinux_2_28_x86_64 \
-    --python-version 312 --implementation cp --only-binary=:all: --no-deps -d wheels/
+pip wheel antlr4-python3-runtime==4.9.3 --no-deps -w wheels/        # 纯 py，sdist→py3-none-any
+pip download av opencv-python-headless --platform manylinux_2_28_x86_64 --python-version 312 \
+    --implementation cp --only-binary=:all: --no-deps -d wheels/    # 不锁版本：import-only，新版有 abi3 wheel
 ```
 
-| 修正 | 为什么必须 |
+| 修正 | 为什么必须（均已核实） |
 |---|---|
-| pyarrow 20.0.0 → **24.0.0** | `datasets==4.8.5` 硬性要求 **`pyarrow>=21.0.0`**（dist-info 实查）；20.0.0 装上后 `import datasets` 即崩。上轮误降级根因=`--platform manylinux2014` 太老（pyarrow≥21 只发 manylinux_2_28 wheel） |
-| antlr4 4.13.2 → **4.9.3** | `omegaconf==2.3.0`（env.lock 在册）锁 `antlr4-python3-runtime==4.9.*`，4.13 运行时 API 不匹配 |
-| 补 av + opencv | env.lock 在册；缺了万一在 easyeditor import 链上就是平台现场 ImportError，离线无解 |
+| pyarrow 20.0.0 → **24.0.0** | `datasets==4.8.5` 硬性要求 **`pyarrow>=21.0.0`**（dist-info 实查）；20.0.0 装上 `import datasets` 即崩。上轮误降级根因=`--platform manylinux2014` 太老（pyarrow≥21 只发 manylinux_2_28 wheel）。⚠️ report §8.2「24.0.0 不存在于 PyPI」系误诊——实测 24.0.0 在 PyPI 且有 cp312 manylinux_2_28 wheel |
+| antlr4 4.13.2 → **4.9.3** | `omegaconf==2.3.0` 硬锁 `antlr4-python3-runtime==4.9.*`（实查 requires）；4.9.3 仅 sdist 无 wheel（故 `--only-binary` 上轮抓了 4.13）→ 本地 `pip wheel` 从 sdist 打纯 py wheel |
+| av **17.1.0** + opencv-headless **4.13** | `import easyeditor` 经 `dataset/__init__→coco_caption→blip_processors→randaugment` **eager import av+cv2**（实测：屏蔽任一则 `from easyeditor import BaseEditor` 即 ImportError）。但三个 processor 模块对 av/cv2 **无模块级 API 调用**（实查）+ pilot 文本路径从不实例化 VLM processor → **任何可 import 的版本即可**，故取有 cp312/abi3 wheel 的新版（env.lock 的 14.2.0/opencv-python 无 cp312 manylinux_2_28 wheel）。headless 变体免 libGL，更适合无显示 GPU 节点 |
 
-### ③ 生成 `env.platform.lock`（平台安装清单 = wheels 实况 + 平台预装件说明）
-```bash
-cd /Users/whyu/GitProjects/why-aaai27
-python3 - <<'PY'
-import glob, os, re
-rows = []
-for w in sorted(glob.glob("_upload/wheels/*.whl")):
-    name, ver = os.path.basename(w).split("-")[:2]
-    rows.append(f"{name.replace('_','-')}=={ver}")
-hdr = """# env.platform.lock — 启智离线安装清单（由 _upload/wheels/ 实况生成，勿手编）
-# 用法(平台): python -m pip install --no-index --find-links $W/wheels -r env.platform.lock
-# 不装(镜像预装): torch==2.8.0a0+nv25.6 (env.lock 原 pin 2.9.1, 接受镜像版), torchvision
-# 与 env.lock 的偏差: pyarrow 24.0.0(=lock), PyYAML 6.0->6.0.3(6.0 无 cp312 wheel), antlr4 4.9.3(=lock)
-"""
-open("env.platform.lock","w").write(hdr + "\n".join(rows) + "\n")
-print(f"env.platform.lock: {len(rows)} 包")
-PY
-git add env.platform.lock && git commit -m "feat: env.platform.lock (启智离线安装清单)"
-# ⚠️ commit 后重新跑 ①的 tar（让包里带上本文件与最新 HEAD）
-```
+### ③ `env.platform.lock` — ✅ **已生成并随仓提交**（100 包，repo 根）
+平台安装清单（由 wheels 实况生成 + 平台预装件/版本偏差说明）。**装环境只认它，别用 env.lock**（后者是 Mac/py3.10 口径、torch pin 2.9.1 装不上）。重新生成法见仓库 `env.platform.lock` 头注。
+> commit 后须重跑 ①的 tar，让包里带上 `env.platform.lock` 与最新 HEAD。
 
 ### ④ 校验和 + 分卷预案（report 问题 D：单文件上限未知）
 ```bash
@@ -100,7 +81,7 @@ split -b 5G models-7B.tar.gz models-7B.tar.gz.part_   # 平台侧: cat models-7B
 |---|---|---|
 | `why-aaai27.tar.gz` | ~0.3–0.5GB | 解到 `$W/why-aaai27/` |
 | `models-7B.tar.gz`（或分卷） | 11.3GB | 解到 `$W/models/` |
-| `wheels/` 整目录（含修正后 ~104 whl） | ~0.3GB | `$W/wheels/` |
+| `wheels/` 整目录（修正后 100 whl） | ~0.3GB | `$W/wheels/` |
 | `MANIFEST.sha256` | KB | `$W/`（解包前校验） |
 
 ## 2. 平台侧落地（交互式建模，镜像 `whyaaai-base`，无 GPU 规格即可）
