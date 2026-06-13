@@ -52,12 +52,16 @@ tar czf _upload/why-aaai27.tar.gz \
 重做命令（仅当需重建 wheels 时）：
 ```bash
 cd /Users/whyu/GitProjects/why-aaai27/_upload
-rm -f wheels/pyarrow-20*.whl wheels/antlr4_python3_runtime-4.1[0-9]*.whl
+rm -f wheels/pyarrow-20*.whl wheels/antlr4_python3_runtime-4.1[0-9]*.whl wheels/pandas-*macosx*.whl
 pip download pyarrow==24.0.0 --platform manylinux_2_28_x86_64 --python-version 312 \
     --implementation cp --only-binary=:all: --no-deps -d wheels/
 pip wheel antlr4-python3-runtime==4.9.3 --no-deps -w wheels/        # 纯 py，sdist→py3-none-any
 pip download av opencv-python-headless --platform manylinux_2_28_x86_64 --python-version 312 \
     --implementation cp --only-binary=:all: --no-deps -d wheels/    # 不锁版本：import-only，新版有 abi3 wheel
+pip download pandas==2.3.3 --platform manylinux_2_28_x86_64 --python-version 312 \
+    --implementation cp --only-binary=:all: --no-deps -d wheels/    # report 那次混进了 Mac cp313 轮子
+# ⚠️ 收尾必做：审计 wheels 平台标签，揪出混进来的 Mac/win/错 py 版本（report 的 pip download 漏过 --platform）：
+python3 -c "import glob,os; bad=[os.path.basename(w) for w in glob.glob('wheels/*.whl') if not (w.endswith('-none-any.whl') or ('-cp312-' in w and '_x86_64' in w and 'macos' not in w) or ('-abi3-' in w and '_x86_64' in w))]; print('BAD:',bad or 'none')"
 ```
 
 | 修正 | 为什么必须（均已核实） |
@@ -65,6 +69,7 @@ pip download av opencv-python-headless --platform manylinux_2_28_x86_64 --python
 | pyarrow 20.0.0 → **24.0.0** | `datasets==4.8.5` 硬性要求 **`pyarrow>=21.0.0`**（dist-info 实查）；20.0.0 装上 `import datasets` 即崩。上轮误降级根因=`--platform manylinux2014` 太老（pyarrow≥21 只发 manylinux_2_28 wheel）。⚠️ report §8.2「24.0.0 不存在于 PyPI」系误诊——实测 24.0.0 在 PyPI 且有 cp312 manylinux_2_28 wheel |
 | antlr4 4.13.2 → **4.9.3** | `omegaconf==2.3.0` 硬锁 `antlr4-python3-runtime==4.9.*`（实查 requires）；4.9.3 仅 sdist 无 wheel（故 `--only-binary` 上轮抓了 4.13）→ 本地 `pip wheel` 从 sdist 打纯 py wheel |
 | av **17.1.0** + opencv-headless **4.13** | `import easyeditor` 经 `dataset/__init__→coco_caption→blip_processors→randaugment` **eager import av+cv2**（实测：屏蔽任一则 `from easyeditor import BaseEditor` 即 ImportError）。但三个 processor 模块对 av/cv2 **无模块级 API 调用**（实查）+ pilot 文本路径从不实例化 VLM processor → **任何可 import 的版本即可**，故取有 cp312/abi3 wheel 的新版（env.lock 的 14.2.0/opencv-python 无 cp312 manylinux_2_28 wheel）。headless 变体免 libGL，更适合无显示 GPU 节点 |
+| pandas **Mac cp313 → linux cp312** | report 那次 `pip download` 漏了 `--platform` 把 `pandas-2.3.3-cp313-cp313-macosx_arm64.whl` 混进来，平台 `No matching distribution`。换 `pandas-2.3.3-cp312-cp312-manylinux_2_28_x86_64.whl`（2.3.3 只有 manylinux_2_28，无 2_17）。**教训：打包收尾务必跑上面的 wheels 平台标签审计**——abi3(cp310/cp39-abi3) 是好的、macosx/裸 cp313 是坏的 |
 
 ### ③ `env.platform.lock` — ✅ **已生成并随仓提交**（100 包，repo 根）
 平台安装清单（由 wheels 实况生成 + 平台预装件/版本偏差说明）。**装环境只认它，别用 env.lock**（后者是 Mac/py3.10 口径、torch pin 2.9.1 装不上）。重新生成法见仓库 `env.platform.lock` 头注。
