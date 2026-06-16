@@ -61,14 +61,23 @@ MEMIT 首次 `edit()` 会**自动**触发并缓存到 `stats_dir`。我们已把
 **qwen 路由 bug 已自动修**：`edit_loop` 在 `from_hparams` 前自动调 `vendor_patches/easyedit_qwen2_loader.apply()`（否则 R1-Distill-Qwen 落老 Qwen1 分支 → `fp32` TypeError），无需手动操作（详见 `src/vendor_patches/README.md §2`）。
 **采样臂**：默认 greedy（首窗主口径）；要跑 plan §2.5 的 temp0.6×3，把 `pilot.yaml` 的 `sampling.enabled` 设 `true`（每 case 多产 3 行 `decode=sample`）。
 
-### 4a 预过滤（§2.3，先做，约 0.5–1 GPU·h）
+### 4a 预过滤（§2.3，先做，8 卡约 1 GPU·h）
 只留「编辑前模型确实知道旧事实」的 case，否则「回退」无意义。**所有命令在项目根跑**（yaml 路径相对项目根；
-easyeditor 靠 `PYTHONPATH=source/EasyEdit` 引入。run_pilot 会把 data/hparams/results 解析成项目根绝对路径）。
+easyeditor 靠 `PYTHONPATH=source/EasyEdit` 引入）。prefilter 已支持 8 卡分片（`--rank/--world`）+ `--merge` 合并。
 ```bash
-PYTHONPATH=source/EasyEdit python src/prefilter.py --config experiments/pilot.yaml --device 0
-# → data/counterfact.prefiltered.jsonl（攒够 2×n=400 存活即停）
+rm -f data/counterfact.prefiltered.jsonl*
+# ⚠ 8 卡并发加载必须错峰（每个隔 15s）+ 日志留盘（勿 /dev/null）——见 §8「并发加载挤爆」
+for r in $(seq 0 7); do
+  PYTHONPATH=source/EasyEdit python src/prefilter.py --config experiments/pilot.yaml \
+      --rank $r --world 8 --device $r >/tmp/pf_r$r.log 2>&1 &
+  sleep 15
+done; wait
+tail -n1 /tmp/pf_r*.log     # 应 8 行 "本次判 N 存活 M"，无 Traceback/Killed；nvidia-smi 应见 8 卡 P2
+PYTHONPATH=source/EasyEdit python src/prefilter.py --config experiments/pilot.yaml --merge   # 无 GPU，合分片
+# → data/counterfact.prefiltered.jsonl（去重 + 按洗牌序 + 截 2×n=400）
 ```
-存活率预计 40–60%。`--budget B0` 更快但可能漏召；默认 B3（自然思考）最忠实。
+存活率预计 40–60%（B0 实测 ~50%）。`--budget B0` 更快但对推理模型可能漏召；默认 **B3**（自然思考）最忠实。
+先用 `--limit 16` 跑一遍冒烟（每卡 2 条，~3min）确认 8 卡都点亮、无报错，再去掉 `--limit` 正式跑。
 
 ### 4b layer 扫描（plan §7，**合格线 B0 下 ES≥90% & Locality≥85%，判生成式 ES_b 不判 rewrite_acc**）
 R1-Distill-Qwen-7B 基座是 Qwen2.5-**Math**-7B，现成 hparams 仅架构兼容。扫三组：
@@ -79,15 +88,19 @@ R1-Distill-Qwen-7B 基座是 Qwen2.5-**Math**-7B，现成 hparams 仅架构兼�
 - 选定后改回 `pilot.yaml` 定稿。
 
 ### 4c 跑 pilot（8 卡分片，约 4–6 GPU·h；**项目根跑，别 cd 进 source/EasyEdit**）
+⚠ **8 卡启动必须错峰（`& sleep 15`）+ 日志留盘（勿 `/dev/null`）**——见 §8「并发加载挤爆」。日志留盘是为了静默死能被发现（启动后 `nvidia-smi` 应见 8 卡都 P2；否则 `tail /tmp/pilot_*` 查 OOM/Killed）。
 ```bash
 for r in $(seq 0 7); do
   PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/pilot.yaml \
-      --editor ROME --rank $r --world 8 --device $r &
+      --editor ROME --rank $r --world 8 --device $r >/tmp/pilot_ROME_r$r.log 2>&1 &
+  sleep 15
 done; wait
-# MEMIT 同理（换 --editor MEMIT）
+tail -n1 /tmp/pilot_ROME_r*.log      # 确认 8 个都启起来、无 Killed
+# MEMIT 同理（换 --editor MEMIT；**MEMIT 跑前先按 §3 单进程预热 mom2**），日志改 /tmp/pilot_MEMIT_r$r.log
 for r in $(seq 0 7); do
   PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/pilot.yaml \
-      --editor MEMIT --rank $r --world 8 --device $r &
+      --editor MEMIT --rank $r --world 8 --device $r >/tmp/pilot_MEMIT_r$r.log 2>&1 &
+  sleep 15
 done; wait
 ```
 - 产出：`results/pilot/r1qwen7b_{ROME,MEMIT}_cf200_r{r}of8.jsonl`（含完整 CoT，一等资产）。
@@ -141,6 +154,7 @@ GPT-2-XL 冒烟 `src/smoke_rome_gpt2.py`（之前被杀）降为可选：`cd sou
 | **qwen 路由 bug** | 含 'qwen' 不含 'qwen2' → 老 Qwen1 分支（fp32 TypeError + 错 eos）。**`edit_loop` 自动 `apply()` 修**（§4），新入口手动加载 R1-Distill 前须自调 `vendor_patches.easyedit_qwen2_loader.apply()` |
 | **mom2 语料 id 已死** | datasets≥3 拒绝脚本式 `wikipedia/20200501.en` → `edit_loop` 自动 patch 映射 `wikimedia/wikipedia/20231101.en`（§3）；离线窗口须预下载；`gen_alphaedit_P.py` 等不走 edit_loop 的入口须自调 `easyedit_mom2_dataset.apply()` |
 | **mom2 并发首跑** | 8 分片同时触发协方差计算 → 先单进程预热再开分片（§3），热身分片删除 |
+| **8 卡并发加载挤爆** | 8 进程同时 `from_pretrained` 同一模型 → CPU 内存/IO 峰值，多数被 OOM-killer 杀，**只剩 1 卡 P2 干活**（stderr 进 `/dev/null` 时静默无报错，极易误判）。症状=`nvidia-smi` 只 GPU0 满载、其余 P8 空。**修：错峰启动**（每个 `& sleep 15`）+ 日志留盘（`>/tmp/..._r$r.log`，勿 `/dev/null`），`tail` 查 8 行成功。prefilter（直接 AutoModel 加载）6/16 实测必踩；pilot（EasyEdit 加载）也照加作保险（§4a/§4c 命令已含） |
 | **合格线判生成式 ES_b** | layer 扫 / 编辑质量一律看 `score_pilot` 的 `ES`/`Loc`，**不看 rewrite_acc**（08：rewrite_acc 6/8 但生成式 0/8） |
 | 全角竖线 `<｜User｜>` U+FF5C | 模板里勿替换成半角 `|`；真 eos `<｜end▁of▁sentence｜>`(151643)，`<think>`/`</think>` 是 special=false 原子 token(151648/151649) |
 | `PYTHONPATH=.` | easyeditor 本地包，否则 ModuleNotFoundError |
