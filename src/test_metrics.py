@@ -136,6 +136,41 @@ def test_score_esf_and_flip():
     assert out["B3"]["Flip"] == 1.0, f"Flip 应 1（两立场都现）: {out['B3']}"
 
 
+def test_subject_substring_guard():
+    """o_old 作主体子串时不污染判分（6.16 eyeball：主体复述 ≠ 旧知识回忆）。
+    主体 'Miami International Film Festival' 含 o_old 'Miami'。"""
+    fd, path = tempfile.mkstemp(suffix=".jsonl"); os.close(fd)
+    rows = [
+        # c0: 编辑生效——o_old(Miami)只在主体里出现，真断言是 o_new(Latvia)；cot 仅复述题目
+        {"case_id": "c0", "budget": "B0", "probe": "efficacy",
+         "answer": "The Miami International Film Festival is located in Latvia.",
+         "cot": "where the Miami International Film Festival is located, I recall it"},
+        # c1: 真回退——答案在主体外又现 o_old(located in Miami)；cot 真回忆旧知识
+        {"case_id": "c1", "budget": "B0", "probe": "efficacy",
+         "answer": "The Miami International Film Festival is located in Miami, Florida.",
+         "cot": "it is actually located in Miami, not Latvia"},
+    ]
+    with open(path, "w", encoding="utf-8") as f:
+        for r in rows:
+            f.write(json.dumps(r) + "\n")
+    subj = "Miami International Film Festival"
+    cases = [{"case_id": "c0", "s": subj, "o_old": "Miami", "o_new": "Latvia"},
+             {"case_id": "c1", "s": subj, "o_old": "Miami", "o_new": "Latvia"}]
+    out = metrics.score(path, cases, {})
+    os.remove(path)
+    # c0: ES=1(主体里的 Miami 不算)/CLR=0(仅复述)；c1: ES=0(主体外 Miami=回退)/CLR=1(真回忆) → 聚合 0.5/0.5
+    assert out["B0"]["n"] == 2, f"n: {out['B0']}"
+    assert abs(out["B0"]["ES"] - 0.5) < 1e-9, f"ES 应 0.5（c0 生效/c1 回退）: {out['B0']}"
+    assert abs(out["B0"]["CLR"] - 0.5) < 1e-9, f"CLR 应 0.5（c0 仅复述/c1 真回忆）: {out['B0']}"
+    # 关键反证：不挖主体则 c0 会被误判（ES=0 假阴 + CLR=1 假阳）——确认 guard 生效
+    cases_nos = [{"case_id": "c0", "o_old": "Miami", "o_new": "Latvia"}]  # 无 s → 不挖
+    fd2, p2 = tempfile.mkstemp(suffix=".jsonl"); os.close(fd2)
+    with open(p2, "w") as f:
+        f.write(json.dumps(rows[0]) + "\n")
+    bad = metrics.score(p2, cases_nos, {}); os.remove(p2)
+    assert bad["B0"]["ES"] == 0.0 and bad["B0"]["CLR"] == 1.0, f"无 guard 应假阴/假阳: {bad['B0']}"
+
+
 def test_score_bootstrap():
     # 复用 _scenario 的 cf_0/cf_1：B0 ES 点估=1.0；B1 ES 点估=0.5；CI 含点估、且确定性(同 seed 同值)
     fd, path = tempfile.mkstemp(suffix=".jsonl"); os.close(fd)
@@ -163,7 +198,8 @@ def test_score_bootstrap():
 
 TESTS = [test_hit_alias_case_and_none, test_score_exact,
          test_paraphrase_locality_and_decode_filter, test_none_metrics_when_probe_absent,
-         test_flip_analysis, test_score_esf_and_flip, test_score_bootstrap]
+         test_flip_analysis, test_score_esf_and_flip, test_subject_substring_guard,
+         test_score_bootstrap]
 
 
 def _main():

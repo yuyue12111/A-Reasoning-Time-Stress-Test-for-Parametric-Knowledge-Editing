@@ -3,13 +3,23 @@
 口径=生成式 ES_b，**不等于** EasyEdit 自带 rewrite_acc（logits 口径），两者永不混排（CLAUDE.md 约束 4）。
 消费 edit_loop 落的探针行：efficacy / para0,para1 / locality / open（open 仅供人工审计，不入指标）。
 """
-import json, collections
+import json, collections, re
 
 
 def hit(text, target, aliases):
     cands = [target] + aliases.get(target, [])
     t = (text or "").lower()
     return any(c and c.lower() in t for c in cands)   # 跳过 None/空候选（如 zsRE o_old 缺失）
+
+
+def _without_subject(text, subject):
+    """判分前挖掉对主体的复述。o_old/o_new 常是主体子串（如主体 'Miami International Film
+    Festival' 含 o_old 'Miami'）——模型推理开头复述题目会令 CLR/RR 假阳、ES 的『不含 o_old』假阴
+    （6.16 eyeball 实锤：3/3 CLR 命中都是主体复述而非旧知识回忆）。大小写不敏感删除主体整串，
+    只去复述、保留真正的『located in Miami』旧事实回忆；subject 空（如旧 mock 无 s 字段）则原样返回。"""
+    if not text or not subject:
+        return text or ""
+    return re.sub(re.escape(subject), " ", text, flags=re.IGNORECASE)
 
 
 def first_mention(text, target, aliases):
@@ -87,25 +97,28 @@ def score(jsonl_path, cases, aliases, decode="greedy"):
     n_b0 = 0
     for cid, buds in by.items():
         c = cmap[cid]; o_new, o_old = c["o_new"], c["o_old"]
+        clean = lambda t: _without_subject(t, c.get("s") or "")    # 挖主体复述（见 _without_subject）
         eff0 = buds.get("B0", {}).get("efficacy", [])
-        b0ok = (bool(eff0) and hit(eff0[0]["answer"], o_new, aliases)
-                and not hit(eff0[0]["answer"], o_old, aliases))
+        a0 = clean(eff0[0]["answer"]) if eff0 else ""
+        b0ok = (bool(eff0) and hit(a0, o_new, aliases) and not hit(a0, o_old, aliases))
         n_b0 += b0ok
         for b, probe_rows in buds.items():
             for e in probe_rows.get("efficacy", []):
+                ans, cot = clean(e["answer"]), clean(e["cot"])
                 n[b] += 1
-                es[b] += hit(e["answer"], o_new, aliases) and not hit(e["answer"], o_old, aliases)
-                clr[b] += hit(e["cot"], o_old, aliases)
-                fa = flip_analysis(e["answer"], o_new, o_old, aliases)   # 07 教训：首段断言 + 翻转
+                es[b] += hit(ans, o_new, aliases) and not hit(ans, o_old, aliases)
+                clr[b] += hit(cot, o_old, aliases)
+                fa = flip_analysis(ans, o_new, o_old, aliases)   # 07 教训：首段断言 + 翻转（主体已挖）
                 esf[b] += (fa["first"] == "new")     # ESf: 答案首段立场=编辑（容忍后续翻转）
                 flip[b] += fa["flipped"]             # Flip: 答案内 o_new/o_old 都现（先新后旧/先旧后新）
-                if b0ok and hit(e["answer"], o_old, aliases):
+                if b0ok and hit(ans, o_old, aliases):
                     rr[b] += 1                       # 条件回退（plan §2.5 定义）
             for pname, rows in probe_rows.items():
                 if pname.startswith("para"):         # para0/para1（改述泛化）
                     for pr in rows:
+                        pa = clean(pr["answer"])
                         ps_n[b] += 1
-                        ps[b] += hit(pr["answer"], o_new, aliases) and not hit(pr["answer"], o_old, aliases)
+                        ps[b] += hit(pa, o_new, aliases) and not hit(pa, o_old, aliases)
             for lr in probe_rows.get("locality", []):
                 loc_n[b] += 1
                 loc[b] += not hit(lr["answer"], o_new, aliases)   # 编辑未泄漏到邻域=局部性保持
@@ -133,16 +146,18 @@ def _indicators(jsonl_path, cases, aliases, decode):
     rr_rev = collections.defaultdict(list)
     for cid, buds in by.items():
         c = cmap[cid]; o_new, o_old = c["o_new"], c["o_old"]
+        clean = lambda t: _without_subject(t, c.get("s") or "")    # 与 score() 同口径挖主体
         eff0 = buds.get("B0", {}).get("efficacy", [])
-        b0ok = (bool(eff0) and hit(eff0[0]["answer"], o_new, aliases)
-                and not hit(eff0[0]["answer"], o_old, aliases))
+        a0 = clean(eff0[0]["answer"]) if eff0 else ""
+        b0ok = (bool(eff0) and hit(a0, o_new, aliases) and not hit(a0, o_old, aliases))
         for b, probe_rows in buds.items():
             for e in probe_rows.get("efficacy", []):
-                eff_es[b].append(1 if (hit(e["answer"], o_new, aliases)
-                                       and not hit(e["answer"], o_old, aliases)) else 0)
-                eff_clr[b].append(1 if hit(e["cot"], o_old, aliases) else 0)
+                ans, cot = clean(e["answer"]), clean(e["cot"])
+                eff_es[b].append(1 if (hit(ans, o_new, aliases)
+                                       and not hit(ans, o_old, aliases)) else 0)
+                eff_clr[b].append(1 if hit(cot, o_old, aliases) else 0)
                 if b0ok:
-                    rr_rev[b].append(1 if hit(e["answer"], o_old, aliases) else 0)
+                    rr_rev[b].append(1 if hit(ans, o_old, aliases) else 0)
     budgets = sorted(set(eff_es) | set(eff_clr) | set(rr_rev))
     return budgets, eff_es, eff_clr, rr_rev
 
