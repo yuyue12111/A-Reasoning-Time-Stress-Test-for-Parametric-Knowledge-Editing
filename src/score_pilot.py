@@ -58,6 +58,13 @@ def main():
         for b in bs:
             print(f"{b:<7}{cif(bs[b]['ES']):>24}{cif(bs[b]['RR']):>24}{cif(bs[b]['CLR']):>24}")
 
+        drop = metrics.drop_bootstrap(merged, cases, aliases, base="B0", n_boot=args.boot)
+        print(f"\nES 降幅 ES(B0)−ES(b) 配对 bootstrap（plan §2.5；越想越退主判据，CI 全>0=显著回退）：")
+        for b in sorted(drop):
+            t = drop[b]
+            sig = "  ✅CI>0 显著" if t and t[1] > 0 else ("  ⚠CI 含0" if t else "")
+            print(f"  B0→{b}: {cif(t)}{sig}")
+
     os.remove(merged)
     print("\ngo/no-go (plan §Phase 1): RR(natural=B3)≥0.20 或 ES 自 B0 降幅≥0.20pp，"
           "且 ≥60% 回退案例可归因反思片段（人工审计 30 条）。")

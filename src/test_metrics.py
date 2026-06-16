@@ -196,10 +196,25 @@ def test_score_bootstrap():
     assert bs == bs2, "同 seed 的 bootstrap 应可复现"
 
 
+def test_drop_bootstrap():
+    # 复用 _scenario: cf_0 B0=1/B1=0/B2=1, cf_1 B0=1/B1=1 → ES(B0)−ES(B1)=0.5, ES(B0)−ES(B2)=0
+    fd, path = tempfile.mkstemp(suffix=".jsonl"); os.close(fd)
+    _scenario(path)
+    cases = [{"case_id": "cf_0", "o_old": "Paris", "o_new": "Rome"},
+             {"case_id": "cf_1", "o_old": "French", "o_new": "English"}]
+    d = metrics.drop_bootstrap(path, cases, {"Rome": ["Roma"]}, base="B0", n_boot=500, seed=1)
+    os.remove(path)
+    assert abs(d["B1"][0] - 0.5) < 1e-9, f"B0→B1 降幅点估应 0.5: {d['B1']}"
+    assert abs(d["B2"][0] - 0.0) < 1e-9, f"B0→B2 降幅点估应 0.0: {d['B2']}"
+    for b in d:
+        pt, lo, hi = d[b]
+        assert -1 <= lo <= pt <= hi <= 1, f"{b} 降幅 CI 异常(应 -1≤lo≤点估≤hi≤1): {d[b]}"
+
+
 TESTS = [test_hit_alias_case_and_none, test_score_exact,
          test_paraphrase_locality_and_decode_filter, test_none_metrics_when_probe_absent,
          test_flip_analysis, test_score_esf_and_flip, test_subject_substring_guard,
-         test_score_bootstrap]
+         test_score_bootstrap, test_drop_bootstrap]
 
 
 def _main():

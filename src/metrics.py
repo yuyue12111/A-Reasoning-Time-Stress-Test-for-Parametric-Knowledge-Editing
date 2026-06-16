@@ -182,3 +182,43 @@ def score_bootstrap(jsonl_path, cases, aliases, n_boot=10000, seed=42, decode="g
 
     return {b: {"ES": ci_of(eff_es[b]), "CLR": ci_of(eff_clr[b]), "RR": ci_of(rr_rev[b])}
             for b in budgets}
+
+
+def _es_by_case(jsonl_path, cases, aliases, decode="greedy"):
+    """{case_id: {budget: 0/1}} 的 efficacy ES（去主体口径），供配对降幅 bootstrap。"""
+    cmap = {c["case_id"]: c for c in cases}
+    by = collections.defaultdict(lambda: collections.defaultdict(list))
+    for line in open(jsonl_path):
+        r = json.loads(line)
+        if r.get("probe") == "efficacy" and r.get("decode", "greedy") == decode:
+            by[r["case_id"]][r["budget"]].append(r)
+    es = collections.defaultdict(dict)
+    for cid, buds in by.items():
+        c = cmap[cid]; o_new, o_old = c["o_new"], c["o_old"]
+        clean = lambda t: _without_subject(t, c.get("s") or "")
+        for b, rows in buds.items():
+            ans = clean(rows[0]["answer"])
+            es[cid][b] = 1 if (hit(ans, o_new, aliases) and not hit(ans, o_old, aliases)) else 0
+    return es
+
+
+def drop_bootstrap(jsonl_path, cases, aliases, base="B0", n_boot=10000, seed=42, decode="greedy", ci=0.95):
+    """ES 降幅 ES(base)−ES(b) 的**配对** bootstrap CI（按 case 重采样，同 case 的两档同采）。
+    比边际 CI 更准地判"越想越退"显著性：配对消除 case 间方差（两个边际 CI 重叠 ≠ 降幅不显著）。
+    返回 {b: (point, lo, hi)}；point>0 = 思考后 ES 下降。降幅 CI 全 >0 → 显著回退。"""
+    import random
+    es = _es_by_case(jsonl_path, cases, aliases, decode)
+    rng = random.Random(seed)
+    lo_q, hi_q = (1 - ci) / 2, (1 + ci) / 2
+    budgets = sorted({b for v in es.values() for b in v} - {base})
+    out = {}
+    for b in budgets:
+        pairs = [(es[cid][base], es[cid][b]) for cid in es if base in es[cid] and b in es[cid]]
+        m = len(pairs)
+        if not m:
+            out[b] = None; continue
+        point = sum(a0 - ab for a0, ab in pairs) / m
+        means = sorted(sum((lambda p: p[0] - p[1])(pairs[rng.randrange(m)])
+                           for _ in range(m)) / m for _ in range(n_boot))
+        out[b] = (point, means[int(lo_q * n_boot)], means[min(int(hi_q * n_boot), n_boot - 1)])
+    return out
