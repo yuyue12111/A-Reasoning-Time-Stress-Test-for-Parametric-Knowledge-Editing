@@ -98,13 +98,15 @@ def test_apply_swaps_module_attrs_idempotent():
     assert ed.AutoModelForCausalLM is P.PatchedAutoModelForCausalLM
 
 
-def test_model_strips_fp32_kwarg():
-    # 复刻 editor.py L123：qwen 老分支传 fp32=False + 真 kwargs；不打补丁会 TypeError
+def test_model_strips_fp32_and_forces_bf16():
+    # 复刻 editor.py L123：qwen 老分支传 fp32=False + torch_dtype(fp32/fp16)；不打补丁会 TypeError
     P.PatchedAutoModelForCausalLM.from_pretrained(
-        NAME, fp32=False, trust_remote_code=True, torch_dtype="float16", device_map=None)
+        NAME, fp32=False, trust_remote_code=True, torch_dtype="float32", device_map=None)
     assert "fp32" not in _FakeAutoModel.last_kwargs, "fp32 应被剥掉"
+    assert "torch_dtype" not in _FakeAutoModel.last_kwargs, "editor 的旧 torch_dtype 应被去掉"
+    assert _FakeAutoModel.last_kwargs["dtype"] == "bfloat16", "应强制原生 bf16（24G 卡免 OOM）"
     assert _FakeAutoModel.last_kwargs["trust_remote_code"] is True, "其它 kwarg 应透传"
-    assert _FakeAutoModel.last_kwargs["torch_dtype"] == "float16", "torch_dtype 应透传"
+    assert _FakeAutoModel.last_kwargs["device_map"] is None, "其它 kwarg 应透传"
 
 
 def test_tokenizer_drops_eos_override_and_sets_pad():
@@ -128,7 +130,7 @@ def test_tokenizer_type_preserved_two_padding_branches():
     assert _editor_padding_side(tok, NAME, "FT") == "left", "非 ROME 族 AR tok → left"
 
 
-TESTS = [test_apply_swaps_module_attrs_idempotent, test_model_strips_fp32_kwarg,
+TESTS = [test_apply_swaps_module_attrs_idempotent, test_model_strips_fp32_and_forces_bf16,
          test_tokenizer_drops_eos_override_and_sets_pad,
          test_tokenizer_type_preserved_two_padding_branches]
 

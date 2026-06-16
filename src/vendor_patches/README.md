@@ -67,7 +67,9 @@ AlphaEdit 的 `cache_c` 进程级全局跨 `edit()` 累积（02 §5）——单�
 ### 采用的修法（方案 A，不改 source/）：模块属性级 monkeypatch
 `easyedit_qwen2_loader.py`：把 `easyeditor.editors.editor` 模块内引用的
 `AutoModelForCausalLM`/`AutoTokenizer`（editor.py:9 模块级 import）换成薄包装——
-model 包装剥 `fp32` kwarg；tokenizer 包装丢弃 eos/pad/unk 覆盖并把 pad 设回真 eos。
+model 包装剥 `fp32` kwarg **+ 强制 `dtype="bfloat16"`**（editor 默认 fp32 → 7B=28GB，单张 24G 卡
+如 4090 必 OOM；R1-Distill 原生 bf16=14GB，无精度损失、`compute_v` 比 fp16 稳，H200 上也更省更快）；
+tokenizer 包装丢弃 eos/pad/unk 覆盖并把 pad 设回真 eos。
 **作用域最小**（只动这两个名字）、editor.py 自身的两段 `padding_side` 逻辑（L132-137）原样保留、
 返回的是真 tokenizer 实例（不破坏 isinstance 门控）、可 mock 单测、零 fork 漂移。
 

@@ -33,12 +33,19 @@ _BOGUS_TOK_KWARGS = ("eos_token", "pad_token", "unk_token")
 
 
 class PatchedAutoModelForCausalLM:
-    """剥掉只有 Qwen-1 remote code 认的 `fp32` kwarg，其余透传真 AutoModelForCausalLM。
-    （pop 在缺省时为 no-op，故对 editor.py 其它分支无副作用。）"""
+    """① 剥掉只有 Qwen-1 remote code 认的 `fp32` kwarg；② 把 dtype 强制为模型原生 **bf16**。
+
+    为何强制 bf16：editor.py 的 qwen 分支默认 fp32（`fp16:false`），7B fp32=28GB → 单张 24G 卡
+    （4090/3090/A5000 等）加载即 OOM。R1-Distill 原生就是 bf16（14GB，省一半显存且无精度损失），
+    bf16 的数值范围同 fp32，对 ROME `compute_v` 的梯度优化也比 fp16 稳。H200 上同样 OK（更省显存更快）。
+    用字符串 `"bfloat16"` 设 `dtype=`（transformers 5.5 的新名，旧 `torch_dtype` 已弃用）——
+    **不 import torch**，本模块保持零重依赖、mock 测在 system python3 可跑。"""
 
     @staticmethod
     def from_pretrained(*args, **kwargs):
         kwargs.pop("fp32", None)
+        kwargs.pop("torch_dtype", None)          # 去掉 editor 传的 fp32/fp16 旧名
+        kwargs["dtype"] = "bfloat16"             # 强制原生 bf16（24G 卡免 OOM）
         return _REAL_AUTO_MODEL.from_pretrained(*args, **kwargs)
 
 
