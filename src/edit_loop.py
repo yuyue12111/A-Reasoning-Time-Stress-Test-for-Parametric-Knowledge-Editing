@@ -102,11 +102,19 @@ def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1,
                 continue
             wcopy = None
             try:
+                # ⚠ sequential_edit=True 是刻意的、不可改回 False（血泪雷点）：
+                # EasyEdit 的 edit_requests 在 sequential_edit=False 时，会在 edit() **返回前**就把
+                # ROME/MEMIT 权重还原回基座（editor.py:406-409 的末尾 else 分支 copy_to_param 回写）。
+                # 那样我们随后的 generate_with_budget 全程在**未编辑的基座**上生成 —— 编哪层都一样、
+                # 生成式 ES 测的全是基座（曾导致三层 md5 全等、08 的"rewrite_acc≫生成式 ES"被污染）。
+                # sequential_edit=True 时 ROME/MEMIT 不在内部还原（editor.py:384-393），编辑保留到我们
+                # 生成完，再由下方 finally:restore(model,wcopy) 做单条协议的还原。我们每次只传 1 条
+                # request、每条 case 后必还原 → 无跨条累积，单条编辑协议成立。
                 _, _, wcopy = ed.edit(prompts=[c["prompt"]],
                                       ground_truth=[c["o_old"]],
                                       target_new=[c["o_new"]],
                                       subject=[c["s"]],          # ROME/MEMIT 必需
-                                      sequential_edit=False)
+                                      sequential_edit=True)
                 for b in budgets:
                     for ptype, q in probes(c):
                         for decode, seed, temp, gk in arms:
