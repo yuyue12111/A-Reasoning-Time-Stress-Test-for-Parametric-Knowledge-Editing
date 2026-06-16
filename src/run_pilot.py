@@ -1,13 +1,23 @@
 """Pilot 主入口 (plan Phase 1)：读 yaml → 抽样 cases → 跑 edit_loop（分片 + 续跑）。
 
+**从项目根目录跑**（yaml 里 data/、source/EasyEdit/hparams、results/ 都相对项目根；脚本也会把它们
+解析成项目根的绝对路径，故任意 cwd 均可，但建议在根目录）。easyeditor 靠 PYTHONPATH 引入：
+
+  cd <项目根>
   # 8 卡，每卡一进程：
-  cd source/EasyEdit
-  for r in $(seq 0 7); do PYTHONPATH=. python ../../src/run_pilot.py \
-      --config ../../experiments/pilot.yaml --editor ROME --rank $r --world 8 & done; wait
+  for r in $(seq 0 7); do PYTHONPATH=source/EasyEdit python src/run_pilot.py \
+      --config experiments/pilot.yaml --editor ROME --rank $r --world 8 --device $r & done; wait
   # 干跑（无 GPU，验证抽样/分片/路径/overrides）：
-  python src/run_pilot.py --config experiments/pilot.yaml --editor ROME --dry-run
+  PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/pilot.yaml --editor ROME --dry-run
 """
 import argparse, json, os, random, yaml
+
+_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # src/ 的上一级=项目根
+
+
+def _abs(p):
+    """相对路径按项目根解析（绝对路径原样）——使 run_pilot 不依赖 cwd（data/hparams/results/stats）。"""
+    return p if os.path.isabs(p) else os.path.join(_ROOT, p)
 
 
 def load_cases(path, n=None, seed=42):
@@ -23,21 +33,24 @@ def shard_ids(cases, rank, world):
 
 def resolve(cfg, editor, rank, world, device=None):
     ds = cfg["dataset"]
-    path = ds["path"] if os.path.exists(ds["path"]) else ds.get("fallback_path", ds["path"])
-    prefiltered = path == ds["path"]
+    p_pre, p_fb = _abs(ds["path"]), _abs(ds.get("fallback_path", ds["path"]))
+    path = p_pre if os.path.exists(p_pre) else p_fb
+    prefiltered = path == p_pre
     cases = load_cases(path, ds.get("n"), cfg.get("seed", 42))
     ed = cfg["editors"][editor]
     overrides = dict(cfg.get("hparams_overrides", {}))
     overrides["device"] = device if device is not None else rank
+    if "stats_dir" in overrides:                 # mom2 缓存位置也按项目根固定（不随 cwd 漂移）
+        overrides["stats_dir"] = _abs(overrides["stats_dir"])
     if "layers" in ed:
         overrides["layers"] = ed["layers"]
-    out = os.path.join(cfg["out_dir"],
+    out = os.path.join(_abs(cfg["out_dir"]),
                        f"{cfg['model_tag']}_{editor}_{ds['tag']}_r{rank}of{world}.jsonl")
     samp = cfg.get("sampling")               # plan §2.5 采样臂；enabled=false 时 None（首窗 greedy 先行 §6.3）
     sampling = None
     if samp and samp.get("enabled"):
         sampling = {"temperature": samp.get("temperature", 0.6), "seeds": samp.get("seeds", [0, 1, 2])}
-    return dict(path=path, prefiltered=prefiltered, cases=cases, hparams=ed["hparams"],
+    return dict(path=path, prefiltered=prefiltered, cases=cases, hparams=_abs(ed["hparams"]),
                 overrides=overrides, out=out, budgets=cfg["budgets"], sampling=sampling)
 
 

@@ -148,22 +148,25 @@ PYTHONPATH=source/EasyEdit python src/rome_mps_probe.py --model $M --device cuda
 # ② mom2 预热 —— ⚠️ 关键：**必须单进程先跑**（用 1 张卡），别直接开 8 进程！
 #    8 进程并发首跑会各自重算协方差(每个 ~几 GPU·h)、还可能写坏缓存。预热只跑 1 条 case 把 mom2 算好缓存。
 #    （8 卡是给 pilot 并行用的；mom2 本身是单 GPU 活，开 8 卡也不会更快，所以先单进程喂出缓存。）
-cd source/EasyEdit
-PYTHONPATH=. python ../../src/run_pilot.py --config ../../experiments/pilot.yaml \
+#    ⚠️ 全部从项目根跑，**别 cd 进 source/EasyEdit**（yaml 路径相对项目根；easyeditor 靠 PYTHONPATH 引入）
+PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/pilot.yaml \
     --editor MEMIT --rank 0 --world 200 --device 0          # world=200 → 只跑 1 条，触发并缓存 mom2
-rm ../../results/pilot/r1qwen7b_MEMIT_cf200_r0of200.jsonl   # 删热身分片（别混进打分）
-cd ../..
+rm results/pilot/r1qwen7b_MEMIT_cf200_r0of200.jsonl         # 删热身分片（别混进打分）
 
 # ③ 预过滤（1 卡即可，~0.5–1h）
-cd source/EasyEdit
-PYTHONPATH=. python ../../src/prefilter.py --config ../../experiments/pilot.yaml --device 0
-cd ../..
+PYTHONPATH=source/EasyEdit python src/prefilter.py --config experiments/pilot.yaml --device 0
 
-# ④ layer 小扫 + ⑤ pilot 正式跑 —— **8 卡全开**，照 RUNBOOK.md §4b/§4c（每段 8 进程、--world 8 --device $r）。
-#    合格线判生成式 ES≥0.90 & Loc≥0.85 @B0（不看 rewrite_acc）。命令块见 RUNBOOK §4 / interplan2 §4。
+# ④ layer 小扫 + ⑤ pilot 正式跑 —— **8 卡全开**（仍从项目根）：
+for r in $(seq 0 7); do
+  PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/pilot.yaml --editor ROME --rank $r --world 8 --device $r &
+done; wait
+for r in $(seq 0 7); do
+  PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/pilot.yaml --editor MEMIT --rank $r --world 8 --device $r &
+done; wait
+#    layer 扫合格线判生成式 ES≥0.90 & Loc≥0.85 @B0（不看 rewrite_acc）；6 组配置见 RUNBOOK §4b。
 
 # ⑥ 打分（CPU，同终端）
-cd $W/why-aaai27 && python src/score_pilot.py --config experiments/pilot.yaml --editor ROME
+python src/score_pilot.py --config experiments/pilot.yaml --editor ROME
 python src/score_pilot.py --config experiments/pilot.yaml --editor MEMIT
 ```
 

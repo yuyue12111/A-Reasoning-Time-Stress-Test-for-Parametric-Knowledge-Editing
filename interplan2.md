@@ -123,7 +123,7 @@ python -c "import sys;sys.path.insert(0,'src');from vendor_patches.easyedit_mom2
 for t in metrics edit_loop run_pilot; do python src/test_$t.py; done
 python src/vendor_patches/test_qwen2_loader.py && python src/vendor_patches/test_mom2_dataset.py
 python src/test_think_budget.py && python src/test_steer.py
-cd source/EasyEdit && PYTHONPATH=.:$W/why-aaai27/src python -c "from vendor_patches.easyedit_qwen2_loader import apply as a1; from vendor_patches.easyedit_mom2_dataset import apply as a2; a1(); a2(); print('PATCH OK')"
+PYTHONPATH=source/EasyEdit:src python -c "from vendor_patches.easyedit_qwen2_loader import apply as a1; from vendor_patches.easyedit_mom2_dataset import apply as a2; a1(); a2(); print('PATCH OK')"
 ```
 **收尾**：实例「保存镜像并停止」→ 存为 **`whyaaai-env`**；后续所有作业用它（环境步永久免做）。
 
@@ -134,28 +134,29 @@ cd source/EasyEdit && PYTHONPATH=.:$W/why-aaai27/src python -c "from vendor_patc
 
 ⚠️ **8 卡只加速 pilot 的 case 分片；mom2 是单 GPU 单进程的一次性活，必须先单进程喂出缓存再开 8 进程**，否则 8 进程各自重算协方差（每个数 GPU·h）+ 写坏缓存。顺序（行首均 `cd`+离线 export，`M=$W/models/DeepSeek-R1-Distill-Qwen-7B`）：
 
+⚠️ **全部从项目根 `$W/why-aaai27` 跑，别 `cd` 进 `source/EasyEdit`**（yaml 里 data/hparams/results 都相对项目根；easyeditor 靠 `PYTHONPATH=source/EasyEdit` 引入）。`W` 见 qz_quickstart 第 0 步（`export W=$(dirname "$PWD")`）。
 ```bash
-W=/inspire/qb-ilm/project/ai4education/ky26140; cd $W/why-aaai27
-export HF_HOME=$W/hf HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1; M=$W/models/DeepSeek-R1-Distill-Qwen-7B
+cd $W/why-aaai27
+export HF_HOME=$W/hf HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+M=$W/models/DeepSeek-R1-Distill-Qwen-7B
 
 # ① 冒烟（~15min，用 1 张卡；先确认 7B 真能编+整链通，别让 pilot 跑一半才暴雷）
 python src/test_think_budget.py --model $M --device cuda
 PYTHONPATH=source/EasyEdit python src/rome_mps_probe.py --model $M --device cuda:0 --cases 2 --budgets B0 --fresh
 
-# ② mom2 预热（⚠️ 单进程 1 卡！world=200 → 只跑 1 条 case，触发并缓存 mom2；H200 估 2–4h）
-cd source/EasyEdit
-PYTHONPATH=. python ../../src/run_pilot.py --config ../../experiments/pilot.yaml --editor MEMIT --rank 0 --world 200 --device 0
-rm ../../results/pilot/r1qwen7b_MEMIT_cf200_r0of200.jsonl   # 删热身分片，防混入打分 glob
+# ② mom2 预热（⚠️ 单进程 1 卡！world=200 → 只跑 1 条 case，触发并缓存 mom2）
+PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/pilot.yaml --editor MEMIT --rank 0 --world 200 --device 0
+rm results/pilot/r1qwen7b_MEMIT_cf200_r0of200.jsonl   # 删热身分片，防混入打分 glob
 
 # ③ 预过滤（1 卡，~0.5–1h）
-PYTHONPATH=. python ../../src/prefilter.py --config ../../experiments/pilot.yaml --device 0
+PYTHONPATH=source/EasyEdit python src/prefilter.py --config experiments/pilot.yaml --device 0
 
 # ④ layer 小扫（6 组：ROME [5]/[7]/[10]、MEMIT [4-8]/[6-10]/[8-12]；各 n=50 只 B0）+ ⑤ pilot —— **8 卡全开**：
 for r in $(seq 0 7); do
-  PYTHONPATH=. python ../../src/run_pilot.py --config ../../experiments/pilot.yaml --editor ROME --rank $r --world 8 --device $r &
+  PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/pilot.yaml --editor ROME --rank $r --world 8 --device $r &
 done; wait
 for r in $(seq 0 7); do
-  PYTHONPATH=. python ../../src/run_pilot.py --config ../../experiments/pilot.yaml --editor MEMIT --rank $r --world 8 --device $r &
+  PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/pilot.yaml --editor MEMIT --rank $r --world 8 --device $r &
 done; wait
 ```
 layer 扫的 6 组配置怎么造、合格线判据、定稿回写 `pilot.yaml`——照 `RUNBOOK.md` §4b（**判生成式 ES≥0.90 & Loc≥0.85 @B0，永不混 rewrite_acc**）。pilot 跑完进 §5 打分。被抢占/超时同命令重跑即续。

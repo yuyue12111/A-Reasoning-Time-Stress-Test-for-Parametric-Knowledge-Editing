@@ -28,7 +28,7 @@ pip install -r env.lock           # 若 env.lock 有 @file/本地路径报错，
 1. `conda create` 卡 ToS → 用 `-c conda-forge --override-channels`（上面已含）。
 2. conda-forge 的 python 不自带 pip → `create` 时显式列 `pip`，或 `python -m ensurepip --upgrade`。
 3. 系统 py 太旧（<3.10）装不了 torch2.9/transformers5.5 → 必须 ≥3.10 env。
-4. `easyeditor` 是**本地包非 pip 安装**，且无 setup.py → 跑任何用到它的脚本要 `cd source/EasyEdit && PYTHONPATH=.`。
+4. `easyeditor` 是**本地包非 pip 安装**，且无 setup.py → 跑任何用到它的脚本：**在项目根目录加 `PYTHONPATH=source/EasyEdit`**（如 `PYTHONPATH=source/EasyEdit python src/run_pilot.py ...`）。**别 cd 进 source/EasyEdit**——yaml 里 data/hparams/results 都相对项目根，cd 进去会找不到（run_pilot 已把这些解析成项目根绝对路径，但仍以根目录为准）。
 5. GPU 机改 device：脚本默认按 rank 给卡号（见 §4c）。
 
 ## 2. 数据（一次性；若 `data/*.jsonl` 不在）
@@ -50,8 +50,8 @@ MEMIT 首次 `edit()` 会**自动**触发并缓存到 `stats_dir`。我们已把
   （启智挂载 `/inspire/dataset/wikipedia/20231101/`，自动探测，离线安全；`WHYAAAI_WIKI_PARQUET`
   可显式指路径），无本地分片再回落 `wikimedia/wikipedia/20231101.en` hub 映射（有网时 ~20GB）。
   机理与口径注记见 `src/vendor_patches/README.md` §3、平台接线见 `interplan2.md` §2。
-- ⚠️ **并发预热雷**：8 分片并发首跑会**同时**触发 mom2（浪费 + 可能写坏缓存）——先单进程预热：
-  `PYTHONPATH=. python ../../src/run_pilot.py --config ../../experiments/pilot.yaml --editor MEMIT --rank 0 --world 200 --device 0`
+- ⚠️ **并发预热雷**：8 分片并发首跑会**同时**触发 mom2（浪费 + 可能写坏缓存）——先单进程预热（**项目根跑**）：
+  `PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/pilot.yaml --editor MEMIT --rank 0 --world 200 --device 0`
   （world=200 → 只跑 1 条 case，顺带算好 mom2；**跑完删掉热身分片** `results/pilot/*_r0of200.jsonl`，防混入打分 glob），然后再开 8 分片。
 
 ## 4. Pilot（关键路径，6/22 go/no-go）
@@ -62,10 +62,10 @@ MEMIT 首次 `edit()` 会**自动**触发并缓存到 `stats_dir`。我们已把
 **采样臂**：默认 greedy（首窗主口径）；要跑 plan §2.5 的 temp0.6×3，把 `pilot.yaml` 的 `sampling.enabled` 设 `true`（每 case 多产 3 行 `decode=sample`）。
 
 ### 4a 预过滤（§2.3，先做，约 0.5–1 GPU·h）
-只留「编辑前模型确实知道旧事实」的 case，否则「回退」无意义。
+只留「编辑前模型确实知道旧事实」的 case，否则「回退」无意义。**所有命令在项目根跑**（yaml 路径相对项目根；
+easyeditor 靠 `PYTHONPATH=source/EasyEdit` 引入。run_pilot 会把 data/hparams/results 解析成项目根绝对路径）。
 ```bash
-cd source/EasyEdit
-PYTHONPATH=. python ../../src/prefilter.py --config ../../experiments/pilot.yaml --device 0
+PYTHONPATH=source/EasyEdit python src/prefilter.py --config experiments/pilot.yaml --device 0
 # → data/counterfact.prefiltered.jsonl（攒够 2×n=400 存活即停）
 ```
 存活率预计 40–60%。`--budget B0` 更快但可能漏召；默认 B3（自然思考）最忠实。
@@ -78,16 +78,15 @@ R1-Distill-Qwen-7B 基座是 Qwen2.5-**Math**-7B，现成 hparams 仅架构兼�
 - ⚠️ **合格线必判生成式 `ES_b`，不可用 EasyEdit `rewrite_acc`**：08 笔记实证在 1.5B 上 rewrite_acc post=6/8 但生成式 ES_b=0/8——rewrite_acc 会"通过"一堆生成不动的层。1.5B@默认超参编辑不进生成 → 7B 这步若也过不了线，先调 `v_lr/v_num_grad_steps` 或换层，再不行退 Qwen2.5-7B-Instruct 基线（plan 风险表）。
 - 选定后改回 `pilot.yaml` 定稿。
 
-### 4c 跑 pilot（8 卡分片，约 4–6 GPU·h）
+### 4c 跑 pilot（8 卡分片，约 4–6 GPU·h；**项目根跑，别 cd 进 source/EasyEdit**）
 ```bash
-cd source/EasyEdit
 for r in $(seq 0 7); do
-  PYTHONPATH=. python ../../src/run_pilot.py --config ../../experiments/pilot.yaml \
+  PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/pilot.yaml \
       --editor ROME --rank $r --world 8 --device $r &
 done; wait
 # MEMIT 同理（换 --editor MEMIT）
 for r in $(seq 0 7); do
-  PYTHONPATH=. python ../../src/run_pilot.py --config ../../experiments/pilot.yaml \
+  PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/pilot.yaml \
       --editor MEMIT --rank $r --world 8 --device $r &
 done; wait
 ```

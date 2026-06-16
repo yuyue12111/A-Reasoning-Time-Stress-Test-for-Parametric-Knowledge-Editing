@@ -48,9 +48,10 @@ def test_resolve_overrides_and_paths():
     os.remove(dp)
     assert R["overrides"]["device"] == 2, "device 默认用 rank"
     assert R["overrides"]["model_name"] == "deepseek-ai/X"
-    assert R["overrides"]["stats_dir"] == "./data/stats_r1qwen"
+    assert os.path.isabs(R["overrides"]["stats_dir"]) and R["overrides"]["stats_dir"].endswith("data/stats_r1qwen"), \
+        f"stats_dir 应解析为项目根绝对路径: {R['overrides']['stats_dir']}"
     assert R["overrides"]["layers"] == [5], "layers 来自 editor 段"
-    assert R["out"].endswith("r1qwen7b_ROME_cf200_r2of8.jsonl"), f"out 命名错: {R['out']}"
+    assert os.path.isabs(R["out"]) and R["out"].endswith("r1qwen7b_ROME_cf200_r2of8.jsonl"), f"out 命名错: {R['out']}"
     assert R["prefiltered"] is True, "dataset.path 存在即视为预过滤输入"
     assert len(R["cases"]) == 5
 
