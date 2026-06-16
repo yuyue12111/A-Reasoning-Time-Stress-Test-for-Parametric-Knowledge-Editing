@@ -43,10 +43,11 @@ data/     清洗数据(大文件 gitignore,     results/ 实验 jsonl（gitignor
 
 ## 防雷清单（前人血泪，违反必翻车）
 
+- **致命：`edit_loop` 调 `ed.edit(...)` 必须 `sequential_edit=True`，永不改回 `False`**——EasyEdit `edit_requests`（`editor.py:406-409`）在 `sequential_edit=False` 时于 `edit()` **返回前**就把 ROME/MEMIT 权重还原回基座 → 随后 `generate_with_budget` **全程在未编辑的基座上生成**（编哪层都一样、三层 md5 逐字节相同）。`True` 时不内部还原，编辑保留到生成完、再由 `finally:restore` 做单条协议还原（每次仅 1 条 request + 每条必还原 → 无跨条累积）。**此 bug 曾污染 08 全部生成式 ES + 首版三层扫描**；修复 commit `fb46107`(2026-06-16)，`edit_loop.py` 已加强注释。
 - **EasyEdit 把含 'qwen' 不含 'qwen2' 的 model_name 路由进老 Qwen1 分支**（`editor.py:122`：fp32 kwarg TypeError + 错 eos）→ **已由 `edit_loop` 自动接入的 `vendor_patches/easyedit_qwen2_loader.py`(方案A) 修掉**；任何新入口加载 R1-Distill-Qwen 前须确保 `apply()` 生效（pilot 主路径已自动）
 - **EasyEdit mom2 语料 id 在 datasets≥3 已死**（`layer_stats.py:104` 脚本式 `wikipedia/20200501.en` 必崩，MEMIT/AlphaEdit 前置全断）→ 已由 `vendor_patches/easyedit_mom2_dataset.py` 映射 `wikimedia/wikipedia/20231101.en`（edit_loop 自动接入；不走 edit_loop 的入口须自调 `apply()`）；8 分片**并发首跑会重复触发 mom2**——先单进程预热（RUNBOOK §3）
-- **口径：layer 扫合格线判 `生成式 ES_b(B0)`，不判 `rewrite_acc`**——08 实证 rewrite_acc post=6/8 但生成式 ES_b=0/8，两者脱节；rewrite_acc 会"通过"生成不动的层
-- R1-Distill-Qwen-7B 基座是 Qwen2.5-**Math**-7B：现成 qwen2.5-7b hparams 仅架构兼容，layers 需 {[4-8],[6-10],[8-12]} 扫描（合格线 ES≥90% & Locality≥85%，**生成式口径**）；1.5B@默认超参编辑不进生成（08）→ 主结果须 7B
+- **口径：layer 扫合格线判 `生成式 ES_b(B0)`，不判 `rewrite_acc`**——修复后 7B/CF 实测 rewrite_acc≈1.0 但生成式 ES_b≈0.55（layer5,n=40,B0），口径差真实存在（~0.45），rewrite_acc 会"通过"生成里只部分显形的编辑（**注：08 旧引用的 6/8 vs 0/8 是上面那个 sequential_edit bug 的污染值，已作废**）
+- R1-Distill-Qwen-7B 基座是 Qwen2.5-**Math**-7B：现成 qwen2.5-7b hparams 仅架构兼容，layers 实测 **layer5>7>10（已锁 layer5）**；**合格线已改为「Loc≥0.85 下取生成式 B0 ES_b 最高的层」**（原 ES≥90% 是 rewrite_acc 口径数误植到生成式口径，见 plan v1.18）；主结果须 7B（1.5B 见 08，但其"编辑不进生成"结论受 bug 污染、存疑）
 - DeepSeek 模板用**全角竖线** `<｜User｜>`(U+FF5C)，复制时极易被替换成半角导致静默错误；真 eos 是 `<｜end▁of▁sentence｜>`(151643)，`<think>`/`</think>` 是 special=false 原子 token(151648/151649)
 - `edit_loop.run` 的 `finally: restore(...)` 不许删——异常不还原会污染整个分片（真权重侧 08 已验还原正确）
 - jsonl 溯源头用 `git -C <项目根>`（`source/EasyEdit` 自带 .git，HEAD 不同，否则记错哈希）

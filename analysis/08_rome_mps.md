@@ -1,5 +1,26 @@
 # 08 · 本地 M5/MPS 参数版 ROME 首信号（harness 真权重端到端 + rewrite_acc≠ES_b 口径实证）
 
+> ## ⚠ 重大更正（2026-06-16）—— §3 的"完全脱节"结论被 harness bug 污染，已作废
+>
+> 本笔记的**核心发现 §3「rewrite_acc post=6/8 但生成式 ES_b(B0)=0/8，两口径完全脱节」是错的**，
+> 原因是 **`edit_loop` 当时传 `sequential_edit=False`**：EasyEdit `edit_requests`（`editor.py:406-409`）
+> 在该模式下**于 `edit()` 返回前就把 ROME 权重还原回基座**。我们随后 `generate_with_budget` 全程在
+> **未编辑的基座**上生成——所以「编辑后 raw 与编辑前 byte 级一致」（§3.1）不是"1.5B 编辑不进生成"，
+> 而是**根本没在编辑后的模型上生成**。`rewrite_acc`（§2，post=6/8）在还原**之前**算的，仍有效。
+>
+> **修复**: `edit_loop` 改 `sequential_edit=True`（commit `fb46107`，2026-06-16）。
+>
+> **修复后真数（7B / real CounterFact / n=40 / B0 / 8×4090）**：生成式 **ES_b=0.55**（layer5）/0.475(7)/0.40(10)，
+> 而 rewrite_acc≈1.0 → **口径差是真的，但是 ~0.45 不是 ~1.0**；"editing 进 logits 不进生成"被夸大了。
+> 三层在修复前 md5 逐字节相同、修复后 0.55/0.475/0.40 分开——是这个 bug 的铁证（见 plan v1.16 / 6.16 实录）。
+>
+> **逐节裁决**：§1（ROME 跑通/无算子墙）✅有效 ｜ §2（rewrite_acc=6/8）✅有效 ｜ **§3/§3.1/§3.2 ❌作废**
+> （生成在基座上）｜ §4.1（"判生成式 ES_b 不判 rewrite_acc"）——**指导仍对**（口径差真实存在），但**引用的 6/8 vs 0/8
+> 反例作废**，真实差距小得多，且 0.90 合格线已按生成式口径下调（plan §7，见 v1.16）｜ §4.4（restore 正确）✅有效
+> ｜ §5（1.5B 参数版"诚实负"）⚠**存疑**：负值多半是本 bug 而非 1.5B 太弱，须用修复版在 1.5B 复测才能下结论。
+>
+> 下方原文全部保留作审计留痕，但 §3 系的"脱节"叙述**以本框为准**。
+
 - **日期**: 2026-06-12 ｜ **状态**: 跑完 ✅（ROME-on-MPS 通了，**无算子墙**；现象在 1.5B 上诚实负）
 - **机器/模型**: MacBook Pro M5 Pro 24G，MPS(float32)，`deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B`（≈7 tok/s）
 - **脚本**: `src/rome_mps_probe.py`（复用 `edit_loop.run` → 端到端验证整条 pilot harness）；ROME hparams `hparams/ROME/qwen2.5-7b.yaml`（1.5B 与 7B 同架构 28 层 qwen2，复用）

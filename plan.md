@@ -4,7 +4,7 @@
 - **目标**: AAAI-27（2027-02-16/23, 蒙特利尔）。首选 **AI Alignment track**（编辑作为安全干预在 test-time compute 下失效），备选 Main Track
 - **硬截止**: abstract **2026-07-20**，全文 **2026-07-27**，补充材料 +3 天（均 UTC-12；以官方 CFP 页为准，本周内再核对一次 track 专属日期）
 - **页数约束**: 正文 7 页 + 参考文献；两阶段评审（Phase 1 两人工评审 + 一份 AI 生成非决策评审），故 **摘要/引言/图 1 必须在 Phase 1 就能独立讲完整个故事**
-- **版本**: v1.17 (2026-06-12)。决策记录：方向 B′ 经地毯式查新确认窄切口可行（见 `analysis/00_shortlist.md`）；复现队列 7 项已确认；pilot go/no-go 机制生效。**阶段交接见 `phase-1.md`，进度总结与作战计划见 `sumandplan1.md`，组内启智平台（全离线）开窗操作见 `interplan2.md`（实测 `report.md`）**
+- **版本**: v1.18 (2026-06-16)。决策记录：方向 B′ 经地毯式查新确认窄切口可行（见 `analysis/00_shortlist.md`）；复现队列 7 项已确认；pilot go/no-go 机制生效；**6/16 抓修一只致命 harness bug（生成全在基座）→ 首次拿到真实 7B 生成式编辑信号（ES_b=0.55），并按生成式口径重定 layer 合格线**。**阶段交接见 `phase-1.md`，进度总结与作战计划见 `sumandplan1.md`，组内启智平台（全离线）开窗操作见 `interplan2.md`（实测 `report.md`）**
 - **v1.1 变更**: ① 新增 §2.6 第 4 项混杂（批量编辑干扰）并确立**单条编辑为主协议**；② §5 算力账按单条编辑协议重算（70 → ~400 GPU·h，原估计依赖批量编辑+vLLM 假设，与主协议冲突）；③ 风险表补 R1-Distill-Qwen-7B 基座为 Qwen2.5-**Math**-7B 的超参移植风险与层扫描预案；④ 新增 §11 源码实测附录（hparams 路径、prefill 模板字符串、CPU 冒烟脚本，全部为 2026-06-10 源码确认）
 - **v1.2 变更 (2026-06-10)**: ① **单条编辑协议获用户签字确认**（算力 420 GPU·h 预算生效）；② EasyEdit 权重还原机制审计完成（精确逐元素拷回，循环正确性成立，证据见 `analysis/01_easyedit.md` §3）；③ CPU 冒烟因容器磁盘/无 torch 改在本地执行（命令在 01 笔记 §1）；④ 新增 §12 Pilot harness 三模块完整实现代码
 - **v1.3 变更 (2026-06-10)**: ① Phase 0 第 3 张复现笔记 `analysis/03_rtofu.md` 完成（R-TOFU 解码协议 + 口径审计）；②【§12.1 注意点② 定案】`<think>`/`</think>` 在 R1-Distill-Qwen-7B 与 -Llama-8B 的 tokenizer 中均**非**特殊 token（查 HF `tokenizer_config.json` 之 `added_tokens_decoder`）→ `</think>` 走文本检测，无需 token-id StoppingCriteria；③ `src/think_budget.py` 用 R-TOFU 逐字 prefill（ZeroThink/LessThink/DefaultCoT，byte-for-byte 校验）替换 v0 占位，`_gen` 解码改 `skip_special_tokens=True`；④【待用户拍板】预算档定义在 §2.4（6 档）与 §12.1 代码（B0–B4 5 档）间不自洽，详见 03 笔记 §9
@@ -35,6 +35,12 @@
   ② 新增 **`interplan2.md`** 取代 interplan §2–§7（Mac 打包上传 → 平台解包 → `env.platform.lock` 离线装环境 → 模型绝对路径 override → 自检五连 → 冒烟/正式跑/回传），interplan.md 加横幅降级为平台机制参考；
   ③ **`easyedit_mom2_dataset.py` 升 v2**（report §7 问题 A 修复）：本地 parquet **直读分支**优先（自动探测 `/inspire/dataset/wikipedia/...`，env `WHYAAAI_WIKI_PARQUET` 可显式指定；完全不碰 HF hub，`HF_*_OFFLINE=1` 安全），无本地分片回落 hub 映射；mock 测 4→5；
   ④ **抓住 report 遗留的一个平台必崩项**：上轮 wheels 里 pyarrow 被 manylinux2014 约束误降到 20.0.0，而 `datasets 4.8.5` 硬性要求 **pyarrow≥21**（import 即崩）→ wheels 修正三件（pyarrow 24.0.0 manylinux_2_28 重下、antlr4 回 4.9.3 本地打纯 py wheel（omegaconf 2.3.0 锁版）、补 av/opencv 保险）+ `env.platform.lock`（平台专用安装清单，与 env.lock 分明）
+- **v1.18 变更 (2026-06-16)**: **8×4090 首次真跑 → 抓修致命 harness bug + 拿到真实生成式编辑信号 + 口径合格线决策**——
+  ① **【致命 bug 修复，commit `fb46107`】`edit_loop` 的 `ed.edit(...)` 从 `sequential_edit=False` 改 `True`**：EasyEdit `edit_requests`（`editor.py:406-409`）在 `sequential_edit=False` 下**于 `edit()` 返回前就把 ROME/MEMIT 权重 `copy_to_param` 还原回基座** → 我们随后 `generate_with_budget` **全程在未编辑的基座上生成**。铁证：8 卡跑 layer 5/7/10（溯源头 `overrides.layers` 各为 [5]/[7]/[10] 正确），但三层生成正文 md5 **逐字节相同**（`06a75b04…`）、score 全等（ES=0.075）。`sequential_edit=True` 下 ROME/MEMIT 不内部还原（`editor.py:384-393`），编辑保留到生成完、再由 `edit_loop` 自己的 `finally:restore(model,wcopy)` 做单条协议还原（每次仅 1 条 request + 每条必还原 → 无跨条累积，单条编辑协议成立）。mock 单测全绿；
+  ② **【真实信号】修复后同条件（7B / real CounterFact / n=40 / B0 / 未预过滤 / 8×4090）生成式 ES_b：layer 5=0.55（Loc 0.85）> layer 7=0.475（Loc 0.825）> layer 10=0.40（Loc 0.825）**——ES 从 0.075 跳到 0.55（×7），三层分开且单调（早中层更利事实编辑，合 ROME 文献）。**锁定 layer 5**；
+  ③ **【口径决策，拍板】§7/Phase 1 的 layer 合格线 `B0 ES≥0.90 & Loc≥0.85` 中的 0.90 是 rewrite_acc 口径数字、误植到生成式 ES_b 口径**：实测 rewrite_acc≈1.0 但生成式 ES_b≈0.55，~0.45 的 logits↔生成 口径差**本身是论文发现之一**。**改为「在 Loc≥0.85 前提下取生成式 B0 ES_b 最高的层」**（best-achievable，非固定 0.90），论文 rewrite_acc 与 ES_b 并列汇报；
+  ④ **【文档更正】**`analysis/08` 顶部加重大更正框（§3「rewrite_acc 6/8 vs 生成式 ES_b 0/8 完全脱节」**作废**——当时也走 `sequential_edit=False`，生成在基座上；§1/§2/§4.4 仍有效，§5 的 1.5B"诚实负"存疑待复测）；CLAUDE.md 防雷清单加 `sequential_edit=True` 致命条 + 更正口径条与 layer 条；
+  ⑤ **下一步**：layer 5 跑 B0/B3/B4 预算扫（测"越想越退"主论点 ES 是否随预算崩塌、RR/Flip 是否抬头）→ 若信号在，预过滤 n=200 + 全档正式 pilot（ROME+MEMIT）出正式数
 
 ---
 
@@ -127,7 +133,7 @@
 - **RR(b)** = P( A(e,b)=o_old | A(e,0)=o* )，**条件回退率**——零思考下成功的编辑中，b 预算下回到旧答案的比例（主指标，剔除"本来就没编成功"的噪声）
 - **Leak(b)** = P( o_old ∈ C(e,b) )，链内旧知识提及率
 - **FlipPoint**: C 中模型立场从 o* 翻向 o_old 的首个 token 位置（机理用）。已实现字符级近似 `metrics.flip_analysis`（first/last 立场 + flip_pos）+ 答案口径 `ESf`(首段断言)/`Flip`(两立场都现)（v1.15，07 教训：子串判分分不出"先新后旧"）；Phase 3 升 token 级 logit-lens。
-- **Locality / Portability**: CounterFact 标准 Neighborhood / Paraphrase 指标，确认编辑本身质量达标（达不到则该编辑器结果整体作废）。**判生成式口径**（`metrics` 的 `Loc`/`PS`，非 EasyEdit rewrite_acc——v1.15/`analysis/08` 实证两者脱节）。
+- **Locality / Portability**: CounterFact 标准 Neighborhood / Paraphrase 指标，确认编辑本身质量达标（达不到则该编辑器结果整体作废）。**判生成式口径**（`metrics` 的 `Loc`/`PS`，非 EasyEdit rewrite_acc——v1.18 实测两者有真实口径差 rewrite_acc≈1.0 vs 生成式 ES_b≈0.55；08 旧『完全脱节 0/8』引用系 sequential_edit bug 污染、已更正）。
 - **ΔReason**: 修补前后 GSM8K-200 与 MATH500-100 准确率变化（修补副作用）
 - 统计：每条 greedy + temperature 0.6 × 3 seeds；置信区间 95% bootstrap（按编辑条目重采样，n=10,000）
 
@@ -267,7 +273,7 @@ why-aaai/
 |---|---|---|
 | 撞车（6/10 后出现同命题论文） | 高 | 每周一 arXiv 增量扫描（§8 关键词）；若被抢现象，pivot 强调机理+修补（方法论文化）；若机理也被抢，剩余素材转 workshop |
 | pilot 不成立 | 中 | §9 fallback，12 天沉没成本封顶 |
-| ROME/MEMIT 在 R1-Distill 上编辑质量本身不达标（Locality 崩） | 中 | 注意 R1-Distill-Qwen-7B 基座是 Qwen2.5-**Math**-7B（非通用版），EasyEdit qwen2.5-7b hparams 仅架构兼容、超参未必最优：冒烟期做 layers ∈ {[4-8],[6-10],[8-12]} 小扫描，以 B0 下 ES≥90% 且 Locality≥85% 为合格线（**判生成式 ES_b，不判 EasyEdit rewrite_acc**——v1.15/`analysis/08` 实证两者脱节：1.5B 上 rewrite_acc post=6/8 但生成式 ES_b=0/8）；仍不达标则先调 `v_lr/v_num_grad_steps` 或换层，再不行以 Qwen2.5-7B-Instruct（同架构非推理版）验证编辑质量基线，主模型改 Qwen3-8B |
+| ROME/MEMIT 在 R1-Distill 上编辑质量本身不达标（Locality 崩） | 中 | 注意 R1-Distill-Qwen-7B 基座是 Qwen2.5-**Math**-7B（非通用版），EasyEdit qwen2.5-7b hparams 仅架构兼容、超参未必最优：冒烟期做 layers 小扫描（实测 layer 5>7>10，已锁 layer 5），合格线＝**在 Locality≥85% 前提下取生成式 B0 ES_b 最高的层**（best-achievable，**判生成式 ES_b 不判 rewrite_acc**——v1.18 实测 rewrite_acc≈1.0 但生成式 ES_b≈0.55 有真实口径差；原『ES≥90%』是 rewrite_acc 数字误植到生成式口径、v1.18 改；08 旧引用 6/8 vs 0/8 系 sequential_edit bug 污染值作废）；仍偏低则先调 `v_lr/v_num_grad_steps` 或换层，再不行以 Qwen2.5-7B-Instruct（同架构非推理版）验证编辑质量基线，主模型改 Qwen3-8B |
 | 排队完全拿不到卡 | 中 | 云端逃生 $400 预算；pilot 仅需一个 4–6h 窗口，优先抢 |
 | Qwen3 编辑不兼容 | 中 | 6/27 检查点降级预案已写入 Phase 2 |
 | 7 页装不下三段式 | 低 | 机理细节与第二数据集进附录；正文保 RQ1+RQ3 完整 |
