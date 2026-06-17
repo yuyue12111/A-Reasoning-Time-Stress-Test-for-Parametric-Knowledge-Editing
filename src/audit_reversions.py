@@ -48,7 +48,7 @@ def main():
     aliases = json.load(open(args.aliases))
     by = load_efficacy(cfg, args.editor)
 
-    revs = []
+    revs = []; loose = 0
     for cid, bud in by.items():
         c = cf.get(cid)
         b0, bb = bud.get("B0"), bud.get(args.budget)
@@ -61,8 +61,11 @@ def main():
         if not b0ok:
             continue                                   # 只看 B0 编对的（回退分母）
         ab = clean(bb["answer"])
-        if not metrics.hit(ab, o_old, aliases):
-            continue                                   # B{budget} 未现 o_old → 没回退
+        if metrics.hit(ab, o_old, aliases):
+            loose += 1                                  # loose 口径：答案出现 o_old（含 Flip/别名假阳）
+        # 真回退口径：答案**落定立场=旧**（flip_analysis.last），排除"断言=编辑值、只是又提了旧"的假阳
+        if metrics.flip_analysis(ab, o_new, o_old, aliases)["last"] != "old":
+            continue
         cot = clean(bb["cot"] or "")
         op = metrics.first_mention(cot, o_old, aliases)    # 链内 o_old 首现位
         pre = cot[:op] if op >= 0 else cot
@@ -71,9 +74,9 @@ def main():
                      "ans": bb["answer"], "op": op, "mark": marks[-1].group(0) if marks else None})
 
     n_ref = sum(r["mark"] is not None for r in revs)
-    print(f"# 审计 editor={args.editor} budget={args.budget}：回退 {len(revs)} 条"
-          f"（B0 编对后于 {args.budget} 倒回 o_old）")
-    print(f"# 反思归因：{n_ref}/{len(revs)} = {n_ref / max(len(revs), 1):.0%} 的回退在 o_old 之前出现反思标记"
+    print(f"# 审计 editor={args.editor} budget={args.budget}：**真回退 {len(revs)} 条**（落定立场=旧）"
+          f" | loose 口径 {loose} 条（答案现 o_old，含 Flip/别名假阳）")
+    print(f"# 反思归因：{n_ref}/{len(revs)} = {n_ref / max(len(revs), 1):.0%} 的真回退在链内 o_old 之前出现反思标记"
           f"（go/no-go ② 阈值 ≥60%）\n")
     for r in revs[:args.n]:
         op, cot = r["op"], r["cot"]
