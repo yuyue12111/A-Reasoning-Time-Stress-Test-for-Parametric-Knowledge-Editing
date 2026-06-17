@@ -4,7 +4,7 @@
 - **目标**: AAAI-27（2027-02-16/23, 蒙特利尔）。首选 **AI Alignment track**（编辑作为安全干预在 test-time compute 下失效），备选 Main Track
 - **硬截止**: abstract **2026-07-20**，全文 **2026-07-27**，补充材料 +3 天（均 UTC-12；以官方 CFP 页为准，本周内再核对一次 track 专属日期）
 - **页数约束**: 正文 7 页 + 参考文献；两阶段评审（Phase 1 两人工评审 + 一份 AI 生成非决策评审），故 **摘要/引言/图 1 必须在 Phase 1 就能独立讲完整个故事**
-- **版本**: v1.18 (2026-06-16)。决策记录：方向 B′ 经地毯式查新确认窄切口可行（见 `analysis/00_shortlist.md`）；复现队列 7 项已确认；pilot go/no-go 机制生效；**6/16 抓修一只致命 harness bug（生成全在基座）→ 首次拿到真实 7B 生成式编辑信号（ES_b=0.55），并按生成式口径重定 layer 合格线**。**阶段交接见 `phase-1.md`，进度总结与作战计划见 `sumandplan1.md`，组内启智平台（全离线）开窗操作见 `interplan2.md`（实测 `report.md`）**
+- **版本**: v1.19 (2026-06-17)。决策记录：方向 B′ 经地毯式查新确认窄切口可行（见 `analysis/00_shortlist.md`）；复现队列 7 项已确认；pilot go/no-go 机制生效；6/16 抓修致命 harness bug（生成全在基座）；**6/17 ROME×CF n=200 主结果：聚合 ES 不随预算降（RQ1 证伪），但 CLR 链层泄漏 0.685 压倒性 → 主线转 CLR 中心，见 `analysis/10`**。**阶段交接见 `phase-1.md`，进度总结与作战计划见 `sumandplan1.md`，组内启智平台（全离线）开窗操作见 `interplan2.md`（实测 `report.md`）**
 - **v1.1 变更**: ① 新增 §2.6 第 4 项混杂（批量编辑干扰）并确立**单条编辑为主协议**；② §5 算力账按单条编辑协议重算（70 → ~400 GPU·h，原估计依赖批量编辑+vLLM 假设，与主协议冲突）；③ 风险表补 R1-Distill-Qwen-7B 基座为 Qwen2.5-**Math**-7B 的超参移植风险与层扫描预案；④ 新增 §11 源码实测附录（hparams 路径、prefill 模板字符串、CPU 冒烟脚本，全部为 2026-06-10 源码确认）
 - **v1.2 变更 (2026-06-10)**: ① **单条编辑协议获用户签字确认**（算力 420 GPU·h 预算生效）；② EasyEdit 权重还原机制审计完成（精确逐元素拷回，循环正确性成立，证据见 `analysis/01_easyedit.md` §3）；③ CPU 冒烟因容器磁盘/无 torch 改在本地执行（命令在 01 笔记 §1）；④ 新增 §12 Pilot harness 三模块完整实现代码
 - **v1.3 变更 (2026-06-10)**: ① Phase 0 第 3 张复现笔记 `analysis/03_rtofu.md` 完成（R-TOFU 解码协议 + 口径审计）；②【§12.1 注意点② 定案】`<think>`/`</think>` 在 R1-Distill-Qwen-7B 与 -Llama-8B 的 tokenizer 中均**非**特殊 token（查 HF `tokenizer_config.json` 之 `added_tokens_decoder`）→ `</think>` 走文本检测，无需 token-id StoppingCriteria；③ `src/think_budget.py` 用 R-TOFU 逐字 prefill（ZeroThink/LessThink/DefaultCoT，byte-for-byte 校验）替换 v0 占位，`_gen` 解码改 `skip_special_tokens=True`；④【待用户拍板】预算档定义在 §2.4（6 档）与 §12.1 代码（B0–B4 5 档）间不自洽，详见 03 笔记 §9
@@ -41,6 +41,15 @@
   ③ **【口径决策，拍板】§7/Phase 1 的 layer 合格线 `B0 ES≥0.90 & Loc≥0.85` 中的 0.90 是 rewrite_acc 口径数字、误植到生成式 ES_b 口径**：实测 rewrite_acc≈1.0 但生成式 ES_b≈0.55，~0.45 的 logits↔生成 口径差**本身是论文发现之一**。**改为「在 Loc≥0.85 前提下取生成式 B0 ES_b 最高的层」**（best-achievable，非固定 0.90），论文 rewrite_acc 与 ES_b 并列汇报；
   ④ **【文档更正】**`analysis/08` 顶部加重大更正框（§3「rewrite_acc 6/8 vs 生成式 ES_b 0/8 完全脱节」**作废**——当时也走 `sequential_edit=False`，生成在基座上；§1/§2/§4.4 仍有效，§5 的 1.5B"诚实负"存疑待复测）；CLAUDE.md 防雷清单加 `sequential_edit=True` 致命条 + 更正口径条与 layer 条；
   ⑤ **下一步**：layer 5 跑 B0/B3/B4 预算扫（测"越想越退"主论点 ES 是否随预算崩塌、RR/Flip 是否抬头）→ 若信号在，预过滤 n=200 + 全档正式 pilot（ROME+MEMIT）出正式数
+- **v1.19 变更 (2026-06-17)**: **ROME × CF 预过滤 n=200 主结果出炉 → 原 RQ1（聚合 ES↓）证伪，主线转 CLR 中心**（全文见 `analysis/10`）——
+  ① **预过滤 8 卡分片就绪**：`prefilter.py` 加 `--rank/--world/--merge` + 按 case 续跑（雷点：8 卡并发 `from_pretrained` 会 OOM 挤死 7 个 → **错峰 `& sleep 15` + 日志留盘**，已写 RUNBOOK §4a/§4c/§8）；B3 口径预过滤 248 存活；
+  ② **【主结果 ROME n=200】聚合 ES 三档持平 0.375/0.385/0.375，配对 ES 降幅 CI 含 0 → "ES(b) 单调降 ≥20pp"（RQ1-H1）在有功效样本上证伪**，不得再宣称；
+  ③ **【口径再修两处】**(a) 判 o_old/o_new 前挖主体复述 `_without_subject`（commit `d29c4cc`，修主体子串致 CLR/RR 假阳 + ES 假阴；新增回归测试）；(b) 回退判据由"答案出现 o_old"改"落定立场 `flip_analysis.last==old`"（commit `1d4835b`）——审计实锤 loose RR 把 Flip/别名假阳（siglas→断言 Japan 却命中别名 Portuguese）算进回退；
+  ④ **【回退 honest 数】loose RR(B3)=0.227 → settled RR≈12/75=0.16**（CI 横跨 0.20，骑线）；`audit_reversions.py` 反思归因 7/12=58%（n=12 噪声内 ≈60%）；
+  ⑤ **【头牌信号】CLR(B3)=0.685 [0.620,0.750]**——B0 编对的 case 思考时 **69% 在链中重浮旧知识**,压倒性稳健,机理 RQ2 直接证据；
+  ⑥ **【机制】churn**：ES 持平 = ~17 条被翻回（掉出 ES）被另 ~19 条 late-emergence（B0 没显形、思考后冒出）抵消 → 聚合稳、底下翻搅。"只在零思考测编辑成功率会错过此不稳定"本身是论文 point；
+  ⑦ **【主线重构】** 弃"ES 单调失效"，立"**编辑撑不过链式推理：旧知识 ~69% 重浮于链（CLR 主）+ ~16% 顶回最终答案（settled RR 次）+ 聚合 ES 因 late-emergence 虚假稳定（机制点）**"。**go/no-go 重心拟从最终答案 RR/ES 挪到链层 CLR + 机理可归因**（阈值待 MEMIT 数据齐一起重定 plan）；
+  ⑧ **【待办】** MEMIT n=200（mom2 逐层预热，进行中）→ 同款 audit → ROME+MEMIT 回退案例**合并**做反思归因（撑大 n=12）+ CLR 两编辑器对照 → 再拍 6/22；CLR 也需做一次别名/落定清洗审计
 
 ---
 
