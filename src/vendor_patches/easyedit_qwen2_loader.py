@@ -23,6 +23,7 @@
 
 用法：在 `BaseEditor.from_hparams(hp)` 之前调用一次 `apply()`（edit_loop.run 已接入）。幂等。
 """
+import os
 from transformers import AutoModelForCausalLM as _REAL_AUTO_MODEL
 from transformers import AutoTokenizer as _REAL_AUTO_TOKENIZER
 
@@ -45,7 +46,11 @@ class PatchedAutoModelForCausalLM:
     def from_pretrained(*args, **kwargs):
         kwargs.pop("fp32", None)
         kwargs.pop("torch_dtype", None)          # 去掉 editor 传的 fp32/fp16 旧名
-        kwargs["dtype"] = "bfloat16"             # 强制原生 bf16（24G 卡免 OOM）
+        # 默认原生 bf16（24/48G 卡免 OOM，4090 实测 compute_v 稳）。
+        # 可由 WHYAAAI_DTYPE 覆盖：H200(Hopper) 上 bf16 的 compute_v 优化会发散成 NaN
+        # （bf16 7 位尾数 + Hopper kernel 舍入累积，4090/Ada 无此问题）→ 设 WHYAAAI_DTYPE=float32
+        # 全精度规避（H200 80G 装 fp32 28GB 绰绰有余）。bf16 与 fp32 指数范围相同，差在尾数精度。
+        kwargs["dtype"] = os.environ.get("WHYAAAI_DTYPE", "bfloat16")
         return _REAL_AUTO_MODEL.from_pretrained(*args, **kwargs)
 
 
