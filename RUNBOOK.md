@@ -154,7 +154,8 @@ GPT-2-XL 冒烟 `src/smoke_rome_gpt2.py`（之前被杀）降为可选：`cd sou
 | **qwen 路由 bug** | 含 'qwen' 不含 'qwen2' → 老 Qwen1 分支（fp32 TypeError + 错 eos）。**`edit_loop` 自动 `apply()` 修**（§4），新入口手动加载 R1-Distill 前须自调 `vendor_patches.easyedit_qwen2_loader.apply()` |
 | **mom2 语料 id 已死** | datasets≥3 拒绝脚本式 `wikipedia/20200501.en` → `edit_loop` 自动 patch 映射 `wikimedia/wikipedia/20231101.en`（§3）；离线窗口须预下载；`gen_alphaedit_P.py` 等不走 edit_loop 的入口须自调 `easyedit_mom2_dataset.apply()` |
 | **mom2 并发首跑** | 8 分片同时触发协方差计算 → 先单进程预热再开分片（§3），热身分片删除 |
-| **8 卡并发加载挤爆** | 8 进程同时 `from_pretrained` 同一模型 → CPU 内存/IO 峰值，多数被 OOM-killer 杀，**只剩 1 卡 P2 干活**（stderr 进 `/dev/null` 时静默无报错，极易误判）。症状=`nvidia-smi` 只 GPU0 满载、其余 P8 空。**修：错峰启动**（每个 `& sleep 15`）+ 日志留盘（`>/tmp/..._r$r.log`，勿 `/dev/null`），`tail` 查 8 行成功。prefilter（直接 AutoModel 加载）6/16 实测必踩；pilot（EasyEdit 加载）也照加作保险（§4a/§4c 命令已含） |
+| **8 卡并发加载挤爆**（**低内存节点才有**） | 8 进程同时 `from_pretrained` 同一模型 → CPU 内存峰值，多数被 OOM-killer 杀，**只剩 1 卡 P2 干活**（stderr 进 `/dev/null` 时静默无报错）。症状=`nvidia-smi` 只 GPU0 满载、其余 P8 空。**修：错峰启动**（每个 `& sleep 15`）+ 日志留盘（勿 `/dev/null`）。**仅低内存节点需要**：4090 那种节点必踩；**H200 节点 1800G 内存 → 8 卡 fp32(8×28G) 并发加载随便，不用错峰**。日志留盘永远要（静默死能发现） |
+| **H200/Hopper bf16 → NaN**（致命，6/18 实测） | bf16 下 ROME `compute_v` 优化在 **Hopper kernel** 上舍入累积**发散成 NaN** → 插入 NaN 权重 → greedy 静默出垃圾、**采样 `multinomial` 遇 NaN 概率直接 CUDA assert 崩**（4090/Ada 无此问题）。**修：H200 上每条命令前加 `WHYAAAI_DTYPE=float32`**（`vendor_patches/easyedit_qwen2_loader.py` 读此 env 切 fp32；H200 141G 装 fp32 28GB 随意）。实测 **fp32≈bf16**（B3 RR 0.235 vs 0.227、CLR/剂量-反应一致，n=40 校验过）→ 与 4090 bf16 结果可混用。fp32 比 bf16 慢一点但 H200 总体仍 ~4-5× 快于 4090 |
 | **合格线判生成式 ES_b** | layer 扫 / 编辑质量一律看 `score_pilot` 的 `ES`/`Loc`，**不看 rewrite_acc**（08：rewrite_acc 6/8 但生成式 0/8） |
 | 全角竖线 `<｜User｜>` U+FF5C | 模板里勿替换成半角 `|`；真 eos `<｜end▁of▁sentence｜>`(151643)，`<think>`/`</think>` 是 special=false 原子 token(151648/151649) |
 | `PYTHONPATH=.` | easyeditor 本地包，否则 ModuleNotFoundError |
