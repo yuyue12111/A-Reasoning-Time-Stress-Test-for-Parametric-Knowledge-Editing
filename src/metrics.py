@@ -94,14 +94,14 @@ def score(jsonl_path, cases, aliases, decode="greedy"):
     esf = collections.Counter(); flip = collections.Counter()
     ps = collections.Counter(); loc = collections.Counter()
     n = collections.Counter(); ps_n = collections.Counter(); loc_n = collections.Counter()
-    n_b0 = 0
+    rr_n = collections.Counter()      # RR 分母按**行**：b0ok 案例的每条 efficacy 生成
+    # （采样臂每 case 有多个 seed 行，分母不可用案例数 n_b0，否则分子按行/分母按案例 → RR 虚高 >1）
     for cid, buds in by.items():
         c = cmap[cid]; o_new, o_old = c["o_new"], c["o_old"]
         clean = lambda t: _without_subject(t, c.get("s") or "")    # 挖主体复述（见 _without_subject）
         eff0 = buds.get("B0", {}).get("efficacy", [])
         a0 = clean(eff0[0]["answer"]) if eff0 else ""
         b0ok = (bool(eff0) and hit(a0, o_new, aliases) and not hit(a0, o_old, aliases))
-        n_b0 += b0ok
         for b, probe_rows in buds.items():
             for e in probe_rows.get("efficacy", []):
                 ans, cot = clean(e["answer"]), clean(e["cot"])
@@ -111,8 +111,9 @@ def score(jsonl_path, cases, aliases, decode="greedy"):
                 fa = flip_analysis(ans, o_new, o_old, aliases)   # 07 教训：首段断言 + 翻转（主体已挖）
                 esf[b] += (fa["first"] == "new")     # ESf: 答案首段立场=编辑（容忍后续翻转）
                 flip[b] += fa["flipped"]             # Flip: 答案内 o_new/o_old 都现（先新后旧/先旧后新）
-                if b0ok and hit(ans, o_old, aliases):
-                    rr[b] += 1                       # 条件回退（plan §2.5 定义）
+                if b0ok:                             # 条件回退（plan §2.5）：分母分子都按行
+                    rr_n[b] += 1
+                    rr[b] += bool(hit(ans, o_old, aliases))
             for pname, rows in probe_rows.items():
                 if pname.startswith("para"):         # para0/para1（改述泛化）
                     for pr in rows:
@@ -125,7 +126,7 @@ def score(jsonl_path, cases, aliases, decode="greedy"):
 
     rate = lambda num, den: (num / den if den else None)
     # ESf(首段断言) vs ES(严格)的差 + Flip 揭示"答案内越想越退"（首段是编辑、落定回旧）。
-    return {b: {"ES": rate(es[b], n[b]), "RR": rr[b] / max(n_b0, 1), "CLR": rate(clr[b], n[b]),
+    return {b: {"ES": rate(es[b], n[b]), "RR": rate(rr[b], rr_n[b]), "CLR": rate(clr[b], n[b]),
                 "ESf": rate(esf[b], n[b]), "Flip": rate(flip[b], n[b]),
                 "PS": rate(ps[b], ps_n[b]), "Loc": rate(loc[b], loc_n[b]),
                 "n": n[b], "n_para": ps_n[b], "n_loc": loc_n[b]}
