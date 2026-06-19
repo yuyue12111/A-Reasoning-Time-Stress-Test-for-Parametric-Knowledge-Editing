@@ -35,6 +35,22 @@ def first_mention(text, target, aliases):
     return best
 
 
+def last_mention(text, target, aliases):
+    """target(含别名)在 text 中最晚出现的字符位置；无则 -1。大小写不敏感。
+    与 first_mention 配套：判『答案落定立场』须比【末次】提及，不能只比首现序——
+    flip_analysis 的 last 比的是 o_new/o_old 各自【首现】谁更晚，会把『先断言新、末尾
+    顺带提/否定一句旧』误判成回退（审计分桶 held），系统性高估 RR。"""
+    t = (text or "").lower()
+    best = -1
+    for c in [target] + aliases.get(target, []):
+        if not c:
+            continue
+        i = t.rfind(c.lower())
+        if i > best:
+            best = i
+    return best
+
+
 def flip_analysis(text, o_new, o_old, aliases):
     """立场翻转分析 (plan §2.5 FlipPoint；07 教训：子串判分分不出"先新后旧"翻转，
     如『Mars. However…Jupiter』子串同时命中 o_new/o_old，纯 hit 判不出落定立场)。

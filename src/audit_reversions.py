@@ -49,6 +49,7 @@ def main():
     by = load_efficacy(cfg, args.editor)
 
     revs = []; loose = 0
+    cats = collections.Counter()
     for cid, bud in by.items():
         c = cf.get(cid)
         b0, bb = bud.get("B0"), bud.get(args.budget)
@@ -61,31 +62,43 @@ def main():
         if not b0ok:
             continue                                   # 只看 B0 编对的（回退分母）
         ab = clean(bb["answer"])
-        if metrics.hit(ab, o_old, aliases):
-            loose += 1                                  # loose 口径：答案出现 o_old（含 Flip/别名假阳）
-        # 真回退口径：答案**落定立场=旧**（flip_analysis.last），排除"断言=编辑值、只是又提了旧"的假阳
-        if metrics.flip_analysis(ab, o_new, o_old, aliases)["last"] != "old":
-            continue
+        has_new = metrics.hit(ab, o_new, aliases)
+        has_old = metrics.hit(ab, o_old, aliases)
+        if not has_old:
+            continue                                   # 答案根本没提旧 → 无任何回退
+        loose += 1                                      # loose 口径：答案出现 o_old（旧 RR 口径，含编辑守住者）
+        # 三分桶（按答案【末次】提及定落定立场，修 flip 首现序 bug）：
+        #   clean = 只含旧不含新（ES 镜像，最干净的回退）
+        #   churn = 新旧都含、末次落旧（先 churn 后真回退）
+        #   held  = 新旧都含、末次落新（编辑守住，旧只末尾顺带提/被否定 → 旧 flip 口径误算成回退）
+        lm_new = metrics.last_mention(ab, o_new, aliases)
+        lm_old = metrics.last_mention(ab, o_old, aliases)
+        cat = "clean" if not has_new else ("churn" if lm_old > lm_new else "held")
+        cats[cat] += 1
         cot = clean(bb["cot"] or "")
         op = metrics.first_mention(cot, o_old, aliases)    # 链内 o_old 首现位
         pre = cot[:op] if op >= 0 else cot
         marks = list(REFLECT.finditer(pre))
         revs.append({"cid": cid, "o_new": o_new, "o_old": o_old, "q": bb["q"], "cot": cot,
-                     "ans": bb["answer"], "op": op, "mark": marks[-1].group(0) if marks else None})
+                     "ans": bb["answer"], "op": op, "cat": cat,
+                     "mark": marks[-1].group(0) if marks else None})
 
-    n_ref = sum(r["mark"] is not None for r in revs)
-    print(f"# 审计 editor={args.editor} budget={args.budget}：**真回退 {len(revs)} 条**（落定立场=旧）"
-          f" | loose 口径 {loose} 条（答案现 o_old，含 Flip/别名假阳）")
-    print(f"# 反思归因：{n_ref}/{len(revs)} = {n_ref / max(len(revs), 1):.0%} 的真回退在链内 o_old 之前出现反思标记"
-          f"（go/no-go ② 阈值 ≥60%）\n")
+    settled = [r for r in revs if r["cat"] in ("clean", "churn")]   # 答案真落定到旧
+    n_ref = sum(r["mark"] is not None for r in settled)
+    print(f"# 审计 editor={args.editor} budget={args.budget}  B0编对且答案现旧(loose)={loose} 条")
+    print(f"#   分桶：clean(只旧不新)={cats['clean']}  churn(新旧都现·末次落旧)={cats['churn']}"
+          f"  held(新旧都现·末次落新=编辑守住,旧仅顺带)={cats['held']}")
+    print(f"#   → 真落定回退 clean+churn={len(settled)} 条；旧『flip 首现序』口径把 held 也误算进回退(虚高 {cats['held']} 条)")
+    print(f"# 反思归因：{n_ref}/{len(settled)} = {n_ref / max(len(settled), 1):.0%}"
+          f"（仅对真落定回退计；go/no-go ② 阈值 ≥60%；末次仍是粗判，以下全答案人工复核）\n")
     for r in revs[:args.n]:
         op, cot = r["op"], r["cot"]
-        seg = ("..." + cot[max(0, op - 220):op + 60].replace("\n", " ") + "...") if op >= 0 else cot[:280]
+        seg = ("..." + cot[max(0, op - 300):op + 110].replace("\n", " ") + "...") if op >= 0 else cot[:420]
         print("=" * 72)
-        print(f"[{r['cid']}] Q: {r['q']}")
+        print(f"[{r['cid']}] ({r['cat']}) Q: {r['q']}")
         print(f"  新={r['o_new']}  旧={r['o_old']}  反思标记={r['mark']!r}")
         print(f"  链(o_old 处): {seg}")
-        print(f"  答: {(r['ans'] or '')[:160]}")
+        print(f"  答(全): {(r['ans'] or '').strip().replace(chr(10), ' ')[:500]}")
 
 
 if __name__ == "__main__":
