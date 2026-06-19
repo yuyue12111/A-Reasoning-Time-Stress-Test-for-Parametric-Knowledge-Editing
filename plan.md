@@ -4,7 +4,7 @@
 - **目标**: AAAI-27（2027-02-16/23, 蒙特利尔）。首选 **AI Alignment track**（编辑作为安全干预在 test-time compute 下失效），备选 Main Track
 - **硬截止**: abstract **2026-07-20**，全文 **2026-07-27**，补充材料 +3 天（均 UTC-12；以官方 CFP 页为准，本周内再核对一次 track 专属日期）
 - **页数约束**: 正文 7 页 + 参考文献；两阶段评审（Phase 1 两人工评审 + 一份 AI 生成非决策评审），故 **摘要/引言/图 1 必须在 Phase 1 就能独立讲完整个故事**
-- **版本**: v1.19 (2026-06-17)。决策记录：方向 B′ 经地毯式查新确认窄切口可行（见 `analysis/00_shortlist.md`）；复现队列 7 项已确认；pilot go/no-go 机制生效；6/16 抓修致命 harness bug（生成全在基座）；**6/17 ROME×CF n=200 主结果：聚合 ES 不随预算降（RQ1 证伪），但 CLR 链层泄漏 0.685 压倒性 → 主线转 CLR 中心，见 `analysis/10`**。**阶段交接见 `phase-1.md`，进度总结与作战计划见 `sumandplan1.md`，组内启智平台（全离线）开窗操作见 `interplan2.md`（实测 `report.md`）**
+- **版本**: v1.20 (2026-06-18)。决策记录：方向 B′ 窄切口可行；复现队列 7 项确认；6/16 抓修致命 harness bug（生成全在基座）；**6/17-18 ROME+MEMIT n=200 + 采样稳健性 + H200 通路全齐 → RQ1 现象稳健成立(CLR 链层泄漏 0.68-0.73 两编辑器一致、go/no-go ① 由 MEMIT 满足)、主线转 CLR 中心、转 RQ2 机理(见 `analysis/10`)**。**阶段交接见 `phase-1.md`，进度总结与作战计划见 `sumandplan1.md`，组内启智平台（全离线）开窗操作见 `interplan2.md`（实测 `report.md`）**
 - **v1.1 变更**: ① 新增 §2.6 第 4 项混杂（批量编辑干扰）并确立**单条编辑为主协议**；② §5 算力账按单条编辑协议重算（70 → ~400 GPU·h，原估计依赖批量编辑+vLLM 假设，与主协议冲突）；③ 风险表补 R1-Distill-Qwen-7B 基座为 Qwen2.5-**Math**-7B 的超参移植风险与层扫描预案；④ 新增 §11 源码实测附录（hparams 路径、prefill 模板字符串、CPU 冒烟脚本，全部为 2026-06-10 源码确认）
 - **v1.2 变更 (2026-06-10)**: ① **单条编辑协议获用户签字确认**（算力 420 GPU·h 预算生效）；② EasyEdit 权重还原机制审计完成（精确逐元素拷回，循环正确性成立，证据见 `analysis/01_easyedit.md` §3）；③ CPU 冒烟因容器磁盘/无 torch 改在本地执行（命令在 01 笔记 §1）；④ 新增 §12 Pilot harness 三模块完整实现代码
 - **v1.3 变更 (2026-06-10)**: ① Phase 0 第 3 张复现笔记 `analysis/03_rtofu.md` 完成（R-TOFU 解码协议 + 口径审计）；②【§12.1 注意点② 定案】`<think>`/`</think>` 在 R1-Distill-Qwen-7B 与 -Llama-8B 的 tokenizer 中均**非**特殊 token（查 HF `tokenizer_config.json` 之 `added_tokens_decoder`）→ `</think>` 走文本检测，无需 token-id StoppingCriteria；③ `src/think_budget.py` 用 R-TOFU 逐字 prefill（ZeroThink/LessThink/DefaultCoT，byte-for-byte 校验）替换 v0 占位，`_gen` 解码改 `skip_special_tokens=True`；④【待用户拍板】预算档定义在 §2.4（6 档）与 §12.1 代码（B0–B4 5 档）间不自洽，详见 03 笔记 §9
@@ -50,6 +50,12 @@
   ⑥ **【机制】churn**：ES 持平 = ~17 条被翻回（掉出 ES）被另 ~19 条 late-emergence（B0 没显形、思考后冒出）抵消 → 聚合稳、底下翻搅。"只在零思考测编辑成功率会错过此不稳定"本身是论文 point；
   ⑦ **【主线重构】** 弃"ES 单调失效"，立"**编辑撑不过链式推理：旧知识 ~69% 重浮于链（CLR 主）+ ~16% 顶回最终答案（settled RR 次）+ 聚合 ES 因 late-emergence 虚假稳定（机制点）**"。**go/no-go 重心拟从最终答案 RR/ES 挪到链层 CLR + 机理可归因**（阈值待 MEMIT 数据齐一起重定 plan）；
   ⑧ **【待办】** MEMIT n=200（mom2 逐层预热，进行中）→ 同款 audit → ROME+MEMIT 回退案例**合并**做反思归因（撑大 n=12）+ CLR 两编辑器对照 → 再拍 6/22；CLR 也需做一次别名/落定清洗审计
+- **v1.20 变更 (2026-06-18)**: **MEMIT n=200 齐 + 采样稳健性过 + H200 通路打通 → 实验稳健性收工,转 RQ2**——
+  ① **【MEMIT n=200】**ES 略降(0.370→0.315)、**RR(B3)=0.351 CI[0.243,0.459] 稳过 0.20**（比 ROME 强）、**CLR(B3)=0.725**;两编辑器 CLR 都 0.68-0.73 一致 → **go/no-go ① 由 MEMIT 干净满足**;②（合并反思归因 ROME+MEMIT settled 回退：B3 16/30=53%、B4 19/32=59%,贴 60% 线下,但字符正则是下界,RQ2 换 LLM-judge）；
+  ② **【采样稳健性,plan §6.3】**ROME cf200s B0/B3 加采样臂(greedy+temp0.6×3seed)：**CLR(B3) greedy 0.685 ≈ 采样 0.680、RR 0.256 vs 0.320（都 >0.20,采样略高）、ES/ESf/Flip 一致** → **结论在 greedy 与采样下都成立,非解码伪影**(论文可写);
+  ③ **【H200 通路】**Hopper 上 bf16 ROME `compute_v` 必发散 NaN(采样 multinomial CUDA assert 崩)→ `WHYAAAI_DTYPE=float32` 切 fp32 规避(loader env 开关,commit 见 git);**fp32≈bf16 经 n=40 校验**(B3 RR 0.235 vs 4090 0.227、CLR 一致)→ 两 dtype 结果可混用;H200 fp32 ~2.4× 快于 4090、1800G 内存免错峰(RUNBOOK §8);
+  ④ **【口径修两处】**(a) RR 分母改按行 `rr_n`（修采样臂多 seed 致 RR 虚高 >1;greedy/主结果不受影响）;(b) `score_pilot --decode` 分打 greedy/采样臂;
+  ⑤ **【下一步=RQ2 机理】**主线已立(CLR 中心)、现象稳健 → 转 Phase 2：**LLM-judge 反思归因**(判 CoT「此处是否反思中重检索旧知识」,取代卡 56% 的字符正则,钉 go/no-go ② + 撑机理章)→ 链内 FlipPoint 定位(旧知识涌回的位置)→ Phase 3 training-free steering 修复(RQ3)
 
 ---
 
