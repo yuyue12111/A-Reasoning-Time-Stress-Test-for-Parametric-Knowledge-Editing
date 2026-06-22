@@ -1,0 +1,36 @@
+# 强推理器探针 · 14B (plan v1.23 ②；6/27 效应量决策点)
+# RQ: 更强的推理器(R1-Distill-Qwen-14B > 7B)上，真回忆 CLR / RR 是否更大(随能力 scaling)?
+# 设计: ROME-only(mom2_adjustment=false 无需 mom2 预热)；复用 7B 的 ROME hparams，
+#       只 override 尺寸相关字段(edit_loop 泛型 setattr)。case 取 7B 预过滤集前 100(seed42 同序 → 与 7B 可比子集)。
+# 跑(4090 bf16，14B 单卡 ~28G 装得下、无 Hopper bf16→NaN 问题)：
+#   cd <项目根>
+#   export WHYAAAI_MODEL=$W/models/DeepSeek-R1-Distill-Qwen-14B
+#   for r in $(seq 0 7); do PYTHONPATH=source/EasyEdit python src/run_pilot.py \
+#       --config experiments/probe14b.yaml --editor ROME --rank $r --world 8 --device $r & done; wait
+#   python src/score_pilot.py --config experiments/probe14b.yaml --editor ROME
+#   python src/audit_clr.py  --config experiments/probe14b.yaml --editor ROME --budget B3 --n 40
+
+model_tag: r1qwen14b
+seed: 42
+out_dir: results/probe
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-14B   # 离线平台用 WHYAAAI_MODEL=本地绝对路径覆盖
+  stats_dir: ./data/stats_r1qwen14b                      # ROME 无 mom2 用不到，占位分目录
+  v_loss_layer: 47                                       # 14B=48 层，末层 idx 47 (7B 是 27)
+
+dataset:
+  tag: cf100
+  path: data/counterfact.prefiltered.jsonl   # 复用 7B 预过滤集前 100(seed42 同序 → 与 7B 可比)
+  fallback_path: data/counterfact.jsonl
+  n: 100
+
+budgets: [B0, B3]    # 探针只看零思考 vs 自然思考的对照(省 B4)
+
+sampling:
+  enabled: false     # greedy 主口径(sumandplan §6.3)
+
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml   # 复用(Qwen2 同架构，模块模板一致)；尺寸字段靠上方 override
+    layers: [9]        # 14B 编辑层起步：7B layer5/28≈0.18 深 → 48×0.18≈9；若 B0 ES_b 偏低再扫 {7,9,12}

@@ -80,6 +80,8 @@ def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1,
     hp = HP_CLS[editor_name].from_hparams(hparams_path)
     for k, v in (overrides or {}).items():   # run_pilot 覆盖 model_name/stats_dir/device/layers
         setattr(hp, k, v)
+    if os.environ.get("WHYAAAI_MODEL"):      # 离线平台:env 指本地模型绝对路径(HF id 离线不解析,与 base_probe 一致)
+        hp.model_name = os.environ["WHYAAAI_MODEL"]
     # pilot-blocker 修复：R1-Distill-Qwen 含 'qwen' 不含 'qwen2' → 落 editor.py 老 Qwen1 分支
     # （fp32 kwarg + 错 eos）。方案 A monkeypatch 必须在 from_hparams 加载模型之前生效（sumandplan §5）。
     from vendor_patches.easyedit_qwen2_loader import apply as apply_qwen_loader_patch
