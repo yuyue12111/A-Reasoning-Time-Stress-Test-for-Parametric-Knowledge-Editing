@@ -6,10 +6,29 @@
 import json, collections, re
 
 
+_BAD_ALIAS = re.compile(r"^[\W\d_]*$")   # 纯标点/数字/空 → 丢
+
+def _safe_cands(target, aliases):
+    """候选 = target + 别名，但【丢掉长度<4 的别名】(ISO 国家码 IN/FR/ES/NO/W、语言码 fi/it/zh、
+    emoji 旗 🇫🇮 等)。这些在纯 substring 判定下假阳泛滥：'in'(India)命中 'within/international'、
+    'it'(Italian)命中 'it/with'、'es'(Spain)命中 'uses/cases'、'W'(Vienna)命中任何含 w 的文本
+    → ES/RR/CLR 共用的 hit() 被系统性灌水(国家/语言类 o_old 的 CLR/RR≈100% 全是伪命中)。
+    target 全名永远保留(即便短，如 'IBM')；别名要么 ≥4 字符、要么仍非纯标点。"""
+    out = [target]
+    out += [a for a in aliases.get(target, [])
+            if a and len(str(a).strip()) >= 4 and not _BAD_ALIAS.match(str(a))]
+    return out
+
+
+def _wb(cand):
+    """词边界正则 r'\bcand\b'（大小写不敏感由 text 预 lower 保证）。替换 substring `in`，
+    修 'Microsoft' 误被 'ms' 命中 'items'、'Asia' 误被子串命中等。"""
+    return re.compile(r"\b" + re.escape(str(cand).lower().strip()) + r"\b")
+
+
 def hit(text, target, aliases):
-    cands = [target] + aliases.get(target, [])
     t = (text or "").lower()
-    return any(c and c.lower() in t for c in cands)   # 跳过 None/空候选（如 zsRE o_old 缺失）
+    return any(_wb(c).search(t) for c in _safe_cands(target, aliases) if c)   # 词边界 + 丢短码
 
 
 def _without_subject(text, subject):
@@ -23,15 +42,15 @@ def _without_subject(text, subject):
 
 
 def first_mention(text, target, aliases):
-    """target(含别名)在 text 中最早出现的字符位置；无则 -1。大小写不敏感。"""
+    """target(含安全别名)在 text 中最早出现的字符位置；无则 -1。词边界 + 丢短码(见 _safe_cands)。"""
     t = (text or "").lower()
     best = -1
-    for c in [target] + aliases.get(target, []):
+    for c in _safe_cands(target, aliases):
         if not c:
             continue
-        i = t.find(c.lower())
-        if i >= 0 and (best < 0 or i < best):
-            best = i
+        m = _wb(c).search(t)
+        if m and (best < 0 or m.start() < best):
+            best = m.start()
     return best
 
 
@@ -39,15 +58,17 @@ def last_mention(text, target, aliases):
     """target(含别名)在 text 中最晚出现的字符位置；无则 -1。大小写不敏感。
     与 first_mention 配套：判『答案落定立场』须比【末次】提及，不能只比首现序——
     flip_analysis 的 last 比的是 o_new/o_old 各自【首现】谁更晚，会把『先断言新、末尾
-    顺带提/否定一句旧』误判成回退（审计分桶 held），系统性高估 RR。"""
+    顺带提/否定一句旧』误判成回退（审计分桶 held），系统性高估 RR。词边界 + 丢短码同 hit。"""
     t = (text or "").lower()
     best = -1
-    for c in [target] + aliases.get(target, []):
+    for c in _safe_cands(target, aliases):
         if not c:
             continue
-        i = t.rfind(c.lower())
-        if i > best:
-            best = i
+        last = -1
+        for m in _wb(c).finditer(t):
+            last = m.start()
+        if last > best:
+            best = last
     return best
 
 
@@ -86,7 +107,8 @@ def score(jsonl_path, cases, aliases, decode="greedy"):
 
     指标语义 (plan §2.5)：
       ES  = 1{answer 命中 o_new 且不含 o_old}              （efficacy 探针）
-      RR  = P(answer 含 o_old | B0 efficacy 成功)          （条件回退率，分母=B0 成功数 n_b0）
+      RR  = P(answer 含 o_old | B0 成功)              loose 口径=上界（含"守住+顺带提旧"的假阳）
+      RRs = P(answer 含 o_old 且不含 o_new | B0 成功)   strict 口径=下界（ES 镜像，最干净的回退）
       CLR = 1{cot 含 o_old}                                 （链内旧知识泄漏，efficacy 的 cot）
       PS  = 1{para_answer 命中 o_new 且不含 o_old}          （改述泛化/portability，para* 探针）
       Loc = 1{locality_answer **不含** o_new}               （局部性：编辑未泄漏到邻域）
@@ -111,6 +133,7 @@ def score(jsonl_path, cases, aliases, decode="greedy"):
     ps = collections.Counter(); loc = collections.Counter()
     n = collections.Counter(); ps_n = collections.Counter(); loc_n = collections.Counter()
     rr_n = collections.Counter()      # RR 分母按**行**：b0ok 案例的每条 efficacy 生成
+    rrs = collections.Counter()       # RRs=严口径回退：答案含旧【且不含新】(ES 镜像,排除"守住+顺带提旧")
     # （采样臂每 case 有多个 seed 行，分母不可用案例数 n_b0，否则分子按行/分母按案例 → RR 虚高 >1）
     for cid, buds in by.items():
         c = cmap[cid]; o_new, o_old = c["o_new"], c["o_old"]
@@ -129,7 +152,8 @@ def score(jsonl_path, cases, aliases, decode="greedy"):
                 flip[b] += fa["flipped"]             # Flip: 答案内 o_new/o_old 都现（先新后旧/先旧后新）
                 if b0ok:                             # 条件回退（plan §2.5）：分母分子都按行
                     rr_n[b] += 1
-                    rr[b] += bool(hit(ans, o_old, aliases))
+                    rr[b] += bool(hit(ans, o_old, aliases))                                       # loose(上界)
+                    rrs[b] += bool(hit(ans, o_old, aliases) and not hit(ans, o_new, aliases))     # strict(下界)
             for pname, rows in probe_rows.items():
                 if pname.startswith("para"):         # para0/para1（改述泛化）
                     for pr in rows:
@@ -142,7 +166,7 @@ def score(jsonl_path, cases, aliases, decode="greedy"):
 
     rate = lambda num, den: (num / den if den else None)
     # ESf(首段断言) vs ES(严格)的差 + Flip 揭示"答案内越想越退"（首段是编辑、落定回旧）。
-    return {b: {"ES": rate(es[b], n[b]), "RR": rate(rr[b], rr_n[b]), "CLR": rate(clr[b], n[b]),
+    return {b: {"ES": rate(es[b], n[b]), "RR": rate(rr[b], rr_n[b]), "RRs": rate(rrs[b], rr_n[b]), "CLR": rate(clr[b], n[b]),
                 "ESf": rate(esf[b], n[b]), "Flip": rate(flip[b], n[b]),
                 "PS": rate(ps[b], ps_n[b]), "Loc": rate(loc[b], loc_n[b]),
                 "n": n[b], "n_para": ps_n[b], "n_loc": loc_n[b]}
