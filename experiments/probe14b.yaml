@@ -20,10 +20,10 @@ hparams_overrides:
   v_loss_layer: 47                                       # 14B=48 层，末层 idx 47 (7B 是 27)
 
 dataset:
-  tag: cf100
-  path: data/counterfact.prefiltered.jsonl   # 复用 7B 预过滤集前 100(seed42 同序 → 与 7B 可比)
+  tag: cf200
+  path: data/counterfact.prefiltered.jsonl   # 复用 7B 预过滤集前 200(seed42 同序 → 与 7B 可比)
   fallback_path: data/counterfact.jsonl
-  n: 100
+  n: 200
 
 budgets: [B0, B3]    # 探针只看零思考 vs 自然思考的对照(省 B4)
 

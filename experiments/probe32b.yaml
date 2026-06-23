@@ -20,10 +20,10 @@ hparams_overrides:
   v_loss_layer: 63                                       # 32B=64 层，末层 idx 63 (7B 是 27)
 
 dataset:
-  tag: cf100
-  path: data/counterfact.prefiltered.jsonl   # 与 14B/7B 同序可比
+  tag: cf200
+  path: data/counterfact.prefiltered.jsonl   # 与 14B/7B 同序可比(前 200 = 7B 全集)
   fallback_path: data/counterfact.jsonl
-  n: 100
+  n: 200
 
 budgets: [B0, B3]
 
