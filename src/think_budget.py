@@ -28,7 +28,7 @@ LESSTHINK_CANNED = ("<｜User｜>{q}<｜Assistant｜><think>\n"
 
 THINK_END = "</think>"
 WAIT = "\nWait, let me double-check this."
-CAP = {"B1": 256, "B2": 1024, "B3": 8192, "B4": 8192}
+CAP = {"B1": 256, "B2": 1024, "B3": 8192, "B4": 8192, "B3M": 16384}   # B3M = genbench 专用长链档(MATH 链常 >8192 被截在 \boxed 前),不入 RQ1/RQ3 主口径锚点
 
 def _gen(model, tok, text, max_new, do_sample=False, temperature=0.6, logits_processor=None):
     ids = tok(text, return_tensors="pt").to(model.device)
@@ -47,7 +47,7 @@ def _gen(model, tok, text, max_new, do_sample=False, temperature=0.6, logits_pro
 def _ntok(tok, s):
     return len(tok(s, add_special_tokens=False)["input_ids"])
 
-def generate_with_budget(model, tok, q, budget, do_sample=False, temperature=0.6, seed=None, suppress=None):
+def generate_with_budget(model, tok, q, budget, do_sample=False, temperature=0.6, seed=None, suppress=None, answer_cap=256):
     """返回 (cot, answer, full_text)。budget ∈ {B0,B1,B2,B3,B4}。
 
     解码臂 (plan §2.5「每条 greedy + temperature 0.6 × 3 seeds」)：
@@ -63,7 +63,7 @@ def generate_with_budget(model, tok, q, budget, do_sample=False, temperature=0.6
         return _gen(model, tok, text, mx, do_sample=do_sample, temperature=temperature, logits_processor=lp)
     if budget == "B0":                      # ZeroThink: 逐字复用 R-TOFU 闭合空思考块
         text = ZEROTHINK.format(q=q)
-        ans = g(text, 256, use_sup=bool(suppress) and suppress["scope"] == "all")   # B0 无链；仅 scope=all 压答案
+        ans = g(text, answer_cap, use_sup=bool(suppress) and suppress["scope"] == "all")   # B0 无链；仅 scope=all 压答案
         return "", ans, text + ans
     prefix, cot, waits = TPL.format(q=q), "", 0
     while True:
@@ -76,5 +76,5 @@ def generate_with_budget(model, tok, q, budget, do_sample=False, temperature=0.6
         cot += chunk
         if _ntok(tok, cot) >= CAP[budget]: break   # B1/B2 截断 / 预算耗尽
     text = prefix + cot + "\n" + THINK_END + "\n\n"
-    ans = g(text, 256, use_sup=bool(suppress) and suppress["scope"] == "all")   # 答案段：仅 scope=all 压(think 只压链)
+    ans = g(text, answer_cap, use_sup=bool(suppress) and suppress["scope"] == "all")   # 答案段：仅 scope=all 压(think 只压链)
     return cot, ans, text + ans

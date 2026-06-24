@@ -20,14 +20,19 @@ import metrics
 BENCHES = {"gsm8k": "data/gsm8k_200.jsonl", "math": "data/math500_100.jsonl"}
 
 
-def union_old_ids(tok, src, aliases):
-    """所有编辑 o_old 的并集首-token id(最坏界:同时压全部被编辑事实)。"""
-    ids = set()
+def old_ids(tok, src, aliases, mode="union"):
+    """被编辑 o_old 的首-token id 集合。
+    mode='union':并集全部被编辑事实(病态最坏界,同时压全部 o_old);
+    mode='single':只取第 1 条 o_old(现实上界:模拟单条编辑的抑制器误施于通用 query)。"""
     from suppress import build_old_token_ids
+    ids = set()
     for l in open(src):
         o_old = json.loads(l).get("o_old")
-        if o_old:
-            ids |= build_old_token_ids(tok, o_old, aliases)
+        if not o_old:
+            continue
+        ids |= build_old_token_ids(tok, o_old, aliases)
+        if mode == "single":
+            break
     return ids
 
 
@@ -63,12 +68,12 @@ def correct(bench, gen, gold):
     return norm(boxed(gen)) == norm(gold) and norm(gold) != ""
 
 
-def out_path(cfg, rank):
-    return os.path.join(cfg["out_dir"], f"{cfg['model_tag']}_GENBENCH_r{rank}.jsonl")
+def out_path(cfg, rank, suffix=""):
+    return os.path.join(cfg["out_dir"], f"{cfg['model_tag']}_GENBENCH{suffix}_r{rank}.jsonl")
 
 
-def score(cfg):
-    pat = os.path.join(cfg["out_dir"], f"{cfg['model_tag']}_GENBENCH_r*.jsonl")
+def score(cfg, suffix=""):
+    pat = os.path.join(cfg["out_dir"], f"{cfg['model_tag']}_GENBENCH{suffix}_r*.jsonl")
     rows = [json.loads(l) for s in sorted(glob.glob(pat)) for l in open(s) if '"bench"' in l]
     agg = collections.defaultdict(lambda: collections.Counter())
     for r in rows:
@@ -76,13 +81,13 @@ def score(cfg):
         agg[b]["n"] += 1
         agg[b]["off"] += bool(r.get("ok_off"))
         agg[b]["on"] += bool(r.get("ok_on"))
-    print(f"# 通用能力门  model={cfg['hparams_overrides']['model_name']}  suppress={cfg.get('suppress')}")
-    print(f"{'bench':<8}{'n':>5}{'acc_off':>9}{'acc_on(并集最坏界)':>20}{'Δ':>9}")
+    print(f"# 通用能力门  model={cfg['hparams_overrides']['model_name']}  suppress={cfg.get('suppress')}  suffix={suffix or '(旧无后缀run)'}")
+    print(f"{'bench':<8}{'n':>5}{'acc_off':>9}{'acc_on(抑制)':>16}{'Δ':>9}")
     for b in sorted(agg):
         s = agg[b]; off = s["off"] / s["n"]; on = s["on"] / s["n"]
-        print(f"{b:<8}{s['n']:>5}{off:>9.3f}{on:>20.3f}{on - off:>+9.3f}")
-    print("\nacc_off=不挂抑制(=部署时非编辑 query 的真实通用能力);acc_on=最坏界并集抑制。"
-          "Δ 接近 0 → 修复附带损害可忽略(门:|Δ|≤0.02)。")
+        print(f"{b:<8}{s['n']:>5}{off:>9.3f}{on:>16.3f}{on - off:>+9.3f}")
+    print("\nacc_off=不挂抑制(=部署时非编辑 query 的真实通用能力,应逼近模型公认水平);acc_on=按 suffix 配置抑制。"
+          "Δ 门:|Δ|≤0.02。注:union+all=病态最坏界;single+think=现实上界(部署口径)。")
 
 
 def main():
@@ -92,10 +97,19 @@ def main():
     ap.add_argument("--world", type=int, default=1)
     ap.add_argument("--score", action="store_true")
     ap.add_argument("--aliases", default="data/aliases.json")
+    ap.add_argument("--mode", choices=["union", "single"], default="union",
+                    help="union=并集全部 o_old(病态最坏界);single=单条 o_old(现实上界:单编辑抑制器误施于通用 query)")
+    ap.add_argument("--force_scope", choices=["all", "think"], default=None,
+                    help="覆盖 config.suppress.scope;不给则用 config(probe32b_sup.yaml=think)")
+    ap.add_argument("--gsm8k_budget", default="B3")
+    ap.add_argument("--math_budget", default="B3M", help="MATH 链常 >8192,默认 B3M=16384 防截断")
+    ap.add_argument("--answer_cap", type=int, default=512, help="答案段 token 上限(旧 256 截断答案重述→基线虚低)")
     args = ap.parse_args()
     cfg = yaml.safe_load(open(args.config))
+    scope = args.force_scope or cfg["suppress"].get("scope", "all")
+    suffix = f"_{args.mode}_{scope}"          # 输出按 mode+scope 分文件 → 不同配置不串、不与旧污染run撞 done 集
     if args.score:
-        score(cfg)
+        score(cfg, suffix)
         return
 
     import torch
@@ -111,11 +125,13 @@ def main():
 
     aliases = json.load(open(args.aliases))
     src = cfg["dataset"].get("fallback_path", cfg["dataset"]["path"])
-    ids = union_old_ids(tok, src, aliases)
-    sup = {"processor": make_processor(ids, cfg["suppress"]["penalty"]), "scope": "all"}   # 最坏界:全程压并集
-    print(f"[genbench] 并集 o_old token 数={len(ids)}  penalty={cfg['suppress']['penalty']}  dev={dev}")
+    ids = old_ids(tok, src, aliases, mode=args.mode)
+    sup = {"processor": make_processor(ids, cfg["suppress"]["penalty"]), "scope": scope}
+    print(f"[genbench] mode={args.mode} scope={scope} o_old_token数={len(ids)} "
+          f"penalty={cfg['suppress']['penalty']} budget(gsm8k={args.gsm8k_budget},math={args.math_budget}) "
+          f"answer_cap={args.answer_cap} dev={dev} suffix={suffix}")
 
-    op = out_path(cfg, args.rank)
+    op = out_path(cfg, args.rank, suffix)
     os.makedirs(cfg["out_dir"], exist_ok=True)
     done = set()
     if os.path.exists(op):
@@ -135,9 +151,10 @@ def main():
                 if i % args.world != args.rank or (bench, i) in done:
                     continue
                 q = it["q"]
+                bdg = args.gsm8k_budget if bench == "gsm8k" else args.math_budget
                 try:
-                    _, ans_off, _ = think_budget.generate_with_budget(model, tok, q, "B3", suppress=None)
-                    _, ans_on, _ = think_budget.generate_with_budget(model, tok, q, "B3", suppress=sup)
+                    _, ans_off, _ = think_budget.generate_with_budget(model, tok, q, bdg, suppress=None, answer_cap=args.answer_cap)
+                    _, ans_on, _ = think_budget.generate_with_budget(model, tok, q, bdg, suppress=sup, answer_cap=args.answer_cap)
                     rec = {"bench": bench, "i": i, "ok_off": correct(bench, ans_off, it["a"]),
                            "ok_on": correct(bench, ans_on, it["a"])}
                 except Exception as e:
