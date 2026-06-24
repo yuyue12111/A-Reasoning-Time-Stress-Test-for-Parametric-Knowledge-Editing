@@ -116,7 +116,7 @@
   ② **【红线自查全清】**三危险红线(scaling law / RR>0.20 / 首次发现)grep 自查 → 全部仅出现在否定句(\"we do not…\")=合规;唯一溯源缺口(base_probe 0.59 此前无出处)已补 `results.json.base_probe.7B`{0.59/0.67/0.755};
   ③ **【基建齐,commit `244310c`】**`probe_llama70b.yaml`(model_parallel 跨卡 2×4/1×8,70B 单卡放不下;`think_budget` 用 `model.device` → 无需改码)+ `plots.py` 多族 fig1(1×3 面板每族一线,向后兼容 flat,stub 测三路径全过)+ `results.json` capability→`families` 重构(新点 append 即可);
   ④ **【主线现状】**RQ1/RQ2/RQ3 三腿齐 + 全文初稿 + 出图脚本就绪。**唯一剩余 = GPU 补点回填**:genbench Δ(收 RQ3 通用能力门)、Qwen-1.5B/Llama-8B/70B score(跨族跨规模曲线、破 7B Math 特化 confound)。回来后只需填 `results.json`(families/genbench)→ `python src/plots.py` 出图 → draft.md 去 [pending];
-  ⑤ **【★在飞快照刷新】**▸平台 H200:**genbench 跑中**;▸**Llama-8B + 70B 已下载到 big disk** `/inspire/qb-ilm/project/ai4education/public/whywhy/models/DeepSeek-R1-Distill-Llama-{8B,70B}`(H200 已确认 ls 可见),1.5B 在 hdd;▸**待跑(GPU)**:Llama-8B(8 卡数据并行,ROME 无需 mom2 预热已核;fp32 防 Hopper NaN;命令见会话/config)→ 验通 Llama 路径后再 70B(model_parallel 跨卡);▸后台 workflow:无(paper-draft 已完落盘);▸**待回**:genbench Δ、Llama-8B/70B/1.5B score(回来 append `results.json.capability.families` → `python src/plots.py`);▸**待我建**:无;▸红线同上。
+  ⑤ **【★在飞快照刷新(6/24 跨实例分工已定)】**算力=两独立实例各 8 卡:**A=8×4090 联网/下载机(bf16 无 NaN)** + **B=8×H200 离线(fp32 防 Hopper NaN)**,共享 big disk(模型 `.../public/whywhy/models/DeepSeek-R1-Distill-Llama-{8B,70B}` 两边可见)。▸**H200**:genbench 跑中 → 完即接 **70B**(`probe_llama70b.yaml`,model_parallel 跨卡,首跑 1×8 盯第一条 case 防 device-mismatch/nan,fp32);▸**4090**:跑 **Llama-8B**(`probe_llama8b.yaml`,8 卡 `--world 8` bf16 不设 DTYPE,~45min–1h;Llama 族首跑=探路,瞄前几条非空即路径验通;ROME 无需 mom2 预热已核);▸两线并行互不抢卡;▸后台 workflow:无(paper-draft 已落盘);▸**待回**:genbench Δ、Llama-8B/70B score(append `results.json.capability.families` → `python src/plots.py`);1.5B 在 hdd 待跑;▸**待我建**:无;▸红线同上。
 
 ---
 
