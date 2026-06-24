@@ -3,8 +3,12 @@
 > 状态:2026-06-24 初稿骨架(RQ1/RQ2/RQ3 数据已到,genbench 安全门跑中)。所有数为**去污判分**口径
 > (metrics.hit 词边界 + 丢 <4 字符别名;substring 旧数已作废,见 plan v1.21)。abstract 7/20 / 全文 7/27。
 
-## 工作标题
-**Thinking Undoes Editing: Test-Time Reasoning Erodes Parametric Knowledge Edits, and a Training-Free Fix**
+## ⚠ 定位调整(v1.28,撞车排查后 — 见 paper/related_work.md)
+撞车排查核实:**现象(SCR 2505.18690/ThinkEval)、非擦除机理(Superficial Editing 2505.12636)、training-free 修复(DISCO 2406.02882)各有强近邻已发表**。故**头牌改为各近邻都没有的 `capability-emergent`**:编辑侵蚀随能力涌现,做成**跨族跨规模曲线**(Qwen 1.5/7/14/32B + Llama 8/70B);现象/机理/修复诚实降为支撑、按 §2 立界对标近邻;chain-only 因果干预(区别 DISCO 答案级)与 CoT 词边界口径作次级独有点。
+
+## 工作标题(capability 头牌)
+**Editing Gets More Fragile as Models Reason Better: A Capability-Emergent Erosion of Knowledge Edits under Test-Time Reasoning, with a Chain-Level Causal Fix**
+(旧标题 *Thinking Undoes Editing* 现象部分已被近邻占,弱化为副线)
 
 ## 一段式 abstract(草)
 参数化知识编辑(ROME/MEMIT)常以**零思考**下的成功率衡量。我们发现:在 R1 式**推理**模型上,随
