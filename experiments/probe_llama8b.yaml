@@ -1,0 +1,27 @@
+# capability 曲线 · Llama-8B 跨族小点(plan v1.28;头牌=capability-emergent)
+# R1-Distill-Llama-8B = Llama-3.1-8B 基座(通用,非数学特化),32 层(末层 idx 31)、hidden 4096。
+# 模块模板与 Qwen2 同名(model.layers.{}.mlp.down_proj / model.norm / lm_head)→ 复用 7B hparams + override。
+# 跑首选 4090 bf16(Llama 在 Hopper 上 ROME compute_v 同样可能 NaN,4090 无此问题、最省心):
+#   export WHYAAAI_MODEL=$W/models/DeepSeek-R1-Distill-Llama-8B
+#   for r in $(seq 0 7); do PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/probe_llama8b.yaml --editor ROME --rank $r --world 8 --device $r & done; wait
+#   python src/score_pilot.py --config experiments/probe_llama8b.yaml --editor ROME
+# 若只能上 H200:加 export WHYAAAI_DTYPE=float32,并 tail 首条日志确认 compute_v 不是 nan(是 nan=没切 fp32)。
+model_tag: r1llama8b
+seed: 42
+out_dir: results/probe
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Llama-8B    # 离线用 WHYAAAI_MODEL=本地路径覆盖
+  stats_dir: ./data/stats_r1llama8b
+  v_loss_layer: 31                                        # Llama-8B=32 层
+dataset:
+  tag: cf200
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 200
+budgets: [B0, B3]
+sampling:
+  enabled: false
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml   # 仅借模块模板/超参,model_name 等已 override(Llama 同构)
+    layers: [6]        # 32×0.18≈6 起步;B0 ES 低再扫 {4,6,8}
