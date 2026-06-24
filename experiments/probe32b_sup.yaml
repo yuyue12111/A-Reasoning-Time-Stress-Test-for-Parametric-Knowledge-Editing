@@ -1,0 +1,41 @@
+# RQ3 修复 A/B · 32B suppress 臂 (plan v1.27;RQ3 设计面板 #1 = o_old logit 抑制)
+# A 臂(baseline,suppress 关)= 复用现有 experiments/probe32b.yaml 的 cf200 结果(同 200 case,seed42 同序)。
+# B 臂(本配置,suppress 开)= 同 200 case、tag 改 cf200sup(输出不撞 A)。配对比 ΔRR/ΔRRs/ΔES(+ Loc 守门)。
+# 关键: suppress 仅作用于 efficacy 探针(edit_loop 接线),locality 探针不碰 → Loc 结构性安全。
+# scope=think = 只压思考链、答案段不压(科学测试:压链内重推能否传导到答案降 RR);消融再开 scope=all。
+# 跑(H200 fp32,约 6h;先验信号可把 n 调小到 60):
+#   cd <项目根>
+#   export WHYAAAI_MODEL=$W/models/DeepSeek-R1-Distill-Qwen-32B; export WHYAAAI_DTYPE=float32; export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+#   for r in $(seq 0 7); do PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/probe32b_sup.yaml --editor ROME --rank $r --world 8 --device $r & done; wait
+#   python src/score_pilot.py --config experiments/probe32b_sup.yaml --editor ROME      # B 臂
+#   python src/score_pilot.py --config experiments/probe32b.yaml     --editor ROME      # A 臂(baseline,已在盘上)
+
+model_tag: r1qwen32b
+seed: 42
+out_dir: results/probe
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B   # 离线平台用 WHYAAAI_MODEL=本地绝对路径覆盖
+  stats_dir: ./data/stats_r1qwen32b
+  v_loss_layer: 63
+
+dataset:
+  tag: cf200sup           # 区别于 A 臂 cf200 的输出名;同 path/n/seed → 同 200 case 配对
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 200
+
+budgets: [B0, B3]
+
+sampling:
+  enabled: false
+
+# RQ3 修复:o_old logit 抑制(run_pilot.resolve → edit_loop.run.suppress_cfg → 仅 efficacy 探针)
+suppress:
+  penalty: 8              # logit 空间常数减法;α 扫 {4,8,12}(改这里重跑)
+  scope: think            # think=只压链(测传导)/ all=连答案一起压(消融)
+
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [12]

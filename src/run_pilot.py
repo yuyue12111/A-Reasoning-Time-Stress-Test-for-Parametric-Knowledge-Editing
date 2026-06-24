@@ -51,7 +51,8 @@ def resolve(cfg, editor, rank, world, device=None):
     if samp and samp.get("enabled"):
         sampling = {"temperature": samp.get("temperature", 0.6), "seeds": samp.get("seeds", [0, 1, 2])}
     return dict(path=path, prefiltered=prefiltered, cases=cases, hparams=_abs(ed["hparams"]),
-                overrides=overrides, out=out, budgets=cfg["budgets"], sampling=sampling)
+                overrides=overrides, out=out, budgets=cfg["budgets"], sampling=sampling,
+                suppress_cfg=cfg.get("suppress"))   # RQ3 修复:yaml 的 suppress 块(无则 None=baseline)
 
 
 def main():
@@ -85,7 +86,8 @@ def main():
             "prefiltered": R["prefiltered"], "n": cfg["dataset"].get("n")}}   # 溯源头配置摘要(plan §6)
     from edit_loop import run
     run(R["cases"], args.editor, R["hparams"], R["budgets"], R["out"], rank=args.rank,
-        world=args.world, overrides=R["overrides"], sampling=R["sampling"], meta=meta)
+        world=args.world, overrides=R["overrides"], sampling=R["sampling"], meta=meta,
+        suppress_cfg=R.get("suppress_cfg"))
 
 
 if __name__ == "__main__":

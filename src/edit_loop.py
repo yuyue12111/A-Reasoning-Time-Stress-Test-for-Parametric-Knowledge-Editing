@@ -72,11 +72,14 @@ def decode_arms(sampling):
 
 
 def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1,
-        overrides=None, sampling=None, meta=None):
+        overrides=None, sampling=None, meta=None, suppress_cfg=None):
     done = set()
     if os.path.exists(out_path):             # 续跑跳过；用 .get 兼容 _meta 头行（无 case_id）
         done = {cid for l in open(out_path) if (cid := json.loads(l).get("case_id"))}
     had_content = os.path.exists(out_path) and os.path.getsize(out_path) > 0
+    _aliases = json.load(open(os.path.join(_PROJECT_ROOT, "data/aliases.json"))) if suppress_cfg else None
+    if suppress_cfg:                         # RQ3 修复(plan v1.27)：逐 case 现构 o_old 抑制器
+        from suppress import build_old_token_ids, make_processor
     hp = HP_CLS[editor_name].from_hparams(hparams_path)
     for k, v in (overrides or {}).items():   # run_pilot 覆盖 model_name/stats_dir/device/layers
         setattr(hp, k, v)
@@ -97,7 +100,7 @@ def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1,
         if not had_content:                       # 新分片：先写溯源头（plan §6，事后补不了）
             hdr = provenance_header({"editor": editor_name, "budgets": budgets,
                                      "rank": rank, "world": world, "overrides": overrides,
-                                     "sampling": sampling, **(meta or {})})
+                                     "sampling": sampling, "suppress": suppress_cfg, **(meta or {})})
             f.write(json.dumps(hdr, ensure_ascii=False) + "\n"); f.flush()
         for i, c in enumerate(cases):
             if i % world != rank or c["case_id"] in done:
@@ -117,10 +120,16 @@ def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1,
                                       target_new=[c["o_new"]],
                                       subject=[c["s"]],          # ROME/MEMIT 必需
                                       sequential_edit=True)
+                sup_eff = None              # RQ3：仅 efficacy 探针压 o_old；locality/para 不碰 → Loc 结构性安全
+                if suppress_cfg:
+                    _ids = build_old_token_ids(tok, c["o_old"], _aliases)
+                    sup_eff = {"processor": make_processor(_ids, suppress_cfg["penalty"]),
+                               "scope": suppress_cfg.get("scope", "think")}
                 for b in budgets:
                     for ptype, q in probes(c):
                         for decode, seed, temp, gk in arms:
-                            cot, ans, _ = generate_with_budget(model, tok, q, b, **gk)
+                            cot, ans, _ = generate_with_budget(model, tok, q, b,
+                                suppress=(sup_eff if ptype == "efficacy" else None), **gk)
                             f.write(json.dumps({"case_id": c["case_id"],
                                 "editor": editor_name, "budget": b, "probe": ptype,
                                 "decode": decode, "seed": seed, "temperature": temp,

@@ -30,11 +30,14 @@ THINK_END = "</think>"
 WAIT = "\nWait, let me double-check this."
 CAP = {"B1": 256, "B2": 1024, "B3": 8192, "B4": 8192}
 
-def _gen(model, tok, text, max_new, do_sample=False, temperature=0.6):
+def _gen(model, tok, text, max_new, do_sample=False, temperature=0.6, logits_processor=None):
     ids = tok(text, return_tensors="pt").to(model.device)
     kw = dict(max_new_tokens=max_new, pad_token_id=tok.eos_token_id, do_sample=do_sample)
     if do_sample:                           # 采样臂 (plan §2.5)：仅采样时才传 temperature
         kw["temperature"] = temperature
+    if logits_processor is not None:        # RQ3 修复：旧知识抑制 (默认 None → generate 调用逐字节不变)
+        from transformers import LogitsProcessorList
+        kw["logits_processor"] = LogitsProcessorList([logits_processor])
     out = model.generate(**ids, **kw)
     # skip_special_tokens=True：<think>/</think> 非特殊 token 不会被剥离 (03_rtofu.md §4)，
     # 同时滤掉 <｜end▁of▁sentence｜> 等，避免污染 answer 的规则判分（与 R-TOFU test.py:39 一致）。
@@ -44,7 +47,7 @@ def _gen(model, tok, text, max_new, do_sample=False, temperature=0.6):
 def _ntok(tok, s):
     return len(tok(s, add_special_tokens=False)["input_ids"])
 
-def generate_with_budget(model, tok, q, budget, do_sample=False, temperature=0.6, seed=None):
+def generate_with_budget(model, tok, q, budget, do_sample=False, temperature=0.6, seed=None, suppress=None):
     """返回 (cot, answer, full_text)。budget ∈ {B0,B1,B2,B3,B4}。
 
     解码臂 (plan §2.5「每条 greedy + temperature 0.6 × 3 seeds」)：
@@ -55,15 +58,16 @@ def generate_with_budget(model, tok, q, budget, do_sample=False, temperature=0.6
     """
     if seed is not None:
         torch.manual_seed(seed)
-    def g(text, mx):                        # 闭包固化本次调用的解码臂，三处生成口径统一
-        return _gen(model, tok, text, mx, do_sample=do_sample, temperature=temperature)
+    def g(text, mx, use_sup=False):         # 闭包固化本次调用的解码臂，三处生成口径统一
+        lp = suppress["processor"] if (use_sup and suppress) else None   # RQ3 抑制：按生成位点开关
+        return _gen(model, tok, text, mx, do_sample=do_sample, temperature=temperature, logits_processor=lp)
     if budget == "B0":                      # ZeroThink: 逐字复用 R-TOFU 闭合空思考块
         text = ZEROTHINK.format(q=q)
-        ans = g(text, 256)
+        ans = g(text, 256, use_sup=bool(suppress) and suppress["scope"] == "all")   # B0 无链；仅 scope=all 压答案
         return "", ans, text + ans
     prefix, cot, waits = TPL.format(q=q), "", 0
     while True:
-        chunk = g(prefix + cot, max(64, CAP[budget] - _ntok(tok, cot)))
+        chunk = g(prefix + cot, max(64, CAP[budget] - _ntok(tok, cot)), use_sup=bool(suppress))   # 压链(think/all 都压)
         if THINK_END in chunk:              # 模型自行结束思考
             head = chunk.split(THINK_END)[0]
             if budget == "B4" and waits < 2:       # s1 式强制延长
@@ -72,5 +76,5 @@ def generate_with_budget(model, tok, q, budget, do_sample=False, temperature=0.6
         cot += chunk
         if _ntok(tok, cot) >= CAP[budget]: break   # B1/B2 截断 / 预算耗尽
     text = prefix + cot + "\n" + THINK_END + "\n\n"
-    ans = g(text, 256)
+    ans = g(text, 256, use_sup=bool(suppress) and suppress["scope"] == "all")   # 答案段：仅 scope=all 压(think 只压链)
     return cot, ans, text + ans
