@@ -23,7 +23,8 @@
     "model": "32B", "n": 200, "scope": "think", "penalty": 8,
     "baseline": {"RR": 0.193, "ES_B3": 0.495, "ES_drop": 0.106, "CLR": 0.545, "Loc": 0.958},
     "suppress": {"RR": 0.085, "ES_B3": 0.631, "ES_drop": -0.035, "CLR": 0.263, "Loc": 0.964},
-    "genbench": {"gsm8k_off": null, "gsm8k_on": null, "math_off": null, "math_on": null}
+    "genbench": {"_status": "[pending] 部署口径(单 o_old/scope=think/仅编辑 query)复测;勿用下方 worstcase 数当部署效果(那是病态上界)。plots.fig3 只在此处非 null 才画通用能力柱→保持 null。", "gsm8k_off": null, "gsm8k_on": null, "math_off": null, "math_on": null},
+    "genbench_worstcase": {"_note": "病态最坏界(并集全部 o_old + scope=all,远超部署)+ harness 疑欠测(base 32B GSM8K 0.535/MATH 0.150 远低于已知 ~0.95/0.90,B3=8192 截断 MATH 长链)→ Δ 不可作部署安全数,仅留作 stress-test 上界。adjudicate 面板 wf_02ee1b3a 评审中。", "gsm8k": {"n": 200, "acc_off": 0.535, "acc_on": 0.385, "delta": -0.150}, "math": {"n": 100, "acc_off": 0.150, "acc_on": 0.190, "delta": 0.040}}
   },
   "logitlens": {
     "model": "32B", "edit_layer": 12, "n_layers": 64, "edit_intact_pct": 1.0,
