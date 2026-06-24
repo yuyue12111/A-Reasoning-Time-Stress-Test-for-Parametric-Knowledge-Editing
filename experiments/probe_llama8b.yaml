@@ -19,6 +19,7 @@ dataset:
   fallback_path: data/counterfact.jsonl
   n: 200
 budgets: [B0, B3]
+probes: [efficacy, locality]   # 锚点只需 ES/CLR/RR(efficacy)+Loc(locality);砍 para/open 省 3 条 B3 长链/case≈2.5×(不改作图指标)
 sampling:
   enabled: false
 editors:

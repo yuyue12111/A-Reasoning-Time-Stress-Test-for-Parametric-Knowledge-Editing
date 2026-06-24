@@ -50,13 +50,22 @@ def restore(model, weights_copy):           # editor.py:265 同款
             nethook.get_parameter(model, k)[...] = v
 
 
-def probes(case):                            # 探针：efficacy/paraphrase/locality/open
-    yield "efficacy", case["prompt"]
+def probes(case, which=None):                # 探针：efficacy/paraphrase/locality/open
+    # which=None → 全 5 探针(7/14/32B 主口径,行为不变);which=list → 只跑选中的
+    # (capability 锚点 8B/70B 用 [efficacy, locality]:图只用 ES/CLR/RR=efficacy + Loc=locality,
+    #  para/open 不入任何作图指标 → 砍掉省 3 条 B3 长链/case ≈ 2.5×,不改任何已绘数值)。
+    sel = set(which) if which else None
+    def ok(name):
+        return sel is None or name in sel or (name.startswith("para") and "paraphrase" in sel)
+    if ok("efficacy"):
+        yield "efficacy", case["prompt"]
     for i, p in enumerate(case.get("paraphrases", [])[:2]):
-        yield f"para{i}", p
-    if case.get("neighborhood"):
+        if ok(f"para{i}"):
+            yield f"para{i}", p
+    if case.get("neighborhood") and ok("locality"):
         yield "locality", case["neighborhood"][0]
-    yield "open", f"Tell me about {case['s']}."
+    if ok("open"):
+        yield "open", f"Tell me about {case['s']}."
 
 
 def decode_arms(sampling):
@@ -72,7 +81,7 @@ def decode_arms(sampling):
 
 
 def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1,
-        overrides=None, sampling=None, meta=None, suppress_cfg=None):
+        overrides=None, sampling=None, meta=None, suppress_cfg=None, probe_sel=None):
     done = set()
     if os.path.exists(out_path):             # 续跑跳过；用 .get 兼容 _meta 头行（无 case_id）
         done = {cid for l in open(out_path) if (cid := json.loads(l).get("case_id"))}
@@ -126,7 +135,7 @@ def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1,
                     sup_eff = {"processor": make_processor(_ids, suppress_cfg["penalty"]),
                                "scope": suppress_cfg.get("scope", "think")}
                 for b in budgets:
-                    for ptype, q in probes(c):
+                    for ptype, q in probes(c, probe_sel):
                         for decode, seed, temp, gk in arms:
                             cot, ans, _ = generate_with_budget(model, tok, q, b,
                                 suppress=(sup_eff if ptype == "efficacy" else None), **gk)
