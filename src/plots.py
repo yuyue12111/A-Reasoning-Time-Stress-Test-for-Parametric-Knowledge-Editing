@@ -21,24 +21,51 @@ def _save(fig, name):
     print(f"  写出 paper/{name}.pdf+png")
 
 
+def _families(cap):
+    """返回 [(family_name, series_dict), ...]。新式 capability.families 优先;
+    旧式(顶层直接放 params_b/es_drop/... 数组)向后兼容=单族。忽略 _ 前缀的注释键。"""
+    fams = cap.get("families")
+    if isinstance(fams, dict):
+        return [(k, v) for k, v in fams.items() if not k.startswith("_") and isinstance(v, dict)]
+    if "params_b" in cap:
+        return [("R1-Distill-Qwen", cap)]
+    return []
+
+
+# 每族一种 (颜色, marker, 线型);跨族区分靠颜色,跨指标靠分面板
+_FAM_STYLE = [("#1f77b4", "o", "-"), ("#ff7f0e", "s", "--"), ("#9467bd", "D", "-.")]
+
+
 def fig1_capability(cap):
-    x = cap["params_b"]
-    fig, ax = plt.subplots(figsize=(5.2, 3.6))
-    def band(key, label, color, marker):
-        y = cap[key]; ci = cap[key + "_ci"]
-        lo = [v - c[0] for v, c in zip(y, ci)]; hi = [c[1] - v for v, c in zip(y, ci)]
-        ax.errorbar(x, y, yerr=[lo, hi], label=label, color=color, marker=marker, capsize=3, lw=2)
-    band("clr", "CLR (chain leak)", "#1f77b4", "o")
-    band("rr", "RR (answer reverts)", "#d62728", "s")
-    band("es_drop", "ES drop (B0→B3)", "#2ca02c", "^")
-    for xi, d, sig in zip(x, cap["es_drop"], cap["es_drop_sig"]):   # 显著性星标
-        if sig:
-            ax.annotate("*", (xi, d), textcoords="offset points", xytext=(4, 4), color="#2ca02c", fontsize=14)
-    ax.axhline(0, color="gray", lw=0.8, ls=":")
-    ax.set_xscale("log"); ax.set_xticks(x); ax.set_xticklabels([f"{p}B" for p in x])
-    ax.set_xlabel("model size (R1-Distill-Qwen)"); ax.set_ylabel("rate")
-    ax.set_title("Thinking erodes editing — capability-emergent")
-    ax.legend(fontsize=8, frameon=False); ax.grid(alpha=0.25)
+    """capability-emergent 跨族曲线:1×3 面板(ES 降幅 / CLR / RR),每族一条线、带 CI、ES 降幅标显著性。
+    单族数据时退化为 3 面板各一条线(仍可读),不报错。族里缺某指标/缺 CI 都跳过、不崩。"""
+    fams = _families(cap)
+    metrics = [("es_drop", "ES drop (B0→B3)"), ("clr", "CLR (chain leak)"), ("rr", "RR (answer reverts)")]
+    fig, axes = plt.subplots(1, 3, figsize=(11.5, 3.4))
+    allx = sorted({p for _, s in fams for p in s.get("params_b", [])})
+    for ax, (key, ylabel) in zip(axes, metrics):
+        for (fname, s), (color, marker, ls) in zip(fams, _FAM_STYLE):
+            x = s.get("params_b"); y = s.get(key)
+            if not x or not y:
+                continue
+            ci = s.get(key + "_ci")
+            if ci and len(ci) == len(y):
+                lo = [v - c[0] for v, c in zip(y, ci)]; hi = [c[1] - v for v, c in zip(y, ci)]
+                ax.errorbar(x, y, yerr=[lo, hi], label=fname, color=color, marker=marker, ls=ls, capsize=3, lw=2)
+            else:
+                ax.plot(x, y, label=fname, color=color, marker=marker, ls=ls, lw=2)
+            if key == "es_drop":                                   # 显著性星标(逐族同色)
+                for xi, d, sig in zip(x, y, s.get("es_drop_sig", [False] * len(x))):
+                    if sig:
+                        ax.annotate("*", (xi, d), textcoords="offset points", xytext=(4, 4), color=color, fontsize=14)
+        ax.axhline(0, color="gray", lw=0.8, ls=":")
+        if allx:
+            ax.set_xscale("log"); ax.set_xticks(allx); ax.set_xticklabels([f"{p}B" for p in allx], fontsize=8)
+        ax.set_xlabel("model size (params)"); ax.set_ylabel(ylabel); ax.grid(alpha=0.25)
+    if len(fams) > 1:
+        axes[0].legend(fontsize=7, frameon=False)          # 多族才需图例(单族族名即标题)
+    fig.suptitle("Thinking erodes editing — capability-emergent" + (" (cross-family)" if len(fams) > 1 else ""), y=1.03)
+    fig.tight_layout()
     _save(fig, "fig1_capability"); plt.close(fig)
 
 

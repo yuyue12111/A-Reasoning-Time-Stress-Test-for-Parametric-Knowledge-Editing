@@ -1,0 +1,43 @@
+# capability 曲线 · Llama-70B 跨族高端锚(plan v1.28；头牌=capability-emergent)
+# R1-Distill-Llama-70B = Llama-3.3-70B 基座(通用,非数学特化),80 层(末层 idx 79)、hidden 8192。
+# 模块模板与 Qwen2/Llama-8B 同名(model.layers.{}.mlp.down_proj / model.norm / lm_head)→ 复用 7B hparams + override。
+#
+# ⚠ 与 7/14/32B 的关键不同 = 单卡放不下,必须 model_parallel(device_map='auto' 把模型摊到多卡):
+#   · fp32 70B ≈ 280G > 单张 H200(141G)→ 必须跨卡;8×H200=1128G 富余,4×H200=564G 也够(280/4≈70G/卡)。
+#   · 故 hparams_overrides.model_parallel: true(覆盖 7B hparams 的 false)→ EasyEdit editor.py:65 走 device_map='auto'、
+#     :142 跳过 .to(device);our think_budget.py 的输入用 model.device(=embedding 所在 cuda:0),accelerate 自动跨卡派发→无需改码。
+#   · ❗ 不能用 7/14/32B 那套 8-进程数据并行(--world 8 --device r):每进程独占 1 卡,70B 放不下必 OOM。改用下面两选一。
+#   · dtype:Hopper bf16 ROME compute_v 可能 NaN → 仍 WHYAAAI_DTYPE=float32(fp32 跨卡空间足);首条日志 tail 确认 compute_v 非 nan。
+#   · 速度:单进程串行 + 70B fp32 + B0/B3 生成会很慢 → n 默认压到 100(高端锚一个稳定点即可),按 case_id 断点续跑(杀了重跑接上)。
+#   · ROME-under-model_parallel 风险:编辑层权重可能落在非 cuda:0 的卡,ROME compute_v 个别 tensor 设备不一致是已知雷区——
+#     首跑务必 tail 第一条 case 日志:若报 device mismatch,在 vendor_patches 里把 compute_v 的中间量 .to(weight.device) 对齐(开窗再修,无 GPU 测不了)。
+#
+# 跑法 A(推荐·2 进程×4 卡,wall-clock 减半;两进程靠 CUDA_VISIBLE_DEVICES 各占 4 卡、world=2 分 case):
+#   export WHYAAAI_MODEL=$W/models/DeepSeek-R1-Distill-Llama-70B; export WHYAAAI_DTYPE=float32
+#   CUDA_VISIBLE_DEVICES=0,1,2,3 PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/probe_llama70b.yaml --editor ROME --rank 0 --world 2 &
+#   CUDA_VISIBLE_DEVICES=4,5,6,7 PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/probe_llama70b.yaml --editor ROME --rank 1 --world 2 & wait
+#   python src/score_pilot.py --config experiments/probe_llama70b.yaml --editor ROME
+# 跑法 B(保守·1 进程×8 卡,最稳但最慢;OOM/报错先用这个排除问题):
+#   export WHYAAAI_MODEL=$W/models/DeepSeek-R1-Distill-Llama-70B; export WHYAAAI_DTYPE=float32
+#   PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/probe_llama70b.yaml --editor ROME --rank 0 --world 1
+#   python src/score_pilot.py --config experiments/probe_llama70b.yaml --editor ROME
+model_tag: r1llama70b
+seed: 42
+out_dir: results/probe
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Llama-70B   # 离线用 WHYAAAI_MODEL=本地路径覆盖
+  stats_dir: ./data/stats_r1llama70b
+  v_loss_layer: 79                                        # Llama-70B=80 层,末层 idx 79
+  model_parallel: true                                    # ⚠ 覆盖 7B hparams 的 false → device_map='auto' 跨卡(70B 单卡放不下)
+dataset:
+  tag: cf100                                              # 高端锚:n=100(70B 串行慢);与 7/14/32 同序前 100 → 可比
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 100
+budgets: [B0, B3]
+sampling:
+  enabled: false
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml   # 仅借模块模板/超参,model_name/层/model_parallel 已 override(Llama 同构)
+    layers: [14]       # 80×0.18≈14 起步;B0 ES 低再扫 {12,16,20}(参 Llama-8B layer6=32×0.18)
