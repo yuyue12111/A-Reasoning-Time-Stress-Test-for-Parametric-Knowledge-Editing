@@ -1,0 +1,22 @@
+# BOS A/B 臂②(BOS OFF=旧 Qwen 7/14/32 口径):跑时【export WHYAAAI_NO_BOS=1】。
+# 与 bosON 臂只差 tag,同 40 case 直接可比。两臂 ES/CLR/RR 接近 = BOS 对 Qwen 无关紧要→跨族不混淆、旧 Qwen 点有效。
+model_tag: r1qwen1_5b
+seed: 42
+out_dir: results/probe
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+  stats_dir: ./data/stats_r1qwen1_5b
+  v_loss_layer: 27
+dataset:
+  tag: cf40_bosOFF
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 40
+budgets: [B0, B3]
+probes: [efficacy, locality]
+sampling:
+  enabled: false
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [5]

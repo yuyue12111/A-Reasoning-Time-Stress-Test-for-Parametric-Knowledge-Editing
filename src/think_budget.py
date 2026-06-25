@@ -15,6 +15,7 @@
 故 </think> 走**文本检测**成立，无需 token-id StoppingCriteria。（既是单原子 token，token-id 检测**亦可行**，
 留作 B4 备选。）真 eos 是 `<｜end▁of▁sentence｜>`(151643)。证据见 03_rtofu.md §4。
 """
+import os
 import torch  # 保留：B4 若日后改 token-id StoppingCriteria / 下游 steering 钩子需要
 
 # --- R-TOFU 逐字模板（全角竖线 U+FF5C，复制时勿替换成半角 |）---
@@ -31,10 +32,11 @@ WAIT = "\nWait, let me double-check this."
 CAP = {"B1": 256, "B2": 1024, "B3": 8192, "B4": 8192, "B3M": 16384}   # B3M = genbench 专用长链档(MATH 链常 >8192 被截在 \boxed 前),不入 RQ1/RQ3 主口径锚点
 
 def _gen(model, tok, text, max_new, do_sample=False, temperature=0.6, logits_processor=None):
-    # R1 模板须以 BOS 开头:R1-Distill-Llama 的 add_bos_token=False、tok() 不自动补 → 缺 BOS 模型退化
-    # (诊断坐实:补 <｜begin▁of▁sentence｜> 即与 apply_chat_template 一字不差地连贯)。
-    # 手动补 BOS + add_special_tokens=False → 对 Llama 补上、对 Qwen(本就含一个 BOS)不双加,两族都恰好一个。
-    bos = tok.bos_token or ""
+    # R1 模板须以 BOS 开头:R1-Distill-Llama/Qwen **都** add_bos_token=False、tok() 不自动补;
+    # apply_chat_template 两族都会加 BOS = 规范格式。Llama 缺 BOS 会退化(诊断坐实补 BOS 即连贯),
+    # Qwen 缺 BOS 仍鲁棒(旧 7/14/32B 即无 BOS 跑出、趋势仍干净)。补 BOS = 更规范、跨族同口径。
+    # WHYAAAI_NO_BOS=1 复刻旧 Qwen 无 BOS 行为(供一致性 A/B / 与旧点对齐)。手动补 + add_special_tokens=False 防双加。
+    bos = "" if os.environ.get("WHYAAAI_NO_BOS") else (tok.bos_token or "")
     if bos and not text.startswith(bos):
         text = bos + text
     ids = tok(text, return_tensors="pt", add_special_tokens=False).to(model.device)

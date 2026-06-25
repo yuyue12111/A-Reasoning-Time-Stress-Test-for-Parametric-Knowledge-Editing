@@ -1,0 +1,22 @@
+# BOS A/B 臂①(BOS ON,默认 think_budget):测 BOS 是否改变 Qwen 行为(跨族对比是否被 BOS 混淆)。
+# 跑时【不设】WHYAAAI_NO_BOS。与 bosOFF 臂只差 tag,同 40 case 直接可比。
+model_tag: r1qwen1_5b
+seed: 42
+out_dir: results/probe
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+  stats_dir: ./data/stats_r1qwen1_5b
+  v_loss_layer: 27
+dataset:
+  tag: cf40_bosON
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 40
+budgets: [B0, B3]
+probes: [efficacy, locality]
+sampling:
+  enabled: false
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [5]
