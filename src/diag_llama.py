@@ -1,35 +1,45 @@
-"""一次性定位 Llama 跑废的两个 bug(只读探针,不写 results)。
+"""一次性钉死 Llama 跑废的两个 bug(v2,只读探针,不写 results)。
 跑:  export WHYAAAI_MODEL=<本地 R1-Distill-Llama-8B 路径>;  python src/diag_llama.py
-读三件事 → 贴回输出:
-  A) 分词器 fast/slow + decode 是否把 Ġ/Ċ 还原成 空格/换行(bug#1 解码);
-  B) 我们的 think_budget 模板在【未编辑基座】上是否连贯(隔离 bug#2 = 模板坏 vs ROME 编辑坏);
-  C) 若 decode 脏,convert_tokens_to_string 是否干净(给修法方向)。
+四块输出 → 贴回:
+  A) transformers 版本 + 编码是否把空格抓成 Ġ(编码 OK?);
+  B) python decode vs rust backend decode 谁干净(给 decode 修法);
+  C) 我们 ZEROTHINK 模板的 prompt token(特殊 token 是否单 id、模板对不对);
+  D) 生成的【原始 token id/token】—— 看模型到底吐的是退化串还是正常词被坏 decode 显成垃圾。
 """
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import torch
+import torch, transformers
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import think_budget
 
 m = os.environ["WHYAAAI_MODEL"]
-tok = AutoTokenizer.from_pretrained(m)
+t = AutoTokenizer.from_pretrained(m)
 
-print("=== A) 分词器 + decode 解码 ===")
-print("type:", type(tok).__name__, "| is_fast:", getattr(tok, "is_fast", "?"))
-probe = "Hello world\nThe capital is Paris."
-ids = tok(probe, add_special_tokens=False)["input_ids"]
-dec = tok.decode(ids, skip_special_tokens=True)
-print("decode round-trip:", repr(dec))
-print("  → 脏(含 Ġ/Ċ)吗:", ("Ġ" in dec or "Ċ" in dec), "| ==原文吗:", dec == probe)
-print("=== C) 备选解码路径(若上面脏,看这些干净否) ===")
-toks = tok.convert_ids_to_tokens(ids)
-print("convert_tokens_to_string:", repr(tok.convert_tokens_to_string(toks)))
-print("decode(clean_up=True)   :", repr(tok.decode(ids, skip_special_tokens=True, clean_up_tokenization_spaces=True)))
+print("=== A) 版本 + 编码 ===")
+print("transformers:", transformers.__version__, "| tok:", type(t).__name__, "fast:", t.is_fast)
+ids = t("Hello world\nParis", add_special_tokens=False)["input_ids"]
+print("enc ids   :", ids)
+print("enc tokens:", t.convert_ids_to_tokens(ids), "  ← 有 Ġworld/Ċ = 编码抓到空格(锅在解码)")
 
-print("\n=== B) 我们的 think_budget 模板 × 未编辑基座(无 ROME) ===")
+print("=== B) python decode vs rust backend decode ===")
+print("py  decode:", repr(t.decode(ids, skip_special_tokens=True)))
+try:
+    print("rust decode:", repr(t.backend_tokenizer.decode(ids, skip_special_tokens=False)))
+except Exception as e:
+    print("rust decode err:", repr(e))
+
+print("=== C) 我们 ZEROTHINK 模板的 prompt token ===")
+prompt = think_budget.ZEROTHINK.format(q="What is the capital of France?")
+penc = t(prompt, return_tensors="pt")
+ptoks = t.convert_ids_to_tokens(penc["input_ids"][0].tolist())
+print("prompt tokens:", ptoks, "  ← <｜User｜>/<｜Assistant｜>/<think>/</think> 应各是单 token")
+
+print("=== D) 生成原始 token(无 decode 干扰)===")
 model = AutoModelForCausalLM.from_pretrained(m, dtype=torch.bfloat16).to("cuda:0").eval()
-for b in ["B0", "B3"]:
-    cot, ans, _ = think_budget.generate_with_budget(model, tok, "What is the capital of France?", b)
-    print(f"[{b}] cot_chars={len(cot)} | answer={repr(ans[:160])}")
-print("\n判读:B 段连贯出现 Paris = 模板 OK→bug#2 在 ROME 编辑(借 Qwen 超参在 Llama 上发散);"
-      " B 段也是 . \\n\\n 垃圾 = 我们模板/分词对 Llama 不对。A/C 段定 decode 修法。")
+out = model.generate(**penc.to("cuda:0"), max_new_tokens=30, do_sample=False)
+gen = out[0][penc["input_ids"].shape[1]:].tolist()
+print("gen ids   :", gen)
+print("gen tokens:", t.convert_ids_to_tokens(gen), "  ← 若是正常英文词=模型 OK(只是 decode 坏);若全是 .ĊĊ=真退化")
+print("gen pydec :", repr(t.decode(gen, skip_special_tokens=True)))
+print("\n判读:D 的 gen tokens 是正常词(Paris/capital...) → 模型好、只 decode 坏 → 修 decode 即全好;"
+      "D 仍是 ./Ċ → 模型真退化 → 再查模板/ROME。B 的 rust decode 干净 → decode 修法=走 backend/后处理。")
