@@ -104,6 +104,15 @@ def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1,
     apply_mom2_dataset_patch()
     ed = BaseEditor.from_hparams(hp)
     model, tok = ed.model, ed.tok
+    # R1-Llama 修复必须落在【真正用于生成/解码的 ed.tok】上:EasyEdit 的 llama 分支不走被 patch 的
+    # AutoTokenizer → qwen2_loader 的 fix 漏掉 ed.tok（现象:生成连贯但 decode 仍 Ġ/Ċ → 判分炸)。
+    # 这里直接对 ed.tok 兜底(fix_r1_tokenizer 幂等:非 Metaspace 原样、Qwen 零影响)。
+    try:
+        from r1_tokenizer import fix_r1_tokenizer
+        tok = fix_r1_tokenizer(tok, hp.model_name)
+        ed.tok = tok                                  # 同步回 ed,后续若有用 ed.tok 处一致
+    except Exception as e:
+        print(f"[edit_loop] r1_tokenizer 兜底修复跳过:{e!r}")
     arms = decode_arms(sampling)                  # greedy(+采样臂)；每臂一行 jsonl
     with open(out_path, "a") as f:
         if not had_content:                       # 新分片：先写溯源头（plan §6，事后补不了）
