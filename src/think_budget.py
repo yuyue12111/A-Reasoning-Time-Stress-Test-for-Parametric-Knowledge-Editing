@@ -31,7 +31,13 @@ WAIT = "\nWait, let me double-check this."
 CAP = {"B1": 256, "B2": 1024, "B3": 8192, "B4": 8192, "B3M": 16384}   # B3M = genbench 专用长链档(MATH 链常 >8192 被截在 \boxed 前),不入 RQ1/RQ3 主口径锚点
 
 def _gen(model, tok, text, max_new, do_sample=False, temperature=0.6, logits_processor=None):
-    ids = tok(text, return_tensors="pt").to(model.device)
+    # R1 模板须以 BOS 开头:R1-Distill-Llama 的 add_bos_token=False、tok() 不自动补 → 缺 BOS 模型退化
+    # (诊断坐实:补 <｜begin▁of▁sentence｜> 即与 apply_chat_template 一字不差地连贯)。
+    # 手动补 BOS + add_special_tokens=False → 对 Llama 补上、对 Qwen(本就含一个 BOS)不双加,两族都恰好一个。
+    bos = tok.bos_token or ""
+    if bos and not text.startswith(bos):
+        text = bos + text
+    ids = tok(text, return_tensors="pt", add_special_tokens=False).to(model.device)
     kw = dict(max_new_tokens=max_new, pad_token_id=tok.eos_token_id, do_sample=do_sample)
     if do_sample:                           # 采样臂 (plan §2.5)：仅采样时才传 temperature
         kw["temperature"] = temperature
