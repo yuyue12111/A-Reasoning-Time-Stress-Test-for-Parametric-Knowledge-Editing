@@ -28,7 +28,7 @@
         "clr":    [0.305],
         "clr_ci": [[0.240, 0.370]],
         "_loc": [0.670],
-        "_provisional": "8B=layer6 临时点(Loc 0.67<0.85 合格线,借 Qwen 超参可能偏猛过编辑;wf ww9ij8hpf 设计层/超参扫描修;若改层数值可能微调)。跨族意义=通用 8B(ES降幅 0.04/CLR 0.305/RR 0.091)≈ Qwen-7B-Math(−0.03/0.335/0.080)→ 小尺度 erosion 与族无关、非 Math 特化伪影。70B 待回 append [8,70]。"
+        "_provisional": "当前数=旧 layer6/clamp4(Loc 0.67 不合格)的 n=200 值,待替换。扫描(wf ww9ij8hpf,n=60×4格)已定锁 **layer6/clamp_norm_factor=2**:Loc 0.67→0.90 合格、B0 ES 不掉(0.667),诊断坐实=借 Qwen clamp=4 对 Llama 过编辑。probe_llama8b.yaml 已改 clamp2/tag cf200c2,**待 n=200 复跑回填最终点**(n=60 试跑 ES降幅 0.033/CLR 0.317/RR 0.125,与旧 clamp4 同量级→小尺度 erosion 结论稳)。跨族意义=通用 8B≈Qwen-7B-Math→非 Math 特化伪影。70B 待 append [8,70]。"
       }
     }
   },

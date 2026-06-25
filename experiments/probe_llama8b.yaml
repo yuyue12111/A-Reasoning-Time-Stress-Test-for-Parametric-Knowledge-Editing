@@ -13,8 +13,9 @@ hparams_overrides:
   model_name: deepseek-ai/DeepSeek-R1-Distill-Llama-8B    # 离线用 WHYAAAI_MODEL=本地路径覆盖
   stats_dir: ./data/stats_r1llama8b
   v_loss_layer: 31                                        # Llama-8B=32 层
+  clamp_norm_factor: 2                                    # 借 Qwen 的 4 对 Llama 残差流偏猛→Loc 塌(0.67);扫描定 clamp=2 救回 Loc≈0.90 且 ES 不掉(wf ww9ij8hpf;跨架构 transfer 调参,论文 §3 注)
 dataset:
-  tag: cf200
+  tag: cf200c2                                            # 新 tag:与旧 clamp4/Loc0.67 的 cf200 数据隔离
   path: data/counterfact.prefiltered.jsonl
   fallback_path: data/counterfact.jsonl
   n: 200
