@@ -18,17 +18,17 @@
       },
       "R1-Distill-Llama": {
         "params_b": [8],
-        "es_b0":  [0.660],
-        "es_b3":  [0.620],
-        "es_drop":     [0.040],
-        "es_drop_ci":  [[-0.030, 0.115]],
+        "es_b0":  [0.625],
+        "es_b3":  [0.610],
+        "es_drop":     [0.015],
+        "es_drop_ci":  [[-0.060, 0.095]],
         "es_drop_sig": [false],
-        "rr":     [0.091],
-        "rr_ci":  [[0.045, 0.144]],
-        "clr":    [0.305],
-        "clr_ci": [[0.240, 0.370]],
-        "_loc": [0.670],
-        "_provisional": "当前数=旧 layer6/clamp4(Loc 0.67 不合格)的 n=200 值,待替换。扫描(wf ww9ij8hpf,n=60×4格)已定锁 **layer6/clamp_norm_factor=2**:Loc 0.67→0.90 合格、B0 ES 不掉(0.667),诊断坐实=借 Qwen clamp=4 对 Llama 过编辑。probe_llama8b.yaml 已改 clamp2/tag cf200c2,**待 n=200 复跑回填最终点**(n=60 试跑 ES降幅 0.033/CLR 0.317/RR 0.125,与旧 clamp4 同量级→小尺度 erosion 结论稳)。跨族意义=通用 8B≈Qwen-7B-Math→非 Math 特化伪影。70B 待 append [8,70]。"
+        "rr":     [0.144],
+        "rr_ci":  [[0.088, 0.208]],
+        "clr":    [0.340],
+        "clr_ci": [[0.275, 0.410]],
+        "_loc": [0.835],
+        "_note": "8B 最终点 = layer6/clamp_norm_factor=2,n=200(clamp4 借值对 Llama 过编辑致 Loc 0.67,扫描 wf ww9ij8hpf 定 clamp=2)。Loc B0=0.835/B3=0.865 = 恰在 0.85 线(bootstrap 噪声内),诚实标 locality-marginal;**不再降 clamp 凑线(=tune-to-threshold,workflow 明禁)**。跨族意义:通用 8B(CLR 0.340/RR 0.144/ES降幅 0.015)落在 Qwen-7B(CLR 0.335)~14B 带 → 同尺度 erosion 与族无关、非 Math 特化伪影。论文 §3 注 Llama 用 clamp=2(跨架构 transfer 调参,非 per-model 凑数)。70B 待 append→params_b [8,70]。"
       }
     }
   },
