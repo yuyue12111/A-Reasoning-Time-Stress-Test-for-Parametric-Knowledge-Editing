@@ -16,7 +16,20 @@
         "clr_ci": [[0.270, 0.400], [0.405, 0.545], [0.475, 0.616]],
         "_pending": "1.5B 低锚(probe_qwen1_5b.yaml)出后 prepend 进每个数组首位"
       },
-      "_pending_R1-Distill-Llama": "8B(probe_llama8b.yaml)+70B(probe_llama70b.yaml)出后新增此族:{params_b:[8,70],...};跨族=证 capability-emergent 非 Qwen-Math 特化伪影"
+      "R1-Distill-Llama": {
+        "params_b": [8],
+        "es_b0":  [0.660],
+        "es_b3":  [0.620],
+        "es_drop":     [0.040],
+        "es_drop_ci":  [[-0.030, 0.115]],
+        "es_drop_sig": [false],
+        "rr":     [0.091],
+        "rr_ci":  [[0.045, 0.144]],
+        "clr":    [0.305],
+        "clr_ci": [[0.240, 0.370]],
+        "_loc": [0.670],
+        "_provisional": "8B=layer6 临时点(Loc 0.67<0.85 合格线,借 Qwen 超参可能偏猛过编辑;wf ww9ij8hpf 设计层/超参扫描修;若改层数值可能微调)。跨族意义=通用 8B(ES降幅 0.04/CLR 0.305/RR 0.091)≈ Qwen-7B-Math(−0.03/0.335/0.080)→ 小尺度 erosion 与族无关、非 Math 特化伪影。70B 待回 append [8,70]。"
+      }
     }
   },
   "rq3": {
