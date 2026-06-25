@@ -2,6 +2,7 @@
   "_note": "论文图表数据源(去污判分口径,plan v1.26/v1.27)。ROME × CounterFact, greedy, n=200。genbench 出后填。",
   "capability": {
     "_schema": "families[name] = {params_b, es_b0, es_b3, es_drop, es_drop_ci, es_drop_sig, rr, rr_ci, clr, clr_ci};新点直接 append 进对应族的每个数组(须 results.json 真实数,[pending] 的点先别加);plots.fig1 每族一条线。flat 旧式(顶层直接放数组)仍兼容=单族 Qwen。",
+    "_bos_note": "口径:R1-Distill-Qwen/Llama tokenizer 均 add_bos_token=False。旧 Qwen 7/14/32B 实际无 BOS 跑出(鲁棒、趋势干净);Llama 缺 BOS 退化故必补 BOS。BOS A/B(1.5B,n=40,同 40 case):ON vs OFF 的 ES@B0 0.525/0.550、ES@B3 0.550/0.575、ES降幅 −0.025/−0.025(同)、CLR 0.275/0.225、RR 0.048/0.045 —— 差异 ≤1–2 case、CI 大幅重叠 → BOS 对 Qwen 无材料级影响,旧 Qwen 点有效、跨族对比不被 BOS 混淆。论文 §3 注此 robustness。",
     "families": {
       "R1-Distill-Qwen": {
         "params_b": [7, 14, 32],

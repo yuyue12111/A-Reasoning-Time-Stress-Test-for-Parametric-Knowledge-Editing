@@ -17,8 +17,10 @@ dataset:
   fallback_path: data/counterfact.jsonl
   n: 200
 budgets: [B0, B3]
+probes: [efficacy, locality]   # 锚点只需 ES/CLR/RR(efficacy)+Loc(locality);砍 para/open 提速(与 8B/70B 同)
 sampling:
   enabled: false
+# 跑法(与旧 Qwen 7/14/32 同口径=无 BOS):export WHYAAAI_NO_BOS=1 再跑(BOS A/B 已证对 Qwen 无材料级影响,留此仅为严格一致)。
 editors:
   ROME:
     hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
