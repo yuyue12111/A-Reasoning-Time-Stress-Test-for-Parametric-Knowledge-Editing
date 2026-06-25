@@ -1,0 +1,22 @@
+# Llama-8B 编辑质量扫描 G4(wf ww9ij8hpf):layer5(浅一层兜底)+ clamp 2;与 clamp 正交,防 L6 偏深
+model_tag: r1llama8b
+seed: 42
+out_dir: results/probe
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+  stats_dir: ./data/stats_r1llama8b
+  v_loss_layer: 31
+  clamp_norm_factor: 2
+dataset:
+  tag: cf60_L5_c2
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 60
+budgets: [B0, B3]
+probes: [efficacy, locality]
+sampling:
+  enabled: false
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [5]

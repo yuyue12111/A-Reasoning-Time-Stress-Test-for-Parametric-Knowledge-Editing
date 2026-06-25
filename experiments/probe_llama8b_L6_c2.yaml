@@ -1,0 +1,24 @@
+# Llama-8B 编辑质量扫描 G1(wf ww9ij8hpf):layer6 + clamp_norm_factor 4→2(主轴最可能修 Loc)
+# 病因:ES@B0=0.66 健康但 Loc=0.67 塌 → 借 Qwen 的 clamp=4 对 Llama 残差流偏猛、更新漏邻域。收 clamp 是最直接、ES 代价最小的杠杆。
+# 判:score_pilot 看 B0 行 Loc≥0.85 且 B0 ES_b 最高(plan §7 订正口径,生成式非 rewrite_acc)。
+model_tag: r1llama8b
+seed: 42
+out_dir: results/probe
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+  stats_dir: ./data/stats_r1llama8b
+  v_loss_layer: 31
+  clamp_norm_factor: 2          # 借值 4→2(edit_loop setattr 生效);收更新幅度救 Loc
+dataset:
+  tag: cf60_L6_c2               # 每格唯一→输出 jsonl 不撞
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 60
+budgets: [B0, B3]
+probes: [efficacy, locality]    # Loc 来自 locality、ES 来自 efficacy;砍 para/open 提速
+sampling:
+  enabled: false
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [6]
