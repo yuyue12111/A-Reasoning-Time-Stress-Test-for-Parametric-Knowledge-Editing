@@ -6,7 +6,22 @@
 自动 glob 8 个分片合并后打分；cases 的 o_old/o_new 用清洗后全量查表（覆盖所有 case_id）。
 """
 import argparse, json, glob, os, tempfile, yaml
+from collections import Counter
 import metrics
+
+
+def _is_degenerate(s):
+    """答案退化检测(模型被搞坏的征兆,如 'с717717717' / ' Hakk717717717'):
+    字符多样性极低,或【不同滑动 4-gram 占比极低】(=高度复读)。短答案(如 'Paris')不判退化。"""
+    s = (s or "").strip()
+    if len(s) < 20:
+        return False
+    if len(set(s)) / len(s) < 0.15:                  # 字符种类极少(就几个字反复)
+        return True
+    g = [s[i:i + 4] for i in range(len(s) - 3)]       # 滑动 4-gram(step=1,不会错位漏掉周期性复读)
+    if g and len(set(g)) / len(g) < 0.45:             # 不同 4-gram 占比低 = 复读;干净文本≈0.9
+        return True
+    return False
 
 
 def collect(cfg, editor):
@@ -27,18 +42,41 @@ def main():
     ap.add_argument("--editor", required=True)
     ap.add_argument("--boot", type=int, default=10000, help="bootstrap 次数(plan §2.5 n=10000)；0 跳过")
     ap.add_argument("--decode", default="greedy", help="解码臂 greedy/sample（采样臂须 sampling.enabled 跑过）")
+    ap.add_argument("--drop-degenerate", action="store_true",
+                    help="丢弃【答案退化(模型损坏)】的整条 case —— 抢救 model_parallel 70B 部分 case 被编辑累积搞坏的分片")
     args = ap.parse_args()
     cfg = yaml.safe_load(open(args.config))
     shards, cases, aliases, src = collect(cfg, args.editor)
 
+    bad = set()
+    if args.drop_degenerate:                 # 先扫一遍,标出答案退化的 case_id(整条丢)
+        for s in shards:
+            for l in open(s):
+                try:
+                    d = json.loads(l)
+                except Exception:
+                    continue
+                if d.get("case_id") and _is_degenerate(d.get("answer", "")):
+                    bad.add(d["case_id"])
+
     fd, merged = tempfile.mkstemp(suffix=".jsonl"); os.close(fd)
-    n_err = 0
+    n_err = n_drop = 0
     with open(merged, "w") as o:
         for s in shards:
             for l in open(s):
+                if bad:                      # 跳过退化 case 的所有行
+                    try:
+                        cid = json.loads(l).get("case_id")
+                    except Exception:
+                        cid = None
+                    if cid in bad:
+                        continue
                 if '"error"' in l:
                     n_err += 1
                 o.write(l)
+    if args.drop_degenerate:
+        n_drop = len(bad)
+        print(f"# [drop-degenerate] 丢弃退化 case {n_drop} 条(模型损坏);余下为干净子集")
     res = metrics.score(merged, cases, aliases, decode=args.decode)
 
     fmt = lambda x: f"{x:>8.3f}" if isinstance(x, float) else f"{'—':>8}"   # None → 占位（该档无该探针）
