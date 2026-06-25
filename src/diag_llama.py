@@ -1,6 +1,6 @@
-"""验证 R1-Llama 分词器修复(fix_r1_tokenizer)端到端是否治本。
-跑:  export WHYAAAI_MODEL=<本地 R1-Distill-Llama-8B 路径>;  python src/diag_llama.py
-修复前 vs 修复后对照:编码保不保空格 / 模板 token 对不对 / 生成是不是正常英文。
+"""定位 Llama 第二个 bug:tokenizer 已修好(空格回来),但我们模板仍退化。
+三方对照:apply_chat_template(连贯基准)/ 我们 TPL / 我们 TPL+BOS,看差在哪、BOS 是否治本。
+跑:  export WHYAAAI_MODEL=<本地 R1-Distill-Llama-8B>;  python src/diag_llama.py
 """
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -10,22 +10,33 @@ from r1_tokenizer import fix_r1_tokenizer
 import think_budget
 
 m = os.environ["WHYAAAI_MODEL"]
-s = "is the capital of France"
-
-print("=== 修复前(原始 AutoTokenizer)===")
-raw = AutoTokenizer.from_pretrained(m)
-print("enc:", raw.convert_ids_to_tokens(raw(s, add_special_tokens=False)["input_ids"]))
-
-print("=== 修复后(fix_r1_tokenizer)===")
 tok = fix_r1_tokenizer(AutoTokenizer.from_pretrained(m), m)
-print("enc:", tok.convert_ids_to_tokens(tok(s, add_special_tokens=False)["input_ids"]), " ← 应带 Ġ、空格回来")
-rt = "What is the capital of France?\n</think>"
-print("decode round-trip:", repr(tok.decode(tok(rt, add_special_tokens=False)["input_ids"])))
-print("  </think> 可见?:", "</think>" in tok.decode(tok(rt, add_special_tokens=False)["input_ids"]))
-
-print("\n=== 修复后 × 我们模板 × 未编辑基座 生成 ===")
 model = AutoModelForCausalLM.from_pretrained(m, dtype=torch.bfloat16).to("cuda:0").eval()
-for b in ["B0", "B3"]:
-    cot, ans, _ = think_budget.generate_with_budget(model, tok, "What is the capital of France?", b)
-    print(f"[{b}] cot_chars={len(cot)} | answer={repr(ans[:160])}")
-print("\n判读:enc 带 Ġ + decode 含 </think> + 生成出现 'Paris'/正常英文 = 治本,可批量重跑 8B/70B。")
+q = "What is the capital of France?"
+
+
+def gen(enc):
+    enc = enc.to("cuda:0")
+    o = model.generate(**enc, max_new_tokens=40, do_sample=False)
+    return tok.decode(o[0][enc["input_ids"].shape[1]:], skip_special_tokens=True)
+
+
+print("=== 1) apply_chat_template(连贯基准)===")
+act = tok.apply_chat_template([{"role": "user", "content": q}], add_generation_prompt=True,
+                              return_tensors="pt", return_dict=True)
+print("head tokens:", tok.convert_ids_to_tokens(act["input_ids"][0].tolist())[:10])
+print("gen:", repr(gen(act)[:160]))
+
+print("=== 2) 我们的 TPL(tok 默认 add_special_tokens)===")
+oenc = tok(think_budget.TPL.format(q=q), return_tensors="pt")
+print("head tokens:", tok.convert_ids_to_tokens(oenc["input_ids"][0].tolist())[:10])
+print("gen:", repr(gen(oenc)[:160]))
+
+print("=== 3) 我们的 TPL + 显式 BOS ===")
+bos = tok.bos_token or "<｜begin▁of▁sentence｜>"
+oenc2 = tok(bos + think_budget.TPL.format(q=q), return_tensors="pt", add_special_tokens=False)
+print("head tokens:", tok.convert_ids_to_tokens(oenc2["input_ids"][0].tolist())[:10])
+print("gen:", repr(gen(oenc2)[:160]))
+print("\nbos_token=", repr(tok.bos_token), " add_bos_token=", getattr(tok, "add_bos_token", "?"))
+print("判读:对比 1 与 2 的 head tokens 差在哪(多半是 1 有 <｜begin▁of▁sentence｜>、2 没有);"
+      "若 3(加 BOS)生成连贯出现 Paris → 修法=模板补 BOS。")
