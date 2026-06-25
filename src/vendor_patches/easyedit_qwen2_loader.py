@@ -65,6 +65,15 @@ class PatchedAutoTokenizer:
             kwargs.pop(k, None)
         tok = _REAL_AUTO_TOKENIZER.from_pretrained(*args, **kwargs)
         tok.pad_token = tok.eos_token          # pad 设回真 eos（与 editor 其它 AR 分支同口径）
+        # R1-Distill-Llama 在 transformers 5.x 被误建成 Metaspace(删空格)→ 就地修成 byte-level
+        # （Qwen 不含 Metaspace、原样放过；见 src/r1_tokenizer.py）。model_path = 第一个位置参/kwarg。
+        mp = args[0] if args else kwargs.get("pretrained_model_name_or_path")
+        if mp:
+            try:
+                from r1_tokenizer import fix_r1_tokenizer
+                tok = fix_r1_tokenizer(tok, mp)
+            except Exception as e:
+                print(f"[qwen2_loader] r1_tokenizer 修复跳过:{e!r}")
         return tok
 
 

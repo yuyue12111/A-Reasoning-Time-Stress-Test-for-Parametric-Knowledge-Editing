@@ -121,6 +121,8 @@ def main():
     dtype = {"float32": torch.float32, "bfloat16": torch.bfloat16}.get(os.environ.get("WHYAAAI_DTYPE", "bfloat16"), torch.bfloat16)
     dev = f"cuda:{args.rank}" if args.world > 1 else "cuda"
     tok = AutoTokenizer.from_pretrained(model_name)
+    from r1_tokenizer import fix_r1_tokenizer       # R1-Llama Metaspace 删空格修复(Qwen 原样)
+    tok = fix_r1_tokenizer(tok, model_name)
     model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=dtype).to(dev).eval()
 
     aliases = json.load(open(args.aliases))
