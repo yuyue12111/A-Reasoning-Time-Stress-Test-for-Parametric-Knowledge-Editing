@@ -122,7 +122,7 @@
   ② **【1.5B】**layer5/n196/`WHYAAAI_NO_BOS=1` 对齐旧 Qwen 口径;CLR 0.209<7B=低端更小。
   ③ **【70B 抢救】**model_parallel 2×4 fp32 下出现**间歇数值不稳**(部分 case 答案 ramble 成 717/Session 复读);`score_pilot --drop-degenerate`(长度无关检测:滑动4-gram<0.40 + 词复读>0.25)丢 6 条退化、留 **n=84 干净**。注:**第一版检测器有 length-bias bug(`len(set)/len<0.15` 误杀 verbose 长答案、假阳60-72%),已修**——用户两次正确质疑。干净子集指标有效、丢弃按处理序无偏。
   ④ **【BOS robustness】**Qwen/Llama tokenizer 均 add_bos_token=False;Llama 缺 BOS 退化必补,Qwen 鲁棒;A/B(1.5B n40)证 BOS 对 Qwen 无材料级影响 → 旧 Qwen 点有效、跨族不混淆(results.json `_bos_note`)。
-  ⑤ **【在飞】**§4 跨族段 + Abstract/§1 数字更新 + 对抗红线核验 = **workflow `w4pb9ze1o` 跑中**(完→我落 paper/draft.md)。▸**剩余低优先**:genbench 部署口径复测(harness 已修,RQ3 已 SURVIVE-WITH-REFRAME 不挡)。▸**论文待注**:§3 Llama clamp=2(跨架构 transfer)+ 70B drop-degenerate + BOS robustness;▸红线:不宣称 scaling law / 逐对显著 / RR>0.20 / 首次发现。
+  ⑤ **【✅draft 全文跨族化已落(wf `w4pb9ze1o` + 对抗核验,commit 见 git)】**`paper/draft.md` 现为 6 点跨族:§4 RQ1 重写(新表 + cross-family alignment + honest-scoping:只 Qwen-32B 显著、Llama-70B n=84 不显著)、Abstract×3/§1 更新、§2/§3/§7 同步(§3 补 BOS robustness + clamp + 70B drop-degenerate 口径;§7 trend-across-six-points + 7B confound 由 Llama 破)。对抗核验:数全对 results.json、红线全守(唯一 blocker Loc"above"→"below" 已修)。自查无残留 3 点单族 / scaling-law 正面 / RR>0.20 / 首次。▸**剩余低优先**:genbench 部署口径复测(harness 已修,RQ3 SURVIVE-WITH-REFRAME 不挡);出图 `python src/plots.py`(matplotlib 机上跑,fig1 已支持跨族多线);draft→LaTeX 主工程。▸红线:不宣称 scaling law / 逐对显著 / RR>0.20 / 首次发现。
 
 ---
 
