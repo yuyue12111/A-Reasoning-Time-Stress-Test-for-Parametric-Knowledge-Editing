@@ -39,7 +39,8 @@ for cfg in $CFGS; do
   tag=$(basename "$cfg" .yaml)
   echo "===== $(date +%H:%M) RUN $tag (world=$WORLD) ====="
   for r in $(seq 0 $((WORLD-1))); do
-    CUDA_VISIBLE_DEVICES="${GROUPS[$r]}" PYTHONPATH=source/EasyEdit python src/run_pilot.py \
+    CUDA_VISIBLE_DEVICES="${GROUPS[$r]}" WHYAAAI_DTYPE=float32 WHYAAAI_DEVICE_MAP=balanced_low_0 \
+      PYTHONPATH=source/EasyEdit python src/run_pilot.py \
         --config "$cfg" --editor ROME --rank "$r" --world "$WORLD" >"/tmp/a2_${tag}_r$r.log" 2>&1 &
     sleep 20                                                  # 错峰:每 replica 跨卡加载 ~65G/卡,别同时挤
   done

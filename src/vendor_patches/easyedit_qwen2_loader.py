@@ -58,6 +58,8 @@ class PatchedAutoModelForCausalLM:
         _dm = os.environ.get("WHYAAAI_DEVICE_MAP")
         if _dm and kwargs.get("device_map"):
             kwargs["device_map"] = _dm
+        print(f"[qwen2_loader] LOAD dtype={kwargs.get('dtype')} device_map={kwargs.get('device_map')} "
+              f"(WHYAAAI_DTYPE={os.environ.get('WHYAAAI_DTYPE')} WHYAAAI_DEVICE_MAP={os.environ.get('WHYAAAI_DEVICE_MAP')})", flush=True)
         return _REAL_AUTO_MODEL.from_pretrained(*args, **kwargs)
 
 
