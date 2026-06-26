@@ -195,6 +195,55 @@ def summarize(labels):
     }
 
 
+def pool_summaries(scale_labels):
+    """scale_labels = {scale: [label records]}(各 scale 已 aggregate)。产 per-scale + pooled 表 + κ + contests。
+    用于 §5 三尺度表(7B/14B/32B + pooled)= RQ2 taxonomy 呼应 capability-emergent。"""
+    per, pooled_inpop = {}, []
+    for scale, labels in scale_labels.items():
+        per[scale] = summarize(labels)
+        pooled_inpop += [r for r in labels if r.get("in_population")]
+    n = len(pooled_inpop)
+    prows = []
+    for cat in PREC:
+        flags = [1 if r["primary"] == cat else 0 for r in pooled_inpop]
+        prows.append({"route": cat, "n": sum(flags), "pct": round(sum(flags) / n, 3) if n else None,
+                      "ci": _boot_ci(flags) if n else [None, None]})
+    vl = [r["votes"] for r in pooled_inpop if len(r.get("votes", [])) >= 2 and all(v in PRIMARIES for v in r["votes"])]
+    return {"per_scale": per, "pooled": {
+        "n_population": n, "table": prows, "fleiss_kappa": fleiss_kappa(vl, PREC),
+        "contests_edit_pct": round(sum(1 for r in pooled_inpop if r.get("contests_edit") == 1) / n, 3) if n else None,
+        "associative_subtypes": dict(Counter(r.get("associative_subtype") for r in pooled_inpop
+                                              if r["primary"] == "Associative" and r.get("associative_subtype")))}}
+
+
+def latex_table(pool):
+    """§5 LaTeX 表:routes × {scales..., Pooled} 计数(% in 括号),+ n/excluded-held/κ/contests 行。"""
+    scales = list(pool["per_scale"].keys())
+    cols = scales + ["Pooled"]
+    def cell(summ, cat):
+        row = next((r for r in summ["table"] if r["route"] == cat), None)
+        if not row or summ["n_population"] == 0:
+            return "--"
+        return f"{row['n']} ({100*row['pct']:.0f}\\%)" if row["n"] else "0"
+    L = ["\\begin{tabular}{l" + "c" * len(cols) + "}", "\\toprule",
+         "Route & " + " & ".join(cols) + " \\\\", "\\midrule"]
+    for cat in PREC:
+        cells = [cell(pool["per_scale"][s], cat) for s in scales]
+        prow = next(r for r in pool["pooled"]["table"] if r["route"] == cat)
+        cells.append(f"{prow['n']} ({100*prow['pct']:.0f}\\%)" if pool["pooled"]["n_population"] and prow["n"] else ("0" if pool["pooled"]["n_population"] else "--"))
+        L.append(f"{cat} & " + " & ".join(cells) + " \\\\")
+    L.append("\\midrule")
+    npop = [str(pool["per_scale"][s]["n_population"]) for s in scales] + [str(pool["pooled"]["n_population"])]
+    L.append("$n$ (gated reversions) & " + " & ".join(npop) + " \\\\")
+    held = [str(pool["per_scale"][s]["excluded"].get("Excluded-held", 0)) for s in scales] + ["--"]
+    L.append("Excluded (held) & " + " & ".join(held) + " \\\\")
+    kap = [("%.2f" % pool["per_scale"][s]["fleiss_kappa_overall"]) if pool["per_scale"][s]["fleiss_kappa_overall"] is not None else "--" for s in scales]
+    kap.append(("%.2f" % pool["pooled"]["fleiss_kappa"]) if pool["pooled"]["fleiss_kappa"] is not None else "--")
+    L.append("Fleiss' $\\kappa$ & " + " & ".join(kap) + " \\\\")
+    L += ["\\bottomrule", "\\end{tabular}"]
+    return "\n".join(L)
+
+
 # ---------------- CLI ----------------
 def _read_jsonl(p):
     return [json.loads(l) for l in open(p) if l.strip()]
@@ -251,6 +300,24 @@ def cmd_aggregate(args):
     print(f"#   contests_edit={summ['contests_edit_pct']}  assoc_subtypes={summ['associative_subtypes']}  alias_gap={summ['n_alias_gap']}")
 
 
+def cmd_pool(args):
+    scale_labels = {}
+    for spec in args.labels:                                  # "scale=path"
+        scale, _, path = spec.partition("=")
+        scale_labels[scale] = _read_jsonl(path)
+    pool = pool_summaries(scale_labels)
+    json.dump(pool, open(args.out_summary, "w"), ensure_ascii=False, indent=2)
+    if args.out_latex:
+        open(args.out_latex, "w").write(latex_table(pool))
+    print(f"# pool: {len(scale_labels)} 尺度 → {args.out_summary}" + (f" + {args.out_latex}" if args.out_latex else ""))
+    for s, summ in pool["per_scale"].items():
+        tab = "  ".join(f"{r['route'][:4]}={r['n']}" for r in summ["table"])
+        print(f"#   {s:<5} n={summ['n_population']:>3} held={summ['excluded'].get('Excluded-held',0):>2} κ={summ['fleiss_kappa_overall']}  {tab}")
+    p = pool["pooled"]
+    print(f"#   POOL  n={p['n_population']:>3}  κ={p['fleiss_kappa']}  contests={p['contests_edit_pct']}  " +
+          "  ".join(f"{r['route'][:4]}={r['n']}({100*r['pct']:.0f}%)" if r['pct'] is not None else f"{r['route'][:4]}=0" for r in p["table"]))
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="mode", required=True)
@@ -259,8 +326,10 @@ def main():
     a = sub.add_parser("aggregate"); a.add_argument("--prefeatures", required=True)
     a.add_argument("--verdicts", default=None); a.add_argument("--out-labels", required=True)
     a.add_argument("--summary", required=True)
+    p = sub.add_parser("pool"); p.add_argument("--labels", nargs="+", required=True, help="scale=labels.jsonl ...")
+    p.add_argument("--out-summary", required=True); p.add_argument("--out-latex", default=None)
     args = ap.parse_args()
-    (cmd_emit if args.mode == "emit" else cmd_aggregate)(args)
+    {"emit": cmd_emit, "aggregate": cmd_aggregate, "pool": cmd_pool}[args.mode](args)
 
 
 if __name__ == "__main__":

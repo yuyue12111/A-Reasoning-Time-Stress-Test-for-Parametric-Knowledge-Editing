@@ -51,17 +51,25 @@
     "7B": {"answer_old_b0": 0.59, "answer_old_b3": 0.67, "chain_old_b3": 0.755}
   },
   "rq2_taxonomy": {
-    "_status": "[pending] per-route counts —— 待 3-判官 workflow(a3_judge.mjs)跑完回退链 + src/chain_classify.py aggregate 填。taxonomy 定稿见 plan v1.31 / workflow wjrh3070w;判官读 RAW cot、strict precedence、必引 verbatim span。",
-    "model": "32B", "editor": "ROME", "dataset": "CounterFact", "decode": "greedy",
-    "n_b0_ok": 109, "n_reverted": 17,
-    "extraction": {"n_explicit_clr": 17, "n_implicit_leak": 0,
-      "_note": "提取(src/extract_reverted.py)实测:109 条 B0 编辑成功中 17 条被 B3 思考推翻;**全 17 条链内显式含 o_old(CLR),0 条 implicit-leak** → 32B 上 RR 与 CLR 紧耦合、无沉默式回退(Associative/implicit 桶经验为空,仍保留作 exhaustive+诚实)。"},
-    "gate": "B0 commit o_new & not o_old;B3 committed answer commit o_old;排除 held(commit o_new)/degenerate/loop/short_code(<4字)/morpho(o_old↔o_new 互为变体)",
+    "_status": "DONE —— 3-判官面板(workflow wbhgnlufw[14B+32B] + wuq9wq97k[7B],各链×3 判官读 RAW cot、strict precedence Reflective-override>Bridge>Recall>Associative、必引 verbatim span)→ src/chain_classify aggregate(多数决/3-way precedence)+ pool。LaTeX 表 results/a3/table_rq2.tex。",
+    "editor": "ROME", "dataset": "CounterFact", "decode": "greedy", "scales": ["7B", "14B", "32B"],
+    "gate": "STEP-1 排 short_code(<4字 matcher 盲)/morpho(o_old↔o_new 互为变体);STEP-0 群体=B0 commit o_new&not o_old + B3 committed answer commit o_old;held(答案 commit o_new)由判官裁排除。",
     "categories": ["Recall", "Bridge", "Reflective-override", "Associative"],
-    "_category_note": "Recall=直陈值无中介;Bridge=经命名中介推出(32B 众数路径);Reflective-override=draft 'dismiss' 收紧(verbalize o_new→反思→同段落旧,真回退中罕见);Associative=残差(implicit-leak/ramble)。draft 旧 3 分(recall/bridge/dismiss)不成立:recall/bridge 1:1 保留、dismiss 收紧、必加 Associative。",
-    "counts": {"Recall": null, "Bridge": null, "Reflective-override": null, "Associative": null},
-    "associative_subtypes": {"implicit-leak": 0, "ramble": null},
-    "contests_edit_pct": null, "fleiss_kappa": null,
-    "_orthogonal": "contests_edit 二元 stance(链是否逐字称 o_new 错)单列、cross-cut 四类;n<4 的类按定性存在性主张报(含 Reflective-override),小 n 下跨 editor/scale 池化。"
+    "_category_note": "Recall=直陈值无中介;Bridge=经命名中介推出(众数路径);Reflective-override=draft 'dismiss' 收紧(verbalize o_new→反思标记→同段 commit 旧);Associative=残差(implicit-leak/ramble)。draft 旧 3 分不成立:recall/bridge 1:1、dismiss 收紧、必加 Associative。",
+    "per_scale": {
+      "7B":  {"n_population": 4,  "n_excluded_held": 1, "n_excluded_artifact": 1, "Bridge": 4, "Reflective-override": 0, "Recall": 0, "Associative": 0, "fleiss_kappa": null, "_note": "全 Bridge;含 2 条 clr_in_cot=False 经 spelling/etymology 线索被判 Bridge(非真 implicit-leak);κ 因全一类未定义=完美一致它是 Bridge。"},
+      "14B": {"n_population": 5,  "n_excluded_held": 7, "n_excluded_artifact": 1, "Bridge": 5, "Reflective-override": 0, "Recall": 0, "Associative": 0, "fleiss_kappa": null},
+      "32B": {"n_population": 10, "n_excluded_held": 6, "n_excluded_artifact": 1, "Bridge": 8, "Reflective-override": 2, "Recall": 0, "Associative": 0, "fleiss_kappa": 0.588, "reflective_override_cases": ["cf_21770", "cf_7868"], "_note": "RO 两条均 contests_edit=1/factual(逐字称编辑值错再 override)。"}
+    },
+    "pooled": {"n_population": 19, "Bridge": 17, "Bridge_pct": 0.895, "Bridge_ci": [0.737, 1.0],
+      "Reflective-override": 2, "RO_pct": 0.105, "RO_ci": [0.0, 0.263], "Recall": 0, "Associative": 0,
+      "fleiss_kappa": 0.52, "contests_edit_pct": 0.158},
+    "findings": [
+      "Bridge 众数(pooled 90% [74,100]):回退是【重构】—— 经命名中介(词源/地理/类属/虚构连接)推出 o_old,非纯记忆直取。",
+      "Recall=0 & Associative=0(全三尺度):无 flat-recall;无真 implicit-leak(7B 两条 clr=False 也被判 Bridge-via-spelling)→ 回退总有可引的推导子句。",
+      "Reflective-override 仅 32B 出现(2/10,7B/14B=0)→ **该路径本身 capability-emergent**:须 engage 编辑值→质疑→override,小模型只靠表面线索 bridge 到旧值,呼应头牌能力涌现。",
+      "held 排除多(7B1/14B7/32B6):loose-RR(答案含旧)高估;判官-committed 回退(n=19 pooled)更贴近 strict RRs 口径。"
+    ],
+    "_orthogonal": "contests_edit 二元 stance(链逐字称 o_new 错)= pooled 15.8%,cross-cut 四类;κ 仅 32B/pooled 有意义(7B/14B 全 Bridge→κ 未定义);小 n 故低频类按定性存在性 + bootstrap CI 报。"
   }
 }

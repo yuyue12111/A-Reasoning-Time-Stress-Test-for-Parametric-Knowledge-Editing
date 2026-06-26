@@ -1,0 +1,206 @@
+{
+  "per_scale": {
+    "7b": {
+      "n_population": 4,
+      "excluded": {
+        "Excluded-artifact": 1,
+        "Excluded-held": 1
+      },
+      "table": [
+        {
+          "route": "Reflective-override",
+          "n": 0,
+          "pct": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "route": "Bridge",
+          "n": 4,
+          "pct": 1.0,
+          "ci": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "route": "Recall",
+          "n": 0,
+          "pct": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "route": "Associative",
+          "n": 0,
+          "pct": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ]
+        }
+      ],
+      "associative_subtypes": {},
+      "contests_edit_pct": 0.0,
+      "contests_reason": {},
+      "n_split": 0,
+      "n_alias_gap": 1,
+      "fleiss_kappa_overall": -0.091,
+      "_note": "n<4 的类按定性存在性主张报(见 §5);kappa 仅非排除类;CI=按 case bootstrap(n=10000)。"
+    },
+    "14b": {
+      "n_population": 5,
+      "excluded": {
+        "Excluded-held": 7,
+        "Excluded-artifact": 1
+      },
+      "table": [
+        {
+          "route": "Reflective-override",
+          "n": 0,
+          "pct": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "route": "Bridge",
+          "n": 5,
+          "pct": 1.0,
+          "ci": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "route": "Recall",
+          "n": 0,
+          "pct": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "route": "Associative",
+          "n": 0,
+          "pct": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ]
+        }
+      ],
+      "associative_subtypes": {},
+      "contests_edit_pct": 0.2,
+      "contests_reason": {},
+      "n_split": 0,
+      "n_alias_gap": 0,
+      "fleiss_kappa_overall": null,
+      "_note": "n<4 的类按定性存在性主张报(见 §5);kappa 仅非排除类;CI=按 case bootstrap(n=10000)。"
+    },
+    "32b": {
+      "n_population": 10,
+      "excluded": {
+        "Excluded-held": 6,
+        "Excluded-artifact": 1
+      },
+      "table": [
+        {
+          "route": "Reflective-override",
+          "n": 2,
+          "pct": 0.2,
+          "ci": [
+            0.0,
+            0.5
+          ]
+        },
+        {
+          "route": "Bridge",
+          "n": 8,
+          "pct": 0.8,
+          "ci": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "route": "Recall",
+          "n": 0,
+          "pct": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "route": "Associative",
+          "n": 0,
+          "pct": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ]
+        }
+      ],
+      "associative_subtypes": {},
+      "contests_edit_pct": 0.2,
+      "contests_reason": {
+        "factual": 2
+      },
+      "n_split": 0,
+      "n_alias_gap": 0,
+      "fleiss_kappa_overall": 0.588,
+      "_note": "n<4 的类按定性存在性主张报(见 §5);kappa 仅非排除类;CI=按 case bootstrap(n=10000)。"
+    }
+  },
+  "pooled": {
+    "n_population": 19,
+    "table": [
+      {
+        "route": "Reflective-override",
+        "n": 2,
+        "pct": 0.105,
+        "ci": [
+          0.0,
+          0.263
+        ]
+      },
+      {
+        "route": "Bridge",
+        "n": 17,
+        "pct": 0.895,
+        "ci": [
+          0.737,
+          1.0
+        ]
+      },
+      {
+        "route": "Recall",
+        "n": 0,
+        "pct": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "route": "Associative",
+        "n": 0,
+        "pct": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ]
+      }
+    ],
+    "fleiss_kappa": 0.52,
+    "contests_edit_pct": 0.158,
+    "associative_subtypes": {}
+  }
+}

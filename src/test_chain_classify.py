@@ -98,6 +98,23 @@ def test_summarize_counts():
     assert s["contests_edit_pct"] == 0.5
 
 
+def test_pool_summaries():
+    def lab(cid, prim, inpop=True):
+        return {"case_id": cid, "primary": prim, "in_population": inpop, "votes": [prim] * 3 if inpop else [],
+                "contests_edit": 0, "contests_edit_reason": "none", "associative_subtype": None, "split": False}
+    sl = {
+        "7b": [lab("a", "Bridge"), lab("b", "Bridge"), lab("x", "Excluded-held", False)],
+        "32b": [lab("c", "Bridge"), lab("d", "Reflective-override"), lab("e", "Recall")],
+    }
+    pool = cc.pool_summaries(sl)
+    assert pool["pooled"]["n_population"] == 5, pool["pooled"]["n_population"]
+    pt = {r["route"]: r["n"] for r in pool["pooled"]["table"]}
+    assert pt["Bridge"] == 3 and pt["Reflective-override"] == 1 and pt["Recall"] == 1
+    assert pool["per_scale"]["7b"]["excluded"]["Excluded-held"] == 1
+    tex = cc.latex_table(pool)
+    assert "\\begin{tabular}" in tex and "Pooled" in tex and "Bridge" in tex
+
+
 if __name__ == "__main__":
     for name, fn in sorted(globals().items()):
         if name.startswith("test_") and callable(fn):
