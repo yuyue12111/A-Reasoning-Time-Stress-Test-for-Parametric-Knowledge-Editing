@@ -13,6 +13,7 @@ hparams_overrides:
   model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B   # 离线用 WHYAAAI_MODEL=本地绝对路径覆盖
   stats_dir: ./data/stats_r1qwen32b
   v_loss_layer: 63
+  model_parallel: true        # H100 80G 单卡放不下 32B fp32(130G)→ device_map 跨卡;launcher 每 replica 给 2 卡
 
 dataset:
   tag: cf100sup_th_p16
