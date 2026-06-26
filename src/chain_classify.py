@@ -90,12 +90,13 @@ def prefeatures(row, aliases):
 
 
 def gate_exclusion(row, pf):
-    """STEP -1 artifact + degenerate 预排除(无需判官)。返回排除标签或 None。"""
-    if pf["short_code"] or pf["morpho_artifact"]:
+    """STEP -1 预排除(只做廉价**确定性**判:matcher 盲对 + 真垃圾输出)。返回排除标签或 None。
+    ⚠ 不在此做 loop/held 检测:R1 正常思考链反思标记(wait/actually/I think)频现,
+    任何"反思计数"loop-guard 都会误杀正常 churn 链(实测把 panel 的 Reflective-override 范例 cf_9255 都排除了)。
+    held(承诺 o_new)/语义打转由**判官读 RAW cot** 裁(judge prompt 内含 commit-check + LOOP GUARD)。"""
+    if pf["short_code"] or pf["morpho_artifact"]:        # <4字 matcher 盲 / o_old↔o_new 非可分对
         return "Excluded-artifact"
-    cot = row.get("cot") or ""
-    if _is_degenerate(row.get("answer") or "") or len(audit_reversions.REFLECT.findall(cot)) >= 3 and pf["clr_in_cot"] and row.get("b3_has_new"):
-        # 退化 / 反思-loop≥3 且新旧反复 = 语义打转,非干净回退
+    if _is_degenerate(row.get("answer") or ""):          # 内容触发、长度无关的真垃圾(717 复读类),非反思
         return "Excluded-degenerate"
     return None
 

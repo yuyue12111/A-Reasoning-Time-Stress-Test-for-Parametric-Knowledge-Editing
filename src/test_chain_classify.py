@@ -25,6 +25,18 @@ def test_gate_artifact_and_shortcode():
     assert pf2["morpho_artifact"] is True and cc.gate_exclusion(row2, pf2) == "Excluded-artifact"
 
 
+def test_gate_keeps_reflective_churn():
+    # cf_9255 型(panel 的 Reflective-override 范例):反思标记频现 + 新旧都提 + 答案落旧。
+    # 绝不能被预门控当 degenerate 排除(旧 loop-guard 的 bug)。
+    row = {"case_id": "cf_9255", "s": "Anschutz", "o_old": "Colorado", "o_new": "Gujarat",
+           "cot": "It's in Gujarat. Wait, no — actually I think the Anschutz family is a Colorado thing. "
+                  "Hmm, let me reconsider. But actually it's in Colorado.",
+           "answer": "It is located in Colorado.", "clr_in_cot": True, "b3_has_new": True}
+    pf = cc.prefeatures(row, AL)
+    assert pf["reflect_before_old"] is True, "确有反思标记(prefeature 该 True)"
+    assert cc.gate_exclusion(row, pf) is None, "正常反思 churn 链不该被预门控排除(held 由判官裁)"
+
+
 def test_prefeatures_bridge_row():
     # cf_t3 型:cot 不含 'Rome'(implicit/Bridge),无反思,subject 不重叠,非短码
     row = {"case_id": "cf_t3", "s": "Y", "o_old": "Rome", "o_new": "Madrid",
