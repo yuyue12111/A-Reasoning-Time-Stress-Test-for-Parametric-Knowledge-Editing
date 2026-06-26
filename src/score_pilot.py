@@ -11,15 +11,17 @@ import metrics
 
 
 def _is_degenerate(s):
-    """答案退化检测(模型被搞坏的征兆,如 'с717717717' / ' Hakk717717717'):
-    字符多样性极低,或【不同滑动 4-gram 占比极低】(=高度复读)。短答案(如 'Paris')不判退化。"""
+    """退化检测(**长度无关**):字符级复读(滑动 4-gram 不同占比极低)或词级复读(某词占比过高)。
+    ⚠ 不能用 len(set(s))/len(s) —— 长的【正常】答案字符种类/长度天然低(600字英文≈0.07),会误杀
+    70B 的 verbose 长答案(实测假阳 60-72%)。真垃圾('717717'/'Session Session')才是复读结构。"""
     s = (s or "").strip()
-    if len(s) < 20:
+    if len(s) < 25:
         return False
-    if len(set(s)) / len(s) < 0.15:                  # 字符种类极少(就几个字反复)
+    g = [s[i:i + 4] for i in range(len(s) - 3)]       # 滑动 4-gram:正常文本≈0.85,'717717'类≈0.1
+    if g and len(set(g)) / len(g) < 0.40:
         return True
-    g = [s[i:i + 4] for i in range(len(s) - 3)]       # 滑动 4-gram(step=1,不会错位漏掉周期性复读)
-    if g and len(set(g)) / len(g) < 0.45:             # 不同 4-gram 占比低 = 复读;干净文本≈0.9
+    w = s.split()                                     # 词级复读:'medical medical medical'/'Session Session of of'
+    if len(w) >= 8 and Counter(w).most_common(1)[0][1] / len(w) > 0.25:
         return True
     return False
 
