@@ -1,0 +1,37 @@
+# A2 · RQ3 α-sweep + scope ablation · 32B (plan v1.31;审计 wfgmaerr3 必做项)
+# 目的:证 penalty=8 非 cherry-pick —— ΔRR/ΔCLR 随 α 单调(dose-response),Loc 守门跨 α 稳;
+#       scope=all(连答案一起压)作消融,对比 scope=think(只压链)说明为何选 think。
+# 与 headline(probe32b_sup,n=200,p8/think)同 edit(layer12/v63/同 hparams),仅 suppress 旋钮变。
+# 基线参照 = experiments/probe32b.yaml 的 cf200(suppress 关,n=200);按 case_id 取交集配对算 Δ。
+# 只跑 efficacy(RR/CLR/ES)+locality(Loc)两探针 → 较 headline 5 探针省约半生成。
+# 本点:scope=think, penalty=2, n=100。tag=cf100sup_th_p2 → 输出不撞其它点。
+model_tag: r1qwen32b
+seed: 42
+out_dir: results/probe
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B   # 离线用 WHYAAAI_MODEL=本地绝对路径覆盖
+  stats_dir: ./data/stats_r1qwen32b
+  v_loss_layer: 63
+
+dataset:
+  tag: cf100sup_th_p2
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 100
+
+budgets: [B0, B3]
+
+sampling:
+  enabled: false
+
+probes: [efficacy, locality]      # 省 paraphrase/open;RQ3 只需 efficacy+Loc
+
+suppress:
+  penalty: 2
+  scope: think
+
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [12]
