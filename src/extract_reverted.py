@@ -15,6 +15,7 @@ CPU only、无 GPU、无模型加载 → 平台上与 GPU 跑并行,不抢卡。
 import argparse, glob, json, os
 import yaml
 import metrics
+import audit_reversions                                    # REFLECT 正则(torch-free);算 reflect_before_old prefeature
 
 
 def load_records(out_dir, model_tag, editor, tag, decode="greedy"):
@@ -57,6 +58,9 @@ def select_reverted(cases, by_case, aliases, b0="B0", b3="B3"):
         n_b0ok += 1
         if not metrics.hit(a3, o_old, aliases):              # §5 回退 = B3 答案含旧值
             continue
+        s = c.get("s") or ""                                 # 以下 prefeature 给 chain_classify 当 prior/门控依据(RAW 文本)
+        op = metrics.first_mention(cot3, o_old, aliases)
+        pre = cot3[:op] if op >= 0 else cot3
         rows.append({
             "case_id": cid, "s": c.get("s"), "r": c.get("r"), "prompt": c.get("prompt"),
             "o_old": o_old, "o_new": o_new,
@@ -64,10 +68,19 @@ def select_reverted(cases, by_case, aliases, b0="B0", b3="B3"):
             "cot": cot3, "answer": a3,
             "clr_in_cot": bool(metrics.hit(cot3, o_old, aliases)),      # False=RR-without-CLR(implicit 硬样本)
             "b3_has_new": bool(metrics.hit(a3, o_new, aliases)),        # 答案是否同时含新值(flip/并存)
+            # —— prefeature(RAW;均非门控硬判,judge 读 RAW 为准;clr_in_cot 是 RAW 不是 scrub)——
+            "overlap_subject": bool(metrics.hit(s, o_old, aliases) or metrics.hit(s, o_new, aliases)),  # 旧/新是主体子串→scrub prefeature 作废
+            "short_code": len(str(o_old)) < 4 or len(str(o_new)) < 4,   # <4 字符 matcher 盲(STEP -1 排除)
+            "morpho_artifact": bool(metrics.hit(o_new, o_old, aliases) or metrics.hit(o_old, o_new, aliases)),  # 非可分对
+            "reflect_before_old": bool(audit_reversions.REFLECT.search(pre)),  # 旧值首现前有反思标记(Reflective-override prior)
+            "commits_new_last": metrics.flip_analysis(a3, o_new, o_old, aliases).get("last"),  # 答案末位立场(positional hint,judge 覆盖)
         })
     n_implicit = sum(1 for r in rows if not r["clr_in_cot"])
     stats = {"n_total": n_total, "n_b0ok": n_b0ok, "n_rev": len(rows),
-             "n_implicit": n_implicit, "n_explicit": len(rows) - n_implicit}
+             "n_implicit": n_implicit, "n_explicit": len(rows) - n_implicit,
+             "n_overlap_subject": sum(1 for r in rows if r["overlap_subject"]),
+             "n_short_code": sum(1 for r in rows if r["short_code"]),
+             "n_morpho": sum(1 for r in rows if r["morpho_artifact"])}
     return rows, stats
 
 
@@ -96,6 +109,7 @@ def main():
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
     print(f"# 分片 {len(shards)}  有 B0&B3 的 case {st['n_total']}  其中 B0 编辑成功 {st['n_b0ok']}  → 回退(B3 含旧) {st['n_rev']}")
     print(f"# 回退中 implicit(链内无显式旧值, RR-without-CLR) {st['n_implicit']} / explicit(CLR) {st['n_explicit']}")
+    print(f"# matcher 不可靠预警:overlap_subject {st['n_overlap_subject']} / short_code {st['n_short_code']} / morpho {st['n_morpho']}(chain_classify 据此门控)")
     print(f"# → {args.out}  (下载后上传到分类会话,跑多判官填 §5)")
 
 

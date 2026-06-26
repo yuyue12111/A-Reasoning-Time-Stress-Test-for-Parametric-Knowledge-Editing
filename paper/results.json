@@ -49,5 +49,19 @@
   "base_probe": {
     "_note": "未编辑基座对 CounterFact 目标事实的回忆(src/base_probe.py,WHYAAAI_MODEL 指基座);用于排除 7B 低 ES 是『纯不知道』而非编辑/推理交互。draft §3/§4/§7 引 7B=0.59=answer_old_b0。",
     "7B": {"answer_old_b0": 0.59, "answer_old_b3": 0.67, "chain_old_b3": 0.755}
+  },
+  "rq2_taxonomy": {
+    "_status": "[pending] per-route counts —— 待 3-判官 workflow(a3_judge.mjs)跑完回退链 + src/chain_classify.py aggregate 填。taxonomy 定稿见 plan v1.31 / workflow wjrh3070w;判官读 RAW cot、strict precedence、必引 verbatim span。",
+    "model": "32B", "editor": "ROME", "dataset": "CounterFact", "decode": "greedy",
+    "n_b0_ok": 109, "n_reverted": 17,
+    "extraction": {"n_explicit_clr": 17, "n_implicit_leak": 0,
+      "_note": "提取(src/extract_reverted.py)实测:109 条 B0 编辑成功中 17 条被 B3 思考推翻;**全 17 条链内显式含 o_old(CLR),0 条 implicit-leak** → 32B 上 RR 与 CLR 紧耦合、无沉默式回退(Associative/implicit 桶经验为空,仍保留作 exhaustive+诚实)。"},
+    "gate": "B0 commit o_new & not o_old;B3 committed answer commit o_old;排除 held(commit o_new)/degenerate/loop/short_code(<4字)/morpho(o_old↔o_new 互为变体)",
+    "categories": ["Recall", "Bridge", "Reflective-override", "Associative"],
+    "_category_note": "Recall=直陈值无中介;Bridge=经命名中介推出(32B 众数路径);Reflective-override=draft 'dismiss' 收紧(verbalize o_new→反思→同段落旧,真回退中罕见);Associative=残差(implicit-leak/ramble)。draft 旧 3 分(recall/bridge/dismiss)不成立:recall/bridge 1:1 保留、dismiss 收紧、必加 Associative。",
+    "counts": {"Recall": null, "Bridge": null, "Reflective-override": null, "Associative": null},
+    "associative_subtypes": {"implicit-leak": 0, "ramble": null},
+    "contests_edit_pct": null, "fleiss_kappa": null,
+    "_orthogonal": "contests_edit 二元 stance(链是否逐字称 o_new 错)单列、cross-cut 四类;n<4 的类按定性存在性主张报(含 Reflective-override),小 n 下跨 editor/scale 池化。"
   }
 }
