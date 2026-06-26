@@ -30,10 +30,10 @@ hparams_overrides:
   v_loss_layer: 79                                        # Llama-70B=80 层,末层 idx 79
   model_parallel: true                                    # ⚠ 覆盖 7B hparams 的 false → device_map='auto' 跨卡(70B 单卡放不下)
 dataset:
-  tag: cf100                                              # 高端锚:n=100(70B 串行慢);与 7/14/32 同序前 100 → 可比
+  tag: cf100                                              # tag 保持 cf100 → A4 续跑(跳过已完成的旧 n≈84,只补 100-199);与 7/14/32 同序可比
   path: data/counterfact.prefiltered.jsonl
   fallback_path: data/counterfact.jsonl
-  n: 100
+  n: 200                                                  # A4:84→200 做厚最弱头牌锚(plan v1.31 必做);GPFS 持久→断点续跑省一半
 budgets: [B0, B3]
 probes: [efficacy, locality]   # 锚点只需 ES/CLR/RR(efficacy)+Loc(locality);砍 para/open 省 3 条 B3 长链/case≈2.5×(不改作图指标)
 sampling:
