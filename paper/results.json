@@ -38,7 +38,7 @@
     "model": "32B", "n": 200, "scope": "think", "penalty": 8,
     "baseline": {"RR": 0.193, "ES_B3": 0.495, "ES_drop": 0.106, "CLR": 0.545, "Loc": 0.958},
     "suppress": {"RR": 0.085, "ES_B3": 0.631, "ES_drop": -0.035, "CLR": 0.263, "Loc": 0.964},
-    "genbench": {"_status": "[pending] 部署口径(单 o_old/scope=think/仅编辑 query)复测;勿用下方 worstcase 数当部署效果(那是病态上界)。plots.fig3 只在此处非 null 才画通用能力柱→保持 null。", "gsm8k_off": null, "gsm8k_on": null, "math_off": null, "math_on": null},
+    "genbench": {"_status": "DONE(部署口径 single o_old + scope=think,B3M=16384+answer_cap=512 解 boxed 前截断;bf16 单卡 H100 run_a1_h100.sh)。", "mode": "single", "scope": "think", "n_gsm8k": 200, "n_math": 100, "gsm8k_off": 0.855, "gsm8k_on": 0.860, "gsm8k_delta": 0.005, "math_off": 0.700, "math_on": 0.700, "math_delta": 0.000, "gate": "|delta_acc|<=0.02", "gate_pass": true, "_note": "部署口径双双过门(GSM8K Δ+0.005 / MATH 0.000,均≤0.02)→ 抑制器对非编辑通用能力近零伤害。绝对值从最坏界 harness 的 0.535/0.150 涨回 0.855/0.700=印证旧低分是 B3=8192 截断伪影(B3M=16384 解),非模型不行。注:single+think 误施于全部通用 query 仍是上界——部署时抑制器只在编辑 query 触发、非编辑 Δ=0 by construction。"},
     "genbench_worstcase": {"_note": "病态最坏界(并集全部 o_old + scope=all,远超部署)+ harness 欠测(base 32B GSM8K 0.535/MATH 0.150 远低于已知 ~0.95/0.90:think_budget B3=8192 截 MATH 长链于 boxed 前、答案段 256 截重述)→ Δ 既不能证伤也不能证不伤=uninformative,仅留作 stress-test 上界。面板 wjt97ozxo 已裁定 RQ3=SURVIVE-WITH-REFRAME(主腿在被编辑 query 答案上、与此正交)。部署口径门待修 harness(已加 B3M=16384/answer_cap/解除 scope 硬编码,commit 见 git)后 single+think 复测。", "gate": "|delta_acc|<=0.02", "gate_pass": false, "gsm8k": {"n": 200, "acc_off": 0.535, "acc_on": 0.385, "delta": -0.150}, "math": {"n": 100, "acc_off": 0.150, "acc_on": 0.190, "delta": 0.040}}
   },
   "logitlens": {
