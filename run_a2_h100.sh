@@ -18,11 +18,12 @@ if [ ! -e "$WHYAAAI_MODEL/config.json" ]; then
   echo "✗ 找不到 32B: $WHYAAAI_MODEL —— 确认 H100 挂了共享盘 / export WHYAAAI_MODEL 后重跑"; exit 1
 fi
 
-# 卡分组:2 replica × 4 卡(默认,稳——130G/4≈33G/卡,balanced_low_0 下大量余量)。
-# 跑通确认不 OOM 后想提速可改 4 replica × 2 卡:GROUPS=("0,1" "2,3" "4,5" "6,7")(65G/卡,余量小)。
-GROUPS=("0,1,2,3" "4,5,6,7")
+# 卡分组:先用 1 replica × 8 卡跑通(130G/8≈16G/卡,绝对不 OOM,且单进程无多卡混乱)。
+# 确认 nvidia-smi 8 卡都 ~16-20G(摊开了)+ 首点输出是人话(非 NaN) 后,想提速再改:
+#   GROUPS=("0,1,2,3" "4,5,6,7")  # 2 replica×4 卡(33G/卡);务必先 pkill 干净再换。
+GROUPS=("0,1,2,3,4,5,6,7")
 WORLD=${#GROUPS[@]}
-echo "✓ model=$WHYAAAI_MODEL  fp32  model_parallel($WHYAAAI_DEVICE_MAP)  ${WORLD} replica  $(date +%F\ %H:%M)"
+echo "✓ model=$WHYAAAI_MODEL  DTYPE=$WHYAAAI_DTYPE  device_map=$WHYAAAI_DEVICE_MAP  ${WORLD} replica×${#GROUPS[0]}卡(去逗号数)  $(date +%F\ %H:%M)"
 
 # RESET(只在第一次从 OOM 残骸重跑时需要):清掉上次产生的空/半 jsonl,避免 meta 行混入。已有真数据想续跑就别清。
 # rm -f results/probe/r1qwen32b_ROME_cf100sup_*_r*of*.jsonl
