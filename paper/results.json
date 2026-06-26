@@ -30,7 +30,7 @@
         "clr":    [0.340, 0.524],
         "clr_ci": [[0.275, 0.410], [0.417, 0.631]],
         "_loc": [0.835, 0.929],
-        "_note": "8B=layer6/clamp2 n=200(Loc 0.835 marginal);70B=layer14/clamp4 model_parallel 2×4 fp32,n=84(丢 6 条 MP 间歇数值不稳的退化 case,--drop-degenerate 长度无关检测;干净子集→指标有效,丢弃按处理序无偏)。**跨族双点单调↑**:Llama CLR 8B 0.340→70B 0.524、RR 0.144→0.185、ES降幅 0.015→0.095。跨族对齐:Llama-8B≈Qwen-7B(CLR 0.34/0.335)、Llama-70B≈Qwen-32B(CLR 0.524/0.545)→**erosion 随规模/能力涨、与族(Math vs 通用)无关=非 Math 特化伪影**(头牌跨族证据齐)。论文 §3 注 Llama clamp(8B=2)+70B drop-degenerate;§4 跨族曲线。"
+        "_note": "8B=layer6/clamp2 n=200(Loc 0.835 marginal);70B=layer14/**clamp4**(注:8B=clamp2 经扫描定、70B 用默认4=逐模型不同;但 CLR 对 clamp∈{2,3,4} 鲁棒 0.31-0.33、不驱动 erosion 结论)model_parallel 2×4 fp32,n=84(丢 6 条 MP 间歇数值不稳的退化 case,--drop-degenerate 内容触发长度无关检测=**非处理序**;退化即编辑失败→丢弃方向**有偏**,须报 with/without 两版+仅作方向锚,稳定 Qwen/8B 上同检测丢~0)。**跨族双点单调↑**:Llama CLR 8B 0.340→70B 0.524、RR 0.144→0.185、ES降幅 0.015→0.095。跨族对齐:Llama-8B≈Qwen-7B(CLR 0.34/0.335)、Llama-70B≈Qwen-32B(CLR 0.524/0.545)→**erosion 随规模/能力涨、与族(Math vs 通用)无关=非 Math 特化伪影**(头牌跨族证据齐)。论文 §3 注 Llama clamp(8B=2)+70B drop-degenerate;§4 跨族曲线。"
       }
     }
   },
