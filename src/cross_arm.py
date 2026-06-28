@@ -18,12 +18,14 @@ METRICS = ["ES", "RR", "RRs", "CLR"]
 
 
 def per_case(cfg, editor, budget, decode="greedy"):
-    """{case_id: {ES,RR,RRs,CLR}} on efficacy/greedy at one budget。口径同 score_pilot(metrics.hit)。"""
+    """{case_id: {ES,RR,RRs,CLR}} on efficacy/greedy。**口径严格同 metrics.score**:
+    _without_subject 挖主体复述(去污)+ RR/RRs 仅在 b0ok(B0 编辑成功)case 上有值(否则 None,不入分母);
+    ES/CLR 在全 case 上。→ 边际数与 score_pilot 一致、跨臂配对差在 paper 口径。"""
     ds = cfg["dataset"]
     pat = os.path.join(cfg["out_dir"], f"{cfg['model_tag']}_{editor}_{ds['tag']}_r*.jsonl")
     cases = {c["case_id"]: c for c in (json.loads(l) for l in open(ds.get("fallback_path", ds["path"])))}
     aliases = json.load(open("data/aliases.json"))
-    out = {}
+    by = {}                                          # cid -> budget -> efficacy 行
     for sh in sorted(glob.glob(pat)):
         for line in open(sh):
             line = line.strip()
@@ -32,25 +34,39 @@ def per_case(cfg, editor, budget, decode="greedy"):
             d = json.loads(line)
             if d.get("_meta") or d.get("error") or d.get("probe") != "efficacy":
                 continue
-            if d.get("decode", "greedy") != decode or d.get("budget") != budget or d["case_id"] not in cases:
+            if d.get("decode", "greedy") != decode or d["case_id"] not in cases:
                 continue
-            c = cases[d["case_id"]]
-            o_old, o_new = c["o_old"], c["o_new"]
-            ans, cot = d.get("answer") or "", d.get("cot") or ""
-            ho, hn = bool(metrics.hit(ans, o_old, aliases)), bool(metrics.hit(ans, o_new, aliases))
-            out[d["case_id"]] = {"ES": int(hn and not ho), "RR": int(ho),
-                                 "RRs": int(ho and not hn), "CLR": int(bool(metrics.hit(cot, o_old, aliases)))}
+            by.setdefault(d["case_id"], {})[d.get("budget")] = d
+    out = {}
+    for cid, buds in by.items():
+        if budget not in buds:
+            continue
+        c = cases[cid]
+        s, o_old, o_new = c.get("s") or "", c["o_old"], c["o_new"]
+        clean = lambda t: metrics._without_subject(t or "", s)        # 去主体复述(同 metrics.score line140)
+        ans, cot = clean(buds[budget].get("answer")), clean(buds[budget].get("cot"))
+        ho, hn = bool(metrics.hit(ans, o_old, aliases)), bool(metrics.hit(ans, o_new, aliases))
+        rec = {"ES": int(hn and not ho), "CLR": int(bool(metrics.hit(cot, o_old, aliases)))}
+        b0 = buds.get("B0")                                          # b0ok 门(B0 答新且不含旧;scope=think 下 B0 跨臂同)
+        b0ok = bool(b0) and metrics.hit(clean(b0.get("answer")), o_new, aliases) \
+            and not metrics.hit(clean(b0.get("answer")), o_old, aliases)
+        rec["RR"] = int(ho) if b0ok else None                        # RR/RRs 仅 b0ok case 有值(同 metrics rr_n 门)
+        rec["RRs"] = int(ho and not hn) if b0ok else None
+        out[cid] = rec
     return out
 
 
 def marginal(A):
-    n = len(A)
-    return {m: round(sum(v[m] for v in A.values()) / n, 4) for m in METRICS} if n else {}
+    out = {}
+    for m in METRICS:
+        vals = [v[m] for v in A.values() if v.get(m) is not None]
+        out[m] = round(sum(vals) / len(vals), 4) if vals else None
+    return out
 
 
 def paired_diff(A, B, metric, B_=10000, seed=42):
-    """按 case_id 配对的 (armA - armB) 均差 + 95% bootstrap CI + 双侧 p(重采样 case)。"""
-    ids = sorted(set(A) & set(B))
+    """按 case_id 配对的 (armA - armB) 均差 + 95% bootstrap CI + 双侧 p(重采样 case)。None(如非 b0ok 的 RR)跳过。"""
+    ids = [i for i in sorted(set(A) & set(B)) if A[i].get(metric) is not None and B[i].get(metric) is not None]
     if not ids:
         return {"n": 0}
     diffs = [A[i][metric] - B[i][metric] for i in ids]
@@ -80,7 +96,8 @@ def main():
     print(f"\n# 各臂边际速率:")
     print(f"{'arm':<6}" + "".join(f"{m:>9}" for m in METRICS))
     for k, v in arms.items():
-        mg = marginal(v); print(f"{k:<6}" + "".join(f"{mg.get(m,0):>9.3f}" for m in METRICS))
+        mg = marginal(v)
+        print(f"{k:<6}" + "".join(f"{(mg.get(m) if mg.get(m) is not None else float('nan')):>9.3f}" for m in METRICS))
 
     # 预注册关键对照(存在的臂才算)
     contrasts = [("T", "N", "fix 效应(o_old-vs-零,非主报)"), ("T", "P", "★o_old 超 placebo 的 margin(主报特异性)"),
