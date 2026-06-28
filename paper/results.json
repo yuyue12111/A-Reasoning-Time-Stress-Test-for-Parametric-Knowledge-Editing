@@ -5,78 +5,431 @@
     "_bos_note": "口径:R1-Distill-Qwen/Llama tokenizer 均 add_bos_token=False。旧 Qwen 7/14/32B 实际无 BOS 跑出(鲁棒、趋势干净);Llama 缺 BOS 退化故必补 BOS。BOS A/B(1.5B,n=40,同 40 case):ON vs OFF 的 ES@B0 0.525/0.550、ES@B3 0.550/0.575、ES降幅 −0.025/−0.025(同)、CLR 0.275/0.225、RR 0.048/0.045 —— 差异 ≤1–2 case、CI 大幅重叠 → BOS 对 Qwen 无材料级影响,旧 Qwen 点有效、跨族对比不被 BOS 混淆。论文 §3 注此 robustness。",
     "families": {
       "R1-Distill-Qwen": {
-        "params_b": [1.5, 7, 14, 32],
-        "es_b0":  [0.582, 0.500, 0.555, 0.595],
-        "es_b3":  [0.607, 0.530, 0.515, 0.495],
-        "es_drop":     [-0.026, -0.030, 0.040, 0.106],
-        "es_drop_ci":  [[-0.097, 0.051], [-0.110, 0.050], [-0.030, 0.110], [0.030, 0.182]],
-        "es_drop_sig": [false, false, false, true],
-        "rr":     [0.061, 0.080, 0.162, 0.193],
-        "rr_ci":  [[0.018, 0.105], [0.030, 0.140], [0.099, 0.234], [0.126, 0.269]],
-        "clr":    [0.209, 0.335, 0.475, 0.545],
-        "clr_ci": [[0.153, 0.265], [0.270, 0.400], [0.405, 0.545], [0.475, 0.616]],
-        "_loc": [0.954, null, null, 0.958],
+        "params_b": [
+          1.5,
+          7,
+          14,
+          32
+        ],
+        "es_b0": [
+          0.582,
+          0.5,
+          0.555,
+          0.595
+        ],
+        "es_b3": [
+          0.607,
+          0.53,
+          0.515,
+          0.495
+        ],
+        "es_drop": [
+          -0.026,
+          -0.03,
+          0.04,
+          0.106
+        ],
+        "es_drop_ci": [
+          [
+            -0.097,
+            0.051
+          ],
+          [
+            -0.11,
+            0.05
+          ],
+          [
+            -0.03,
+            0.11
+          ],
+          [
+            0.03,
+            0.182
+          ]
+        ],
+        "es_drop_sig": [
+          false,
+          false,
+          false,
+          true
+        ],
+        "rr": [
+          0.061,
+          0.08,
+          0.162,
+          0.193
+        ],
+        "rr_ci": [
+          [
+            0.018,
+            0.105
+          ],
+          [
+            0.03,
+            0.14
+          ],
+          [
+            0.099,
+            0.234
+          ],
+          [
+            0.126,
+            0.269
+          ]
+        ],
+        "clr": [
+          0.209,
+          0.335,
+          0.475,
+          0.545
+        ],
+        "clr_ci": [
+          [
+            0.153,
+            0.265
+          ],
+          [
+            0.27,
+            0.4
+          ],
+          [
+            0.405,
+            0.545
+          ],
+          [
+            0.475,
+            0.616
+          ]
+        ],
+        "_loc": [
+          0.954,
+          null,
+          null,
+          0.958
+        ],
         "_note": "1.5B(layer5,n=196,WHYAAAI_NO_BOS=1 对齐旧口径):CLR 0.209<7B 0.335=低端更小,ES降幅 -0.026 ns。4 尺度 CLR 0.209/0.335/0.475/0.545 单调↑、RR 0.061/0.080/0.162/0.193 单调↑、ES降幅仅 32B 显著=capability-emergent。"
       },
       "R1-Distill-Llama": {
-        "params_b": [8, 70],
-        "es_b0":  [0.625, 0.610],
-        "es_b3":  [0.610, 0.503],
-        "es_drop":     [0.015, 0.107],
-        "es_drop_ci":  [[-0.060, 0.095], [0.032, 0.182]],
-        "es_drop_sig": [false, true],
-        "rr":     [0.144, 0.175],
-        "rr_ci":  [[0.088, 0.208], [0.105, 0.246]],
-        "clr":    [0.340, 0.529],
-        "clr_ci": [[0.275, 0.410], [0.460, 0.599]],
-        "_loc": [0.835, 0.930],
+        "params_b": [
+          8,
+          70
+        ],
+        "es_b0": [
+          0.625,
+          0.61
+        ],
+        "es_b3": [
+          0.61,
+          0.503
+        ],
+        "es_drop": [
+          0.015,
+          0.107
+        ],
+        "es_drop_ci": [
+          [
+            -0.06,
+            0.095
+          ],
+          [
+            0.032,
+            0.182
+          ]
+        ],
+        "es_drop_sig": [
+          false,
+          true
+        ],
+        "rr": [
+          0.144,
+          0.175
+        ],
+        "rr_ci": [
+          [
+            0.088,
+            0.208
+          ],
+          [
+            0.105,
+            0.246
+          ]
+        ],
+        "clr": [
+          0.34,
+          0.529
+        ],
+        "clr_ci": [
+          [
+            0.275,
+            0.41
+          ],
+          [
+            0.46,
+            0.599
+          ]
+        ],
+        "_loc": [
+          0.835,
+          0.93
+        ],
         "_note": "8B=layer6/clamp2 n=200(Loc 0.835 marginal);70B=layer14/**clamp4**(8B=clamp2 扫描定、70B 默认4=逐模型不同;CLR 对 clamp∈{2,3,4} 鲁棒 0.31-0.33、不驱动结论)model_parallel 2×4 fp32 **做厚到 n=200**(--drop-degenerate 丢 13 条 MP 间歇数值不稳退化 case→**n=187 干净**;内容触发长度无关检测,稳定 Qwen/8B 上丢~0;退化即编辑失败→丢弃方向有偏,仍报 with/without)。**★A4 做厚成果:ES降幅 0.107 [0.032,0.182] CI 排零=显著**(n=84 时 0.095 [-0.024,0.214] 不显著)→ **Qwen-32B(0.106)+Llama-70B(0.107)双高端点均显著、跨族对称**=不再是『仅 1/6 cell 显著』。跨族双点单调↑:Llama CLR 8B 0.340→70B 0.529、RR 0.144→0.175。跨族对齐:Llama-8B≈Qwen-7B(CLR .340/.335)、Llama-70B≈Qwen-32B(CLR .529/.545、ES降幅 .107/.106)→erosion 随规模/能力涨、与族无关=非 Math 特化伪影。论文 §3 注 70B n=187/丢13;§4 跨族曲线+双显著点。"
       }
     }
   },
   "rq3": {
-    "model": "32B", "n": 200, "scope": "think", "penalty": 8,
-    "baseline": {"RR": 0.193, "ES_B3": 0.495, "ES_drop": 0.106, "CLR": 0.545, "Loc": 0.958},
-    "suppress": {"RR": 0.085, "ES_B3": 0.631, "ES_drop": -0.035, "CLR": 0.263, "Loc": 0.964},
-    "alpha_sweep": {"_status": "DONE(A2 6/6;scope=think dose-response 5 点 + scope=all 消融 1 点;n=100,B3;run_a2_h200.sh)。证 penalty=8 非 cherry-pick + scope=think 是正确因果位点。",
+    "model": "32B",
+    "n": 200,
+    "scope": "think",
+    "penalty": 8,
+    "baseline": {
+      "RR": 0.193,
+      "ES_B3": 0.495,
+      "ES_drop": 0.106,
+      "CLR": 0.545,
+      "Loc": 0.958
+    },
+    "suppress": {
+      "RR": 0.085,
+      "ES_B3": 0.631,
+      "ES_drop": -0.035,
+      "CLR": 0.263,
+      "Loc": 0.964
+    },
+    "alpha_sweep": {
+      "_status": "DONE(A2 6/6;scope=think dose-response 5 点 + scope=all 消融 1 点;n=100,B3;run_a2_h200.sh)。证 penalty=8 非 cherry-pick + scope=think 是正确因果位点。",
       "_schema": "think_sweep: penalty→{CLR,ES,RR,RRs,Loc}@B3,n=100;α=0=headline 基线 n=200。scope_ablation: penalty=8 下 think vs all。",
-      "penalty":[0, 2, 4, 8, 12, 16],
-      "CLR":[0.545, 0.444, 0.384, 0.268, 0.146, 0.082],
-      "ES": [0.495, 0.596, 0.606, 0.639, 0.688, 0.660],
-      "RR": [0.193, 0.138, 0.155, 0.105, 0.069, 0.069],
-      "RRs":[null,  0.069, 0.069, 0.018, 0.017, 0.000],
-      "Loc":[0.958, 0.959, 0.959, 0.958, 0.957, 0.958],
-      "scope_ablation": {"penalty": 8, "n": 100,
-        "think": {"ES_B0": 0.580, "ES_B3": 0.639, "CLR_B3": 0.268, "RR_B3": 0.105, "RRs_B3": 0.018, "Loc_B3": 0.958},
-        "all":   {"ES_B0": 0.727, "ES_B3": 0.670, "CLR_B3": 0.268, "RR_B3": 0.113, "RRs_B3": 0.028, "Loc_B3": 0.958},
-        "_note": "scope=all 连答案段一起压 o_old:B3 CLR 与 think 相同(0.268,都压同一段链)、RR 相近(.113/.105),但 **B0 ES 0.580→0.727**——all 在答案段直接压 o_old、即便无思考也强推 o_new=直接写被打分的答案段(失去 clean 因果探针性质)。故主报 scope=think(只动链、答案未触、改善是挣来的);scope=all 仅作消融、量级可比但因果解读塌。"},
-      "_note": "CLR 单调↓(0.545→0.444→0.384→0.268→0.146→0.082)、ES 升后微降(峰 α≈8-12)、**Loc 全程平 ~0.958(守门跨 α 全稳)**→ penalty=8 在平滑曲线 ES 峰附近、非 cherry-pick。th_p8(n=100)复现 headline suppress(CLR 0.268 vs 0.263、ES 0.639 vs 0.631)→ 跨 n 口径一致。RR p2/p4 轻微非单调=n=100 噪声,RRs/CLR 干净单调。"},
-    "genbench": {"_status": "DONE(部署口径 single o_old + scope=think,B3M=16384+answer_cap=512 解 boxed 前截断;bf16 单卡 H100 run_a1_h100.sh)。", "mode": "single", "scope": "think", "n_gsm8k": 200, "n_math": 100, "gsm8k_off": 0.855, "gsm8k_on": 0.860, "gsm8k_delta": 0.005, "math_off": 0.700, "math_on": 0.700, "math_delta": 0.000, "gate": "|delta_acc|<=0.02", "gate_pass": true, "_note": "部署口径双双过门(GSM8K Δ+0.005 / MATH 0.000,均≤0.02)→ 抑制器对非编辑通用能力近零伤害。绝对值从最坏界 harness 的 0.535/0.150 涨回 0.855/0.700=印证旧低分是 B3=8192 截断伪影(B3M=16384 解),非模型不行。注:single+think 误施于全部通用 query 仍是上界——部署时抑制器只在编辑 query 触发、非编辑 Δ=0 by construction。"},
-    "genbench_worstcase": {"_note": "病态最坏界(并集全部 o_old + scope=all,远超部署)+ harness 欠测(base 32B GSM8K 0.535/MATH 0.150 远低于已知 ~0.95/0.90:think_budget B3=8192 截 MATH 长链于 boxed 前、答案段 256 截重述)→ Δ 既不能证伤也不能证不伤=uninformative,仅留作 stress-test 上界。面板 wjt97ozxo 已裁定 RQ3=SURVIVE-WITH-REFRAME(主腿在被编辑 query 答案上、与此正交)。部署口径门待修 harness(已加 B3M=16384/answer_cap/解除 scope 硬编码,commit 见 git)后 single+think 复测。", "gate": "|delta_acc|<=0.02", "gate_pass": false, "gsm8k": {"n": 200, "acc_off": 0.535, "acc_on": 0.385, "delta": -0.150}, "math": {"n": 100, "acc_off": 0.150, "acc_on": 0.190, "delta": 0.040}}
+      "penalty": [
+        0,
+        2,
+        4,
+        8,
+        12,
+        16
+      ],
+      "CLR": [
+        0.545,
+        0.444,
+        0.384,
+        0.268,
+        0.146,
+        0.082
+      ],
+      "ES": [
+        0.495,
+        0.596,
+        0.606,
+        0.639,
+        0.688,
+        0.66
+      ],
+      "RR": [
+        0.193,
+        0.138,
+        0.155,
+        0.105,
+        0.069,
+        0.069
+      ],
+      "RRs": [
+        null,
+        0.069,
+        0.069,
+        0.018,
+        0.017,
+        0.0
+      ],
+      "Loc": [
+        0.958,
+        0.959,
+        0.959,
+        0.958,
+        0.957,
+        0.958
+      ],
+      "scope_ablation": {
+        "penalty": 8,
+        "n": 100,
+        "think": {
+          "ES_B0": 0.58,
+          "ES_B3": 0.639,
+          "CLR_B3": 0.268,
+          "RR_B3": 0.105,
+          "RRs_B3": 0.018,
+          "Loc_B3": 0.958
+        },
+        "all": {
+          "ES_B0": 0.727,
+          "ES_B3": 0.67,
+          "CLR_B3": 0.268,
+          "RR_B3": 0.113,
+          "RRs_B3": 0.028,
+          "Loc_B3": 0.958
+        },
+        "_note": "scope=all 连答案段一起压 o_old:B3 CLR 与 think 相同(0.268,都压同一段链)、RR 相近(.113/.105),但 **B0 ES 0.580→0.727**——all 在答案段直接压 o_old、即便无思考也强推 o_new=直接写被打分的答案段(失去 clean 因果探针性质)。故主报 scope=think(只动链、答案未触、改善是挣来的);scope=all 仅作消融、量级可比但因果解读塌。"
+      },
+      "_note": "CLR 单调↓(0.545→0.444→0.384→0.268→0.146→0.082)、ES 升后微降(峰 α≈8-12)、**Loc 全程平 ~0.958(守门跨 α 全稳)**→ penalty=8 在平滑曲线 ES 峰附近、非 cherry-pick。th_p8(n=100)复现 headline suppress(CLR 0.268 vs 0.263、ES 0.639 vs 0.631)→ 跨 n 口径一致。RR p2/p4 轻微非单调=n=100 噪声,RRs/CLR 干净单调。"
+    },
+    "genbench": {
+      "_status": "DONE(部署口径 single o_old + scope=think,B3M=16384+answer_cap=512 解 boxed 前截断;bf16 单卡 H100 run_a1_h100.sh)。",
+      "mode": "single",
+      "scope": "think",
+      "n_gsm8k": 200,
+      "n_math": 100,
+      "gsm8k_off": 0.855,
+      "gsm8k_on": 0.86,
+      "gsm8k_delta": 0.005,
+      "math_off": 0.7,
+      "math_on": 0.7,
+      "math_delta": 0.0,
+      "gate": "|delta_acc|<=0.02",
+      "gate_pass": true,
+      "_note": "部署口径双双过门(GSM8K Δ+0.005 / MATH 0.000,均≤0.02)→ 抑制器对非编辑通用能力近零伤害。绝对值从最坏界 harness 的 0.535/0.150 涨回 0.855/0.700=印证旧低分是 B3=8192 截断伪影(B3M=16384 解),非模型不行。注:single+think 误施于全部通用 query 仍是上界——部署时抑制器只在编辑 query 触发、非编辑 Δ=0 by construction。"
+    },
+    "genbench_worstcase": {
+      "_note": "病态最坏界(并集全部 o_old + scope=all,远超部署)+ harness 欠测(base 32B GSM8K 0.535/MATH 0.150 远低于已知 ~0.95/0.90:think_budget B3=8192 截 MATH 长链于 boxed 前、答案段 256 截重述)→ Δ 既不能证伤也不能证不伤=uninformative,仅留作 stress-test 上界。面板 wjt97ozxo 已裁定 RQ3=SURVIVE-WITH-REFRAME(主腿在被编辑 query 答案上、与此正交)。部署口径门待修 harness(已加 B3M=16384/answer_cap/解除 scope 硬编码,commit 见 git)后 single+think 复测。",
+      "gate": "|delta_acc|<=0.02",
+      "gate_pass": false,
+      "gsm8k": {
+        "n": 200,
+        "acc_off": 0.535,
+        "acc_on": 0.385,
+        "delta": -0.15
+      },
+      "math": {
+        "n": 100,
+        "acc_off": 0.15,
+        "acc_on": 0.19,
+        "delta": 0.04
+      }
+    }
   },
   "logitlens": {
-    "model": "32B", "edit_layer": 12, "n_layers": 64, "edit_intact_pct": 1.0,
-    "layers_sampled": [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64],
-    "gap_sampled": [0.201, 0.177, -0.246, -0.351, 0.120, 0.500, 0.280, 0.560, 1.189, 1.555, 0.965, 0.775, 1.082, 7.391, 11.548, 17.803, 11.569]
+    "model": "32B",
+    "edit_layer": 12,
+    "n_layers": 64,
+    "edit_intact_pct": 1.0,
+    "layers_sampled": [
+      0,
+      4,
+      8,
+      12,
+      16,
+      20,
+      24,
+      28,
+      32,
+      36,
+      40,
+      44,
+      48,
+      52,
+      56,
+      60,
+      64
+    ],
+    "gap_sampled": [
+      0.201,
+      0.177,
+      -0.246,
+      -0.351,
+      0.12,
+      0.5,
+      0.28,
+      0.56,
+      1.189,
+      1.555,
+      0.965,
+      0.775,
+      1.082,
+      7.391,
+      11.548,
+      17.803,
+      11.569
+    ]
   },
   "base_probe": {
     "_note": "未编辑基座对 CounterFact 目标事实的回忆(src/base_probe.py,WHYAAAI_MODEL 指基座);用于排除 7B 低 ES 是『纯不知道』而非编辑/推理交互。draft §3/§4/§7 引 7B=0.59=answer_old_b0。",
-    "7B": {"answer_old_b0": 0.59, "answer_old_b3": 0.67, "chain_old_b3": 0.755}
+    "7B": {
+      "answer_old_b0": 0.59,
+      "answer_old_b3": 0.67,
+      "chain_old_b3": 0.755
+    }
   },
   "rq2_taxonomy": {
     "_status": "DONE —— 3-判官面板(workflow wbhgnlufw[14B+32B] + wuq9wq97k[7B],各链×3 判官读 RAW cot、strict precedence Reflective-override>Bridge>Recall>Associative、必引 verbatim span)→ src/chain_classify aggregate(多数决/3-way precedence)+ pool。LaTeX 表 results/a3/table_rq2.tex。",
-    "editor": "ROME", "dataset": "CounterFact", "decode": "greedy", "scales": ["7B", "14B", "32B"],
+    "editor": "ROME",
+    "dataset": "CounterFact",
+    "decode": "greedy",
+    "scales": [
+      "7B",
+      "14B",
+      "32B"
+    ],
     "gate": "STEP-1 排 short_code(<4字 matcher 盲)/morpho(o_old↔o_new 互为变体);STEP-0 群体=B0 commit o_new&not o_old + B3 committed answer commit o_old;held(答案 commit o_new)由判官裁排除。",
-    "categories": ["Recall", "Bridge", "Reflective-override", "Associative"],
+    "categories": [
+      "Recall",
+      "Bridge",
+      "Reflective-override",
+      "Associative"
+    ],
     "_category_note": "Recall=直陈值无中介;Bridge=经命名中介推出(众数路径);Reflective-override=draft 'dismiss' 收紧(verbalize o_new→反思标记→同段 commit 旧);Associative=残差(implicit-leak/ramble)。draft 旧 3 分不成立:recall/bridge 1:1、dismiss 收紧、必加 Associative。",
     "per_scale": {
-      "7B":  {"n_population": 4,  "n_excluded_held": 1, "n_excluded_artifact": 1, "Bridge": 4, "Reflective-override": 0, "Recall": 0, "Associative": 0, "fleiss_kappa": null, "_note": "全 Bridge;含 2 条 clr_in_cot=False 经 spelling/etymology 线索被判 Bridge(非真 implicit-leak);κ 因全一类未定义=完美一致它是 Bridge。"},
-      "14B": {"n_population": 5,  "n_excluded_held": 7, "n_excluded_artifact": 1, "Bridge": 5, "Reflective-override": 0, "Recall": 0, "Associative": 0, "fleiss_kappa": null},
-      "32B": {"n_population": 10, "n_excluded_held": 6, "n_excluded_artifact": 1, "Bridge": 8, "Reflective-override": 2, "Recall": 0, "Associative": 0, "fleiss_kappa": 0.588, "reflective_override_cases": ["cf_21770", "cf_7868"], "_note": "RO 两条均 contests_edit=1/factual(逐字称编辑值错再 override)。"}
+      "7B": {
+        "n_population": 4,
+        "n_excluded_held": 1,
+        "n_excluded_artifact": 1,
+        "Bridge": 4,
+        "Reflective-override": 0,
+        "Recall": 0,
+        "Associative": 0,
+        "fleiss_kappa": null,
+        "_note": "全 Bridge;含 2 条 clr_in_cot=False 经 spelling/etymology 线索被判 Bridge(非真 implicit-leak);κ 因全一类未定义=完美一致它是 Bridge。"
+      },
+      "14B": {
+        "n_population": 5,
+        "n_excluded_held": 7,
+        "n_excluded_artifact": 1,
+        "Bridge": 5,
+        "Reflective-override": 0,
+        "Recall": 0,
+        "Associative": 0,
+        "fleiss_kappa": null
+      },
+      "32B": {
+        "n_population": 10,
+        "n_excluded_held": 6,
+        "n_excluded_artifact": 1,
+        "Bridge": 8,
+        "Reflective-override": 2,
+        "Recall": 0,
+        "Associative": 0,
+        "fleiss_kappa": 0.588,
+        "reflective_override_cases": [
+          "cf_21770",
+          "cf_7868"
+        ],
+        "_note": "RO 两条均 contests_edit=1/factual(逐字称编辑值错再 override)。"
+      }
     },
-    "pooled": {"n_population": 19, "Bridge": 17, "Bridge_pct": 0.895, "Bridge_ci": [0.737, 1.0],
-      "Reflective-override": 2, "RO_pct": 0.105, "RO_ci": [0.0, 0.263], "Recall": 0, "Associative": 0,
-      "fleiss_kappa": 0.52, "contests_edit_pct": 0.158},
+    "pooled": {
+      "n_population": 19,
+      "Bridge": 17,
+      "Bridge_pct": 0.895,
+      "Bridge_ci": [
+        0.737,
+        1.0
+      ],
+      "Reflective-override": 2,
+      "RO_pct": 0.105,
+      "RO_ci": [
+        0.0,
+        0.263
+      ],
+      "Recall": 0,
+      "Associative": 0,
+      "fleiss_kappa": 0.52,
+      "contests_edit_pct": 0.158
+    },
     "findings": [
       "Bridge 众数(pooled 90% [74,100]):回退是【重构】—— 经命名中介(词源/地理/类属/虚构连接)推出 o_old,非纯记忆直取。",
       "Recall=0 & Associative=0(全三尺度):无 flat-recall;无真 implicit-leak(7B 两条 clr=False 也被判 Bridge-via-spelling)→ 回退总有可引的推导子句。",
@@ -84,5 +437,131 @@
       "held 排除多(7B1/14B7/32B6):loose-RR(答案含旧)高估;判官-committed 回退(n=19 pooled)更贴近 strict RRs 口径。"
     ],
     "_orthogonal": "contests_edit 二元 stance(链逐字称 o_new 错)= pooled 15.8%,cross-cut 四类;κ 仅 32B/pooled 有意义(7B/14B 全 Bridge→κ 未定义);小 n 故低频类按定性存在性 + bootstrap CI 报。"
+  },
+  "emergence": {
+    "_note": "B-emergence:erosion 指标对 log10(参数量)pool 两族回归;slope CI 排零=涌现有统计支撑(非仅靠 2/6 per-cell 显著)。6 点小样、log-params 为能力代理(跨族 alignment 已论证)、不宣称 scaling law。OLS 解析 t-CI(df=n-2)+按点 bootstrap(n=10000,seed42)+逆方差 WLS+family 控制。src/emergence_regression.py 可复现。",
+    "es_drop": {
+      "n_points": 6,
+      "ols": {
+        "slope": 0.0954,
+        "ci95": [
+          0.033,
+          0.1577
+        ],
+        "se": 0.0225,
+        "r2": 0.818,
+        "excludes_zero": true
+      },
+      "bootstrap": {
+        "ci": [
+          0.0514,
+          0.1986
+        ],
+        "p_slope_le_0": 0.0008,
+        "n_boot": 9999
+      },
+      "wls_invvar": {
+        "slope": 0.094,
+        "ci95_boot": [
+          0.0539,
+          0.1952
+        ],
+        "p_le0": 0.0008
+      },
+      "family_controlled": {
+        "logparams_slope": 0.0975,
+        "ci95": [
+          0.0077,
+          0.1874
+        ],
+        "se": 0.0282
+      },
+      "per_family_slope": {
+        "R1-Distill-Qwen": 0.0975,
+        "R1-Distill-Llama": 0.0977
+      }
+    },
+    "rr": {
+      "n_points": 6,
+      "ols": {
+        "slope": 0.0809,
+        "ci95": [
+          0.0189,
+          0.1428
+        ],
+        "se": 0.0223,
+        "r2": 0.767,
+        "excludes_zero": true
+      },
+      "bootstrap": {
+        "ci": [
+          0.0304,
+          0.1654
+        ],
+        "p_slope_le_0": 0.0014,
+        "n_boot": 9999
+      },
+      "wls_invvar": {
+        "slope": 0.0824,
+        "ci95_boot": [
+          0.0322,
+          0.1712
+        ],
+        "p_le0": 0.0014
+      },
+      "family_controlled": {
+        "logparams_slope": 0.0815,
+        "ci95": [
+          -0.0082,
+          0.1711
+        ],
+        "se": 0.0282
+      },
+      "per_family_slope": {
+        "R1-Distill-Qwen": 0.1041,
+        "R1-Distill-Llama": 0.0329
+      }
+    },
+    "clr": {
+      "n_points": 6,
+      "ols": {
+        "slope": 0.2176,
+        "ci95": [
+          0.1206,
+          0.3146
+        ],
+        "se": 0.0349,
+        "r2": 0.907,
+        "excludes_zero": true
+      },
+      "bootstrap": {
+        "ci": [
+          0.1565,
+          0.3465
+        ],
+        "p_slope_le_0": 0.0014,
+        "n_boot": 9999
+      },
+      "wls_invvar": {
+        "slope": 0.2179,
+        "ci95_boot": [
+          0.1612,
+          0.3489
+        ],
+        "p_le0": 0.0014
+      },
+      "family_controlled": {
+        "logparams_slope": 0.2419,
+        "ci95": [
+          0.1538,
+          0.3299
+        ],
+        "se": 0.0277
+      },
+      "per_family_slope": {
+        "R1-Distill-Qwen": 0.2611,
+        "R1-Distill-Llama": 0.2006
+      }
+    }
   }
 }
