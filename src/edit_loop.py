@@ -59,6 +59,8 @@ def probes(case, which=None):                # 探针：efficacy/paraphrase/loca
         return sel is None or name in sel or (name.startswith("para") and "paraphrase" in sel)
     if ok("efficacy"):
         yield "efficacy", case["prompt"]
+    if case.get("hop_q") and ok("hop"):         # E-MULTIHOP/W3:编辑后问多跳题(hops[0],绝不点名 o_old)
+        yield "hop", case["hop_q"]
     for i, p in enumerate(case.get("paraphrases", [])[:2]):
         if ok(f"para{i}"):
             yield f"para{i}", p
