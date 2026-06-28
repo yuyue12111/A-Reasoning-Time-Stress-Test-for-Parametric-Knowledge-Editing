@@ -195,6 +195,24 @@
       "CLR": 0.263,
       "Loc": 0.964
     },
+    "sup_battery": {
+      "_status": "DONE(E-SUP-BATTERY/W1 因果对照,4 臂 N/T/D/P,32B/CF/scope=think/α=8/B3;paper 口径=metrics.score[_without_subject 去污+RR/RRs b0ok 门];cross_arm 配对差;prereg-esup.md 预注册;run_esup_h200.sh)。",
+      "n": {"N": 198, "T": 198, "D": 196, "P": 199},
+      "marginal_B3": {
+        "N": {"ES": 0.495, "RR": 0.193, "RRs": 0.092, "CLR": 0.545},
+        "T": {"ES": 0.631, "RR": 0.085, "RRs": 0.042, "CLR": 0.263},
+        "D": {"ES": 0.281, "RR": 0.309, "RRs": 0.236, "CLR": 0.587},
+        "P": {"ES": 0.507, "RR": 0.210, "RRs": 0.113, "CLR": 0.492}
+      },
+      "contrasts_B3_mean_ci_p": {
+        "T_minus_N": {"ES": [0.138, [0.082, 0.194], 0.0], "RR": [-0.102, [-0.170, -0.042], 0.001], "RRs": [-0.051, [-0.102, 0.0], 0.073], "CLR": [-0.276, [-0.337, -0.214], 0.0]},
+        "T_minus_P": {"ES": [0.122, [0.051, 0.193], 0.002], "RR": [-0.095, [-0.171, -0.029], 0.010], "RRs": [-0.057, [-0.114, -0.010], 0.029], "CLR": [-0.228, [-0.294, -0.162], 0.0]},
+        "D_minus_N": {"ES": [-0.217, [-0.289, -0.144], 0.0], "RR": [0.086, [0.019, 0.152], 0.010], "RRs": [0.095, [0.038, 0.162], 0.002], "CLR": [0.041, [-0.010, 0.098], 0.163]},
+        "P_minus_N": {"ES": [0.015, [-0.046, 0.081], 0.709], "RR": [0.0, [-0.057, 0.057], 1.0], "RRs": [-0.009, [-0.047, 0.028], 0.828], "CLR": [-0.051, [-0.102, 0.0], 0.054]}
+      },
+      "verdict": "★W1 三件套齐(prereg 全中):(1) **T−P 四指标全排零**(RR −0.095 p=.010 / CLR −0.228 p<.001 / RRs −0.057 p=.029 / ES +0.122 p=.002)=o_old 效应超 placebo floor=特异;(2) **P−N≈0**(RR 恰 0.0 / ES p=.71 / RRs p=.83 含零)=placebo 惰性=非通用链扰动;(3) **D−N ES −0.217 显著负**=方向特异(压 o_new 反恶化、RR/RRs 升)。**符号阶梯 D<N~P<T**(ES 0.281<0.495≈0.507<0.631)如预注册。→ RQ3 从'一个管用干预'升为'符号/特异/剂量(A2 α-sweep)受控的因果操控'。诚实:placebo CLR P−N −0.05 p=.054 边际(随机词微触链内泄漏),但被 o_old −0.276 碾压、T−P CLR −0.228 p<.001 仍稳。N/T 边际复现 headline(RR .193/.085、CLR .545/.263)=口径一致。",
+      "_main_report": "主报 effect-above-placebo = T−P:RR −0.095[−0.171,−0.029]、CLR −0.228[−0.294,−0.162]、ES +0.122[0.051,0.193],全排零。"
+    },
     "alpha_sweep": {
       "_status": "DONE(A2 6/6;scope=think dose-response 5 点 + scope=all 消融 1 点;n=100,B3;run_a2_h200.sh)。证 penalty=8 非 cherry-pick + scope=think 是正确因果位点。",
       "_schema": "think_sweep: penalty→{CLR,ES,RR,RRs,Loc}@B3,n=100;α=0=headline 基线 n=200。scope_ablation: penalty=8 下 think vs all。",
