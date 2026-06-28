@@ -87,8 +87,13 @@ def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1,
         done = {cid for l in open(out_path) if (cid := json.loads(l).get("case_id"))}
     had_content = os.path.exists(out_path) and os.path.getsize(out_path) > 0
     _aliases = json.load(open(os.path.join(_PROJECT_ROOT, "data/aliases.json"))) if suppress_cfg else None
-    if suppress_cfg:                         # RQ3 修复(plan v1.27)：逐 case 现构 o_old 抑制器
+    _sup_source = (suppress_cfg or {}).get("source", "o_old")   # o_old=现fix | o_new=方向对照 | placebo=特异性对照(E-SUP-BATTERY/W1)
+    _placebo = None
+    if suppress_cfg:                         # RQ3 修复(plan v1.27)：逐 case 现构抑制器;source 决定压哪个词
         from suppress import build_old_token_ids, make_processor
+        if _sup_source == "placebo":         # BLIND 频率/长度匹配供体(src/placebo_donor.py 离线锁定,看 RR 前定)
+            _pj = suppress_cfg.get("placebo_map", "data/placebo_donors.json")
+            _placebo = json.load(open(os.path.join(_PROJECT_ROOT, _pj)))
     hp = HP_CLS[editor_name].from_hparams(hparams_path)
     for k, v in (overrides or {}).items():   # run_pilot 覆盖 model_name/stats_dir/device/layers
         setattr(hp, k, v)
@@ -138,11 +143,18 @@ def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1,
                                       target_new=[c["o_new"]],
                                       subject=[c["s"]],          # ROME/MEMIT 必需
                                       sequential_edit=True)
-                sup_eff = None              # RQ3：仅 efficacy 探针压 o_old；locality/para 不碰 → Loc 结构性安全
+                sup_eff = None              # RQ3：仅 efficacy 探针压;locality/para 不碰 → Loc 结构性安全
                 if suppress_cfg:
-                    _ids = build_old_token_ids(tok, c["o_old"], _aliases)
-                    sup_eff = {"processor": make_processor(_ids, suppress_cfg["penalty"]),
-                               "scope": suppress_cfg.get("scope", "think")}
+                    if _sup_source == "o_new":
+                        _tgt, _al = c["o_new"], _aliases               # 方向对照:压编辑值 → 若反降回退=符号错(近致命)
+                    elif _sup_source == "placebo":
+                        _tgt, _al = (_placebo or {}).get(c["case_id"]), {}   # 无关匹配词,不带别名
+                    else:
+                        _tgt, _al = c["o_old"], _aliases               # 默认:压旧值=现 fix
+                    if _tgt:
+                        _ids = build_old_token_ids(tok, _tgt, _al)
+                        sup_eff = {"processor": make_processor(_ids, suppress_cfg["penalty"]),
+                                   "scope": suppress_cfg.get("scope", "think")}
                 for b in budgets:
                     for ptype, q in probes(c, probe_sel):
                         for decode, seed, temp, gk in arms:

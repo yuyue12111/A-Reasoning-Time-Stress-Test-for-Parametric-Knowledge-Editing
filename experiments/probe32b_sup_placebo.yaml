@@ -1,0 +1,38 @@
+# E-SUP-BATTERY/W1 · P 臂 = 压 placebo(特异性对照) · 32B (depth-plan.md)
+# 与 headline T 臂(probe32b_sup.yaml,压 o_old)同 edit/同 200 case/同 scope=think/同 α=8,仅 suppress.source=placebo。
+# placebo = src/placebo_donor.py 离线 BLIND 锁定的频率/长度匹配无关词(data/placebo_donors.json)。
+# 预注册:压无关词不应改善回退(P−N≈0=链扰动 floor);o_old 效应主报 T−P 的 margin(超出 placebo floor 的部分)。
+# 若 placebo 也显著改善 → "fix 是通用链扰动"=W1 自伤,则诚实改述为"o_old-targeting 超 floor X"。
+# 跑(H200 fp32,同 D 臂):--config experiments/probe32b_sup_placebo.yaml
+model_tag: r1qwen32b
+seed: 42
+out_dir: results/probe
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+  stats_dir: ./data/stats_r1qwen32b
+  v_loss_layer: 63
+
+dataset:
+  tag: cf200sup_placebo        # 同 200 case,输出名区别
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 200
+
+budgets: [B0, B3]
+
+sampling:
+  enabled: false
+
+probes: [efficacy, locality]
+
+suppress:
+  penalty: 8
+  scope: think
+  source: placebo              # ★特异性对照:压频率/长度匹配的无关词
+  placebo_map: data/placebo_donors.json
+
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [12]
