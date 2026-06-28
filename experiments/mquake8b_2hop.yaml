@@ -1,0 +1,33 @@
+# E-MULTIHOP/W3 · 编辑态 2-hop · Llama-8B (depth-plan.md;MVP)
+# 编辑单事实(prompt/o_old/o_new/s)→ 问多跳题 hop_q(edit_loop 已加 hop probe,绝不点名 o_old)→
+# multihop.py score 评 hits_new(hop_answer_new)/hits_old(hop_answer_old)。dataset=base-floor 门后的信息残池。
+# 跑(先 run_mh_basefloor.sh 出 mquake_gated;4090 bf16 或 H200 fp32):
+#   for r in $(seq 0 7); do PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/mquake8b_2hop.yaml --editor ROME --rank $r --world 8 --device $r & done; wait
+#   python src/multihop.py score --edited 'results/probe/r1llama8b_ROME_mh2hop_r*of*.jsonl' --pool data/mquake_gated.jsonl
+model_tag: r1llama8b
+seed: 42
+out_dir: results/probe
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+  stats_dir: ./data/stats_r1llama8b
+  v_loss_layer: 31
+  clamp_norm_factor: 2                                    # 同 probe_llama8b(跨架构 transfer 定)
+
+dataset:
+  tag: mh2hop                                             # 输出 r1llama8b_ROME_mh2hop_r*of*.jsonl
+  path: data/mquake_gated.jsonl                           # base-floor 门后的信息残池(先跑 run_mh_basefloor.sh)
+  fallback_path: data/mquake_clean.jsonl                  # 没门过就退干净池(会含先验尾,仅冒烟用)
+  n: 200                                                  # 残池 ~100,n 给足
+
+budgets: [B0, B3]
+
+probes: [hop]                                             # 只跑多跳探针(edit_loop:case.hop_q)
+
+sampling:
+  enabled: false
+
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [6]
