@@ -102,6 +102,36 @@ def analyze(metric, fams):
     }
 
 
+def robustness(metric, fams):
+    """影响删除稳健性(E-DECONFOUND 零卡部分):leave-one-family-out + leave-one-point-out。
+    涌现断言只在 slope 跨删除仍正(理想仍排零)才算稳,不靠单点/单族。"""
+    pts = []
+    for fn, F in fams.items():
+        lp = np.log10(F["params_b"])
+        for i, v in enumerate(F[metric]):
+            if v is not None:
+                pts.append((float(lp[i]), float(v), fn))
+    x = np.array([p[0] for p in pts]); y = np.array([p[1] for p in pts]); fam = [p[2] for p in pts]
+    base = ols(x, y)
+    lofo = {}
+    for fn in fams:
+        idx = [i for i in range(len(x)) if fam[i] != fn]
+        if len(set(x[idx])) > 1:
+            o = ols(x[idx], y[idx])
+            lofo[f"drop_{fn}"] = {"slope": round(o["slope"], 4), "n": len(idx),
+                                  "ci": t_ci(o["slope"], o["slope_se"], o["dof"]) if o["dof"] > 0 else None}
+    lopo = []
+    for k in range(len(x)):
+        idx = [i for i in range(len(x)) if i != k]
+        o = ols(x[idx], y[idx])
+        ci = t_ci(o["slope"], o["slope_se"], o["dof"]) if o["dof"] > 0 else None
+        lopo.append({"dropped": [round(float(x[k]), 3), fam[k]], "slope": round(o["slope"], 4), "ci": ci})
+    sl = [d["slope"] for d in lopo]
+    return {"lofo": lofo, "lopo_slope_range": [round(min(sl), 4), round(max(sl), 4)],
+            "lopo_all_positive": all(s > 0 for s in sl),
+            "lopo_all_exclude_zero": all(d["ci"] and d["ci"][0] > 0 for d in lopo)}
+
+
 def main():
     R = json.load(open("paper/results.json"))
     fams = R["capability"]["families"]
@@ -109,10 +139,15 @@ def main():
     print(f"{'metric':<10}{'OLS slope':>12}{'95% CI':>22}{'R2':>7}{'boot p(≤0)':>12}{'排零':>6}  per-family")
     for m in ["es_drop", "rr", "clr"]:
         a = analyze(m, fams)
+        a["robustness"] = robustness(m, fams)
         out[m] = a
         c = a["ols"]
         print(f"{m:<10}{c['slope']:>12.4f}{str(c['ci95']):>22}{c['r2']:>7.2f}{a['bootstrap']['p_slope_le_0']:>12.4f}"
               f"{('YES' if c['excludes_zero'] else 'no'):>6}  {a['per_family_slope']}")
+        rb = a["robustness"]
+        print(f"           ↳ robustness: LOPO slope∈{rb['lopo_slope_range']} all+={rb['lopo_all_positive']} "
+              f"all-excl-0={rb['lopo_all_exclude_zero']} | drop-Llama={rb['lofo'].get('drop_R1-Distill-Llama',{}).get('ci')} "
+              f"drop-Qwen-slope={rb['lofo'].get('drop_R1-Distill-Qwen',{}).get('slope')}")
     R["emergence"] = out
     json.dump(R, open("paper/results.json", "w"), ensure_ascii=False, indent=2)
     print("\n# → results.json.emergence 写入")

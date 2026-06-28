@@ -479,6 +479,29 @@
       "per_family_slope": {
         "R1-Distill-Qwen": 0.0975,
         "R1-Distill-Llama": 0.0977
+      },
+      "robustness": {
+        "lofo": {
+          "drop_R1-Distill-Qwen": {
+            "slope": 0.0977,
+            "n": 2,
+            "ci": null
+          },
+          "drop_R1-Distill-Llama": {
+            "slope": 0.0975,
+            "n": 4,
+            "ci": [
+              -0.0827,
+              0.2776
+            ]
+          }
+        },
+        "lopo_slope_range": [
+          0.0848,
+          0.1313
+        ],
+        "lopo_all_positive": true,
+        "lopo_all_exclude_zero": false
       }
     },
     "rr": {
@@ -520,6 +543,29 @@
       "per_family_slope": {
         "R1-Distill-Qwen": 0.1041,
         "R1-Distill-Llama": 0.0329
+      },
+      "robustness": {
+        "lofo": {
+          "drop_R1-Distill-Qwen": {
+            "slope": 0.0329,
+            "n": 2,
+            "ci": null
+          },
+          "drop_R1-Distill-Llama": {
+            "slope": 0.1041,
+            "n": 4,
+            "ci": [
+              -0.028,
+              0.2361
+            ]
+          }
+        },
+        "lopo_slope_range": [
+          0.0729,
+          0.1038
+        ],
+        "lopo_all_positive": true,
+        "lopo_all_exclude_zero": false
       }
     },
     "clr": {
@@ -561,6 +607,29 @@
       "per_family_slope": {
         "R1-Distill-Qwen": 0.2611,
         "R1-Distill-Llama": 0.2006
+      },
+      "robustness": {
+        "lofo": {
+          "drop_R1-Distill-Qwen": {
+            "slope": 0.2006,
+            "n": 2,
+            "ci": null
+          },
+          "drop_R1-Distill-Llama": {
+            "slope": 0.2611,
+            "n": 4,
+            "ci": [
+              0.1182,
+              0.404
+            ]
+          }
+        },
+        "lopo_slope_range": [
+          0.2014,
+          0.2617
+        ],
+        "lopo_all_positive": true,
+        "lopo_all_exclude_zero": true
       }
     }
   }
