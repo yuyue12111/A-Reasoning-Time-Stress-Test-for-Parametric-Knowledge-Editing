@@ -4,6 +4,43 @@
 **核心 recalibration**：**没有审稿人把广度(多编辑器/数据集/尺度)当 blocker** → 广度=门票,不加分。**提分全在深度/效度:因果对照、鲁棒、多跳。**
 **统一汇报约定**：**effect-above-control** —— 每个指标都报"相对对照臂的差(带配对 CI)",任何 null 都变成一个量化 margin、而不是被迫收回的断言。
 
+---
+
+## 第二轮深度计划 (v2, 2026-06-30) —— W1/W2/W3 完成后的全文 re-review 重排【当前权威】
+
+**DECISIVE tier 三件全 DONE**:W1 E-SUP-BATTERY(prereg 全中,T−P 特异)✅ / W2 E-SEMJUDGE(κ=0.836)✅ / W3 E-MULTIHOP(propagation-erosion 0.188 排零,与单跳同结构复现)✅。下方"DECISIVE/HIGH/INSURANCE tier"是**第一轮**记录(DECISIVE 已全清),本节取代其优先级。
+
+**新 re-review(workflow `wa6rxz0qp`,3 审 borderline/borderline/weak-accept,raw 见 `rereview-round2.md`)的关键纠正**:
+- **最大残余被重定**。不是预命名的"自然生成必要性"(那个**零卡可堵**),而是 **title 名词「capability-emergent」的统计骨架**(唯一 fatal,2 审):6 点 OLS 的 p<0.002 来自 point-resample 同 6 点 → fix(per-case 混合效应 + family 随机效应)**零卡、在盘数据上、abstract 关键**,原计划却错放进 7/27 GPU 窗后。
+- **abstract 关键集 ≫ 我原来的 A1-A3**:漏掉 1 fatal + 3 major-threatens 的 fix,**全部零卡**。
+
+### TIER A —— 零卡 / abstract 关键(7/20 前必落;数据在盘上,写分析码 → 平台跑或本地跑)
+> 执行=我写码列改了哪些文件(不给 base64),用户上传/平台跑;纯文字 fix 我直接改 draft。
+
+1. **【最高·拆 fatal】E-DECONFOUND-NOW(零卡半)**:`emergence_regression.py` 升级——**per-CASE pooled 回归**(每行=一 edit-case×尺度,ES降幅/RR/CLR ~ log10(params) + `chain_len` 协变量 + **family 随机效应**,mixed-effects/GEE,**非**现 6 点 fixed-dummy `family_controlled`);报 log-params 固定效应 slope+CI 作**承重 emergence 统计**,把 6 点 OLS+point-bootstrap **降级为描述性图**。另报 **within-Qwen-only CLR slope 带 CI**(`results.json` 现 0.2611 / ci:null,n=4 fit 须补)。→ 直接灭唯一 fatal(stats+novelty 都 threatens、撑 title 名词)。**需 per-case jsonl(在平台/GPFS)**。
+2. **【最高·堵命名残余】自然生成 NECESSITY 观察检验(零卡)**:在未干预 B3 链(gated 回退池)上,报 **P(回退 | 链含逐字 Bridge 重推子句) vs 无**(用 RQ2 判官已抽的 **17/19 Bridge span**),前景化 **Associative/implicit-leak=0/19**。然后把 draft 每处"the chain re-derives it / reasoning routes around it" **软化**为"in-chain re-derivation 出现在 N/19 自然回退中,且抑制它翻转答案"。→ mechanism #1 + novelty #3,两审同开此方;把"充分性(可 steer)"推向"自然文本里观察到 + 抑制翻转",最高杠杆缺失项。
+3. **【堵承重指标】CLR scorer-robustness 表(零卡重打)**:CLR 及其 6 点 slope 在 alias cutoff **3/4/5** + 有/无 alias list、**per-scale** 重算;证 (a) 单调上升对所有 cutoff 成立、(b) ~2× 灌水因子近似 scale-invariant(去污不差异化缩小小模型 CLR);**明说 <4 字 cutoff 是否预注册**。→ CLR 是唯一单族存活指标(`lopo_all_exclude_zero` 仅 CLR true),未预注册 cutoff 是直击;W2 κ 验的是 reversion 非此 scorer。
+4. **【护 2/6 framing】Llama-70B 敏感行进 Table 1(零卡重制表)**:ES降幅+RR **with/without 丢 13** 配对入表(现仅 §setup prose)+ **最坏行**(13 全记编辑失败的 floor)。最坏 70B CI 仍排零→保"双显著点";否则降级"1 显著点 + 70B 方向复现"。
+5. **【免费文字 fix 打包】**(直接改 draft):(a) §3 Statistics 加 **confirmatory(RQ3 N/T/D/P 预注册)vs exploratory(RQ1 cells 描述性)** 一句 + 可选 Holm 校正 6 个 ES降幅 CI;(b) 软化"Reflective-override is itself capability-emergent"→"仅 32B 出现(2/10),consistent with 但不 establish";(c) 软化 §5"isolated o_old-specificity"→"specific to a meaningful competing target relative to an inert placebo floor";(d) 审 abstract/intro 无多跳泛化措辞、明标 W3 = single-template pilot。
+6. **A1 W4 scope 段(零卡)**:claim 范围限 native-R1 推理器、点名 instruct+CoT 为审稿人会查的那个 future-work 控制;同段**收紧 title/scope 向"locate-then-edit on CounterFact"** + 点名单编辑器 MEMIT 复现为 future work。→ 同时预堵 W4(novelty minor)+ 单编辑器/数据集(stats+novelty major,缓解非闭)。
+7. **A2 部署门 equivalence/CI 边界**:把"passes"换成 **Δacc 的 95% CI + TOST 最小可测退化**;**仅当**要把等价界压到 <0.02 才在 4090 bf16 廉价扩 GSM8K/MATH 的 n(离 H200 关键路径)。
+8. **A3 draft→LaTeX 主工程 + `plots.py` 出图**:fig1 capability 曲线、**fig2 logit-lens gap 带 per-case bootstrap CI 带**(中层 dip 不能点估断言)、fig3 单跳 ES降幅 vs 多跳 propagation-erosion 配对。
+9. **RQ2/RQ3 非独立性 name-and-bound 段(零卡)**:§4/§6 显式命名并 bound"edit-intact 与 fix-works 可能同一 logit 几何读两遍"的循环(现仅处理了更窄的 ΔCLR 同义反复)→ B2 的 H200 窗若滑过 7/27 的滑窗保险。
+
+### TIER B —— 需 GPU 窗 / 全文 7/27(非 abstract)
+- **B1**:reverted 池 17→40+ 重跑 logit-lens 出"≥40 中 100% intact" + **零卡 per-case g_l 分布 + 每层 bootstrap CI**(标 n);中层 dip CI 跨零→降级"margin not established mid-stack, consolidates late"。~2-4 H200-h,搭 B3 base_recall 同一 model-load 窗。
+- **B2**:E-CHAINSUB 链替换中介(T0/T-clean/T-old;必要性=T-clean 拉回 o_new、充分性=T-old 编辑在位仍回退)。N~17-30 32B case study,明标。~3-5 H200-h + 80-100 LOC 新解码路径。破 RQ2/RQ3 循环;camera-ready,有 A-9 段做 fallback。
+- **B3**:E-DECONFOUND GPU 半 —— 未编辑基座重生 `base_recall` 协变量(~8 GPU-h)加进 action-1 已零卡跑出的 per-case 回归;证 capability slope 在 chain_len+base_recall 双控下存活。搭 B1 同窗、不加关键路径。
+
+### DROP(本轮明确不做 —— 审稿人无人当 hard blocker)
+MEMIT/AlphaEdit/zsRE/更多尺度/更多 seed 充量;全套 W4 same-base instruct;W1 sibling 干扰臂 D′;tuned-lens/activation-patching 旁证;8B 多跳模板扩充(廉价但不值抢窗 vs B1/B2)。
+
+### 诚实残余风险(v2 更新)
+1. **(降级)自然生成必要性** —— 原列"无实验可消",re-review 指出 **action-2 零卡观察检验**可把它从"未证"推到"自然文本中 N/19 present 且抑制翻转";仍非随机干预的因果必要性(那需 B2 充分性 + 观察必要性合证),但不再是裸残余。
+2. **多跳是模板 MQuAKE、单模板 P27 扛** —— 明标 single-template pilot;立"非单跳 cloze 伪影",不立硬多步推理 erosion。
+3. **机理单方法 logit-lens** —— B1 加 per-case CI 后中层 claim 有界;tuned-lens/patching 旁证 DROP(成本不值)。
+4. **净**:三审 borderline/borderline/weak-accept;**全部 threatens_acceptance 项的 fix 几乎都零卡**(fatal 统计骨架、必要性、CLR scorer、70B 敏感行)→ 7/20 前零卡冲刺可把 borderline 抬向 accept;GPU 窗(B1/B2/B3)是全文加固非 abstract 阻塞。
+
 ## 三审收敛弱点(优先级)
 - **W1(≥2 审,最高)** 因果只靠 logit-lens;"in-chain re-derivation 驱动回退"有干预**缺对照臂**。
 - **W2(≥2 审,最高)** 干预依赖已知 o_old / 疑似刷榜;别名/多 token/改述/间接表达鲁棒性未证;部署门要写到扎实。
