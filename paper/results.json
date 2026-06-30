@@ -618,19 +618,72 @@
     "_percase_replacement": "【洞 fatal 实质封死·per-case 承重统计最终 6-cell 已跑】6 点 OLS 的 p<0.002 来自 point-resample 同 6 cell 均值(re-review wa6rxz0qp)→ 换 per-CASE 回归(每行=edit-case×尺度,~log10(params)+chain_len,family drop-one FE + 按 family 两级 cluster bootstrap=重采样单位=case nested in family,非 cell-mean)。**最终 6-cell(含 7B,无 WARN,rows=1196)**:CLR slope 0.372 [0.149,0.800] p=.0007 排零、within-Qwen CLR 0.365 [0.062,0.675] p=.010 排零;es_drop 0.033 [-0.037,0.139] p=.19、rr 0.047 [-0.501,0.530] p=.43 不显著=与 draft『foreground CLR』一致。**CLR 在 honest cluster bootstrap(K=2)下仍显著 → 制造显著性的 fatal 实质堵死**(5-cell 0.377→6-cell 0.372 稳健)。6 点 OLS 降描述性。残留(非阻塞):n 混(14/32/70B=cf100、1.5/7/8B 含 cf200,非全 headline n=200);CLR 结论不预期变。",
     "percase": {
       "_status": "FINAL 6-cell (incl 7B; no WARN; rows=1196; n mixed cf100/cf200, not all headline n=200); two-level cluster bootstrap (case nested in family, K=2). 取代 6 点 OLS 为承重 emergence 统计。",
-      "clr": {"slope": 0.372, "ci": [0.149, 0.800], "p_le0": 0.0007, "excludes_zero": true},
-      "within_qwen_clr": {"slope": 0.365, "ci": [0.062, 0.675], "p_le0": 0.010, "excludes_zero": true},
-      "es_drop": {"slope": 0.033, "ci": [-0.037, 0.139], "p_le0": 0.188, "excludes_zero": false},
-      "rr": {"slope": 0.047, "ci": [-0.501, 0.530], "p_le0": 0.426, "excludes_zero": false},
-      "n_rows": 1196, "n_families": 2,
-      "cells_present": ["1.5B-Qwen", "7B-Qwen", "14B-Qwen", "32B-Qwen", "8B-Llama", "70B-Llama"]
+      "clr": {
+        "slope": 0.372,
+        "ci": [
+          0.149,
+          0.8
+        ],
+        "p_le0": 0.0007,
+        "excludes_zero": true
+      },
+      "within_qwen_clr": {
+        "slope": 0.365,
+        "ci": [
+          0.062,
+          0.675
+        ],
+        "p_le0": 0.01,
+        "excludes_zero": true
+      },
+      "es_drop": {
+        "slope": 0.033,
+        "ci": [
+          -0.037,
+          0.139
+        ],
+        "p_le0": 0.188,
+        "excludes_zero": false
+      },
+      "rr": {
+        "slope": 0.047,
+        "ci": [
+          -0.501,
+          0.53
+        ],
+        "p_le0": 0.426,
+        "excludes_zero": false
+      },
+      "n_rows": 1196,
+      "n_families": 2,
+      "cells_present": [
+        "1.5B-Qwen",
+        "7B-Qwen",
+        "14B-Qwen",
+        "32B-Qwen",
+        "8B-Llama",
+        "70B-Llama"
+      ]
     },
     "clr_robustness": {
       "_status": "CLR scorer-robustness (src/clr_robustness.py)。证 CLR 对别名 cutoff 与去污不敏感、趋势非 cutoff 造。注:glob 池化多个 ROME×CF shard(32B n_eff=1476),绝对 CLR 非 headline 口径;cutoff 对比同 case 内有效。",
       "cutoff_invariant": "per-scale CLR 在 cutoff 3/4/5 差 ≤0.01(wb_noalias 亦≈);<4 字符 cutoff 不驱动 CLR。",
-      "slope_on_log10params_per_variant": {"wb_c3": 0.152, "wb_c4": 0.152, "wb_c5": 0.152, "wb_noalias": 0.152, "substr_all": 0.131},
+      "slope_on_log10params_per_variant": {
+        "wb_c3": 0.152,
+        "wb_c4": 0.152,
+        "wb_c5": 0.152,
+        "wb_noalias": 0.152,
+        "substr_all": 0.131
+      },
       "_slope_note": "跨 cutoff 斜率一致(+0.152);灌水 substr 斜率更小(+0.131)→ 去污不制造趋势(清洁口径反略陡)。",
-      "inflation_substr_over_wb_c4": {"1.5B-Qwen": 2.46, "7B-Qwen": 1.85, "14B-Qwen": 1.65, "32B-Qwen": 1.81, "8B-Llama": 1.94, "70B-Llama": 1.56},
+      "inflation_substr_over_wb_c4": {
+        "1.5B-Qwen": 2.46,
+        "7B-Qwen": 1.85,
+        "14B-Qwen": 1.65,
+        "32B-Qwen": 1.81,
+        "8B-Llama": 1.94,
+        "70B-Llama": 1.56
+      },
       "_inflation_note": "~1.6-2.5×(均 ~1.9×)、大致 scale-invariant → 不差异化缩小小模型 CLR、不制造单调。印证 ~2× 去污校正。"
     },
     "es_drop": {
@@ -861,26 +914,124 @@
     "family": "R1-Distill-Llama",
     "dataset": "MQuAKE-CF",
     "decode": "greedy",
-    "budgets": ["B0", "B3"],
+    "budgets": [
+      "B0",
+      "B3"
+    ],
     "n_pool": 150,
     "estimand": "propagation-erosion = 编辑在 B0 已传到 2-hop(答 hop_answer_new 且不答 hop_answer_old)的 case 中,B3 思考后丢失 hop_answer_new 的配对比例;与单跳 RR 同为 within-case 口径。陈旧下游 gold 的 revert 仅次要括号(不领先/不入 abstract)。",
     "pooled": {
       "n_b0_prop": 48,
-      "hop_ES_marginal": { "B0": 0.32, "B3": 0.513 },
+      "hop_ES_marginal": {
+        "B0": 0.32,
+        "B3": 0.513
+      },
       "propagation_erosion_B0toB3": {
         "rate": 0.188,
-        "ci": [0.083, 0.292],
-        "decomp": { "stays_new": 39, "flips_to_old": 1, "neither": 8 }
+        "ci": [
+          0.083,
+          0.292
+        ],
+        "decomp": {
+          "stays_new": 39,
+          "flips_to_old": 1,
+          "neither": 8
+        }
       },
-      "stale_revert_bracket_B3": { "hop_RR": 0.021, "hop_RRs": 0.021 }
+      "stale_revert_bracket_B3": {
+        "hop_RR": 0.021,
+        "hop_RRs": 0.021
+      }
     },
     "per_template_powered": {
-      "P27": { "_rel": "公民→国家元首(最多样/最高功效/唯一 per-template 显著)", "n": 57, "hop_ES_B0": 0.474, "n_b0_prop": 27, "prop_eros": 0.148, "prop_eros_ci": [0.037, 0.296] },
-      "P495": { "_rel": "创作国", "n": 26, "hop_ES_B0": 0.308, "n_b0_prop": 8, "prop_eros": 0.25, "prop_eros_ci": [0.0, 0.625] },
-      "P136": { "_rel": "体裁", "n": 22, "hop_ES_B0": 0.273, "n_b0_prop": 6, "prop_eros": 0.167, "prop_eros_ci": [0.0, 0.5] }
+      "P27": {
+        "_rel": "公民→国家元首(最多样/最高功效/唯一 per-template 显著)",
+        "n": 57,
+        "hop_ES_B0": 0.474,
+        "n_b0_prop": 27,
+        "prop_eros": 0.148,
+        "prop_eros_ci": [
+          0.037,
+          0.296
+        ]
+      },
+      "P495": {
+        "_rel": "创作国",
+        "n": 26,
+        "hop_ES_B0": 0.308,
+        "n_b0_prop": 8,
+        "prop_eros": 0.25,
+        "prop_eros_ci": [
+          0.0,
+          0.625
+        ]
+      },
+      "P136": {
+        "_rel": "体裁",
+        "n": 22,
+        "hop_ES_B0": 0.273,
+        "n_b0_prop": 6,
+        "prop_eros": 0.167,
+        "prop_eros_ci": [
+          0.0,
+          0.5
+        ]
+      }
     },
-    "single_hop_anchor_8B": { "RR": 0.144, "RR_ci": [0.088, 0.208], "ES_drop": 0.015, "_note": "8B 单跳 within-case 回退 RR=0.144 排零、边际 ES降幅≈0(ns)=同掩盖结构;多跳 within-case 0.188 与之同结构同尺度同族复现。" },
+    "single_hop_anchor_8B": {
+      "RR": 0.144,
+      "RR_ci": [
+        0.088,
+        0.208
+      ],
+      "ES_drop": 0.015,
+      "_note": "8B 单跳 within-case 回退 RR=0.144 排零、边际 ES降幅≈0(ns)=同掩盖结构;多跳 within-case 0.188 与之同结构同尺度同族复现。"
+    },
     "verdict": "★W3 多跳 propagation-erosion 显著(pooled 0.188 [0.083,0.292] 排零)→ 编辑向 2-hop 下游的传播在思考后被侵蚀,触及编辑事实在推理链中的下游使用,非单跳 cloze 表面伪影。与单跳 within-case 回退(8B RR 0.144 [0.088,0.208])同结构/同尺度/同族复现。三处诚实:(1) **边际 hop_ES 反升**(0.32→0.513)—— B0=ZeroThink 无 token 做不了 2-hop 推理,思考既补全未传播链(rescue)又侵蚀已传播链(erosion),净为正;故主报 b0_prop 门内 within-case(单跳 RR 同为 within-case 口径、边际 ES降幅亦≈0=同掩盖),不报边际。这是 ZeroThink×多跳结构性、非 bug。(2) **单模板主导**:pooled 显著主要由 P27(n=57、最多样、b0_prop=27、0.148 [0.037,0.296] 排零)扛;P495/P136 b0_prop≤8 欠功效、个体含零。(3) **侵蚀去向='neither'(8/9)非翻旧(1/9)**:多跳侵蚀=编辑传播衰减为噪声,非下游旧事实复辟(与单跳显式翻旧不同)。**32B 去留**:不升 —— 预注册升级门(n_b0_prop≥60 且 ≥4 powered templates)未达(48,仅 P27 有功效);within-case CI 已排零功效够;边际反升是结构性、32B 也消不掉。8B=有界深度结果;32B 多跳留 camera-ready/审稿响应。",
     "scope_honest": "单族单尺度(8B);MQuAKE 模板/合成、推理面温和;pooled 显著 leans on 单模板 P27。立『erosion 非单跳 cloze 伪影』,不立硬/自然多步推理上的 erosion(写进 limitations 残余风险 #2)。"
+  },
+  "necessity": {
+    "_status": "E-NECESSITY (depth-plan §第三轮 #2):自然回退的 in-chain re-derivation 观察性必要性,RQ2 判官链(results/a3/labels_*.jsonl),未重跑/未干预。src/necessity_check.py → results/necessity.json。",
+    "reversions": {
+      "n": 19,
+      "rederiv_route": 19,
+      "rederiv_rate": 1.0,
+      "clr_in_cot": 17,
+      "clr_rate": 0.895,
+      "traceless_associative": 0,
+      "routes": {
+        "Bridge": 17,
+        "Reflective-override": 2
+      }
+    },
+    "held": {
+      "n": 14,
+      "clr_in_cot": 14,
+      "clr_rate": 1.0
+    },
+    "per_scale": {
+      "7b": {
+        "rev_n": 4,
+        "rederiv": 4,
+        "clr": 3,
+        "traceless": 0,
+        "held_n": 1
+      },
+      "14b": {
+        "rev_n": 5,
+        "rederiv": 5,
+        "clr": 4,
+        "traceless": 0,
+        "held_n": 7
+      },
+      "32b": {
+        "rev_n": 10,
+        "rederiv": 10,
+        "clr": 10,
+        "traceless": 0,
+        "held_n": 6
+      }
+    },
+    "verdict": "★必要性方向(观察性):19/19 自然 committed 回退都经可观察链内重推路由(Bridge 17/RO 2),traceless(Associative)=0 → 回退从不无声=in-chain re-derivation 在每个被判回退里都可观察到(链级干预证充分性的观察性补充)。o_old 逐字现于链 17/19。充分性边界(诚实):held n=14 全部 clr_in_cot=True → o_old 现于链对回退【不充分】,答案取决于链是否 commit 到 o_old(呼应 Bridge/Reflective-override vs held)。诚实 caveat:观察性非随机、n 小(19/14)、clr_in_cot 是判官启发式 prefeature、held 群亦判官采样(选在 o_old 显著上→'不充分'是提示性,'回退无 traceless'是更干净的主张)。不报 P(回退|clr) 裸对比(population 选择偏倚)。"
   }
 }

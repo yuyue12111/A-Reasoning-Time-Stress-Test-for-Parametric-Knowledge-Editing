@@ -1,0 +1,98 @@
+{
+  "per_scale": {
+    "7b": {
+      "reversions": {
+        "n": 4,
+        "clr_in_cot": 3,
+        "clr_rate": 0.75,
+        "rederiv_route": 4,
+        "rederiv_rate": 1.0,
+        "traceless": 0,
+        "routes": {
+          "Bridge": 4
+        }
+      },
+      "held": {
+        "n": 1,
+        "clr_in_cot": 1,
+        "clr_rate": 1.0,
+        "rederiv_route": 0,
+        "rederiv_rate": 0.0,
+        "traceless": 0,
+        "routes": {
+          "Excluded-held": 1
+        }
+      }
+    },
+    "14b": {
+      "reversions": {
+        "n": 5,
+        "clr_in_cot": 4,
+        "clr_rate": 0.8,
+        "rederiv_route": 5,
+        "rederiv_rate": 1.0,
+        "traceless": 0,
+        "routes": {
+          "Bridge": 5
+        }
+      },
+      "held": {
+        "n": 7,
+        "clr_in_cot": 7,
+        "clr_rate": 1.0,
+        "rederiv_route": 0,
+        "rederiv_rate": 0.0,
+        "traceless": 0,
+        "routes": {
+          "Excluded-held": 7
+        }
+      }
+    },
+    "32b": {
+      "reversions": {
+        "n": 10,
+        "clr_in_cot": 10,
+        "clr_rate": 1.0,
+        "rederiv_route": 10,
+        "rederiv_rate": 1.0,
+        "traceless": 0,
+        "routes": {
+          "Bridge": 8,
+          "Reflective-override": 2
+        }
+      },
+      "held": {
+        "n": 6,
+        "clr_in_cot": 6,
+        "clr_rate": 1.0,
+        "rederiv_route": 0,
+        "rederiv_rate": 0.0,
+        "traceless": 0,
+        "routes": {
+          "Excluded-held": 6
+        }
+      }
+    }
+  },
+  "pooled": {
+    "reversions": {
+      "n": 19,
+      "clr_in_cot": 17,
+      "clr_rate": 0.8947368421052632,
+      "rederiv_route": 19,
+      "rederiv_rate": 1.0,
+      "traceless": 0,
+      "routes": {
+        "Bridge": 17,
+        "Reflective-override": 2
+      }
+    },
+    "held": {
+      "n": 14,
+      "clr_in_cot": 14,
+      "clr_rate": 1.0
+    },
+    "necessity_statement": "自然 committed 回退 n=19:可观察链内重推路由 19/19 (Bridge+Reflective-override),clr_in_cot 17/19,traceless(Associative) 0 → 回退从不无声。充分性边界:held n=14 中 clr_in_cot 14/14 → o_old 现于链对回退不充分。"
+  },
+  "_note": "E-NECESSITY:自然回退的 in-chain re-derivation 观察性必要性(RQ2 判官链,未重跑/未干预)。报 (i) 回退带可观察重推路由/clr/traceless,(ii) held 也有 clr=不充分。不报 P(回退|clr) 裸对比(判官 population 选择在回退上,偏倚)。"
+}
