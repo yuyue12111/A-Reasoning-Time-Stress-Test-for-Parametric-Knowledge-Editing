@@ -158,3 +158,141 @@ MEMIT/AlphaEdit/zsRE/更多尺度/更多 seed 充量;全套 W4 same-base instruc
 1. **重写 `src/chain_classify.py:25` 判官 prompt**(删 3 句带偏断言 + 加中性 OLD/NEW/NEITHER 门 + truly_reverts,扩 schema,重跑 mocks)—— E-SEMJUDGE 硬前置,不修就发 720 calls = 验证样垃圾。
 2. **写 E-SUP-BATTERY 三离线件**(BLIND placebo 供体构建器 + 跨臂配对 bootstrap joiner + suppress.source yaml 分支)+ 书面预注册 D<N~P<T / effect-above-placebo。
 3. **写 E-MULTIHOP curation 筛 + hop-scorer**,并**在已有 3 尺度跑 E-DECONFOUND per-case 协变量 + leave-one-family-out 预拟** → day-2 知 RQ1 slope 活不活。
+
+
+## 第四轮 (v4) —— 第一性 v2 solidity → 可执行实验计划【当前权威】
+
+**来源**：6 条代码级断言逐条核验(4 verified / 2 partly,两 partly 均为字面-cosmetic 非实质)→ 两审收敛弱点融合 → 7 个实验(S1/S2/S5/S6/S7/S8/S9/S10)设计 + 逐个红队。**本节取代 v3 排程,作 7/20-7/27 唯一作战序。**
+**口径铁律(每个实验都绑,违一即作废)**:① `edit_loop.py:147 ed.edit(sequential_edit=True)` 永不改 False(否则 EasyEdit 在 edit() 返回前还原权重→全程在基座生成,fb46107 污染源);② Hopper 编辑态 `WHYAAAI_DTYPE=float32`(bf16 ROME compute_v→NaN);③ 判分用 `metrics._without_subject`+word-boundary `\bcand\b`+丢<4-char 别名,RR/RRs 门 b0ok,**绝不**混 EasyEdit rewrite_acc(logits 口径);④ scope=='think' 经 `think_budget.py:87` 把答案段解码 lp=None→答案逐字节同基线(架构保证非经验);⑤ 新非-CF 分片 tag 必避 `infer_tag_meta` 黑名单(`percase_emergence.py:116` genbench/multihop/logitlens/steer/sweep/_a1.._a4),否则被并进 RQ1 容量斜率。
+
+### (a) 收敛弱点表
+
+| # | 弱点 | pinned claim | raised_by | sev | 已核验代码事实 | 谁更致命 | 两审互漏 |
+|---|------|-------------|-----------|-----|---------------|---------|---------|
+| W1 | **RQ2 taxonomy 判官 prompt 预设结论(自伤污染)** | "90% (17/19) reverted chains 经 NAMED Bridge 重导;Recall=0/Associative=0/traceless=0"(draft §1 contrib-2、§5 tab:taxonomy、necessity.json reversions.traceless=0) | both | **major** | `chain_classify.py:25` 逐字含 "edit STILL INSTALLED…ROUTING AROUND an intact edit, NOT recalling decayed weights…Make NO claim that…the edit weakened";中性兄弟 `revert_judge.py:20` 不复用且 docstring(:5-6)明说"避免带偏验证判官"。Recall=("recalling decayed weights")与 Associative=("unspoken prior")正是措辞语义禁掉的两类→Recall=0/Associative=0 至少部分仪器制造 | **Claude 更致命**:钉死非对称(`chain_classify:25` 污 vs `revert_judge:20` 中性,draft.md:73 宣传后者"never told edit's status")=审稿读作 cherry-picked neutrality,伤超单结果;depth-plan.md:113/158 自己点名删这些句子=自证 | Codex 漏:necessity 19/19 rederiv+traceless=0 继承**同一**污染源(`necessity_check.py:45-47` 直读 contaminated labels_*.jsonl);Claude 漏:无 |
+| W2 | **logit-lens 非擦除探针近-tautological + 不可判别(无 held 对照/无 CI)** | "reverted 100% edit-intact 于 cloze + 旧事实 mid-stack(g8=-0.246/g12=-0.351)→ reversion 是推理重导非擦除"(draft §5,logitlens edit_intact_pct=1.0) | both | **major** | `logit_lens.py:104` 每 case 重灌 ROME(seq=True)→`:107` 喂裸 cloze(无链)单前向→`:116` intact=gap_top>0。`pick_reversion_cases`(:24,:43-44)只选 b0ok∧B3 含 o_old=纯回退池,**无 held 对照**;ROME 优化的正是 logit(o_new)@此 cloze→intact=1.0 物理几近必然 | **Claude 更致命**:点 mid-stack dip @inject layer12=注入签名非回退相关、held 上同样会出现;判明 tautology 比所述更强(静态权重前向原则上看不到 decode-time 效应) | 两审皆漏:`gap_sampled`(results.json:505)是手填 17-元向量、`logit_lens.py` **不 emit** edit_intact_pct/gap_sampled(grep 证),n=10(32B)无 per-case jsonl 无 CI——比任一审所述更具体 |
+| W3 | **capability p=.0007 来自 K=2 族 cluster bootstrap(假精度)** | "erosion 随 capability 升,两族六尺度,per-case CLR slope 0.372[0.149,0.800] p=.0007"(draft §4,results.json percase) | both | **major** | `percase_emergence.py:339` 实为 `rng.integers(0,K,K)` K=len(fams)=2(非审稿引的硬编码 0,2,2,数值等价→verdict partly);drop-one family FE(:256-259)使 slope 为族内量;within_qwen_clr(:374)slope0.365 p=.01 是更干净腿 | **Codex 统计更精**(点 :339、demote 到 within-Qwen 4 点)/**Claude 后果更致命**(懂 cluster inference 的审稿一眼看穿 2 族给 p<.001=**数字 backfire**,须删非降) | 两审皆差**致命融合一步**:唯一存活的 CLR 同时是 necessity 证明**不可判别回退**的指标(held clr 14/14=1.00 ≥ reverted 0.895)→"capability-emergent"承重统计对标题承诺的答案级 undoing 反-判别(es_drop p=.188/rr p=.426 均含零) |
+| W4 | **RQ2/RQ3 循环:两者读同一 o_old/o_new logit 几何;自然生成必要性未证** | "in-chain re-derivation(非擦除)governs the answer"=RQ2(cloze intact)+RQ3(链 fix)可能是一几何两读;自然必要性有界未闭(draft §6/§7) | both | major(draft 已自认→非 fatal) | scope=='think' 经 `think_budget.py:87` 答案段 lp=None→答案逐字节同基线=架构保证;E-CHAINSUB 在**答案位**作用(logit-lens 误测处:裸 cloze 无链),破循环 | 大致平手;Codex 加"neutral span selection"(bridge 实体须取去污判官输出否则 re-import :25 偏);Claude 加"residual no reframe can erase" | Codex 漏 Claude 的"同 ~20 case 四看";Claude 漏 Codex 的 neutral-span 警告 |
+| W5 | **整机理核 = 一个 n≈20 的 32B 池复用四次** | logit-lens(n≈10-17)/taxonomy(19)/necessity(19)/RQ3 reverted(~11-23)同一 ~20 32B 回退 case 四视角 | **claude only** | major | results.json rq2_taxonomy.pooled n=19、necessity reversions n=19、logitlens 32B n≈10,重叠真实 | Claude 唯一:一个 n=20 池撑四"独立"结果审稿不信;加宽 17→100+(S6/extract_reverted)是单一最高乘子防御(同时硬化四腿) | **Codex 完全漏**——把四件当各自独立 fix,从未注意共分母。本轮最清晰的非对称盲点 |
+| W6 | **生成式 word-boundary 判分 + κ=0.836 测量脊** | "去污 word-boundary 改 ~2x 泄漏膨胀;中性 3-判官 κ=0.836 strict reversion 验证"(draft §3,contrib-4) | both | **minor(solid)** | metric_validation n=87 vs_RRs_strict_decontam κ=0.836/agree=0.931/prec=0.92/rec=0.85/TP23 FP2 FN4 TN58。**关键**:κ 由**中性** sj_validate.py/revert_judge.py 产、**非**污染 taxonomy→头条回退测量验证干净 | 两审皆升档(33 drop 若全 TN→κ升 0.853→0.836 是保守下界);皆未杀 | Claude 独记残余(κ 绝对值依 rule_rr 分层先验、abstract 裸引 0.836 缺 caveat、判官同族);两审皆漏 deployment-gate 等价检验靠单位数 McNemar discordant(draft.md:292 自认"normal approx borderline") |
+| W7 | **RQ3 链 fix 特异性仅相对 INERT placebo 非竞争答案;footprint 小** | "signed/specific/dose-controlled 链 fix;T-P 四指标排零,P-N≈0,D-N 反转,α-sweep Loc 平"(draft §6,rq3.sup_battery)=**两审皆认的真承重腿** | both | **minor** | `think_budget.py:87` 答案段 use_sup 门 scope=='all'→think 下答案逐字节未改=架构保证;B0 ES think0.580/all0.727 消融印证 | Claude 框最精(SUFFICIENCY-under-suppression 非自然 NECESSITY;特异仅对 INERT placebo;footprint ~6 strict/~13 loose)+应**re-center 头条于 RQ3** | Claude 漏 Codex 的第二 operating point(14B/70B)与等长 filler 控制(护"reasoning"词);Codex 未如 Claude 强调 :87 架构保证 |
+
+**单点最弱(两审独立同点)= W1 的 traceless=0/Recall=0/Associative=0**:零 GPU、指纹清晰、任何审稿打开 prompt 文件即复现,且团队自己 depth-plan.md:113/158 点名删过却只修了中性兄弟。
+
+### (b) 排序实验程序(威胁录用×死线可完成,🔴7/20 / 🟠7/27 分段)
+
+> 排序原则:① 攻最弱且零/低成本者优先;② 头条承重腿(RQ3)的泛化与去循环优先;③ 地基(加宽池)是多个实验的前置乘子;④ 红队判"假确认/不可判别 null"风险高者降级或换更便宜杀法。
+
+#### 🔴 7/20 前(abstract;全零卡或单卡轻量,墙钟≤1.5d/件)
+
+---
+
+**[S1] 中性重跑 taxonomy 判官** —— role=**防御**(攻单点最弱 W1)
+- **目标 claim**:KILLS-or-CONFIRMS "reversion 重构性 Bridge 90%(17/19),Recall=0,Associative=0,traceless=0"。去 `chain_classify.py:25` 三句结论灌输,中性重判**同一批链**,测路由分布是否经得起去污(回退**计数**不动——已由中性 revert_judge.py κ=0.836 独立验)。
+- **procedure(绑口径)**:STEP0 fork `JUDGE_PROMPT_NEUTRAL`(删 4 句污染、加中性 OLD/NEW/NEITHER 前置门、把 Recall/implicit-leak 升为一等可引选项);**`summarize/pool_summaries/fleiss_kappa/_boot_ci/latex_table/necessity_check` 100% 复用不动**。STEP1 **不重生成任何链**——`emit --reverted data/reverted_{scale}.jsonl`(已含 cot/answer/s/o_old/o_new,red-team 证 ~5 LOC 即可、非 30-50)重产中性 prompts 到 `results/a3_neutral/`。STEP2 **唯一非本地步**:喂同一 3-判官工作流(99 calls=33 case×3,非 brief 的 720)。STEP3 aggregate→pool→`necessity_check.py --a3 results/a3_neutral`。STEP4 per-case 一致性表(污染 vs 中性 primary,case_id-join)+路由迁移矩阵。
+- **data**:IN(全本地)`results/a3/prompts_{7b,14b,32b}.jsonl`(裸 COT 嵌 prompt 字段)+`prefeat_{scale}.jsonl`+上游 `data/reverted_{scale}.jsonl`;OUT `results/a3_neutral/*` + `necessity_neutral.json` + 一致性表。**GPFS/GPU 不碰**。
+- **predict 证实**:Bridge 仍主导(pooled ≥75%),Recall≈0,traceless≈0,per-case 一致性高→路由由链本身驱动(cf_19889 "pied=foot,gai=happy→French"等真桥),把单点最弱**硬化**为可发表去污表。**杀死**:中性下 Recall>0/Associative>0,Bridge 跌(90%→≤70%),一致性低→确认仪器制造,软化"重构性/no traceless leak"并传入 necessity(traceless 不再=0→撤"回退从不无声")。**即便杀也净正**(自己发现远胜审稿打开 :25)。
+- **null 有信息**:**强**——分布不动=确认(paper 最需的硬化)、分布动=诚实自纠。唯一无信息=n=19 判官噪声,经同 3-判官多数+报 per-case 一致性缓解。
+- **墙钟+LOC**:~1-1.5d / **LOW ~80-140 LOC,无新解码路径无新 harness**。
+- **【both:本地写码 fork+一致性脚本 / 平台跑 99 judge calls】**
+- **红队结论**:**RUN,但 3 项必改 + 1h 免费前筛门**。(真能杀✓)。**改①(闭 loophole-1)**:加**precedence-ablation 臂**——冻 `PREC`(Bridge>Recall,permissive Bridge def @:33-38)留着结构性 prime,"Bridge 存活"被排序混淆;须另跑 Recall-before-Bridge 或非-precedence 多标投票。**改②(闭口径张力)**:STEP0(b) 的 committed-value 前置门可经 `aggregate_votes:108` held≥2 分支移动 in_population→破"n=19 固定"与一致性 join;须**冻 in_population 到污染run 的 case_id 集只重标路由**,或显式报 n-drift。**改③(闭 loophole-2)**:报 per-case 一致性%+迁移矩阵为**主**,cross-prompt κ 为次带 caveat(Bridge base-rate 主导下 κ 退化到 ~0/undefined,即 7B κ=-0.091 病理)。**免费杀**:先人读 2/19 clr_in_cot=False 的链(draft 含糊为"Bridge via spelling cue"者),若任一肉眼即 traceless→claim 零成本死、S1 免跑。
+
+---
+
+**[S9] base-recall×reversion 混淆回归(去 Step2)** —— role=**防御**(攻 W3 capability 因果内容)
+- **目标 claim**:CONFIRMS-OR-KILLS "capability(非 prior-strength/edit-weakness/chain-len)驱动 erosion"。去混淆:斜率是否只是"大模型更知 o_old(更多可泄)"或"ROME 在这些 case 落得更弱"或"链更长"。
+- **procedure(绑口径)**:**红队改写版**——**删原 Step2 edit_margin**(自认近-tautological+方差可能为零+给 clr/es_drop 回归引入 b0ok 群体 NaN-drop 静默缩 n)。只做:Step1 `base_probe.py` 全 6 尺度跑(无编辑,bf16 安全,`{tag}_BASE_cf_r*.jsonl`,load_cases 同 case 集保证 join 精确)→per-case base_recall=`hit(_without_subject(base_B0,s),o_old)`∈{0,1};chain_len 已在 percase 长表。扩 `percase_emergence._design` 加 base_recall+chain_len 协变量(log_params 留 col1),family drop-one dummies 留,同 K=2 cluster bootstrap 跑 nested(带/不带协变量斜率对比)。
+- **data**:IN 6 容量 ROME×CF 分片(GPFS);OUT `{tag}_BASE_cf_r*.jsonl` + `results/percase_emergence_confound.json`(**不**覆盖 headline)。
+- **predict 证实**:加协变量后 **CLR** log_params 斜率仍正、p 小、CI 排零(0.372→~0.25-0.35),且 within-Qwen-only CLR 仍正排零→capability 做超出 base-knowledge 的实功。**杀死**:base_recall partial 后斜率塌向零/失符号稳定→"emergence"只是"大模型更知 o_old";或 chain_len 吸收(Codex 点的"是 reasoning 还是长度?"洞,S8 另补)。
+- **null 有信息**:**强,杀向更值**——null=诚实 paper 改写为"reasoning 重导受权重仍持的冲突先验强度支配"(draft 已半说),换掉脆弱 p=.0007=预堵两审同点的 backfire。
+- **墙钟+LOC**:本地 ~3-4h + 6 尺度 base_probe(轻,无编辑无 mom2,~2-4h 并行);**红队改后省掉整个 Step2 70B-fp32 重编辑 pass(LOC+墙钟瓶颈)**。改后 ~15-40 LOC。
+- **【both:本地写码 join+回归 / 平台跑 6 尺度 base_probe】**
+- **红队结论**:**不按原设计跑——跑去-Step2 廉价子集 + 重框问题**。(真能杀✗ 干净——K=2/6 distinct log_params 使 partial 斜率是族内、"CONFIRM"会把 within-Qwen 走私回 abstract 当跨族 p)。**口径 bug**:(A)`_design` 只过滤 outcome 非协变量→若非全 6 尺度跑 base_probe,join 出 NaN 协变量列进 lstsq 静默坏;(B)edit_margin 只定义在 b0ok→进 clr/es_drop 回归 NaN-drop 非-b0ok 行静默缩 n、偏离 headline n。**故删 Step2、全 6 尺度 base_probe、报 within-Qwen-only,无论显著都 demote 裸 p=.0007 为 within-Qwen 描述性单调趋势 + 采 Codex prior-conflict 重框**。NULL/PARTIAL 是有价值的、对齐审稿想要的 paper;CONFIRM 是陷阱。
+
+---
+
+**[S2-cheap] logit-lens 重制 reverted-arm CI(零 GPU 那半)** —— role=**防御/诚实仪器**(攻 W2)
+- **目标 claim**:把"mid-stack 旧事实是回退特异 substrate"分解:CONFIRM 无污染的 edit-intact 半(带 per-case CI)、测第二半 held-vs-reverted mid-stack 对比。
+- **procedure(绑口径)**:**红队拆分**——reverted-arm per-case bootstrap CI 是**~20 LOC 对已有 `logit_lens.py:120` 已写的 gap_by_layer[0..64] 的纯重制(零 GPU)**,先落地。held-arm(`pick_held_cases` 翻转 budget 条件:b0ok∧NOT hit(clean(bb),o_old))的前向(n≈6-13 新编辑)才需 GPU,**门控在 S6 加宽池之后**(held n<~6 则 Δgap 无界)。
+- **data**:IN `results/probe/r1qwen32b_ROME_cf200_r*.jsonl`+原 logit-lens 输出;OUT 加 group∈{reverted,held}+`logitlens_control_summary.json`,手并入 results.json(替手填 gap_sampled)。
+- **predict 证实**:L8-12 Δgap(held−reverted)CI 严格>0→真回退特异 substrate。**杀死**:Δgap CI 跨零→dip 是 inject-layer(12∈[8,12])artifact、held 同有→drop mid-stack substrate 头条、窄化 logit-lens 仅留"非擦除"、re-center 机理于 RQ3+E-CHAINSUB。
+- **null 有信息**:**强**——~55-65% null(dip 居 edit_layer=12,held 极可能同 dip)是团队最缺的诚实有界负结果,逼正确 paper 动作(re-center RQ3)。
+- **墙钟+LOC**:零-GPU 半 ~20 LOC 立即;held 半 ~40 LOC+小 GPU 窗(<1h,32B fp32 加载主导)。
+- **【both:本地重制 CI(先) / 平台跑 held-arm(后,门控 S6)】**
+- **红队结论**:**RUN 但降级为受控撤退非确认猎**。(真能杀✓ 仅特异性半,非 draft 已发的较弱绝对语句——draft §5:183/185 只说"reverted 里 trace 存在",故先**零成本软化** §5:183/185 去任何回退特异暗示)。**更便宜杀**:logit-lens 静态权重上特异性近-unfalsifiable(caveat#6+#8),纯论证即可删过-claim、零跑。口径:b0ok 划分干净(verified)、scope mismatch(生成式 held≠taxonomy judge-committed held)勿宣称同群体。
+
+#### 🟠 7/27 前(全文;头条承重 + 地基,需 GPU 窗)
+
+---
+
+**[S6] 加宽 32B 回退池 17→100+** —— role=**地基**(撑"四独立结果",W5)
+- **目标 claim**:CONFIRMS(硬化非杀)整机理核——用独立来源 100+ 32B 回退替换共享 n≈20 分母,给路由计数/edit-intact/traceless 各拿到足够窄的 Wilson/bootstrap CI。**只修分母不碰判官 prompt**(与 S1 正交,且是 S1/S2-held/necessity/S5 的前置乘子)。
+- **procedure(绑口径)**:STEP0 `probe32b_wide.yaml`(clone probe32b.yaml,`dataset.n:1500`,**新 tag `cf1500`**——避黑名单;**红队强制加 `dataset.path: data/counterfact.prefiltered.cf1500.jsonl`**——否则 prefilter 覆盖共享 `data/counterfact.prefiltered.jsonl` 毁现有 cf200 headline 与全部 32B suppression 臂)。STEP1 8-shard prefilter(4090 bf16)。STEP2 头条 B0/B3 生成(32B `WHYAAAI_DTYPE=float32`,seq=True,per-case restore)。STEP3 `extract_reverted`(同 b0ok 门;**红队点:extract_reverted 用 RAW answer 无 `_without_subject`、logit_lens 有→两池非同 case 集,须统一 去主体 口径**)。STEP4-6 taxonomy/logit-lens/necessity 在加宽池重跑。
+- **data**:IN `data/counterfact.jsonl`(21919,余量足);OUT `r1qwen32b_ROME_cf1500_r*.jsonl`/`data/reverted_32b_wide.jsonl`/`results/a3/labels_32b_wide.jsonl`/`necessity_wide.json`。
+- **predict 证实**:n≈75-110,Bridge CI 下界 ≥0.55,traceless Wilson 上界 ≤0.05,edit_intact_pct CI 下界 ≥0.96。**杀死**:分布显著移(Bridge<50%/Associative>15%/traceless>10%/edit_intact 明显<1.0)→n=20 是小样 artifact、contrib-2 须从清晰类别降为带 hedge 分布。
+- **null 有信息**:**强**——null=分布不动=目标(把"n=20 四看"变"n=100+带 CI")。
+- **墙钟+LOC**:~12-18h GPU 关键路径(32B fp32 1500-case 生成主导)+~2h judge;**~5-10 LOC(纯 config),无新解码路径**。
+- **【both:本地 config+extract / 平台跑 prefilter+生成+logit-lens】**
+- **红队结论**:**SOFT-CONFIRM 但必改,勿按原样跑**。(真能杀✗ 设计如此 role=foundation)。**致命 口径 bug**:`prefilter.py` 写 `cfg.dataset.path`(每 config 硬编码 `data/counterfact.prefiltered.jsonl` 非 tag-keyed)→STEP0 只改 n/tag 不改 path→**`--merge` 覆盖 cf200 prefiltered 毁现有 headline+全 32B suppression 臂+毁 RR=0.193 可复现**;**修=STEP0 必设 cf1500 专属 dataset.path**。**第二 bug**:extract_reverted(无去主体)vs logit_lens(有去主体)b0ok 门不一致→两加宽池不同 case 集;须统一。**更便宜路**:为防御目标(裸计数→带 CI),先在**已有 n** 上算 Wilson/bootstrap CI(零 GPU ~3 LOC),只在审稿真要更大 n 时才花 GPU——且 cf400 即可翻倍 32B cell、~1/4 墙钟。**框架 bug**:只加宽 32b,pooled n=19(=4+5+10)与 17/19 不变除非 7b/14b 也重跑——勿宣称硬化 pooled 头条。
+
+---
+
+**[S5] E-CHAINSUB 链替换中介** —— role=**头牌**(破 RQ2/RQ3 同几何循环 W4)
+- **目标 claim**:KILLS-OR-CONFIRMS "自然回退是中介答案的 in-chain 重导;链对答案翻 o_old 因果必要;RQ2+RQ3 非一静态几何两读"。冻单 ROME 编辑(三臂权重相同),只看 think 段决定答案分布:T0(模型自反链)/T-clean(仅复述编辑、无 o_old 无 bridge)/T-old(中性桥链重导 o_old)。在**答案位**作用(logit-lens 误测处)。
+- **procedure(绑口径)**:新解码路径"给定 think 段→只解码答案"=`think_budget.py:86-87` 答案分支 5 行重组(`TPL.format(q)+think_seg+THINK_END`,`g(text,256,use_sup=False)`→lp=None 答案逐字节同基线=架构保证)。每 case 一编辑会话三解码,seq=True+per-case restore,`WHYAAAI_DTYPE=float32`。判分生产口径。新 harness `src/chainsub.py`,tag `chainsub_*` **加 `percase_emergence.py:116` 黑名单**。
+- **data**:IN T0=`data/reverted_32b.jsonl` 的 cot;T-old bridge 实体源——**红队致命 bug 修后**:须真跑中性 revert_judge.py 持久化 per-case `quote` 造去污源,或盲于 taxonomy 手抽 bridge span;OUT `results/probe/chainsub_cf200_ROME_{32b,14b}.jsonl`。
+- **predict 证实**:revert(T0)高、revert(T-clean)≈0、revert(T-old)高,答案首-token gap T-clean 正/T0&T-old 负——**冻同权重**→链内容(桥重导)翻答案非权重衰减,必要性在答案位证、循环破。**杀死**:三臂平(T0≈T-clean≈T-old)→答案由静态几何驱动、循环成立、中介头条塌(re-center RQ3-sufficiency only);或 T-clean 也高→非链中介;或 14B 失败→单尺度 artifact;或 T-old 不回退→桥非因果路、taxonomy Bridge 故事过陈述。
+- **null 有信息**:**强**——平 null 把 draft 已自认开放限制(§6/§7)从软 hedge 变实测诚实边界,re-center 头条于干净 RQ3。
+- **墙钟+LOC**:~1d 端到端(含池加宽)/ 新解码路径**薄**(5 行重组)+`chainsub.py` ~120-160 LOC。
+- **【both:本地写 chainsub.py+T-clean/T-old 构造 / 平台跑池加宽+三臂解码】**
+- **红队结论**:**CONDITIONAL——原样有致命 provenance bug,勿跑**。(原则上单点最高杠杆,但)**致命 bug**:T-old 去污规则"取中性判官 `quoted_span`"**事实反了**——`quoted_span` 字段**只存在于 `chain_classify.py:57`(污染 taxonomy)**;`verdicts_32b.jsonl` 即 chain_classify 输出(`:25` prime);中性 `revert_judge.py:32` emit 的是 `quote` 且**从不 per-case 持久化**(`results/sj/` 不存在)→从 verdicts_32b 取 = 源头 re-import "routing-around-intact-edit" prime,破循环本身循环。**修前置**:(a)真跑 revert_judge.py 持久化 quote,或(b)盲于 taxonomy 手抽桥 span;(c)`chainsub` 加 `:116` 黑名单(确需,当前无);(d)删"硬化擦除"宣称(within-case 同权重对照 tautological 继承 logit-lens edit_intact=1.0)。**更便宜杀**:`clr_in_cot` vs revert-rate 在已有 `reverted_*.jsonl` 上交叉表(~20 LOC 零 GPU)——clr_in_cot=False 的回退(o_old 不在链却答案翻)即 prima facie 答案非链中介,先门控 GPU 花费。**池现实**:可用 Bridge case ~8 非 ~20,池加宽是从零 GPU 头条 run+3-判官,非 config-only,重算 7/20 墙钟。
+
+---
+
+**[S10] RQ3 第二 operating point(14B,选 70B)** —— role=**防御**(护真承重腿 W7 泛化)
+- **目标 claim**:KILLS-OR-CONFIRMS "链 fix 非单 32B/CF/α=8 点:signed+specific 控制(T-P 排零、P-N≈0、D-N 反转、Loc 持)在 14B(主)/Llama-70B(次)复现"。
+- **procedure(绑口径)**:**复用 32B E-SUP-BATTERY 管线逐字**,只 3 小 config/operating-point。14B:`probe14b_sup{,_onew,_placebo}.yaml`(model_tag=r1qwen14b,v_loss_layer=47,layers:[9],scope:think,penalty:8)。N 臂若 `r1qwen14b_ROME_cf200_r*.jsonl` 已在 GPFS 则复用。**D=o_new 先跑 n≈100**(符号错 day-1 知,prereg 规则1)。BLIND-locked `data/placebo_donors.json`(覆盖全 21919 cf_*,**勿见结果后重生**)。`cross_arm.py` 读 prereg-esup.md 决策规则。
+- **data**:IN GPFS 14B/70B 权重 + `data/counterfact.prefiltered.jsonl`(同 seed42 序);OUT `r1qwen14b_ROME_cf200sup{,_onew,_placebo}_r*.jsonl` + `results/esup_crossarm_14b.json`;新 config commit。
+- **predict 证实**:14B prereg 符号梯 D≤N≈P<T 复现,T-P 同符号排零,P-N≈0,Loc 持→fix 是回退机理属性跨尺度(70B 则跨族)非单点 artifact。**杀死**:T-P 不排零(单尺度);P-N 排零(placebo 也帮→o_old-特异自伤);D-N 反符号(ES>0/RR<0,**near-fatal**,day-1 D@100 先探);Loc 塌;前置失败(B0 ES_b 低→b0ok 池小→欠功,非真杀,先扫层)。
+- **null 有信息**:**有,带歧义消除**——真 null(健康 b0ok+Loc 持下 T-P 跨零)界定 fix 为 32B-特异、诚实可发;但**欠功 null(B0 ES_b 低)非信息**——须扫层至 B0 ES_b 可比 32B。
+- **墙钟+LOC**:14B ~12-18h 墙钟(含 N 重跑+判分+cross_arm CPU);70B model_parallel ~1.5-2.5 墙钟-天;**≤180 LOC config,0 LOC Python,无新解码/harness/scorer**。
+- **【both:本地写 3 config / 平台跑 T/D/P 三臂】**
+- **红队结论**:**SOUND 但 mis-prioritized + over-scoped;重排序 + 绑主端点**。(真能杀✓ 在 robust 腿 ES@B3/CLR)。**loophole**:prereg 把 T-P 钉在 **b0ok-门控 RR/RRs**(项目自认脆弱的答案级指标),14B null 那里最可能(~30-45%)且设计自留逃生(扫层非真杀)→弱结果经 loophole 不干净证伪。**口径全清**(4/4 关键绑定 verified:seq=True@:147、scope=think@:74/87、cross_arm 去主体+b0ok 门、placebo_donors 覆盖全 cf_*)。**更便宜杀(同审稿线)**:α-sweep 在盘 config(`probe32b_a2_th_p{2,4,8,12,16}` α∈{2,4,8,12,16})——单调剂量响应 5 点是比一个新模型更强的"非单点"反驳,**纯重制零 GPU**,abstract-死线安全。**改**:①先做 α-sweep 重制(零卡先堵 α 轴);②14B 跑 T/P/N+day-1 D@100;③**prereg 钉 ES@B3 为主端点**(非门控 RR),门控-RR null 不能静默降级;④70B 仅 14B 7/22 前确认且 model_parallel compute_v 路径 1-case smoke 去险后才跑(否则最差 trade)。
+
+#### 降级/不进本轮(红队后)
+
+- **[S8] 等长 filler 控制** —— **REJECT for abstract,REWORK before camera-ready**。致命结构混淆:confirm 臂(true-B3)与两 kill 臂(F-other/F-neutral)同时差两变量(是否 reasoning ∧ o_old 是否在链),因设计硬连 CLR(filler)=0→"filler 不翻"被平凡"o_old 不在链"全解释,**不能判别"reasoning 重导此事实" vs "任何提 o_old 的链都翻"**。是降级版 E-CHAINSUB 缺判别臂(T-old:不相关链但含 o_old)。**更便宜赢**:重制已有判官标签(plan.md:134 证 32B 17/17 explicit-CLR、0 Recall/0 Associative=Bridge 路由)零卡已支持 prose claim。若要真因果,花 LOC 在**完整三臂 E-CHAINSUB(加 T-old)**,且须 S6 加宽池过 n≈17 后跑。
+- **[S7] MEMIT 第二编辑器** —— **SOUND-WITH-FIX,camera-ready 优先级**。口径全清(seq=True/scope=think/fp32/b0ok/aliases verified)、极廉(~25-40 LOC YAML 零 Python)。**必改**:**勿只单层[12]跑 MEMIT**——MEMIT 本质多层(出厂 qwen yaml [4,5,6,7,8]),单层退化向 ROME 自身几何=混淆"非 ROME 特有"断言;须**原生多层带 跑**为主点、匹配单层仅作次对照。**更便宜**:先查 `analysis/10` 7B MEMIT 分片是否在平台存活、`score_pilot` 重制(零 GPU 部分 editor-generality 信号,带 7B=flat 尺度 caveat)。phenomenon 臂先发,fix-transfer 臂(~翻倍墙钟)camera-ready-optional。
+
+### (c) 红队总结:被改/降级/有更便宜杀法
+
+- **被改(必改后才跑)**:
+  - **S1** +precedence-ablation 臂(`PREC` Bridge>Recall 是第二结构 prime,冻它则"Bridge 存活"被排序混淆)+冻 in_population case_id 集(committed-value 前置门经 held≥2 移动 n,破 join)+报一致性%非 κ(Bridge 主导下 κ 退化)。
+  - **S5** 修反了的 provenance(`quoted_span` 只在污染 taxonomy;中性 `revert_judge` emit `quote` 且从不持久化)+`chainsub` 加黑名单+删"硬化擦除"宣称+重算池现实(~8 非 ~20)。
+  - **S6** 修 `prefilter.py` path-collision(必设 cf1500 专属 `dataset.path`,否则覆盖共享 prefiltered 毁 headline+全 suppression 臂)+统一 extract_reverted(无去主体)vs logit_lens(有去主体)b0ok 门。
+  - **S9** 删 Step2 edit_margin(近-tautological+方差或为零+给 clr/es_drop 引入 NaN-drop 静默缩 n)、全 6 尺度 base_probe、报 within-Qwen-only、demote 裸 p=.0007。
+  - **S2** 拆零-GPU reverted-CI 半(先发)与 GPU held 半(后,门控 S6);先零成本软化 draft §5:183/185。
+  - **S10** 先 α-sweep 重制堵 α 轴、prereg 钉 ES@B3 主端点、70B 去险后才跑。
+- **被降级**:S8(REJECT-abstract→REWORK-camera-ready,缺判别臂);S7(camera-ready,必多层跑)。
+- **有更便宜杀法(零/低 GPU 先做)**:
+  - S1→1h 人读 2/19 clr_in_cot=False 链(可零成本杀 claim,免跑)。
+  - S5→`clr_in_cot` vs revert-rate 交叉表 ~20 LOC 零 GPU(clr_in_cot=False 回退即答案非链中介证据)。
+  - S6→已有 n 上算 Wilson/bootstrap CI ~3 LOC 零 GPU;真要大 n 则 cf400 非 cf1500(1/4 墙钟)。
+  - S9→within_Qwen_clr 已在 percase_emergence.json,报它+chain_len partial=纯 paper-edit。
+  - S10→α-sweep 在盘 config 重制,5 点剂量响应零 GPU 比一个新模型更强反驳。
+  - S8→重制已有 Bridge/Recall=0 判官标签零卡支持 prose claim。
+
+### (d) 单点最高杠杆 + 7/20 只能做一件
+
+- **单点最高杠杆 = S1(中性重跑 taxonomy)**,且**其前置免费门(1h 人读 2/19 clr_in_cot=False 链)是整轮最高杠杆 1-小时动作**。理由:① 直击两审独立同点的**单点最弱 claim**(W1 traceless=0/Recall=0/Associative=0);② 零 GPU、指纹清晰、任何审稿打开 `chain_classify.py:25` 即复现——不修=送审样垃圾且自证(depth-plan.md:113/158 点名删过);③ 双向强信息(硬化或诚实自纠都净正);④ 输出直接替换污染表 + 一句"路由对去 edit-intact prime 中性重判鲁棒(Appendix κ=X)"中和审稿最强攻击。**注**:S6(加宽池)是更高**结构**乘子(同时硬化四腿),但它是地基非攻击、且需 GPU 窗 + 有 path-collision 致命 bug 待修;S1 是零卡即可落、攻最弱点的最高单点。
+- **7/20 只能做一件 → 做 S1(且先跑其 1h 免费前筛)**。退而求其次同档零卡件:S9-去Step2(within-Qwen 重框 + 6 尺度 base_probe,堵 W3 backfire)与 S10 的 α-sweep 重制(零 GPU 堵"单点"α 轴)。三者皆零/轻卡、皆攻审稿要害、皆可 7/20 落地。**S5/S6 因 GPU 窗 + 待修致命 bug,推 7/27。**
+
+### (e) 诚实边界(到 7/27 受墙钟/工程量限补不上的 → 写 limitation 非算力)
+
+1. **自然(未干预)生成里的必要性不闭**:S5 修后证注入下可操控 + S2/S6 硬化"edit intact"分母,但**都不证 route-around 在自然生成里必要**;logit-lens 仍是单方法单前向静态权重探针(加宽后 n≥40 但原则上看不到 decode-time 效应)。死硬审稿可说"你扰了链/解码器、从没在 wild 观察机理"。**这是本 harness 在 7/27 前无可行实验能完全消的唯一残余**——写 §7 limitation。
+2. **机理核 n 仍 32B-中心**:S6 加宽 32B→100+,但 7b/14b 仍 4/5 case,pooled 头条若要硬化须重跑全尺度(墙钟不够)→main-report 32B-wide,跨尺度路由分布明标 case-study 量级。
+3. **capability 解构后是"prior-strength"非纯"compute"**:S9 后诚实表述为"reasoning 重导受权重仍持的冲突先验强度支配",**within-Qwen-only 单调趋势**(K=2 跨族 p 删);跨族"emergence"因仅 2 族永不达 cluster-robust 可靠区,写 limitation。
+4. **"reasoning"词的等长-drift 排他性不闭**:S8 因结构混淆降级 camera-ready,7/27 前**不**有干净 filler 控制证"是 reasoning 非长上下文漂移";靠已有 Bridge 路由+0 Recall taxonomy(prose 高度)+ N/T/D/P battery 支撑,写"answer-level drift 排他留 future"。
+5. **编辑器/数据集广度=门票非加分**:S7 推 camera-ready,主结果 ROME×CF;MEMIT 多层点若来得及加,否则明标"locate-then-edit 一族,跨编辑器留 open"。
+6. **deployment-gate 等价靠单位数 McNemar**:`draft.md:292` 自认 normal-approx borderline,等价主张落"by-construction"论证非检验功效——两审皆漏,**主动写进 limitation 预堵**。
+- **净**:全做完 = "符号/剂量/方向受控的 fix(两 operating point)+ 判官中性验证的指标 + 混淆受控的 within-Qwen RQ1 + 去污 taxonomy + 加宽机理池" = **accept 级深度档**;但**不闭"自然生成必要性"**(残余#1)——诚实声明,非靠更多 GPU 能补。
