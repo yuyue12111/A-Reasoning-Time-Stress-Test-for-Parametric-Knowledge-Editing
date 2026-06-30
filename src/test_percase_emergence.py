@@ -245,6 +245,14 @@ def test_infer_tag_meta():
     assert pe.infer_tag_meta("weirdname.jsonl", {"weirdname": [99, "Qwen"]}) == (99.0, "Qwen")
     # 认不出 → None
     assert pe.infer_tag_meta("garbage.jsonl") is None
+    # 坑①：下划线当小数点 "r1qwen1_5b" 必须读成 1.5（不是 5.0）
+    assert pe.infer_tag_meta("r1qwen1_5b_ROME_cf200_r0of8.jsonl") == (1.5, "Qwen")
+    # 坑②：非编辑 per-case 文件（含 model_tag 也要拒）—— GENBENCH/multihop/logitlens/sweep
+    assert pe.infer_tag_meta("r1qwen32b_GENBENCH_r0.jsonl") is None
+    assert pe.infer_tag_meta("r1llama8b_ROME_mh2hop_r0of8.jsonl") is None
+    assert pe.infer_tag_meta("r1qwen32b_logitlens_r0.jsonl") is None
+    # override 用下划线键也能匹配下划线文件名（归一后比对）
+    assert pe.infer_tag_meta("r1qwen1_5b_x.jsonl", {"r1qwen1_5b": [1.5, "Qwen"]}) == (1.5, "Qwen")
 
 
 TESTS = [

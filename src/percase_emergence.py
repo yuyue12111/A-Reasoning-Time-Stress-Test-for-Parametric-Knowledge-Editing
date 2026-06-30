@@ -111,11 +111,19 @@ def infer_tag_meta(token, override=None):
     """从一个 token（文件名 / model_tag）推断 (params_b, family)。override: {子串: [params_b, family]}。
     先查显式 override，再查 _TAG_PARAMS 精确键，最后用 `<n>b` + 族关键词的鲁棒解析。返回 None=认不出。"""
     t = str(token).lower()
+    # 非 CF-编辑 per-case 文件（不同 schema）—— 即便文件名含 model_tag（如 r1qwen32b_GENBENCH）也必须拒，
+    # 否则会被误当某尺度的编辑分片污染该 cell。放在 override 之前，确保宽 --map 子串也不能放它进来。
+    if any(bad in t for bad in ("genbench", "multihop", "mh2hop", "logitlens",
+                                "steer", "sweep", "_a1_", "_a2_", "_a3_", "_a4_")):
+        return None
+    # 下划线当小数点（"r1qwen1_5b" → "1.5b"）；否则 _SIZE_RE 把 "5b" 读成 5.0、_TAG_PARAMS 也匹配不上。
+    t = re.sub(r"(?<=\d)_(?=\d)", ".", t)
+    flat = re.sub(r"[^a-z0-9.]+", "", t)
     if override:
         for key, val in override.items():
-            if key.lower() in t:
+            k = re.sub(r"[^a-z0-9.]+", "", re.sub(r"(?<=\d)_(?=\d)", ".", str(key).lower()))
+            if k and k in flat:
                 return float(val[0]), str(val[1])
-    flat = re.sub(r"[^a-z0-9.]+", "", t)
     for key, val in _TAG_PARAMS.items():
         if key in flat:
             return val
@@ -528,6 +536,15 @@ def main():
             "  → 把 --glob 指向 6 个容量 per-case 分片（Qwen 1.5/7/14/32B + Llama 8/70B 的 ROME×CF B0/B3 efficacy jsonl），"
             "可多次 --glob；文件名须含 model_tag 或用 --map 指定。")
 
+    # cell 完整性守门：检测到的 (params_b, family) 必须是已知 6 点；否则 slope 不可信（params 误读/错文件/缺尺度）。
+    _known = {(1.5, "Qwen"), (7.0, "Qwen"), (14.0, "Qwen"), (32.0, "Qwen"), (8.0, "Llama"), (70.0, "Llama")}
+    _got = set((r["params_b"], r["family"]) for r in rows)
+    if _got - _known or _known - _got:
+        print(f"⚠ WARN cells: detected={sorted(_got)} unexpected={sorted(_got - _known)} "
+              f"missing={sorted(_known - _got)} → slope 暂不可信，请核 --glob/--map"
+              f"（genbench/非编辑文件应被自动跳过；1.5B 勿读成 5.0B；7B/32B-CF 须在）。",
+              file=sys.stderr)
+
     control = not args.no_chain_control
     res = analyze(rows, B=args.boot, seed=args.seed, control_chain=control)
     out = {
@@ -566,8 +583,14 @@ def main():
         print(f"within-Qwen CLR: slope={wq['point']} CI={wq['ci95']} p(≤0)={wq['p_slope_le_0']} "
               f"排零={wq['excludes_zero']}  (旧 results.json=0.2611, ci:null → 这里补 CI)")
     print(f"\n# → {args.out}")
-    print("# 解读：log10(参数量) 斜率>0 且 cluster-boot CI 排零 = 涌现有承重统计支撑；"
-          "重采样单位=case nested in family（非 6 个 cell-mean）→ 直接堵『制造显著性』。")
+    _excl = {o: bool(res.get(o, {}).get("excludes_zero")) for o, _b, _d in _OUTCOMES}
+    print("# 解读：重采样单位=case nested in family（非 6 个 cell-mean）→ 直接堵『制造显著性』。")
+    print(f"#   各结局 cluster-boot CI 排零：{_excl}")
+    if any(_excl.values()):
+        print("#   → 至少一指标斜率显著为正 = 涌现有承重统计支撑。")
+    else:
+        print("#   → 点估计为正但 CI 均含零（K=2 family 下 between-family 方差估不准）= 斜率在 family 层面"
+              "不显著 → capability 作【描述性单调趋势】报、不宣称显著斜率（与 MECH-led 机理/修复头牌正交，不动头牌）。")
 
 
 if __name__ == "__main__":
