@@ -16,6 +16,7 @@
 
 ### TIER A —— 零卡 / abstract 关键(7/20 前必落;数据在盘上,写分析码 → 平台跑或本地跑)
 > 执行=我写码列改了哪些文件(不给 base64),用户上传/平台跑;纯文字 fix 我直接改 draft。
+> **进度(6/30,ultracode 流水线 `wyd1uyje4`)**:✅ #1 代码就位(`percase_emergence.py`,自测 9/9,数字待平台跑) ✅ #5/#6/#9 draft 整合(全 approved 无过度让步) | 待跑:#2 必要性观察检验、#3 CLR robustness、#4 70B 敏感行(需平台 per-case 数据) | 待我本地:#7 TOST、#8 LaTeX+plots。
 
 1. **【最高·拆 fatal】E-DECONFOUND-NOW(零卡半)**:`emergence_regression.py` 升级——**per-CASE pooled 回归**(每行=一 edit-case×尺度,ES降幅/RR/CLR ~ log10(params) + `chain_len` 协变量 + **family 随机效应**,mixed-effects/GEE,**非**现 6 点 fixed-dummy `family_controlled`);报 log-params 固定效应 slope+CI 作**承重 emergence 统计**,把 6 点 OLS+point-bootstrap **降级为描述性图**。另报 **within-Qwen-only CLR slope 带 CI**(`results.json` 现 0.2611 / ci:null,n=4 fit 须补)。→ 直接灭唯一 fatal(stats+novelty 都 threatens、撑 title 名词)。**需 per-case jsonl(在平台/GPFS)**。
 2. **【最高·堵命名残余】自然生成 NECESSITY 观察检验(零卡)**:在未干预 B3 链(gated 回退池)上,报 **P(回退 | 链含逐字 Bridge 重推子句) vs 无**(用 RQ2 判官已抽的 **17/19 Bridge span**),前景化 **Associative/implicit-leak=0/19**。然后把 draft 每处"the chain re-derives it / reasoning routes around it" **软化**为"in-chain re-derivation 出现在 N/19 自然回退中,且抑制它翻转答案"。→ mechanism #1 + novelty #3,两审同开此方;把"充分性(可 steer)"推向"自然文本里观察到 + 抑制翻转",最高杠杆缺失项。
