@@ -61,7 +61,8 @@ VARIANTS = {
 
 
 def clr_for_shard(path, cmap, aliases, decode="greedy", late="B3"):
-    """返回 (n_eff, {variant: clr_rate})，CLR=B3 efficacy 行里 hit(_without_subject(cot), o_old)。"""
+    """返回 (n_eff, {variant: 命中计数})——【原始计数,不是率】,以便 main 按 (scale,family) 跨分片聚合。
+    CLR=late efficacy 行里 hit(_without_subject(cot), o_old)。"""
     by = collections.defaultdict(lambda: collections.defaultdict(list))
     for line in open(path):
         try:
@@ -83,7 +84,7 @@ def clr_for_shard(path, cmap, aliases, decode="greedy", late="B3"):
             n += 1
             for v, fn in VARIANTS.items():
                 cnt[v] += int(fn(cot, o_old, aliases))
-    return n, {v: (cnt[v] / n if n else None) for v in VARIANTS}
+    return n, cnt
 
 
 def _ols_slope(xs, ys):
@@ -161,15 +162,20 @@ def main():
     aliases = json.load(open(args.aliases))
     override = json.load(open(args.map)) if args.map else None
 
-    shard_clr, skipped = [], []
+    # 跨分片【按 (params_b, family) 聚合原始计数】→ 每尺度一行(不是每分片一行)。
+    agg = collections.defaultdict(lambda: {"n": 0, **{v: 0 for v in VARIANTS}})
+    skipped = []
     for p in paths:
         meta = pe.infer_tag_meta(os.path.basename(p), override)
         if meta is None:
             skipped.append(os.path.basename(p)); continue
         pb, fam = meta
-        n_eff, clr = clr_for_shard(p, cmap, aliases, decode=args.decode, late=args.late)
-        if n_eff:
-            shard_clr.append((float(pb), fam, n_eff, clr))
+        n_eff, cnt = clr_for_shard(p, cmap, aliases, decode=args.decode, late=args.late)
+        a = agg[(float(pb), fam)]; a["n"] += n_eff
+        for v in VARIANTS:
+            a[v] += cnt[v]
+    shard_clr = [(pb, fam, a["n"], {v: (a[v] / a["n"] if a["n"] else None) for v in VARIANTS})
+                 for (pb, fam), a in agg.items() if a["n"]]
     got = set((pb, fam) for pb, fam, _n, _c in shard_clr)
     if got - _KNOWN or _KNOWN - got:
         print(f"⚠ WARN cells: detected={sorted(got)} missing={sorted(_KNOWN - got)} "

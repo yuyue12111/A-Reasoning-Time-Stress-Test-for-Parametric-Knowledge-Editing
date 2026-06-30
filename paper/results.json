@@ -615,16 +615,23 @@
   },
   "emergence": {
     "_note": "B-emergence:erosion 指标对 log10(参数量)pool 两族回归;slope CI 排零=涌现有统计支撑(非仅靠 2/6 per-cell 显著)。6 点小样、log-params 为能力代理(跨族 alignment 已论证)、不宣称 scaling law。OLS 解析 t-CI(df=n-2)+按点 bootstrap(n=10000,seed42)+逆方差 WLS+family 控制。src/emergence_regression.py 可复现。",
-    "_percase_replacement": "【洞 fatal 实质封死·per-case 承重统计已跑 run-2,5/6 cells】6 点 OLS 的 p<0.002 来自 point-resample 同 6 cell 均值(re-review wa6rxz0qp)→ 换 per-CASE 回归(每行=edit-case×尺度,~log10(params)+chain_len,family drop-one FE + 按 family 两级 cluster bootstrap=重采样单位=case nested in family,非 cell-mean)。结果见 percase 子块:**CLR slope 0.377 [0.141,0.800] p=.0012 排零**、within-Qwen CLR 0.338 [0.029,0.665] p=.016 排零(取代旧 0.2611/ci:null);es_drop/rr 不显著=与 draft『foreground CLR』一致。**CLR 在 honest cluster bootstrap(K=2)下仍显著 → 制造显著性的 fatal 被实质堵死**(run-1 污染时 0.40 临界,修 params/文件后 run-2 0.38 排零=稳健)。6 点 OLS 降描述性。⚠ 残留:① 7B per-case 缺(现 5/6 cells,WARN 报;Table 1 cell-mean 有 7B)② n 混(14/32/70B=cf100、1.5/8B=cf200,非全 headline n=200)→ 找到 7B + n=200 全档重跑出最终 6-cell;CLR 不预期翻转(7B 在曲线中段)。",
+    "_percase_replacement": "【洞 fatal 实质封死·per-case 承重统计最终 6-cell 已跑】6 点 OLS 的 p<0.002 来自 point-resample 同 6 cell 均值(re-review wa6rxz0qp)→ 换 per-CASE 回归(每行=edit-case×尺度,~log10(params)+chain_len,family drop-one FE + 按 family 两级 cluster bootstrap=重采样单位=case nested in family,非 cell-mean)。**最终 6-cell(含 7B,无 WARN,rows=1196)**:CLR slope 0.372 [0.149,0.800] p=.0007 排零、within-Qwen CLR 0.365 [0.062,0.675] p=.010 排零;es_drop 0.033 [-0.037,0.139] p=.19、rr 0.047 [-0.501,0.530] p=.43 不显著=与 draft『foreground CLR』一致。**CLR 在 honest cluster bootstrap(K=2)下仍显著 → 制造显著性的 fatal 实质堵死**(5-cell 0.377→6-cell 0.372 稳健)。6 点 OLS 降描述性。残留(非阻塞):n 混(14/32/70B=cf100、1.5/7/8B 含 cf200,非全 headline n=200);CLR 结论不预期变。",
     "percase": {
-      "_status": "run-2; 5/6 cells (missing 7B-Qwen per-case; n mixed cf100/cf200); two-level cluster bootstrap (case nested in family, K=2). 取代 6 点 OLS 为承重 emergence 统计。final 6-cell pending.",
-      "clr": {"slope": 0.377, "ci": [0.141, 0.800], "p_le0": 0.0012, "excludes_zero": true},
-      "within_qwen_clr": {"slope": 0.338, "ci": [0.029, 0.665], "p_le0": 0.016, "excludes_zero": true},
-      "es_drop": {"slope": 0.036, "ci": [-0.036, 0.138], "p_le0": 0.178, "excludes_zero": false},
-      "rr": {"slope": 0.057, "ci": [-0.505, 0.584], "p_le0": 0.411, "excludes_zero": false},
-      "n_rows": 996, "n_families": 2,
-      "cells_present": ["1.5B-Qwen", "14B-Qwen", "32B-Qwen", "8B-Llama", "70B-Llama"],
-      "cells_missing": ["7B-Qwen"]
+      "_status": "FINAL 6-cell (incl 7B; no WARN; rows=1196; n mixed cf100/cf200, not all headline n=200); two-level cluster bootstrap (case nested in family, K=2). 取代 6 点 OLS 为承重 emergence 统计。",
+      "clr": {"slope": 0.372, "ci": [0.149, 0.800], "p_le0": 0.0007, "excludes_zero": true},
+      "within_qwen_clr": {"slope": 0.365, "ci": [0.062, 0.675], "p_le0": 0.010, "excludes_zero": true},
+      "es_drop": {"slope": 0.033, "ci": [-0.037, 0.139], "p_le0": 0.188, "excludes_zero": false},
+      "rr": {"slope": 0.047, "ci": [-0.501, 0.530], "p_le0": 0.426, "excludes_zero": false},
+      "n_rows": 1196, "n_families": 2,
+      "cells_present": ["1.5B-Qwen", "7B-Qwen", "14B-Qwen", "32B-Qwen", "8B-Llama", "70B-Llama"]
+    },
+    "clr_robustness": {
+      "_status": "CLR scorer-robustness (src/clr_robustness.py)。证 CLR 对别名 cutoff 与去污不敏感、趋势非 cutoff 造。注:glob 池化多个 ROME×CF shard(32B n_eff=1476),绝对 CLR 非 headline 口径;cutoff 对比同 case 内有效。",
+      "cutoff_invariant": "per-scale CLR 在 cutoff 3/4/5 差 ≤0.01(wb_noalias 亦≈);<4 字符 cutoff 不驱动 CLR。",
+      "slope_on_log10params_per_variant": {"wb_c3": 0.152, "wb_c4": 0.152, "wb_c5": 0.152, "wb_noalias": 0.152, "substr_all": 0.131},
+      "_slope_note": "跨 cutoff 斜率一致(+0.152);灌水 substr 斜率更小(+0.131)→ 去污不制造趋势(清洁口径反略陡)。",
+      "inflation_substr_over_wb_c4": {"1.5B-Qwen": 2.46, "7B-Qwen": 1.85, "14B-Qwen": 1.65, "32B-Qwen": 1.81, "8B-Llama": 1.94, "70B-Llama": 1.56},
+      "_inflation_note": "~1.6-2.5×(均 ~1.9×)、大致 scale-invariant → 不差异化缩小小模型 CLR、不制造单调。印证 ~2× 去污校正。"
     },
     "es_drop": {
       "n_points": 6,
