@@ -16,9 +16,9 @@ hparams_overrides:
 
 dataset:
   tag: mh2hop                                             # 输出 r1llama8b_ROME_mh2hop_r*of*.jsonl
-  path: data/mquake_gated.jsonl                           # base-floor 门后的信息残池(先跑 run_mh_basefloor.sh)
-  fallback_path: data/mquake_clean.jsonl                  # 没门过就退干净池(会含先验尾,仅冒烟用)
-  n: 200                                                  # 残池 ~100,n 给足
+  path: data/mquake_gated_clean.jsonl                     # base-floor 门 + recut(丢退化-new P140)后的干净残池=150
+  fallback_path: data/mquake_gated.jsonl                  # 退到未 recut 的 272(仅冒烟)
+  n: 200                                                  # 残池 150,n 给足
 
 budgets: [B0, B3]
 
