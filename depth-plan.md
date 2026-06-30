@@ -6,7 +6,9 @@
 
 ---
 
-## 第三轮 (v3, 2026-06-30) —— 第一性 review → 战略 reframe 设计锦标赛【当前权威·待用户拍板框架分叉】
+## 第三轮 (v3, 2026-06-30) —— 第一性 review → 战略 reframe 设计锦标赛【当前权威·框架=MECH-led 已定】
+
+> **进度(6/30)**:✅ **框架分叉已拍板 = MECH-led 混合**;✅ abstract/intro/contributions 全文 reframe 落地(自写 14 处 + 3 镜对抗验证 approved,plan v1.45)。**待**:percase_emergence 平台出数(灭 fatal)、RRs 进 Table 1、(全文级)§3/§4/§5 节序重排、fig floats、abstract trim 到 150 词。
 
 **触发**:用户做完第一性 review(Codex + Claude,`codex和claude的第一性review.md`),两份独立收敛同一结论:**头牌选错了**。建议序 **机理/修复 > 评测效度 > capability-emergence**,草稿正好反过来。两条最尖锐共识:(i) **CLR 是唯一铁结果**(LOO+within-Qwen 都活,pooled slope 0.218 [0.121,0.315] R²0.91),却被当防御 fallback;title 承诺答案级 *undoing*(ES/RR,脆)→ **title 与铁证据错位=核心结构弱点**;(ii) 漏掉最高价值重构 = 把 x 轴从"想多少"改成 **knowledge-conflict / 竞争先验强度**(base-recall 0.59 只被防御性引用,从没正面 reframe)。
 
