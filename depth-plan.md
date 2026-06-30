@@ -6,7 +6,54 @@
 
 ---
 
-## 第二轮深度计划 (v2, 2026-06-30) —— W1/W2/W3 完成后的全文 re-review 重排【当前权威】
+## 第三轮 (v3, 2026-06-30) —— 第一性 review → 战略 reframe 设计锦标赛【当前权威·待用户拍板框架分叉】
+
+**触发**:用户做完第一性 review(Codex + Claude,`codex和claude的第一性review.md`),两份独立收敛同一结论:**头牌选错了**。建议序 **机理/修复 > 评测效度 > capability-emergence**,草稿正好反过来。两条最尖锐共识:(i) **CLR 是唯一铁结果**(LOO+within-Qwen 都活,pooled slope 0.218 [0.121,0.315] R²0.91),却被当防御 fallback;title 承诺答案级 *undoing*(ES/RR,脆)→ **title 与铁证据错位=核心结构弱点**;(ii) 漏掉最高价值重构 = 把 x 轴从"想多少"改成 **knowledge-conflict / 竞争先验强度**(base-recall 0.59 只被防御性引用,从没正面 reframe)。
+
+**设计锦标赛(workflow `wzn1zgi5g`,8 agent;⚠ novelty/priority 查重 agent 挂了=KC priority 风险未独立核,见下)**:4 套完整 reframe → 评委打分 + 尸检。**评委排序 MECH > EVAL > KC > MIN**(KC nov5/def2/dl2、MECH nov4/def5/dl5)。尸检:**KC 在 base-recall 回 null 时不存活**(它唯一承重确认实验),MECH/EVAL 两种 null 都活。
+
+### ★ 推荐框架:MECH-led 混合(待用户拍板)
+**头牌=机理/修复**(signed/specific/dose-controlled 链内因果干预 + logit-lens 非擦除 + training-free 修复)——**abstract 承重 claim 全站在 results.json 已跑数据上、零未跑依赖、GPU 滑窗杀不掉**。三件混合:
+- **EVAL 的判官验证生成式+word-boundary 口径**做测量脊梁(κ=0.836、[RRs,RR] bracket、~2× 灌水校正),零成本硬化每个回退数。
+- **capability-emergence 降为推论**("更强推理器更会检索被埋的先验"),由 **CLR**(唯一铁指标)扛 + per-case 回归(已建 `percase_emergence.py`,待跑)灭 n=6 OLS fatal。
+- **KC(knowledge-conflict)留 Discussion 解释层 + 门控**:base-recall 0.59/0.67/0.755 作"为什么",**仅当 base-recall×回退 cross-tab 在 7/27 跑强才升头牌**。
+- **拒 KC-as-headline**:依赖未跑实验,且**被两条在手事实反驳** —— taxonomy **Recall=0/19**(纯先验记忆该有 flat recall,实测全 Bridge=重构)+ 多跳侵蚀去向 **'neither' 8/9 非 o_old**(先验重主张该回 o_old)。**拒 MIN**:把最易攻击的 capability 头牌留在 marquee,正是两审点的错位。
+
+**推荐头牌句**:On native R1-Distill reasoners, test-time reasoning reverts a successful edit not by erasing it (intact at cloze 100%,o_old 仍在中层 g8=−0.246/g12=−0.351) but by re-deriving the suppressed fact in the chain — and a signed/specific/dose-controlled chain-only suppression (answer span provably untouched) removes the thinking tax (ES@B3 0.495→0.631, RR 0.193→0.085) above an inert placebo floor (T−P 四指标排零) without hurting locality (0.958→0.964) or general ability。
+
+### NO-REGRET fixes(fork-independent,现在/本周做)
+1. **跑 `percase_emergence.py` → `results/percase_emergence.json`**(需平台 per-case jsonl;灭 n=6 OLS fatal + 出 within-Qwen CLR slope CI)——最高杠杆,无论选哪个 fork 都要,**本周做**。
+2. **软化 abstract/intro 四处 over-claim**(纯文字):"systematically eroded"→限域;"driver/isolates"→"consistent with capability";"continuous B0–B4 axis"→"zero-vs-long B0/B3 contrast"(B1/B2 跑前去掉 continuous);"causally confirms chain-internal re-derivation"→"signed, specific intervention on a causal competitor above an inert placebo floor";"rules out erasure"→"not erased at cloze (n-bounded)";"reports the trend backwards"→"misses the high-end thinking tax"。(我前轮 #5 只软化了 §3/§4/§5,**abstract/intro 仍未软化**。)
+3. **算术/标号对账**(纯文字):Table 1 旗舰格 0.595−0.495=0.100≠0.106 → 加注"ES降幅按 per-case 配对均值、非 rounded marginal 之差";line 159 within-Qwen CLR slope **0.22→0.261**(0.22 是 pooled,误植;真 within-Qwen=drop-Llama LOFO 0.261 [0.118,0.404])。
+4. **RRs 进 Table 1**(需平台 per-case 重算 per-model RRs;κ=0.836 已验却没用在旗舰表)。
+5. **§7 把 RQ2/RQ3 非独立性命名为有界 limitation**(前轮 #9 已加 §6 段→确保 abstract/body/§7 一致、明标 E-CHAINSUB 为 camera-ready)。
+
+### REFRAME-DEPENDENT(仅当用户选 KC-as-headline + cross-tab 跑强)
+abstract 重构成 KC 弧(base-recall 升 x 轴、capability 降 amplifier);base-recall×回退从 7/27 升级为 7/20 承重;title 改 knowledge-conflict;若等长 filler 控制显示非推理 filler 同样侵蚀→"reasoning"→"added inference context"。
+
+### 实验计划(按 杠杆×成本×死线)
+| 实验 | 角色 | 成本 | 死线 | 服务 claim |
+|---|---|---|---|---|
+| per-case 回归跑(`percase_emergence.py`) | 防御 | 零卡(平台数据) | 7/20 | 灭 n=6 fatal、capability 推论诚实 |
+| RRs 进 Table 1 + CLR scorer-robustness(cutoff 3/4/5 per-scale) | 防御 | 零卡(平台数据) | 7/20 | 用已验指标、证 CLR 单调不靠 cutoff DOF |
+| 自然生成 necessity 观察检验(17/19 Bridge span) | 防御 | 零卡 | 7/20 | 把"链内重推驱动回退"推向 in-the-wild,软化循环 |
+| logit-lens **非回退对照** + per-case CI(池 17→40) | 防御 | 廉价 GPU ~2-4h | 7/27 | 中层 dip 是否回退特异(否则解释不了 WHICH 回退)+ 给 100% 加 n/CI |
+| dose B1/B2 + **等长 filler 对照**(32B) | 防御 | 廉价 GPU | 7/27 | 诚实说"dose 单调"+ 分离推理内容 vs 上下文长度 |
+| **base-recall×回退 cross-tab** | KC 头牌承重/MECH 升级门 | 廉价 GPU ~8h | 7/27 | KC 确认实验:先验强度 vs 想多少 |
+| E-CHAINSUB 链替换中介(T0/T-clean/T-old) | 闭循环 | 贵 GPU 80-100 LOC | camera-ready | 唯一彻底破 RQ2/RQ3 循环=证自然必要性 |
+
+### 用户决策点(只有你能定)
+1. **框架分叉**:MECH-led(推荐)vs KC-as-headline-now vs EVAL-led vs MIN。
+2. **Title**:现保留机理/修复向(可后改 KC)vs 现在就 commit knowledge-conflict。
+3. **7/20 前要不要为 base-recall cross-tab 烧 H200**:推荐**否**(KC 赌注、滑窗风险;abstract 关键 compute≈零)。
+4. E-CHAINSUB 是否现在 name 为 future + 机会性建解码路径(推荐:§7 name-and-bound、不阻塞 7/27)。
+
+### 最大残余(全做完仍在)
+**RQ2/RQ3 非独立性(循环)**:logit-lens"cloze 编辑完好"与"链抑制修答案"可能读同一 o_old/o_new logit 几何 → 即便 MECH 的干净因果也只是"强扰动+特异",非真中介;唯一能破的 E-CHAINSUB(证自然必要性)明确 camera-ready、现 harness 7/27 前跑不了。计划硬 bound(答案段不触 + N/T/D/P 符号特异 + inert placebo floor + 零卡自然 necessity 观察)但关不掉。次残余:头牌仍单模型/单编辑器/单数据集/单 α;capability 推论靠 6 点/2 族(Llama 仅 2 尺度)。**⚠ 待办**:KC priority 查重 agent 挂了 → 升 KC 前须补查 knowledge-conflict 框架是否已被占(context-vs-parametric conflict 文献近邻)。
+
+---
+
+## 第二轮深度计划 (v2, 2026-06-30) —— W1/W2/W3 完成后的全文 re-review 重排(优先级被第三轮取代,具体动作仍有效)
 
 **DECISIVE tier 三件全 DONE**:W1 E-SUP-BATTERY(prereg 全中,T−P 特异)✅ / W2 E-SEMJUDGE(κ=0.836)✅ / W3 E-MULTIHOP(propagation-erosion 0.188 排零,与单跳同结构复现)✅。下方"DECISIVE/HIGH/INSURANCE tier"是**第一轮**记录(DECISIVE 已全清),本节取代其优先级。
 
