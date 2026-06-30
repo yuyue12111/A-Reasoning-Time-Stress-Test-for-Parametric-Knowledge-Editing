@@ -154,11 +154,14 @@ def load_percase_rows(paths, cases, aliases, decode="greedy", base="B0", late="B
     # (params_b, family, case_id) -> {budget: {"answer":..,"cot":..,"chain_field":..}}
     bucket = {}
     seen_tags = {}
+    skipped = []
     for path in paths:
         meta = infer_tag_meta(_tag_from_path(path), tag_override)
         if meta is None:
-            raise SystemExit(f"无法从文件名推断 scale/family：{path}\n"
-                             f"  用 --map 显式提供，如 {{'r1qwen7b':[7,'Qwen']}}。")
+            # 宽 glob 会扫到非容量分片（logitlens/multihop/mh2hop…）—— 跳过而非中止；
+            # 真正的容量 per-case 分片文件名须含可识别 model_tag（r1qwen32b/r1llama70b…）或用 --map 指定。
+            skipped.append(os.path.basename(path))
+            continue
         params_b, family = meta
         seen_tags.setdefault((params_b, family), os.path.basename(path))
         with open(path) as fh:
@@ -211,6 +214,9 @@ def load_percase_rows(paths, cases, aliases, decode="greedy", base="B0", late="B
             "es_b0": es_b0, "es_late": es_late, "es_drop": es_b0 - es_late,
             "clr": clr, "b0ok": b0ok, "rr": rr,
         })
+    if skipped:
+        print(f"  [skip] {len(skipped)} 个推不出 scale/family 的分片已忽略（非容量 per-case？）："
+              f"{', '.join(skipped[:8])}{' …' if len(skipped) > 8 else ''}", file=sys.stderr)
     return rows, {f"{p}B_{f}": fn for (p, f), fn in seen_tags.items()}
 
 
@@ -516,7 +522,11 @@ def main():
                                    tag_override=tag_override,
                                    chainlen_field=args.chainlen_field)
     if not rows:
-        raise SystemExit("没有可配对的逐 case 行（需同 case 同时有 base 与 late 的 efficacy 行）。")
+        raise SystemExit(
+            "没有可配对的逐 case 行（需同 case 同时有 base 与 late 的 efficacy 行）。\n"
+            f"  已识别尺度分片：{tags or '（无——glob 可能只扫到 logitlens/multihop 等非容量文件）'}\n"
+            "  → 把 --glob 指向 6 个容量 per-case 分片（Qwen 1.5/7/14/32B + Llama 8/70B 的 ROME×CF B0/B3 efficacy jsonl），"
+            "可多次 --glob；文件名须含 model_tag 或用 --map 指定。")
 
     control = not args.no_chain_control
     res = analyze(rows, B=args.boot, seed=args.seed, control_chain=control)
