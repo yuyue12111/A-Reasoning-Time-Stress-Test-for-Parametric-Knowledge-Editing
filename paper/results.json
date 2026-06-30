@@ -836,5 +836,33 @@
       }
     },
     "verdict": "★严口径 **RRs(去污,我们报的下界)与语义判官 Cohen κ=0.836 / 一致 0.93 / 精度 0.92** = 近乎一致 → 回退非子串伪影,W2 测量端立。loose RR 精度 0.48 = 按设计的上界(『守住+顺带提旧』),判官证实 loose 高估(FP 28)→ 真回退落在 RRs(下界)与 RR(上界)之间正是论文口径。RRs 侧 FP/FN 各小(2/4)。"
+  },
+  "multihop": {
+    "_status": "DONE(E-MULTIHOP/W3,Llama-8B × MQuAKE-CF 2-hop,greedy,B0/B3。ROME 编单事实→问绝不点名 o_old 的 2-hop 题→测编辑向下游传播 + 思考侵蚀。base-floor 门(丢未编辑基座靠先验就答出 o_new/o_old 的 case)+ recut(丢退化-new 模板 P140:new-gold 塌成单实体)→ 干净池 150。主估计量=b0_prop 门上的 propagation-erosion(配对 bootstrap)。src/multihop.py;run_mh_basefloor.sh/run_mh_edited.sh;panel wq9e477xn 修 scorer 变音符/短目标假阳 + recut + 口径)。",
+    "model": "8B",
+    "family": "R1-Distill-Llama",
+    "dataset": "MQuAKE-CF",
+    "decode": "greedy",
+    "budgets": ["B0", "B3"],
+    "n_pool": 150,
+    "estimand": "propagation-erosion = 编辑在 B0 已传到 2-hop(答 hop_answer_new 且不答 hop_answer_old)的 case 中,B3 思考后丢失 hop_answer_new 的配对比例;与单跳 RR 同为 within-case 口径。陈旧下游 gold 的 revert 仅次要括号(不领先/不入 abstract)。",
+    "pooled": {
+      "n_b0_prop": 48,
+      "hop_ES_marginal": { "B0": 0.32, "B3": 0.513 },
+      "propagation_erosion_B0toB3": {
+        "rate": 0.188,
+        "ci": [0.083, 0.292],
+        "decomp": { "stays_new": 39, "flips_to_old": 1, "neither": 8 }
+      },
+      "stale_revert_bracket_B3": { "hop_RR": 0.021, "hop_RRs": 0.021 }
+    },
+    "per_template_powered": {
+      "P27": { "_rel": "公民→国家元首(最多样/最高功效/唯一 per-template 显著)", "n": 57, "hop_ES_B0": 0.474, "n_b0_prop": 27, "prop_eros": 0.148, "prop_eros_ci": [0.037, 0.296] },
+      "P495": { "_rel": "创作国", "n": 26, "hop_ES_B0": 0.308, "n_b0_prop": 8, "prop_eros": 0.25, "prop_eros_ci": [0.0, 0.625] },
+      "P136": { "_rel": "体裁", "n": 22, "hop_ES_B0": 0.273, "n_b0_prop": 6, "prop_eros": 0.167, "prop_eros_ci": [0.0, 0.5] }
+    },
+    "single_hop_anchor_8B": { "RR": 0.144, "RR_ci": [0.088, 0.208], "ES_drop": 0.015, "_note": "8B 单跳 within-case 回退 RR=0.144 排零、边际 ES降幅≈0(ns)=同掩盖结构;多跳 within-case 0.188 与之同结构同尺度同族复现。" },
+    "verdict": "★W3 多跳 propagation-erosion 显著(pooled 0.188 [0.083,0.292] 排零)→ 编辑向 2-hop 下游的传播在思考后被侵蚀,触及编辑事实在推理链中的下游使用,非单跳 cloze 表面伪影。与单跳 within-case 回退(8B RR 0.144 [0.088,0.208])同结构/同尺度/同族复现。三处诚实:(1) **边际 hop_ES 反升**(0.32→0.513)—— B0=ZeroThink 无 token 做不了 2-hop 推理,思考既补全未传播链(rescue)又侵蚀已传播链(erosion),净为正;故主报 b0_prop 门内 within-case(单跳 RR 同为 within-case 口径、边际 ES降幅亦≈0=同掩盖),不报边际。这是 ZeroThink×多跳结构性、非 bug。(2) **单模板主导**:pooled 显著主要由 P27(n=57、最多样、b0_prop=27、0.148 [0.037,0.296] 排零)扛;P495/P136 b0_prop≤8 欠功效、个体含零。(3) **侵蚀去向='neither'(8/9)非翻旧(1/9)**:多跳侵蚀=编辑传播衰减为噪声,非下游旧事实复辟(与单跳显式翻旧不同)。**32B 去留**:不升 —— 预注册升级门(n_b0_prop≥60 且 ≥4 powered templates)未达(48,仅 P27 有功效);within-case CI 已排零功效够;边际反升是结构性、32B 也消不掉。8B=有界深度结果;32B 多跳留 camera-ready/审稿响应。",
+    "scope_honest": "单族单尺度(8B);MQuAKE 模板/合成、推理面温和;pooled 显著 leans on 单模板 P27。立『erosion 非单跳 cloze 伪影』,不立硬/自然多步推理上的 erosion(写进 limitations 残余风险 #2)。"
   }
 }
