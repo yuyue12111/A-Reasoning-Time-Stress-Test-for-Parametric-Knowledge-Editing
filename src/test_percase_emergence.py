@@ -219,10 +219,16 @@ def test_load_percase_rows_mirrors_metrics():
     r = idx[("Qwen", 7.0, "cf_0")]
     assert r["es_b0"] == 1 and r["es_late"] == 0 and r["es_drop"] == 1, r
     assert r["b0ok"] is True and r["rr"] == 1 and r["clr"] == 1, r
+    # Cap1/Cap2 新字段：B3 cot="wait, it is French"(4 词) → clr_count=1, density=1/4, clr_rev=1(CLR∧回退)
+    assert r["clr_count"] == 1, r
+    assert abs(r["clr_density"] - 0.25) < 1e-9, r
+    assert r["clr_rev"] == 1, r
     # 7B cf_1：去主体后 Miami 不算 → es_drop=0；b0ok=True；rr=0
     r1 = idx[("Qwen", 7.0, "cf_1")]
     assert r1["es_b0"] == 1 and r1["es_late"] == 1 and r1["es_drop"] == 0, r1
     assert r1["rr"] == 0, r1
+    # cf_1 CLR 限定回退：clr(Miami 去主体后=0) → clr_rev=0（『编辑守住』不进 Cap2 分子）
+    assert r1["clr_count"] == 0 and r1["clr_rev"] == 0, r1
     # 32B cf_0：es_drop=0
     r3 = idx[("Qwen", 32.0, "cf_0")]
     assert r3["es_drop"] == 0, r3
@@ -255,8 +261,22 @@ def test_infer_tag_meta():
     assert pe.infer_tag_meta("r1qwen1_5b_x.jsonl", {"r1qwen1_5b": [1.5, "Qwen"]}) == (1.5, "Qwen")
 
 
+def test_hit_count_matches_hit():
+    m = pe.metrics
+    al = {"France": ["French"], "India": ["IN"]}   # 短码 IN(<4) 应被丢
+    # 多次出现按次数计；词边界（'french fries' 里的 french 计，'frenchman' 不计）
+    assert m.hit_count("french wine, french bread, frenchman", "France", al) == 2
+    assert m.hit_count("", "France", al) == 0
+    # 与 hit 的一致性：count>0 ⇔ hit True
+    for txt in ("it is French", "no old here", "FRANCE and france"):
+        assert (m.hit_count(txt, "France", al) > 0) == m.hit(txt, "France", al)
+    # 丢短码：India 的 IN 别名被 _safe_cands 丢 → 'within india' 只按全名 India 计 1（不被 'in' 灌水）
+    assert m.hit_count("within India internal", "India", al) == 1
+
+
 TESTS = [
     test_positive_slope_excludes_zero_and_brackets_truth,
+    test_hit_count_matches_hit,
     test_zero_slope_ci_contains_zero,
     test_zero_slope_binary_clr_ci_contains_zero,
     test_positive_slope_binary_clr_excludes_zero,

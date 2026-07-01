@@ -149,14 +149,18 @@ def _wb_count_tokens(text):
 
 
 def load_percase_rows(paths, cases, aliases, decode="greedy", base="B0", late="B3",
-                      tag_override=None, chainlen_field=None):
+                      tag_override=None, chainlen_field=None, tok_count=None):
     """读所有分片 → 逐 (case × scale) 一行。完全复用 metrics.hit / _without_subject。
 
     返回 list[dict]，每行字段：
       case_id, family, params_b, log_params, chain_len,
-      es_b0, es_late, es_drop(=es_b0-es_late), clr(=CLR@late), b0ok, rr(=RR@late|b0ok else None)
+      es_b0, es_late, es_drop(=es_b0-es_late), clr(=CLR@late), b0ok, rr(=RR@late|b0ok else None),
+      clr_count(=late cot 内 o_old 词边界出现次数), clr_density(=clr_count/chain_len, Cap1),
+      clr_rev(=b0ok-gated CLR∧回退 ∈{0,1} else None, Cap2)
     一个 case 必须同时有 base 与 late 的 efficacy 行才入表（es_drop 需要配对）。
     scale/family 由该分片文件名的 model_tag 决定（同一分片内所有 case 同尺度）。
+    tok_count: 可选 callable(text)->int，给了则 chain_len 用真 tokenizer 词数（Cap1；平台侧有 tokenizer）；
+               否则沿用 --chainlen-field 字段或空白分词近似。
     """
     cmap = {c["case_id"]: c for c in cases}
     # (params_b, family, case_id) -> {budget: {"answer":..,"cot":..,"chain_field":..}}
@@ -207,20 +211,33 @@ def load_percase_rows(paths, cases, aliases, decode="greedy", base="B0", late="B
 
         es_b0 = es_of(base)
         es_late = es_of(late)
-        clr = 1 if metrics.hit(clean(buds[late]["cot"]), o_old, aliases) else 0
+        cot_clean = clean(buds[late]["cot"])
+        clr = 1 if metrics.hit(cot_clean, o_old, aliases) else 0
         b0ok = bool(es_b0)                        # b0ok-gated RR：仅 B0 命中编辑的 case 才谈「回退」
         ans_late = clean(buds[late]["answer"])
         rr = (1 if metrics.hit(ans_late, o_old, aliases) else 0) if b0ok else None
 
-        # chain_len：优先用行里真实 token 数字段；否则空白分词近似 B3 cot
+        # chain_len：真 tokenizer(Cap1) > 行内真 token 字段 > 空白分词近似 B3 cot
         cf = buds[late].get("chain_field")
-        chain_len = float(cf) if isinstance(cf, (int, float)) else float(_wb_count_tokens(buds[late]["cot"]))
+        if tok_count is not None:
+            chain_len = float(tok_count(buds[late]["cot"]))
+        elif isinstance(cf, (int, float)):
+            chain_len = float(cf)
+        else:
+            chain_len = float(_wb_count_tokens(buds[late]["cot"]))
+
+        # Cap1 CLR 密度：链内 o_old 出现次数 / chain_len（能力=更高泄漏率 vs 只是更长链）
+        clr_count = metrics.hit_count(cot_clean, o_old, aliases)
+        clr_density = clr_count / chain_len if chain_len > 0 else 0.0
+        # Cap2：CLR 限定到真驱动回退的链（b0ok 门下 CLR∧RR）；非 b0ok → None 不入回归
+        clr_rev = (int(bool(clr) and bool(rr)) if b0ok else None)
 
         rows.append({
             "case_id": cid, "family": family, "params_b": float(params_b),
             "log_params": float(np.log10(params_b)), "chain_len": chain_len,
             "es_b0": es_b0, "es_late": es_late, "es_drop": es_b0 - es_late,
             "clr": clr, "b0ok": b0ok, "rr": rr,
+            "clr_count": clr_count, "clr_density": clr_density, "clr_rev": clr_rev,
         })
     if skipped:
         print(f"  [skip] {len(skipped)} 个推不出 scale/family 的分片已忽略（非容量 per-case？）："
@@ -456,6 +473,8 @@ _OUTCOMES = [
     ("es_drop", False, "ES 降幅 ES@B0−ES@B3 ∈{−1,0,1}（连续，主结局；正=思考后丢编辑）"),
     ("rr", True, "b0ok-gated RR@B3 ∈{0,1}（仅 B0 命中编辑的 case）"),
     ("clr", True, "CLR@B3 ∈{0,1}（链内旧知识泄漏）"),
+    ("clr_density", False, "Cap1: CLR 密度 = 链内 o_old 词边界出现次数/chain_len（连续；涌现=更高泄漏率还是只是链更长？控 chain_len 后仍正 slope=前者）"),
+    ("clr_rev", True, "Cap2: b0ok-gated CLR∧回退 ∈{0,1}（CLR 限定到真驱动回退的链，重测涌现 slope，剔除『编辑守住但顺带提旧』的 CLR）"),
 ]
 
 
@@ -514,6 +533,9 @@ def main():
                     help="不控制 chain_len（默认控制；论文主报控制）")
     ap.add_argument("--chainlen-field", default=None,
                     help="行里已存的真实 token 数字段名（否则用 B3 cot 空白分词近似）")
+    ap.add_argument("--tokenizer", default=None,
+                    help="Cap1：真 tokenizer 路径/HF id，给了则 chain_len 用它对 B3 cot 计 token 数"
+                         "（平台侧模型目录；覆盖 --chainlen-field 与空白近似）。")
     ap.add_argument("--map", default=None,
                     help="JSON 文件，{文件名子串: [params_b, family]}，覆盖默认 model_tag 推断")
     args = ap.parse_args()
@@ -525,10 +547,17 @@ def main():
     aliases = json.load(open(args.aliases))
     tag_override = json.load(open(args.map)) if args.map else None
 
+    tok_count = None
+    if args.tokenizer:                            # Cap1：真 tokenizer 词数（平台侧；缺库/缺权重则回落近似）
+        from transformers import AutoTokenizer
+        _tk = AutoTokenizer.from_pretrained(args.tokenizer)
+        tok_count = lambda s: len(_tk(s or "", add_special_tokens=False)["input_ids"])
+        print(f"  [Cap1] chain_len 用真 tokenizer: {args.tokenizer}")
+
     rows, tags = load_percase_rows(paths, cases, aliases, decode=args.decode,
                                    base=args.base, late=args.late,
                                    tag_override=tag_override,
-                                   chainlen_field=args.chainlen_field)
+                                   chainlen_field=args.chainlen_field, tok_count=tok_count)
     if not rows:
         raise SystemExit(
             "没有可配对的逐 case 行（需同 case 同时有 base 与 late 的 efficacy 行）。\n"

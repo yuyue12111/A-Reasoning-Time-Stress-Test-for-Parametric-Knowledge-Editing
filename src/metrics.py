@@ -31,6 +31,14 @@ def hit(text, target, aliases):
     return any(_wb(c).search(t) for c in _safe_cands(target, aliases) if c)   # 词边界 + 丢短码
 
 
+def hit_count(text, target, aliases):
+    """target(含安全别名)在 text 中的词边界出现**总次数**(跨安全候选求和；口径与 hit 完全一致，
+    只是数次数而非 0/1)。Cap1 的 CLR 密度分子——量『旧知识在链里浮现多少次』而非『是否浮现』，
+    区分「能力=更高泄漏率」与「能力=只是链更长(表面积更大)」。别名重叠极少，求和近似出现次数。"""
+    t = (text or "").lower()
+    return sum(len(_wb(c).findall(t)) for c in _safe_cands(target, aliases) if c)
+
+
 def _without_subject(text, subject):
     """判分前挖掉对主体的复述。o_old/o_new 常是主体子串（如主体 'Miami International Film
     Festival' 含 o_old 'Miami'）——模型推理开头复述题目会令 CLR/RR 假阳、ES 的『不含 o_old』假阴
