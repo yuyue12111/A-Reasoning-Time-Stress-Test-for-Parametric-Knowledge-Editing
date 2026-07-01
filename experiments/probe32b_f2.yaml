@@ -1,0 +1,42 @@
+# F2 · ZeroThink 去混淆(depth-plan §第五轮)—— 「B0 低回退」是空 <think></think> scaffold 的模板 artifact,
+#   还是真·无推理内容? 审稿人会问:你的"无思考"锚点会不会只是那个特定空思考块把模型逼进"立即作答"模式。
+# 设计:同 headline probe32b.yaml 的 32B ROME×CF 编辑协议,但 budgets = [B0, B0P, B1]:
+#   · B0  = ZeroThink 空 <think>\n\n</think>(重测,应对齐 headline cf200 的 B0)
+#   · B0P = LessThink 固定假思考「Okay...I can answer it without thinking much.」= 非空但零推理内容(R-TOFU test.py:18)
+#   · B1  = 256-token 真生成小链(看"加一点真链"是否就抬 RR)
+#   远锚 B3 RR=0.193 已在 headline cf200(同 200 case)上测过,不重跑(省 H200)。
+# 【判读】RR(B0) ≈ RR(B0P) ≪ RR(B1→B3) → 「无思考=编辑守住」不是空 scaffold artifact,而是随推理**内容**单调 = 硬化头牌;
+#         RR(B0P) 跳到 B1 量级 → 空思考块本身在压回退(artifact),须在 draft 里把 ZeroThink 锚点降级/换口径。
+# 【关键】独立 tag cf200f2 → r1qwen32b_ROME_cf200f2_r*.jsonl,不碰 headline cf200 文件;同 prefiltered 路径=同 200 case。
+# 跑(平台,32B fp32,H200;排在 F1 之后):
+#   cd <项目根>
+#   export WHYAAAI_MODEL=$W/models/DeepSeek-R1-Distill-Qwen-32B; export WHYAAAI_DTYPE=float32
+#   for r in $(seq 0 7); do PYTHONPATH=source/EasyEdit python src/run_pilot.py \
+#       --config experiments/probe32b_f2.yaml --editor ROME --rank $r --world 8 --device $r & done; wait
+#   python src/score_pilot.py --config experiments/probe32b_f2.yaml --editor ROME    # greedy;看 B0/B0P/B1 的 RR(b0ok 门同分母)
+# 注: B0P 链按构造不含 o_old → 其 CLR≡0(对照锚,顺带 sanity check 判分器)。
+
+model_tag: r1qwen32b
+seed: 42
+out_dir: results/probe
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B   # 离线平台用 WHYAAAI_MODEL=本地绝对路径覆盖
+  stats_dir: ./data/stats_r1qwen32b
+  v_loss_layer: 63                                       # 32B=64 层，末层 idx 63
+
+dataset:
+  tag: cf200f2                                # ★独立 tag,不覆盖 headline cf200 输出
+  path: data/counterfact.prefiltered.jsonl    # 同 200 case(与 headline 同序可比)
+  fallback_path: data/counterfact.jsonl
+  n: 200
+
+budgets: [B0, B0P, B1]                        # 去混淆三档;远锚 B3=0.193 复用 headline cf200
+
+sampling:
+  enabled: false                              # greedy 主口径(同 headline)
+
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [12]                              # 同 headline 32B 编辑层

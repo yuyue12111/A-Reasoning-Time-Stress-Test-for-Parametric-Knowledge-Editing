@@ -22,9 +22,10 @@ import torch  # 保留：B4 若日后改 token-id StoppingCriteria / 下游 stee
 TPL = "<｜User｜>{q}<｜Assistant｜><think>\n"                      # DefaultCoT  test_cot.py:245
 ZEROTHINK = "<｜User｜>{q}<｜Assistant｜><think>\n\n</think>\n\n"    # ZeroThink   test.py:16
 # R-TOFU 原版 LessThink 是“固定假思考”（单一字符串）；我们主协议把它推广为“思考至 N token
-# 截断”（plan §2.4，即下方 B1/B2/B3 的 CAP 截断）。此常量仅留作消融/口径对照之用。
+# 截断”（plan §2.4，即下方 B1/B2/B3 的 CAP 截断）。此常量留作消融/口径对照 + F2 的 B0P 臂之用。
+LESSTHINK_COT = "Okay, the user asked this, I can answer it without thinking much."   # R-TOFU test.py:18 的固定假思考正文
 LESSTHINK_CANNED = ("<｜User｜>{q}<｜Assistant｜><think>\n"
-                    "Okay, the user asked this, I can answer it without thinking much.\n"
+                    + LESSTHINK_COT + "\n"
                     "</think>\n\n")                               # LessThink   test.py:18
 
 THINK_END = "</think>"
@@ -56,7 +57,11 @@ def _ntok(tok, s):
     return len(tok(s, add_special_tokens=False)["input_ids"])
 
 def generate_with_budget(model, tok, q, budget, do_sample=False, temperature=0.6, seed=None, suppress=None, answer_cap=256):
-    """返回 (cot, answer, full_text)。budget ∈ {B0,B1,B2,B3,B4}。
+    """返回 (cot, answer, full_text)。budget ∈ {B0,B0P,B1,B2,B3,B4}。
+
+    B0P (F2 去混淆臂)：LessThink 固定假思考——非空但**零推理内容**的 think 块（R-TOFU test.py:18）。
+      对照 B0（空 think 块）。若 B0P 的 RR ≈ B0 ≪ B1，则「B0 低回退」不是空 scaffold 的模板 artifact，
+      而是真·无推理内容 → 硬化「越想越退随推理**内容**单调」。B0P 的链按构造不含 o_old → CLR≡0（对照锚）。
 
     解码臂 (plan §2.5「每条 greedy + temperature 0.6 × 3 seeds」)：
       · do_sample=False（默认）→ greedy；首窗主口径，go/no-go 结论须在 greedy 下成立 (sumandplan §6.3)。
@@ -73,6 +78,11 @@ def generate_with_budget(model, tok, q, budget, do_sample=False, temperature=0.6
         text = ZEROTHINK.format(q=q)
         ans = g(text, answer_cap, use_sup=bool(suppress) and suppress["scope"] == "all")   # B0 无链；仅 scope=all 压答案
         return "", ans, text + ans
+    if budget == "B0P":                     # F2 去混淆: LessThink 固定假思考(非空但零推理内容),对照 B0 空 scaffold
+        text = LESSTHINK_CANNED.format(q=q)
+        # 固定假思考正文 = 唯一"链"(prefill 死给,不由模型生成);按构造不含 o_old → CLR≡0(消混淆的对照锚)
+        ans = g(text, answer_cap, use_sup=bool(suppress) and suppress["scope"] == "all")   # 与 B0 同：仅 scope=all 压答案
+        return LESSTHINK_COT, ans, text + ans
     prefix, cot, waits = TPL.format(q=q), "", 0
     while True:
         chunk = g(prefix + cot, max(64, CAP[budget] - _ntok(tok, cot)), use_sup=bool(suppress))   # 压链(think/all 都压)

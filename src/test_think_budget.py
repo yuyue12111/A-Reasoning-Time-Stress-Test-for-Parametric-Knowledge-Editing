@@ -33,6 +33,7 @@ class _Enc(dict):
 class MockTok:
     """词级双射 tokenizer：按空白切词、decode 还原。够 think_budget 的计数/切片用。"""
     eos_token_id = 0
+    bos_token = None            # 词级双射 mock 退出 BOS 逻辑（_gen: None or "" → 不补 BOS）
 
     def __init__(self):
         self.vocab, self.inv = {}, {0: ""}
@@ -127,6 +128,16 @@ def test_b0_zerothink_empty():
         assert ans != "", "B0 answer 不应为空"
 
 
+def test_b0p_lessthink_canned_chain():
+    # B0P (F2): 固定假思考由 prefill 死给 → cot 恒 == LESSTHINK_COT，不随 responder 变；answer 非空
+    for resp in (R_nostop, R_stop):
+        cot, ans, n = _run(resp, "B0P")
+        assert cot == tb.LESSTHINK_COT, f"B0P cot 应恒为固定假思考 {tb.LESSTHINK_COT!r}, 得 {cot!r}"
+        assert n > 0, "B0P 链应非空(与 B0 空块对照)"
+        assert tb.THINK_END not in cot, "B0P cot 不应含 </think>(prefill 已闭合)"
+        assert ans != "", "B0P answer 不应为空"
+
+
 def test_truncation_hits_cap_nostop():
     # 无 </think> 时各档 cot 恰好被 CAP 截断（mock 词级双射 → 精确）
     for b in ("B1", "B2", "B3"):
@@ -184,7 +195,8 @@ def test_sampling_seed_reproducible():
 
 
 MOCK_TESTS = [
-    test_b0_zerothink_empty, test_truncation_hits_cap_nostop, test_truncation_monotone_nostop,
+    test_b0_zerothink_empty, test_b0p_lessthink_canned_chain,
+    test_truncation_hits_cap_nostop, test_truncation_monotone_nostop,
     test_stop_closes_at_first_think_end, test_b4_injects_wait_then_stops, test_b4_geq_b3_and_extends,
     test_decode_kwargs_greedy_vs_sample, test_sampling_seed_reproducible,
 ]
