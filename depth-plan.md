@@ -296,3 +296,58 @@ MEMIT/AlphaEdit/zsRE/更多尺度/更多 seed 充量;全套 W4 same-base instruc
 5. **编辑器/数据集广度=门票非加分**:S7 推 camera-ready,主结果 ROME×CF;MEMIT 多层点若来得及加,否则明标"locate-then-edit 一族,跨编辑器留 open"。
 6. **deployment-gate 等价靠单位数 McNemar**:`draft.md:292` 自认 normal-approx borderline,等价主张落"by-construction"论证非检验功效——两审皆漏,**主动写进 limitation 预堵**。
 - **净**:全做完 = "符号/剂量/方向受控的 fix(两 operating point)+ 判官中性验证的指标 + 混淆受控的 within-Qwen RQ1 + 去污 taxonomy + 加宽机理池" = **accept 级深度档**;但**不闭"自然生成必要性"**(残余#1)——诚实声明,非靠更多 GPU 能补。
+
+
+## 第五轮 (v5) —— "有增量"实验(严格:能翻转/杀死一条 claim 或补 load-bearing 缺口)【与 §第四轮 并列;7/20-7/27 增量层】
+
+**来源**:第三份第一性 review(Claude「增量实验」,`第一性review 增量实验.md`)。它补上 §第四轮**完全漏掉的维度=现象是否【编辑特异】**。§第四轮审 RQ2/RQ3/capability 的内部效度;§第五轮问"该不该有这个现象/机理"。**去重**:M3=§四S1(中性重跑判官,同一件);Cap3≈§四S9(6 尺度 base_probe 去混淆);K1⊂F1(32B base_probe)。**取代**:F1 盖过 §四 的 E-CHAINSUB(S5)成新单点最高杠杆。
+
+**premise 已逐条核盘(本地 grep 证)**:F1=`results.json base_probe` 7B answer_old **0.59→0.67(+0.08)**、chain_old_b3=0.755、**仅 7B、32B 缺**;`base_probe.py` 同口径 metrics.hit/_without_subject、case 集取自已有 ROME 结果=直接可跑。F2=`think_budget.py:23` ZEROTHINK 空块、`:26` LESSTHINK_CANNED 存在标"仅消融用"。F3=采样路径 `:34/:58` 全建、results.json **零采样数**、draft §3.3 宣称"0.6×3 sampling arm"。Cap1=chain_len 是 `:217` 空白分词近似。
+
+### 🥇 第一梯队 · 攻现象根基(§四漏,最高威胁,多零/廉价卡,进 7/20)
+
+- **[F1] 无编辑 thinking-tax 基线 —— 新单点最高杠杆 · 头牌 · 【本地扩 base_probe + 平台跑 32B】**
+  - 目标 claim=KILLS-or-CONFIRMS「thinking undoes **EDITING**(编辑特异)」。`base_probe.py` 在**同一批 200 CF case** B0/B3 跑 32B 基座(`WHYAAAI_DTYPE=float32`),报 **编辑 ES 降幅/RR − 基座 P(o_old) 漂移** 的 effect-above-control margin。
+  - **kill**:基座 P(o_old)@B0→B3 涨 ≈ 编辑 RR(0.19)→ 现象大半是基座"越想越偏先验"、编辑特异残差被吃掉。**confirm**:基座漂移 ≪ 0.19 → 编辑特异坐实、下游全硬。**盘上已有反向证据**:7B base +0.08 = 7B 编辑 RR 0.080(已相等!)。
+  - **红队(我加)**:base 漂移**不自动 kill** —— 编辑态回退="丢失 B0 已装入的 o_new"(base 无 edit 可丢=不同事件);须报三量:base ΔP(o_old)、base ΔP(o_new)(应≈0)、edited RR;**只有 effect-above-control margin(edited RR − base ΔP(o_old))近零才真塌**。即便 margin 小,仍可守"编辑放大了基座漂移"的窄断言。null 双向皆高信息。~40 LOC + 数 H200-h(7B/14B 部分在盘,32B 关键)。
+- **[F2] ZEROTHINK 模板去混淆 · 头牌 · 【本地 ~15 LOC + 平台 4-5 H200-h(n=100)】**
+  - 目标=「税不是空块伪影」。加 B0′=LESSTHINK_CANNED(已有未用)、B0″=B1@CAP32 最小自然链,用 B0′ 重锚 ES 降幅与 b0ok 分母。**kill**:B0 空块 ES ≫ B0′/B0″ → 税部分是"退化零推理捷径 vs 任何真推理"的模板差(空块偏顶层编辑 g64=11.6;一句真推理即触部分重推 g8/g12<0)。**红队**:B0′ 也可能被截断长度混淆,须与 F1 同口径 b0ok。
+- **[F3] 温度/seed 鲁棒性(声称做了却零上报)· 头牌级(标 defense 能 kill)· 【平台跑,~0 LOC】**
+  - 32B B0/B3 temp=0.6 × seed{0,1,2},报 ES 降幅/RR/CLR per-case CI。**kill**:采样下 RR/ES 降幅塌向零/反号 → 回退是单条贪心脆性(中层 gap −0.25~−0.35 近平局,微扰即翻;b0ok 本身贪心定义)。**审稿必点"声称做了没报"**。零 LOC(路径全建)。
+
+### 🥈 第二梯队 · 攻机理/修复头牌(多零卡,7/20)
+
+- **[M1] E-CLRZERO-SPLIT:按基线 CLR 分层修复效应 · 头牌 · 【纯本地零卡再分析】· 修复因果最便宜的 kill**
+  - 把已跑 N/T sup_battery(盘上 n=198)按 baseline-N 每 case **CLR=1 vs CLR=0** 分层,分别重算 T−N 的 RR/ES。机理预测效应集中 CLR=1、CLR=0 消失。**kill**:CLR=0 case(~45%)上 RR 降幅相当 → 修复非靠"堵链内重推"→ 直杀「in-chain re-derivation **governs** the answer」。红队补:per-case 2×2(CLR 降? × RR 降?)中介,RR 在"CLR 没降"case 也改善=答案与链解耦。**零卡、直击头牌因果、今天可跑**。
+- **[M3] = §四 S1** 中性重跑 taxonomy 判官(去重,见 §四;1h 免费前筛已跑=两条 clr=False 均松散桥非 traceless、claim 未被免费杀、S1 值得跑)。
+- **[M4] "强竞争者"placebo 第 5 臂(C)· 防御 · 【本地 ~30 LOC config + 平台 1 臂】**
+  - 现 placebo 惰性(`placebo_donor.py` 取别 case 的 o_old、从不取 o_new);压**同 relation 的强错误答案**(CF 带 relation_id 可分组)。**kill**:C−N ≈ T−N → 修复是"压任何强竞争者"通用效应、T−P(惰性 floor)弱证 → 杀 o_old 特异性(论文自认残余)。
+- **[M5] 反思标记抑制臂 · 头牌级 · 【本地 ~20-30 LOC + 平台 2-4 H200-h】**
+  - 压"wait/actually/but"(reflect_before_old 在 32B 回退 9/10 真)而非 o_old 内容,报 R−P。**kill**:答案照样修好 → 是 override 动作非 o_old 内容驱动 → 窄化"re-derivation"。零卡前奏:现有 T−P 按 reflect_before_old/contests_edit 分层。
+- **[V1] E-CLR-JUDGE:中性判官验 CoT scorer · 头牌 · 【平台 ~40 CoT judge calls】**
+  - κ=0.836 **只验答案级 RRs、从没验 CoT scorer CLR**,而 CLR 是唯一存活 erosion 指标。`metrics.py:149` `hit(cot,o_old)` **无极性检查**→"it is **not** French but Bolton"记 CLR+。中性判官验 CLR 假阳率。**kill**:大量"被否定/顺带提及"假阳 → 裂 emergence 测量地基。零卡红队补 V2:κ 的"neither"判为不一致重算,掉则 0.836 被 easy-TN 撑。
+
+### 🥉 第三梯队 · 攻 capability-emergent(全零卡再分析,7/20)
+
+- **[Cap1] E-CHAINLEN-KILL · 头牌 · 【纯本地零卡 ~50 LOC】**:唯一存活 CLR slope 用**空白分词** chain_len(`percase_emergence.py:217`),CLR 近饱和二值(held 14/14=1.00)。换真 tokenizer chain_len + 二次项 + **CLR-每-token 密度**,slope CI 可能盖零 → "capability-emergent"塌成"大模型链更长、按概率更常提 o_old"。
+- **[Cap2] E-CLR-DISCRIMINANT · 头牌 · 【纯本地零卡】**:CLR 门到**真回退**(CLR*)重测 slope。CLR* 变平而 raw-CLR 仍升 → "啰嗦随能力涨"、非 erosion。
+- **[Cap3] = §四 S9 base-knowledge 混淆**(去重):6 尺度 base_probe 控 edited-CLR slope 的 base-recall-of-o_old。slope 塌 → "CLR 随能力涨"="大模型本就更知 o_old"(知识可得性非 erosion),比 chain-length 更致命。
+
+### 度量/why/部署(各留一真 kill)
+
+- **[K1] ⊂ F1**:32B base_probe(abstract 的 0.59 是 7B 数误引给 32B 头牌,必补;F1 顺带产)。**【平台】**
+- **[K2] E-KC-NOPRIOR · 头牌 · camera-ready**:在**基座不知 o_old**(recall≈0)的事实上编辑还回退吗?回退→"weights still hold the prior"被 falsify=**confabulation 非 conflict**(Recall=0/19+Bridge-via-spelling 使 kill 真可能)。先用 32B base 分层现有 200,不够再补编辑臂。**【both】**
+- **[G1] E-CONDC · 头牌 · 8B 先做可 7/20 · ~40 LOC 路径已通**:在 **o_old 是合法推理中间步**的多跳编辑 query 上开抑制器(precondition-c 盲区,draft §7:295 自认 [pending])。hop-ES 掉→杀"zero collateral by construction"(部署门看不到的编辑-query 侧伤害)。**【both】**
+
+### DROP(结果预定/非增量 —— review 判定,我复核认同)
+E-UNIONTHINK(被两先验夹住)、E-PROMPTEDCOT(§7:286 双向预认+LOC 最贵)、copy-from-subject(overlap_subject=0/10 已死)、E-CANDIDATE-COUNT(判官选择偏倚)、E-INFLATE-DIRECTION(confirm 近必然)、E-FALSENEG(落在 [RRs,RR] 括号内)、E-POSITION-SEGMENT(只收窄不翻)、更多编辑器/数据集/尺度/seed(门票)、single-fact 部署门扩 n(by-construction 恒真)。
+
+### 单点最高杠杆(v5,取代 §四的 S5/E-CHAINSUB)
+**F1(无编辑 thinking-tax 基线),尤其 32B base_probe(盘上缺、是全局最关键缺口)。** 理由:E-CHAINSUB 精修一个**假定为真**的机理;F1 问这机理**该不该存在**——7B 盘上 +0.08≈RR 0.080 是**已指向坏结果的在手证据**、kill 真可能且便宜。confirm→标题 claim 更硬、每条下游更硬;kill→撼动标题。**但**(我红队)F1 的 kill 需 effect-above-control margin 近零 + 账清"丢 o_new vs 提 o_old"两事件,非"base 漂移就塌"。
+
+### 7/20 增量冲刺(全零/廉价卡,融合 §四+§五,按"能杀×便宜")
+1. **F1-32B base_probe**(平台;补全局最关键缺口)+ 本地扩 base_probe 报三量 margin。
+2. **M1 CLR-split**(纯本地零卡;杀修复因果)+ **Cap1/Cap2**(纯本地零卡;杀 capability)+ **F1-7B/14B margin 重表**(在盘)。
+3. **M3=S1 中性判官**(平台 99 calls;免费前筛已过)+ **V1 CLR-judge**(平台 ~40 calls)。
+4. **F3 采样鲁棒**(平台零 LOC;堵"声称做了没报")。
+**7/27**:§四 S5(E-CHAINSUB,修 provenance 后)、S6(加宽池,修 path)、M2(答案位动态 logit-lens)、M4/M5/K2/G1。**诚实残余#1(自然必要性)仍不闭**。
