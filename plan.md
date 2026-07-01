@@ -236,7 +236,8 @@
 - **v1.54 变更 (2026-07-01,compaction-proof 在飞快照刷新)**: **F2 代码就位(commit `ff8cbc0`)→ 交用户上 H200;H100 已出 14b(等齐一起给)**——
   ① **【F2 = code-ready,待平台跑】**`think_budget` 加 **B0P** 分支(LESSTHINK_CANNED 固定假思考=非空但零推理内容,抽 `LESSTHINK_COT` 常量防漂移;B0P 链按构造不含 o_old → CLR≡0 对照锚)+ B0P mock 测(全 9 测绿,顺带修 `MockTok` 缺 `bos_token`——Llama 缺-BOS 修复后遗留、令整套 mock 变红)+ `experiments/probe32b_f2.yaml`(同 headline 32B ROME×CF,`budgets=[B0,B0P,B1]`,独立 tag **cf200f2** 不碰 headline;远锚 B3=0.193 复用 headline 不重跑)。**判读**:RR(B0)≈RR(B0P)≪B1 → 「无思考=编辑守住」非空 scaffold artifact、随推理**内容**单调=硬化头牌;B0P 跳 B1 量级 → ZeroThink 锚点是 artifact 须降级。dry-run 验接线过(budgets 流过、输出 cf200f2 独立文件)。
   ② **【在飞·平台刷新】**base_probe 多尺度(H100):**14b 已完**(等 8b/1.5b 跑齐,用户一起给)→ 凑齐 6 尺度 base-recall 解锁 Cap3/S9。F3 `probe32b_sample.yaml`:ready 排队 H200。
-  ③ **【下一步】**用户上 F2(H200,32B fp32)+ 我并行写 Cap 系列(Cap1 真 tokenizer chain_len/CLR 密度、Cap2 CLR 门真回退重测 slope,零卡本地可跑;Cap3 等 base-recall 齐)。
+  ③ **【Cap1+Cap2 = code-ready,commit `808c3ed`】**做成 `percase_emergence` 两个新 outcome(复用两级 cluster-robust 回归):**Cap1** `clr_density`=链内 o_old 词边界次数(`metrics.hit_count`)/chain_len + `--tokenizer` 真分词选项(控 chain_len 后仍正 slope=能力真涨泄漏率、塌=只是链更长伪影);**Cap2** `clr_rev`=b0ok 门下 CLR∧RR(剔除"守住但顺带提旧"的 CLR,重测涌现 slope)。端到端测+hit_count 测+合成正/零 slope smoke 全绿;**真跑在平台**——复用 emergence 的 6 尺度 per-case 分片(`--glob` 同 percase),本地无数据只能 selftest。**Cap3** 仍等 base_recall 6 尺度齐(H100 base_probe)。
+  ④ **【下一步】**用户上 F2(H200,32B fp32);Cap1/Cap2 待平台 6 尺度分片就位即可跑(与 percase 同 glob,Cap1 加 `--tokenizer $W/models/...-Qwen-32B`);Cap3 等 base-recall。
 
 ---
 
