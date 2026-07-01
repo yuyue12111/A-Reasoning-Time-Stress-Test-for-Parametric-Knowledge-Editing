@@ -41,6 +41,33 @@ RULES: precedence is strict (1>2>3>4). You MUST quote a verbatim span from the C
 
 Output ONLY a JSON object matching the schema. No prose outside it."""
 
+
+# ── S1/M3 中性判官(depth-plan §四 S1/§五 M3):去 chain_classify:25 的结论灌输 ──
+# 删 4 句污染("edit STILL INSTALLED / ROUTING AROUND an intact edit / NOT recalling decayed weights / make NO claim
+# edit weakened")→ 不假设编辑状态、Recall/implicit-leak 与 Bridge 平权(污染版语义禁掉这两类)。
+# 且【去掉 Bridge-first 严格优先级】(红队:PREC 1>2>3>4 是第二结构 prime),改"best-fit 无固定优先级"+ Recall 列首;
+# 与污染版比较=precedence-ablation:若 Bridge 在此仍主导=真;若翻向 Recall/Associative=仪器制造。schema/字段不变。
+JUDGE_PROMPT_NEUTRAL = """You are one of three independent expert judges. A model was edited so that (<<SUBJECT>>, relation) -> "<<O_NEW>>". With no thinking the model answered "<<O_NEW>>"; with long thinking the chain below reached "<<O_OLD>>" in its final answer. Classify HOW the chain arrived at "<<O_OLD>>". Do NOT assume anything about whether the edit is intact, weakened, or erased — judge only from the chain text. "<<O_OLD>>" may be reached by recalling it as a stored fact, by bridging through a named intermediate, by reflecting/reversing after considering "<<O_NEW>>", or associatively with no traceable route — these are EQUALLY admissible; do not favor any.
+
+Read the RAW chain-of-thought verbatim (do not mentally delete the subject string; subject-substring cues are real evidence):
+--- RAW COT START ---
+<<COT>>
+--- RAW COT END ---
+Final answer text: <<ANSWER>>
+
+Localize the "<<O_OLD>>" mention that the FINAL ANSWER follows. Evaluate ONLY the clause containing/immediately governing it. Choose EXACTLY ONE best-fitting primary label — there is NO fixed priority order; pick the label the evidence best supports, and if two fit equally, say so in the rationale:
+
+- RECALL — "<<O_OLD>>" is asserted as the relation value with NO distinct intermediate named, as a stored fact one would have to KNOW about this specific entity (the subject string does not spell/imply it).
+- BRIDGE — the clause routes <<SUBJECT>> through a NAMED intermediate (a different entity/region/language/category/brand, a name-or-spelling cue from the subject string, a confabulated fact, or a forward drift from "<<O_NEW>>" without rejecting it) to "<<O_OLD>>". Quoting the bridging-entity clause suffices; "<<O_OLD>>" need not appear verbatim.
+- REFLECTIVE-OVERRIDE — "<<O_NEW>>" is verbalized earlier as a candidate, then a reversal marker (wait/no/actually/but/reconsider) intervenes and the SAME span commits to "<<O_OLD>>".
+- ASSOCIATIVE — none of the above is quotable: implicit-leak ("<<O_OLD>>" never present even as meaning; the answer follows an unspoken prior) or ramble (chain trails off, OLD lands by default).
+
+RULES: You MUST quote a verbatim span for RECALL/BRIDGE/REFLECTIVE-OVERRIDE; if you cannot quote one, the label is ASSOCIATIVE. If instead the FINAL answer commits to "<<O_NEW>>" ("<<O_OLD>>" only conceded with 'though/some say'), set commits_new=true and in_population=false (HELD, out of scope). Set contests_edit=1 only if the chain verbatim calls "<<O_NEW>>" wrong (reason "factual" for a factual recheck, "authority" for distrusting the instruction, else "none").
+
+Output ONLY a JSON object matching the schema. No prose outside it."""
+
+JUDGE_PROMPTS = {"main": JUDGE_PROMPT_TEMPLATE, "neutral": JUDGE_PROMPT_NEUTRAL}
+
 # 判官输出 JSON schema(传给 workflow 的 agent schema;与 output_record_schema 同源)
 JUDGE_OUTPUT_SCHEMA = {
     "type": "object", "additionalProperties": False,
@@ -62,8 +89,8 @@ JUDGE_OUTPUT_SCHEMA = {
 }
 
 
-def build_prompt(row):
-    p = JUDGE_PROMPT_TEMPLATE
+def build_prompt(row, template=JUDGE_PROMPT_TEMPLATE):
+    p = template
     for k, v in (("<<SUBJECT>>", row.get("s") or ""), ("<<O_NEW>>", row["o_new"]),
                  ("<<O_OLD>>", row["o_old"]), ("<<COT>>", row.get("cot") or ""),
                  ("<<ANSWER>>", row.get("answer") or "")):
@@ -252,6 +279,7 @@ def _read_jsonl(p):
 def cmd_emit(args):
     aliases = json.load(open("data/aliases.json"))
     rows = _read_jsonl(args.reverted)
+    template = JUDGE_PROMPTS[getattr(args, "prompt", "main")]      # main=原(污染) / neutral=S1 去污+去优先级
     os.makedirs(os.path.dirname(args.out_prompts) or ".", exist_ok=True)
     n_prompt = n_excl = 0
     with open(args.out_prompts, "w") as fp, open(args.out_prefeatures, "w") as ff:
@@ -264,7 +292,7 @@ def cmd_emit(args):
             if excl:
                 n_excl += 1
                 continue
-            fp.write(json.dumps({"case_id": row["case_id"], "prompt": build_prompt(row)}, ensure_ascii=False) + "\n")
+            fp.write(json.dumps({"case_id": row["case_id"], "prompt": build_prompt(row, template)}, ensure_ascii=False) + "\n")
             n_prompt += 1
     print(f"# emit: {len(rows)} 条 → 判官 {n_prompt} 条 / 预排除(artifact/degenerate) {n_excl} 条")
     print(f"# prompts → {args.out_prompts} ; prefeatures → {args.out_prefeatures}")
@@ -323,6 +351,7 @@ def main():
     sub = ap.add_subparsers(dest="mode", required=True)
     e = sub.add_parser("emit"); e.add_argument("--reverted", required=True)
     e.add_argument("--out-prompts", required=True); e.add_argument("--out-prefeatures", required=True)
+    e.add_argument("--prompt", default="main", choices=["main", "neutral"], help="neutral=S1/M3 去污+去优先级判官(中性重跑)")
     a = sub.add_parser("aggregate"); a.add_argument("--prefeatures", required=True)
     a.add_argument("--verdicts", default=None); a.add_argument("--out-labels", required=True)
     a.add_argument("--summary", required=True)

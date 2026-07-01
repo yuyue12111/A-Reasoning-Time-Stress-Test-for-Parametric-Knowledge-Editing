@@ -1,0 +1,38 @@
+# F3 · 温度/seed 鲁棒性(depth-plan §第五轮)—— draft §3.3 宣称"0.6×3 sampling arm"但 results.json 零上报;审稿必点。
+# 同 probe32b.yaml 的 32B ROME×CF 编辑协议,但开采样臂(temp=0.6 × seed{0,1,2}),测 RR/ES降幅/CLR 在采样下是否存活。
+# 【关键】新 tag cf200samp → 独立输出 r1qwen32b_ROME_cf200samp_r*.jsonl,不碰 headline cf200 文件;同 prefiltered 路径=同 200 case。
+# 跑(平台,32B fp32,排在 F1/其他之后):
+#   export WHYAAAI_MODEL=$W/models/DeepSeek-R1-Distill-Qwen-32B; export WHYAAAI_DTYPE=float32
+#   for r in $(seq 0 7); do PYTHONPATH=source/EasyEdit python src/run_pilot.py \
+#       --config experiments/probe32b_sample.yaml --editor ROME --rank $r --world 8 --device $r & done; wait
+#   python src/score_pilot.py --config experiments/probe32b_sample.yaml --editor ROME --decode sample   # 采样臂
+#   python src/score_pilot.py --config experiments/probe32b_sample.yaml --editor ROME                    # greedy(同 run 内对照)
+# 看:采样下 RR/ES降幅 塌向零/反号 → 回退是单条贪心脆性(中层 gap −0.25~−0.35 近平局,微扰即翻)= kill;
+#     与 greedy 同量级 → 头牌在采样下鲁棒,补上"声称做了没报"的臂。
+
+model_tag: r1qwen32b
+seed: 42
+out_dir: results/probe
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+  stats_dir: ./data/stats_r1qwen32b
+  v_loss_layer: 63
+
+dataset:
+  tag: cf200samp                              # ★独立 tag,不覆盖 headline cf200 输出
+  path: data/counterfact.prefiltered.jsonl    # 同 200 case(与 headline 同序可比)
+  fallback_path: data/counterfact.jsonl
+  n: 200
+
+budgets: [B0, B3]
+
+sampling:
+  enabled: true
+  temperature: 0.6
+  seeds: [0, 1, 2]
+
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [12]
