@@ -561,6 +561,23 @@
       "answer_old_b0": 0.59,
       "answer_old_b3": 0.67,
       "chain_old_b3": 0.755
+    },
+    "32B": {
+      "answer_old_b0": 0.765,
+      "answer_old_b3": 0.744,
+      "chain_old_b3": 0.829,
+      "answer_new_b0": 0.015,
+      "answer_new_b3": 0.01,
+      "n_b0": 200,
+      "n_b3": 199
+    },
+    "f1_edit_specificity": {
+      "_status": "F1(depth-plan §五 单点最高杠杆):未编辑 32B 基座同 200 CF 的 thinking-drift 对照(src/base_probe.py,同口径 metrics.hit/_without_subject)。",
+      "base_delta_ans_old_B0toB3": -0.021,
+      "edited_RR": 0.193,
+      "effect_above_control": 0.214,
+      "verdict": "★F1 CONFIRM / 闸门 PASSED:32B 未编辑基座 P(o_old) 随思考不升反微降(0.765→0.744,Δ=−0.021),故编辑态回退 RR=0.193 是【编辑特异】、非'基座越想越偏先验'伪影。base ans_new≈0.01 sanity ok。7B 的 +0.08 是小模型个例(7B ES降幅本就 n.s.)。头牌『thinking undoes EDITING』存活。airtight 可选:base ΔP(o_old) per-case 配对 bootstrap CI(需 base jsonl,点估已负/平离 RR 远、结论稳)。",
+      "_bonus": "未编辑基座 B3 链含旧 CLR=0.829 > 编辑态 CLR@B3 0.545 → 基座自由提 o_old、编辑部分压住(与 knowledge-conflict 'why' 一致);base ans_old ~0.75 高=基座本就知 o_old(锚 §1 头牌尺度,补 K1:abstract 的 0.59 是 7B 误引给 32B,现有 32B=0.765)。"
     }
   },
   "rq2_taxonomy": {

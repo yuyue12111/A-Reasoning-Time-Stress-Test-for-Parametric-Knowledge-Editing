@@ -230,7 +230,7 @@
   ③ **【工作纪律】**用户定:能挂平台跑的先挂,平台跑时做本地活;增量 review(翻/杀 claim 或补缺口)是最高优先判据;暂不碰论文写作(数据落库可,draft prose 待放行)。
 - **v1.53 变更 (2026-07-01,compaction-proof 在飞快照)**: **M1 强 CONFIRM 落库 + 三线并行在飞状态(compact 前快照)**——
   ① **【M1 = 强 CONFIRM 已落库】**`results.json rq3.clr_split_M1`:按基线 CLR 分层 T−N 修复效应——CLR1 基线 T−N RR **−0.289** [−0.44,−0.16] p=.0002、CLR0 基线 **+0.014** p=.72(≈0);2×2 RR 改善率 CLR-降 **43%** vs 未降 **4%**(10×)。→ 『链内容中介答案』**within-case 被证实**,直接回应"suppress 每步减 penalty 可能不管 o_old 就改道"的循环质疑(无链内 o_old 可堵时修复=0)。**硬化 RQ3,非 kill。**
-  ② **【在飞·平台】**F1(H200,32B 未编辑 base_probe,现象是否编辑特异 = 闸门):**RUNNING**,等 `答=旧@B0/B3` → F1 margin = 编辑 RR 0.193 − base ΔP(o_old);7B 盘上 +0.08≈RR 0.080 是预警。 base_probe 14B/8B/1.5B(H100):**RUNNING**,凑 6 尺度 base-recall → 解锁 Cap3/S9 杀 capability。
+  ② **【在飞·平台】**F1(H200,32B 未编辑 base_probe = 闸门):**✅DONE CONFIRM**——base P(o_old) 0.765→0.744 Δ=−0.021(不升反降),margin=0.214,编辑特异坐实、头牌存活(results.json base_probe.f1_edit_specificity;顺补 K1:32B base=0.765 替 abstract 误引的 7B 0.59)。 base_probe 14B/8B/1.5B(H100):**RUNNING**,凑 6 尺度 base-recall → 解锁 Cap3/S9 杀 capability。
   ③ **【在飞·待跑(等 H200 空,用户定 F2 直接上 32B 不用 H100 先跑)】**F2 ZEROTHINK 去混淆:**待我写 ~15 LOC**(think_budget 加 B0P=LESSTHINK_CANNED 臂 + [B0,B0P,B1] config;LESSTHINK_CANNED 已在 think_budget.py:26);F3 probe32b_sample.yaml:**ready 排队 H200**。
   ④ **【已完成本地】**S1 中性判官(rq2_taxonomy.neutral_rerun_S1:Recall 0→2 部分证伪 no-flat-recall、Bridge 81%/Associative=0 存活、pop 3/18 判官敏感;results/a3_neutral)、M1、prefilter guard、m1_clrsplit.py、JUDGE_PROMPT_NEUTRAL。**待写本地**:Cap1(真 tokenizer chain_len+CLR 密度)、Cap2(CLR 门真回退重测 slope)、Cap3(等 base-recall)、M4/M5、G1。**待放行写作**:S1 的 draft 软化清单(summary.json.draft_edits_pending)。
 
