@@ -611,7 +611,54 @@
       "Reflective-override 仅 32B 出现(2/10,7B/14B=0)→ **该路径本身 capability-emergent**:须 engage 编辑值→质疑→override,小模型只靠表面线索 bridge 到旧值,呼应头牌能力涌现。",
       "held 排除多(7B1/14B7/32B6):loose-RR(答案含旧)高估;判官-committed 回退(n=19 pooled)更贴近 strict RRs 口径。"
     ],
-    "_orthogonal": "contests_edit 二元 stance(链逐字称 o_new 错)= pooled 15.8%,cross-cut 四类;κ 仅 32B/pooled 有意义(7B/14B 全 Bridge→κ 未定义);小 n 故低频类按定性存在性 + bootstrap CI 报。"
+    "_orthogonal": "contests_edit 二元 stance(链逐字称 o_new 错)= pooled 15.8%,cross-cut 四类;κ 仅 32B/pooled 有意义(7B/14B 全 Bridge→κ 未定义);小 n 故低频类按定性存在性 + bootstrap CI 报。",
+    "neutral_rerun_S1": {
+      "_status": "S1/M3 去污中性重跑(results/a3_neutral;src/chain_classify.py JUDGE_PROMPT_NEUTRAL)。",
+      "pooled": {
+        "n_in_pop": 16,
+        "dist": {
+          "Bridge": 13,
+          "Recall": 2,
+          "Reflective-override": 1
+        },
+        "Bridge_pct": 0.812
+      },
+      "per_scale": {
+        "7b": {
+          "n_in_pop": 3,
+          "dist": {
+            "Bridge": 3
+          }
+        },
+        "14b": {
+          "n_in_pop": 3,
+          "dist": {
+            "Bridge": 2,
+            "Recall": 1
+          }
+        },
+        "32b": {
+          "n_in_pop": 10,
+          "dist": {
+            "Bridge": 8,
+            "Recall": 1,
+            "Reflective-override": 1
+          }
+        }
+      },
+      "population_flip_to_held": [
+        "cf_1130",
+        "cf_7744",
+        "cf_9994"
+      ],
+      "verdict": "★S1 去污+去优先级后:(1) Recall 0→2 = 'no flat recall/Recall=0' 部分仪器制造被证伪,须软化 contrib-2;(2) Bridge 仍主导(13/16≈81% vs 污染 89%)= 重构性回退核心存活;(3) Associative 仍=0 = 'no traceless leak/回退从不无声'(necessity traceless=0)去污后依然成立(最要紧必要性 claim 扛住);(4) population 3/18 迁移 HELD(cf_1130,cf_7744,cf_9994,判官敏感)。净:'Bridge 主导重构 + 从不无声' 存活,'Recall=0' 死,池敏感须诚实报。",
+      "draft_edits_pending": [
+        "abstract/§1 contrib-2 '90% bridge, no flat recall' → 'bridge-dominant (~81% under neutral judges), with a small but non-zero flat-recall rate (~2/16) once the anti-recall prime is removed'",
+        "§5 tab:taxonomy Recall=0 行 → 中性下 Recall≈2/16(报污染 vs 中性两列 + 一致性)",
+        "necessity: Associative=0/traceless=0 存活(不改);但 'reconstructive re-derivation' 收紧为 'bridge-or-recall, never traceless'",
+        "报 population 对判官 prompt 的敏感性(3/18 flip)为 limitation + 中性 run 作 robustness appendix"
+      ]
+    }
   },
   "emergence": {
     "_note": "B-emergence:erosion 指标对 log10(参数量)pool 两族回归;slope CI 排零=涌现有统计支撑(非仅靠 2/6 per-cell 显著)。6 点小样、log-params 为能力代理(跨族 alignment 已论证)、不宣称 scaling law。OLS 解析 t-CI(df=n-2)+按点 bootstrap(n=10000,seed42)+逆方差 WLS+family 控制。src/emergence_regression.py 可复现。",

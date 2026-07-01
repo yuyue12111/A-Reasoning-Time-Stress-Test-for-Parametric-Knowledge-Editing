@@ -1,0 +1,56 @@
+{
+  "_note": "S1/M3 中性重跑 taxonomy 判官(去 chain_classify:25 污染 + 去 Bridge-first 优先级 prime,3 判官同 33 链)。",
+  "pooled_neutral": {
+    "n_in_pop": 16,
+    "dist": {
+      "Bridge": 13,
+      "Recall": 2,
+      "Reflective-override": 1
+    },
+    "Bridge_pct": 0.812
+  },
+  "pooled_contaminated": {
+    "n_in_pop": 19,
+    "dist": {
+      "Bridge": 17,
+      "Reflective-override": 2,
+      "Recall": 0,
+      "Associative": 0
+    }
+  },
+  "per_scale_neutral": {
+    "7b": {
+      "n_in_pop": 3,
+      "dist": {
+        "Bridge": 3
+      }
+    },
+    "14b": {
+      "n_in_pop": 3,
+      "dist": {
+        "Bridge": 2,
+        "Recall": 1
+      }
+    },
+    "32b": {
+      "n_in_pop": 10,
+      "dist": {
+        "Bridge": 8,
+        "Recall": 1,
+        "Reflective-override": 1
+      }
+    }
+  },
+  "population_flip_to_held": [
+    "cf_1130",
+    "cf_7744",
+    "cf_9994"
+  ],
+  "verdict": "★S1 去污+去优先级后:(1) Recall 0→2 = 'no flat recall/Recall=0' 部分仪器制造被证伪,须软化 contrib-2;(2) Bridge 仍主导(13/16≈81% vs 污染 89%)= 重构性回退核心存活;(3) Associative 仍=0 = 'no traceless leak/回退从不无声'(necessity traceless=0)去污后依然成立(最要紧必要性 claim 扛住);(4) population 3/18 迁移 HELD(cf_1130,cf_7744,cf_9994,判官敏感)。净:'Bridge 主导重构 + 从不无声' 存活,'Recall=0' 死,池敏感须诚实报。",
+  "draft_edits_pending": [
+    "abstract/§1 contrib-2 '90% bridge, no flat recall' → 'bridge-dominant (~81% under neutral judges), with a small but non-zero flat-recall rate (~2/16) once the anti-recall prime is removed'",
+    "§5 tab:taxonomy Recall=0 行 → 中性下 Recall≈2/16(报污染 vs 中性两列 + 一致性)",
+    "necessity: Associative=0/traceless=0 存活(不改);但 'reconstructive re-derivation' 收紧为 'bridge-or-recall, never traceless'",
+    "报 population 对判官 prompt 的敏感性(3/18 flip)为 limitation + 中性 run 作 robustness appendix"
+  ]
+}
