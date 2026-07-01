@@ -220,6 +220,10 @@
   ② **【F1 premise 核盘为真=决定性】**`base_probe` 7B answer_old **0.59→0.67=+0.08 漂移** ≈ 7B 编辑 **RR 0.080**(已相等!);仅 7B、**32B base_probe 缺=全局最关键缺口**。若 32B base drift≈RR 0.19,头牌"thinking undoes **EDITING**"大半是基座动力学。F2(ZEROTHINK 空块/LESSTHINK_CANNED 未用)、F3(采样路径全建、零上报、draft §3.3 却宣称)、Cap1(chain_len 空白分词)premise 全真。
   ③ **【§五 整合 + 红队 F1】**写 depth-plan §第五轮(增量专章,严格定义=翻转/杀 claim 或补缺口):🥇F1/F2/F3(现象根基,§四漏);🥈M1(CLR-split 零卡杀修复因果)/M3=S1/M4/M5/V1(CLR-judge:κ 只验 RRs 没验 CLR scorer);🥉Cap1/Cap2/Cap3=S9;K1⊂F1/K2/G1;DROP 9 项复核认同。**红队 F1**:base 漂移不自动 kill——编辑态回退="丢 B0 装入的 o_new"(base 无 edit 可丢=不同事件),须报 effect-above-control margin(edited RR − base ΔP(o_old))近零才真塌。
   ④ **【7/20 增量冲刺(融合 §四+§五)】**F1-32B base_probe(补缺口)+ M1/Cap1/Cap2(纯本地零卡杀)+ M3=S1/V1(平台判官)+ F3(采样零 LOC)。7/27:S5(修后)/S6(修后)/M2/M4/M5/K2/G1。
+- **v1.51 变更 (2026-07-01)**: **开工:M1 代码就位(杀修复因果)+ prefilter provenance guard(修 §四红队致命 bug)**——
+  ① **【M1 E-CLRZERO-SPLIT,`src/m1_clrsplit.py`,selftest 过】**按基线 N 臂 per-case CLR∈{0,1} 分层重算 T−N 的 RR/ES/RRs(复用 cross_arm.per_case 同口径 _without_subject+b0ok 门)+ 2×2 中介(RR 在 CLR-未降 case 的改善率)。KILL:CLR0 分层上 T−N RR 降幅 ≈ CLR1(或 RR 在 CLR-未降 case 大幅改善)→ 修复不靠堵链→直杀「in-chain re-derivation governs the answer」。**本地无 sup_battery jsonl(在平台)→ 我写码+自测,平台零卡跑**:`python src/m1_clrsplit.py --arm N=... --arm T=... --budget B3`。
+  ② **【prefilter guard,修 §四 S6 致命 bug】**`prefilter.py` 两个不同 dataset 共享 dataset.path 会静默覆盖 headline(毁 cf200+全抑制臂+RR=0.193 可复现)。加 `{out}.meta.json` provenance:tag 不同即拒绝(除非 --force),同 tag 重跑放行。验证:不同 tag 正确拒绝、同 tag/force 放行。**S6 加宽池现在安全**。
+  ③ **【下一步】**写 `JUDGE_PROMPT_NEUTRAL`(=S1/M3 前置,修 chain_classify:25 污染)+ Cap1/Cap2 代码;平台跑 M1 + F1-32B base_probe。
 
 ---
 

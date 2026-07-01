@@ -27,6 +27,30 @@ def _abs(p):
     return p if os.path.isabs(p) else os.path.join(_ROOT, p)
 
 
+def _guard_provenance(out, cfg, force):
+    """防覆盖:两个不同 dataset(如 cf200 headline vs cf1500 加宽)若共享同一 dataset.path,
+    merge 会静默覆盖前者(毁 headline + 全 32B 抑制臂,§第四轮红队致命 bug)。以 {out}.meta.json 记 tag,
+    tag 不同即拒绝(除非 --force)。同 tag 重跑/续跑放行。"""
+    meta_p = out + ".meta.json"
+    tag = cfg["dataset"].get("tag")
+    if os.path.exists(meta_p):
+        try:
+            old = json.load(open(meta_p))
+        except Exception:
+            old = {}
+        if old.get("tag") is not None and old.get("tag") != tag and not force:
+            raise SystemExit(
+                f"✗ 拒绝写 {out}:该路径由 dataset.tag={old.get('tag')!r}(n={old.get('n')})建立,"
+                f"当前 tag={tag!r} 不同 → 会覆盖那份数据(可能是 cf200 headline + 全抑制臂,毁 RR=0.193 可复现)。"
+                f"\n  → 给当前 config 一个专属 dataset.path(如 data/counterfact.prefiltered.{tag}.jsonl),或确认无误后加 --force。")
+    return meta_p, tag
+
+
+def _write_meta(meta_p, cfg, count):
+    json.dump({"tag": cfg["dataset"].get("tag"), "n": cfg["dataset"].get("n"), "count": count},
+              open(meta_p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+
+
 def candidates(cfg):
     """确定性候选：读 raw（清洗后全量）→ seed 洗牌 → 留有 o_old 的。返回有序 list + n。"""
     ds = cfg["dataset"]
@@ -46,10 +70,12 @@ def main():
     ap.add_argument("--limit", type=int, default=None, help="候选上限（默认 3×n）")
     ap.add_argument("--merge", action="store_true", help="合并 {out}.r* → {out}（无 GPU，去重 + 按洗牌序 + 截 2n）")
     ap.add_argument("--aliases", default="data/aliases.json")
+    ap.add_argument("--force", action="store_true", help="覆盖 provenance guard（确认要写别的 tag 建过的路径时）")
     args = ap.parse_args()
 
     cfg = yaml.safe_load(open(args.config))
     out = _abs(cfg["dataset"]["path"])
+    meta_p, _tag = _guard_provenance(out, cfg, args.force)     # 防跨-tag 覆盖 headline(红队致命 bug)
     cands, n = candidates(cfg)
     cands = cands[: (args.limit or 3 * n)]
 
@@ -67,6 +93,7 @@ def main():
         with open(out, "w", encoding="utf-8") as f:
             for c in survivors:
                 f.write(json.dumps(c, ensure_ascii=False) + "\n")
+        _write_meta(meta_p, cfg, len(survivors))              # 记 provenance,防将来别的 tag 覆盖
         print(f"[merge] 合 {len(shards)} 分片 → {out}：存活 {len(survivors)}（截至 2n={2 * n}）")
         return
 
