@@ -476,6 +476,39 @@
         "acc_on": 0.19,
         "delta": 0.04
       }
+    },
+    "clr_split_M1": {
+      "_status": "M1 E-CLRZERO-SPLIT(src/m1_clrsplit.py,零卡再分析 N/T sup_battery,n=198):按基线 N 臂 per-case CLR 分层的 T−N 修复效应 + 2×2 中介。",
+      "CLR1_baseline": {
+        "n": 106,
+        "T_minus_N_RR": -0.2889,
+        "ci": [
+          -0.4444,
+          -0.1556
+        ],
+        "p": 0.0002,
+        "T_minus_N_ES": 0.2642,
+        "N_RR": 0.4889,
+        "T_RR": 0.2
+      },
+      "CLR0_baseline": {
+        "n": 90,
+        "T_minus_N_RR": 0.0137,
+        "ci": [
+          0.0,
+          0.0411
+        ],
+        "p": 0.7224,
+        "T_minus_N_ES": -0.0111,
+        "N_RR": 0.0,
+        "T_RR": 0.0137
+      },
+      "mediation_2x2": {
+        "n_b0ok": 118,
+        "RRfix_when_CLR_dropped": 0.435,
+        "RRfix_when_CLR_NOT_dropped": 0.042
+      },
+      "verdict": "★强 CONFIRM(硬化 RQ3 机理,非 kill):修复效应精确集中 CLR1 基线(T−N RR −0.289 p=.0002)、CLR0 基线≈0(+0.014 p=.72);2×2 RR 改善率 CLR-降 43% vs CLR-未降 4%(10×)。→ 『链内容中介答案』within-case 被证实(非仅边际 T−P),直接回应『suppress 每步减 penalty 可能不管 o_old 就改道』的循环质疑:无链内 o_old 可堵时修复什么也不做。"
     }
   },
   "logitlens": {
