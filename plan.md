@@ -224,6 +224,10 @@
   ① **【M1 E-CLRZERO-SPLIT,`src/m1_clrsplit.py`,selftest 过】**按基线 N 臂 per-case CLR∈{0,1} 分层重算 T−N 的 RR/ES/RRs(复用 cross_arm.per_case 同口径 _without_subject+b0ok 门)+ 2×2 中介(RR 在 CLR-未降 case 的改善率)。KILL:CLR0 分层上 T−N RR 降幅 ≈ CLR1(或 RR 在 CLR-未降 case 大幅改善)→ 修复不靠堵链→直杀「in-chain re-derivation governs the answer」。**本地无 sup_battery jsonl(在平台)→ 我写码+自测,平台零卡跑**:`python src/m1_clrsplit.py --arm N=... --arm T=... --budget B3`。
   ② **【prefilter guard,修 §四 S6 致命 bug】**`prefilter.py` 两个不同 dataset 共享 dataset.path 会静默覆盖 headline(毁 cf200+全抑制臂+RR=0.193 可复现)。加 `{out}.meta.json` provenance:tag 不同即拒绝(除非 --force),同 tag 重跑放行。验证:不同 tag 正确拒绝、同 tag/force 放行。**S6 加宽池现在安全**。
   ③ **【下一步】**写 `JUDGE_PROMPT_NEUTRAL`(=S1/M3 前置,修 chain_classify:25 污染)+ Cap1/Cap2 代码;平台跑 M1 + F1-32B base_probe。
+- **v1.52 变更 (2026-07-01)**: **三线并行开跑:S1 中性重跑判官完成(in-app 99 agent)→ 部分 kill 一条 claim;F1(H200)/base_probe 6 尺度(H100)平台跑**——
+  ① **【S1/M3 中性重跑=有增量结果】**去 `chain_classify:25` 4 句污染 + 去 Bridge-first 优先级 prime,3 判官重判同 33 链(`JUDGE_PROMPT_NEUTRAL`,emit --prompt neutral,全程本地+in-app)。**结果(results/a3_neutral,results.json rq2_taxonomy.neutral_rerun_S1)**:(1) **Recall 0→2**(14b cf_3883/32b cf_6933)= "no flat recall/Recall=0" **部分仪器制造、被证伪**→软化 contrib-2;(2) **Bridge 仍主导 81%**(vs 89%)=重构性回退核心存活;(3) **Associative 仍=0**="no traceless leak/回退从不无声"(necessity traceless=0)**去污后依然成立**(最要紧必要性 claim 扛住);(4) population 3/18 迁移 HELD(cf_1130/9994/7744,判官敏感)。净:核心存活、"Recall=0"死、诚实报敏感性。draft 改动清单已记 summary.json(待放行写作再改)。
+  ② **【平台并行】**F1(H200,32B 未编辑 base_probe,现象是否编辑特异)+ base_probe 14B/8B/1.5B(H100,凑 6 尺度 base-recall 解锁 Cap3/S9 杀 capability)命令已给;M1(CPU 零卡)+ F3(probe32b_sample,排队等 H200)ready。
+  ③ **【工作纪律】**用户定:能挂平台跑的先挂,平台跑时做本地活;增量 review(翻/杀 claim 或补缺口)是最高优先判据;暂不碰论文写作(数据落库可,draft prose 待放行)。
 
 ---
 
