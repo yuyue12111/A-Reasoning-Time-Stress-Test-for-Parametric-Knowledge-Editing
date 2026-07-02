@@ -257,6 +257,17 @@ def test_infer_tag_meta():
     assert pe.infer_tag_meta("r1qwen32b_GENBENCH_r0.jsonl") is None
     assert pe.infer_tag_meta("r1llama8b_ROME_mh2hop_r0of8.jsonl") is None
     assert pe.infer_tag_meta("r1qwen32b_logitlens_r0.jsonl") is None
+    # 坑③(2026-07-02 抓)：非-headline 编辑实验必须拒(否则 last-write-wins 覆盖干净 cf200 → 污染 cell)
+    for bad in ("r1qwen32b_ROME_cf200sup_r0of8.jsonl", "r1qwen32b_ROME_cf200sup_placebo_r0of8.jsonl",
+                "r1qwen32b_ROME_cf100sup_th_p8_r0of8.jsonl", "r1qwen7b_ROME_scanL7_r0of8.jsonl",
+                "r1qwen7b_ROME_h200chk_r0of8.jsonl", "r1qwen7b_ROME_cftest_r0of1.jsonl",
+                "r1qwen1_5b_ROME_cf40_bosON_r0of8.jsonl", "r1llama8b_ROME_cf60_L6_c2_r0of8.jsonl",
+                "r1qwen7b_ROME_cf200s_r0of8.jsonl"):
+        assert pe.infer_tag_meta(bad) is None, f"{bad} 应被拒(非 headline 实验)"
+    # headline 干净 tag 必须留：cf200 / cf200c2(8B) / cf100(70B)
+    assert pe.infer_tag_meta("r1qwen32b_ROME_cf200_r0of8.jsonl") == (32.0, "Qwen")
+    assert pe.infer_tag_meta("r1llama8b_ROME_cf200c2_r0of8.jsonl") == (8.0, "Llama")
+    assert pe.infer_tag_meta("r1llama70b_ROME_cf100_r0of2.jsonl") == (70.0, "Llama")
     # override 用下划线键也能匹配下划线文件名（归一后比对）
     assert pe.infer_tag_meta("r1qwen1_5b_x.jsonl", {"r1qwen1_5b": [1.5, "Qwen"]}) == (1.5, "Qwen")
 

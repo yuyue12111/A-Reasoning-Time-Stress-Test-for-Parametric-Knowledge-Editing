@@ -114,7 +114,12 @@ def infer_tag_meta(token, override=None):
     # 非 CF-编辑 per-case 文件（不同 schema）—— 即便文件名含 model_tag（如 r1qwen32b_GENBENCH）也必须拒，
     # 否则会被误当某尺度的编辑分片污染该 cell。放在 override 之前，确保宽 --map 子串也不能放它进来。
     if any(bad in t for bad in ("genbench", "multihop", "mh2hop", "logitlens",
-                                "steer", "sweep", "_a1_", "_a2_", "_a3_", "_a4_")):
+                                "steer", "sweep", "_a1_", "_a2_", "_a3_", "_a4_",
+                                # 非-headline 编辑实验(会 last-write-wins 覆盖干净 cf200 → 污染 cell):
+                                # 抑制(cf*sup/sup_onew/sup_placebo)、layer 扫(scanL*)、冒烟/校验
+                                # (h200chk/cftest/h200t)、BOS A/B(cf40_bos*)、小 pilot(cf40/cf60)、
+                                # F2/F3 派生(cf200f2 无 B3 已自然掉;cf200s/cf200samp 采样臂)。
+                                "sup", "scan", "chk", "test", "_bos", "cf40", "cf60", "cf200s")):
         return None
     # 下划线当小数点（"r1qwen1_5b" → "1.5b"）；否则 _SIZE_RE 把 "5b" 读成 5.0、_TAG_PARAMS 也匹配不上。
     t = re.sub(r"(?<=\d)_(?=\d)", ".", t)
@@ -175,7 +180,10 @@ def load_percase_rows(paths, cases, aliases, decode="greedy", base="B0", late="B
             skipped.append(os.path.basename(path))
             continue
         params_b, family = meta
-        seen_tags.setdefault((params_b, family), os.path.basename(path))
+        # 记录每尺度实际吃进的 dataset-tag 集合（cf200 / cf200c2 / cf100 …）——用于混 tag 告警。
+        m_tag = re.search(r"_(?:ROME|MEMIT|AlphaEdit|FT)_(.+?)_r\d+(?:of\d+)?\.jsonl$", os.path.basename(path))
+        ds_tag = m_tag.group(1) if m_tag else os.path.basename(path)
+        seen_tags.setdefault((params_b, family), set()).add(ds_tag)
         with open(path) as fh:
             for line in fh:
                 try:
@@ -242,7 +250,15 @@ def load_percase_rows(paths, cases, aliases, decode="greedy", base="B0", late="B
     if skipped:
         print(f"  [skip] {len(skipped)} 个推不出 scale/family 的分片已忽略（非容量 per-case？）："
               f"{', '.join(skipped[:8])}{' …' if len(skipped) > 8 else ''}", file=sys.stderr)
-    return rows, {f"{p}B_{f}": fn for (p, f), fn in seen_tags.items()}
+    # ⚠混 tag 告警：同一尺度吃进 >1 个 dataset-tag → last-write-wins 会用字典序最后者覆盖，
+    # 静默污染该 cell（曾用 *_ROME_cf*.jsonl 把 cf200sup 抑制实验覆盖掉 32B 的 cf200 → rr 虚低）。
+    mixed = {f"{p}B-{f}": sorted(tags) for (p, f), tags in seen_tags.items() if len(tags) > 1}
+    if mixed:
+        print(f"  ⚠⚠ 混 tag 告警：以下尺度吃进多个 dataset-tag（last-write-wins 会静默覆盖，数值不可信）：",
+              file=sys.stderr)
+        for k, ts in mixed.items():
+            print(f"       {k}: {ts}  → 用显式 per-scale --glob 或 --map 只留 headline tag", file=sys.stderr)
+    return rows, {f"{p}B_{f}": ("|".join(sorted(tags))) for (p, f), tags in seen_tags.items()}
 
 
 # ------------------------------------------------------------------------------
