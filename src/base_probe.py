@@ -90,11 +90,22 @@ def main():
     model_name = os.environ.get("WHYAAAI_MODEL") or cfg["hparams_overrides"]["model_name"]  # 离线平台:指本地绝对路径
     dtype = {"float32": torch.float32, "bfloat16": torch.bfloat16, "float16": torch.float16}.get(
         os.environ.get("WHYAAAI_DTYPE", "bfloat16"), torch.bfloat16)
-    dev = f"cuda:{args.rank}" if args.world > 1 else "cuda"
     tok = AutoTokenizer.from_pretrained(model_name)
     from r1_tokenizer import fix_r1_tokenizer       # R1-Llama Metaspace 删空格修复(Qwen 原样)
     tok = fix_r1_tokenizer(tok, model_name)
-    model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=dtype).to(dev).eval()
+    # 70B 等单卡放不下 → model_parallel:device_map='auto' 把模型摊到所有可见卡(think_budget 用 model.device,
+    # 输入落 embedding 所在 cuda:0、accelerate 自动跨卡派发,无需改 think_budget)。触发=env WHYAAAI_DEVICE_MAP=auto
+    # 或 config hparams_overrides.model_parallel: true(probe_llama70b.yaml 已有)。此时必须单进程(world=1)。
+    dev_map = os.environ.get("WHYAAAI_DEVICE_MAP") or ("auto" if cfg.get("hparams_overrides", {}).get("model_parallel") else None)
+    if dev_map:
+        if args.world > 1:
+            raise SystemExit("model_parallel(device_map) 下须单进程:用 --world 1(每进程跨所有可见卡摊模型);"
+                             "多卡并行改用 CUDA_VISIBLE_DEVICES 切多组、每组一进程,勿 --world>1。")
+        model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=dtype, device_map=dev_map).eval()
+        print(f"[base_probe] model_parallel device_map={dev_map}(跨可见卡摊模型), dtype={dtype}")
+    else:
+        dev = f"cuda:{args.rank}" if args.world > 1 else "cuda"
+        model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=dtype).to(dev).eval()
 
     cases = load_cases(cfg)
     budgets = [b for b in args.budgets.split(",") if b]
