@@ -1195,5 +1195,110 @@
    }
   },
   "verdict": "★必要性方向(观察性):19/19 自然 committed 回退都经可观察链内重推路由(Bridge 17/RO 2),traceless(Associative)=0 → 回退从不无声=in-chain re-derivation 在每个被判回退里都可观察到(链级干预证充分性的观察性补充)。o_old 逐字现于链 17/19。充分性边界(诚实):held n=14 全部 clr_in_cot=True → o_old 现于链对回退【不充分】,答案取决于链是否 commit 到 o_old(呼应 Bridge/Reflective-override vs held)。诚实 caveat:观察性非随机、n 小(19/14)、clr_in_cot 是判官启发式 prefeature、held 群亦判官采样(选在 o_old 显著上→'不充分'是提示性,'回退无 traceless'是更干净的主张)。不报 P(回退|clr) 裸对比(population 选择偏倚)。"
+ },
+ "f2_zerothink_deconfound": {
+  "_status": "F2(depth-plan §五):去 ZeroThink 空块混淆——B0(空<think></think>)/B0P(LessThink 固定假思考=非空但零推理内容)/B1(256-token 真链),同 32B ROME×CF 200 case,greedy,tag cf200f2。src/think_budget.py B0P 臂 + experiments/probe32b_f2.yaml(commit ff8cbc0)。",
+  "arms": {
+   "B0": {
+    "ES": 0.625,
+    "ESf": 0.75,
+    "RR": 0.0,
+    "RRs": 0.0,
+    "CLR": 0.0,
+    "Flip": 0.145,
+    "Loc": 0.97,
+    "n": 200,
+    "note": "ZeroThink 空思考块"
+   },
+   "B0P": {
+    "ES": 0.715,
+    "ESf": 0.79,
+    "RR": 0.04,
+    "RRs": 0.016,
+    "CLR": 0.0,
+    "Flip": 0.09,
+    "Loc": 0.98,
+    "n": 200,
+    "note": "LessThink 固定假思考(非空、零推理内容);CLR≡0 = sanity 过(判分器不误报 canned 链)"
+   },
+   "B1": {
+    "ES": 0.495,
+    "ESf": 0.625,
+    "RR": 0.208,
+    "RRs": 0.088,
+    "CLR": 0.465,
+    "Flip": 0.195,
+    "Loc": 0.965,
+    "n": 200,
+    "note": "256-token 真生成链"
+   }
+  },
+  "rr_ci": {
+   "B0": [
+    0.0,
+    [
+     0.0,
+     0.0
+    ]
+   ],
+   "B0P": [
+    0.04,
+    [
+     0.008,
+     0.08
+    ]
+   ],
+   "B1": [
+    0.208,
+    [
+     0.136,
+     0.28
+    ]
+   ]
+  },
+  "es_ci": {
+   "B0": [
+    0.625,
+    [
+     0.555,
+     0.69
+    ]
+   ],
+   "B0P": [
+    0.715,
+    [
+     0.65,
+     0.775
+    ]
+   ],
+   "B1": [
+    0.495,
+    [
+     0.425,
+     0.565
+    ]
+   ]
+  },
+  "es_drop_ci": {
+   "B0_to_B0P": [
+    -0.09,
+    [
+     -0.15,
+     -0.03
+    ],
+    "含0/反向(B0P ES 反高)=加零内容链不 erode"
+   ],
+   "B0_to_B1": [
+    0.13,
+    [
+     0.06,
+     0.205
+    ],
+    "CI>0 显著=加真链才 erode"
+   ]
+  },
+  "verdict": "★F2 CONFIRM:RR B0 0.000 ≈ B0P 0.040 ≪ B1 0.208(B0→B0P 仅 +0.040 vs B0P→B1 +0.168)→ 『无思考=编辑守住』【不是】ZeroThink 空块 artifact;RR 只在有【真推理内容】(B1)时跳,不随 think-块 wrapper(B0P)。ES-drop 同证:B0→B0P n.s. 且反向(B0P ES 0.715>0.625)、B0→B1 显著 0.130[0.060,0.205]。CLR:B0P≡0(sanity 过)、B1 0.465(真链泄漏)。→ 硬化头牌『erosion 随推理内容单调』,ZeroThink 锚点有效。",
+  "_bonus": "B1(256-token 短链)RR 0.208 已 ≈ headline B3 RR 0.193、且已过 go/no-go RR≥0.20 → erosion 早饱和(短链即得大部分回退),支持『思考一展开就退』。",
+  "_honest_wrinkle": "B0P ES(0.715)>B0 ES(0.625):ZeroThink 空块比极简 canned think 略欠编辑保持——不威胁去混淆(两者 RR 都≈0),反说明 ZeroThink 锚点【保守】(未人为夸大编辑守住)。"
  }
 }
