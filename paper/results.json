@@ -634,7 +634,7 @@
    "M1_scope": "M1 gate 的是 RQ3 修复的链中介@32B 单尺度,【不】背书 RQ2 跨尺度涌现;两条不同 claim,勿混。",
    "Cap_upgrade": "Cap2(clr_rev slope)+Cap3(net-CLR=edited−base 同门 per-case slope + 回归 erosion~capability|base_recall)从【可选→必做】:封死 CLR 涌现 base-floor 共线的唯一路径。范围:只 gate CLR 涌现叙事,不 gate 头牌(F1/M1/32B ES降幅独立成立)。",
    "emergence_slope_honesty_SUPERSEDED": "⚠per-case cluster-robust 涌现 slope 只有 CLR 显著(0.372[0.149,0.800] excl0);RR(0.047[−0.501,0.53])与 es_drop(0.033[−0.037,0.139]) 均【含零 n.s.】。故涌现-as-slope 唯一显著腿=CLR,而 CLR 与 base CLR 底噪(0.582→0.86)共线。=> 不能'降级 CLR 又声称涌现稳';capability-emergence 维持 supporting-trend(印证 MECH-led 降级),头牌压 M1 within-case + F1 change-control + 32B cell-level ES降幅 0.106[0.030,0.182]显著(≠per-case slope,是单模型 bootstrap)。",
-   "emergence_slope_honesty": "⚠[待 clean 重跑更新]原判'只 CLR per-case slope 显著、RR/es_drop n.s.'建立在【受污染】的 percase 上(32B B3 被 cf200sup 抑制实验覆盖 → es_drop/rr 被低估)。denylist 已加固(commit e21b67c)。干净 per-scale --glob 重跑后需重判:clean 32B(es_drop 0.106/rr 0.193)可能让 es_drop/rr 涌现 slope 复活;CLR base-floor 共线仍需 Cap3(net-CLR)判。当前【不下结论】。"
+   "emergence_slope_honesty": "✅[clean 重跑更新,2026-07-02]污染修复后(commit e21b67c;32B 曾被 cf200sup 覆盖):es_drop 涌现【复活】显著=0.109[0.036,0.175] p=.003(污染时 0.033 n.s.);rr 0.644 p=.052 擦边;clr raw 强显著但 Cap3 net-CLR=0.049 含零=base 底噪伪影【退役】。→ capability-emergence 由 es_drop(编辑特异、非底噪)承重,比污染版('只 CLR、还共线')强得多。v1.55③ 的悲观部分被翻回。"
   },
   "_pending_draft_edits": [
    "abstract L13/17/21/44(32B headline)recall 锚 0.59→0.765(0.59 是 7B 值;base_probe.32B.answer_old_b0=0.765)。",
@@ -779,16 +779,24 @@
   "_note": "B-emergence:erosion 指标对 log10(参数量)pool 两族回归;slope CI 排零=涌现有统计支撑(非仅靠 2/6 per-cell 显著)。6 点小样、log-params 为能力代理(跨族 alignment 已论证)、不宣称 scaling law。OLS 解析 t-CI(df=n-2)+按点 bootstrap(n=10000,seed42)+逆方差 WLS+family 控制。src/emergence_regression.py 可复现。",
   "_percase_replacement": "【洞 fatal 实质封死·per-case 承重统计最终 6-cell 已跑】6 点 OLS 的 p<0.002 来自 point-resample 同 6 cell 均值(re-review wa6rxz0qp)→ 换 per-CASE 回归(每行=edit-case×尺度,~log10(params)+chain_len,family drop-one FE + 按 family 两级 cluster bootstrap=重采样单位=case nested in family,非 cell-mean)。**最终 6-cell(含 7B,无 WARN,rows=1196)**:CLR slope 0.372 [0.149,0.800] p=.0007 排零、within-Qwen CLR 0.365 [0.062,0.675] p=.010 排零;es_drop 0.033 [-0.037,0.139] p=.19、rr 0.047 [-0.501,0.530] p=.43 不显著=与 draft『foreground CLR』一致。**CLR 在 honest cluster bootstrap(K=2)下仍显著 → 制造显著性的 fatal 实质堵死**(5-cell 0.377→6-cell 0.372 稳健)。6 点 OLS 降描述性。残留(非阻塞):n 混(14/32/70B=cf100、1.5/7/8B 含 cf200,非全 headline n=200);CLR 结论不预期变。",
   "percase": {
-   "_status": "⚠[数值待重跑,见 _POLLUTION_WARNING] FINAL 6-cell (incl 7B; no WARN; rows=1196; n mixed cf100/cf200, not all headline n=200); two-level cluster bootstrap (case nested in family, K=2). 取代 6 点 OLS 为承重 emergence 统计。",
+   "_status": "CLEAN 6-cell(commit 后 glob 污染修复;显式 per-scale --glob:cf200/cf200c2/cf100,无混-tag 告警,rows=1194)。两级 cluster bootstrap(case nested in family,K=2)。取代 6 点 OLS 为承重 emergence 统计。★clean 后 es_drop 涌现【复活】显著(污染时被 cf200sup 抑制数据盖住)。",
    "clr": {
-    "slope": 0.372,
-    "ci": [
-     0.149,
-     0.8
+    "point": 0.9703,
+    "kind": "logit",
+    "ci95": [
+     0.5971,
+     1.3503
     ],
-    "p_le0": 0.0007,
     "excludes_zero": true,
-    "_base_floor_caveat": "⚠此 slope(0.372[0.149,0.800] excl0)跑在 raw edited CLR level 上;未编辑 base CLR 亦随 scale 升(0.582/0.825/0.860/0.829)、与之高度共线(base CLR~log-params r≈0.89),results.json 无 base-subtracted/net-CLR slope。故 raw CLR 涌现不能干净归因于'编辑侵蚀随能力更严重'。且 per-case RR/es_drop slope 均 n.s.(见 rr/es_drop)→ 唯一显著涌现腿=此 CLR、正被 base-floor 质疑。封口需 Cap2(clr_rev slope)+Cap3(net-CLR=edited−base 同 b0ok 门 per-case slope)。经 wz4rou8q3 对抗验证。"
+    "p_slope_le_0": 0.0,
+    "n_rows": 1194,
+    "n_families": 2,
+    "n_boot_effective": 10000,
+    "_desc": "CLR@B3 ∈{0,1}（链内旧知识泄漏）",
+    "statsmodels": {
+     "available": false
+    },
+    "_base_floor_caveat": "⚠Cap3 实测(emergence.cap3_netclr):raw CLR slope 强显著,但逐 case 减 base 底噪后 net_clr slope=0.049 [−0.024,0.122] p=.093 【含零不显著】 → CLR 涌现≈全由 base CLR 底噪(0.582→0.86 随 scale 升)共线解释,【非】编辑特异涌现。故 CLR 涌现【退役】、只作描述;capability-emergence 靠 es_drop(0.109 p=.003,编辑特异、非底噪)+ rr(p=.052 擦边)。clr_density(Cap1)显著但未扣 base、同受底噪嫌疑=suggestive。"
    },
    "within_qwen_clr": {
     "slope": 0.365,
@@ -800,22 +808,38 @@
     "excludes_zero": true
    },
    "es_drop": {
-    "slope": 0.033,
-    "ci": [
-     -0.037,
-     0.139
+    "point": 0.1094,
+    "kind": "ols",
+    "ci95": [
+     0.0357,
+     0.1748
     ],
-    "p_le0": 0.188,
-    "excludes_zero": false
+    "excludes_zero": true,
+    "p_slope_le_0": 0.003,
+    "n_rows": 1194,
+    "n_families": 2,
+    "n_boot_effective": 10000,
+    "_desc": "ES 降幅 ES@B0−ES@B3 ∈{−1,0,1}（连续，主结局；正=思考后丢编辑）",
+    "statsmodels": {
+     "available": false
+    }
    },
    "rr": {
-    "slope": 0.047,
-    "ci": [
-     -0.501,
-     0.53
+    "point": 0.6444,
+    "kind": "logit",
+    "ci95": [
+     -0.1134,
+     1.3723
     ],
-    "p_le0": 0.426,
-    "excludes_zero": false
+    "excludes_zero": false,
+    "p_slope_le_0": 0.0517,
+    "n_rows": 689,
+    "n_families": 2,
+    "n_boot_effective": 10000,
+    "_desc": "b0ok-gated RR@B3 ∈{0,1}（仅 B0 命中编辑的 case）",
+    "statsmodels": {
+     "available": false
+    }
    },
    "n_rows": 1196,
    "n_families": 2,
@@ -827,7 +851,102 @@
     "8B-Llama",
     "70B-Llama"
    ],
-   "_POLLUTION_WARNING": "⚠⚠ POLLUTION(2026-07-02 抓,commit e21b67c):本 percase 用宽 glob *_ROME_cf*.jsonl 跑,而 infer_tag_meta 旧 denylist 不含 sup/scan/chk/test → 抑制实验(cf200sup)/layer扫(scanL*)/冒烟 被 last-write-wins 覆盖进 cell。铁证:32B 的 rr 应 0.193(clean cf200)却被 cf200sup 覆盖成 ≈0.092(RQ3 抑制值 0.085)。故下方 clr 0.372/es_drop 0.033/rr 0.047 【数值作废】,待干净 per-scale --glob 重跑(cf200/cf200c2/cf100 各一)。denylist 已加固 + 混-tag 告警。注:32B 被抑制污染=erosion 被【低估】,clean 重跑后 es_drop/rr 涌现 slope 可能【复活】(clean 32B es_drop 0.106/rr 0.193 远强于污染值)。"
+   "cells_descriptive": {
+    "Llama-8.0B": {
+     "n": 200,
+     "es_drop": 0.015,
+     "rr": 0.144,
+     "clr": 0.34
+    },
+    "Llama-70.0B": {
+     "n": 200,
+     "es_drop": 0.11,
+     "rr": 0.1667,
+     "clr": 0.495
+    },
+    "Qwen-1.5B": {
+     "n": 196,
+     "es_drop": -0.0255,
+     "rr": 0.0614,
+     "clr": 0.2092
+    },
+    "Qwen-7.0B": {
+     "n": 200,
+     "es_drop": -0.03,
+     "rr": 0.08,
+     "clr": 0.335
+    },
+    "Qwen-14.0B": {
+     "n": 200,
+     "es_drop": 0.04,
+     "rr": 0.1622,
+     "clr": 0.475
+    },
+    "Qwen-32.0B": {
+     "n": 198,
+     "es_drop": 0.1061,
+     "rr": 0.1933,
+     "clr": 0.5455
+    }
+   },
+   "clr_density": {
+    "point": 0.0037,
+    "kind": "ols",
+    "ci95": [
+     0.0018,
+     0.0051
+    ],
+    "excludes_zero": true,
+    "p_slope_le_0": 0.0001,
+    "n_rows": 1194,
+    "n_families": 2,
+    "n_boot_effective": 10000,
+    "_desc": "Cap1: CLR 密度 = 链内 o_old 词边界出现次数/chain_len（连续；涌现=更高泄漏率还是只是链更长？控 chain_len 后仍正 slope=前者）",
+    "statsmodels": {
+     "available": false
+    }
+   },
+   "clr_rev": {
+    "point": 0.6444,
+    "kind": "logit",
+    "ci95": [
+     -0.1138,
+     1.3764
+    ],
+    "excludes_zero": false,
+    "p_slope_le_0": 0.052,
+    "n_rows": 689,
+    "n_families": 2,
+    "n_boot_effective": 10000,
+    "_desc": "Cap2: b0ok-gated CLR∧回退 ∈{0,1}（CLR 限定到真驱动回退的链，重测涌现 slope，剔除『编辑守住但顺带提旧』的 CLR）",
+    "statsmodels": {
+     "available": false
+    }
+   },
+   "within_Qwen_clr": {
+    "point": 1.1819,
+    "kind": "logit",
+    "ci95": [
+     0.8612,
+     1.5396
+    ],
+    "excludes_zero": true,
+    "p_slope_le_0": 0.0,
+    "n_rows": 794,
+    "n_boot_effective": 10000
+   },
+   "within_Qwen_es_drop": {
+    "point": 0.1194,
+    "kind": "ols",
+    "ci95": [
+     0.0415,
+     0.1983
+    ],
+    "excludes_zero": true,
+    "p_slope_le_0": 0.0007,
+    "n_rows": 794,
+    "n_boot_effective": 10000
+   }
   },
   "clr_robustness": {
    "_status": "CLR scorer-robustness (src/clr_robustness.py)。证 CLR 对别名 cutoff 与去污不敏感、趋势非 cutoff 造。注:glob 池化多个 ROME×CF shard(32B n_eff=1476),绝对 CLR 非 headline 口径;cutoff 对比同 case 内有效。",
@@ -1041,6 +1160,64 @@
     "lopo_all_positive": true,
     "lopo_all_exclude_zero": true
    }
+  },
+  "cap3_netclr": {
+   "_status": "Cap3(src/cap3_netclr.py,clean per-scale glob):net_clr=edited_CLR−base_CLR 逐 case 配对减 base 底噪,重估涌现 slope。net_clr 匹配 4 尺度(1.5B/8B/14B/32B;7B base 未入本次 glob、70B base 未跑),n=793。",
+   "net_clr": {
+    "point": 0.0494,
+    "ci95": [
+     -0.024,
+     0.1216
+    ],
+    "excludes_zero": false,
+    "p_slope_le_0": 0.0928,
+    "n": 793
+   },
+   "clr_raw_matched": {
+    "point": 1.1283,
+    "ci95": [
+     0.8246,
+     1.4682
+    ],
+    "excludes_zero": true
+   },
+   "clr_on_baseCLR0": {
+    "point": 0.654,
+    "ci95": [
+     -0.285,
+     1.7613
+    ],
+    "excludes_zero": false,
+    "n": 178
+   },
+   "per_scale": {
+    "Llama-8.0B": {
+     "n": 200,
+     "edited_clr": 0.34,
+     "base_clr": 0.825,
+     "net_clr": -0.485
+    },
+    "Qwen-1.5B": {
+     "n": 196,
+     "edited_clr": 0.209,
+     "base_clr": 0.582,
+     "net_clr": -0.372
+    },
+    "Qwen-14.0B": {
+     "n": 200,
+     "edited_clr": 0.475,
+     "base_clr": 0.86,
+     "net_clr": -0.385
+    },
+    "Qwen-32.0B": {
+     "n": 197,
+     "edited_clr": 0.543,
+     "base_clr": 0.832,
+     "net_clr": -0.289
+    }
+   },
+   "verdict": "★Cap3 定论:raw CLR slope 1.128[0.825,1.468]强显著 → net(减 base)0.049[−0.024,0.122] p=.093【含零】。逐尺度 net_clr≈平(−0.37/−0.49/−0.39/−0.29)=编辑 CLR 恒定低于 base ~0.38、gap 不随能力扩。→ CLR 涌现是 base 底噪伪影,【退役】为描述;base_clr==0 子集 slope 0.654 亦含零(n=178)。capability-emergence 由 es_drop(0.109 p=.003,编辑特异)接棒,不受影响。",
+   "_gap": "7B base 未进本次 --base-glob(net_clr 只 4 尺度);70B base 未跑。补 7B base(*_BASE_* 已在盘)可回填 5 尺度。"
   }
  },
  "metric_validation": {
