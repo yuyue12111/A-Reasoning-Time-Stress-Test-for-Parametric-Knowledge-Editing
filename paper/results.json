@@ -630,10 +630,11 @@
    "_run": "wz4rou8q3(8-agent workflow:4-lens+kill→synth→2 skeptics;两 skeptics 均 refuted 综合的假支柱,已并入 corrected)",
    "F1_edit_specificity": "held——收紧为 'base 无漂移(Δ≈0,显著性待 per-case CI)' 而非 'base 反向漂移';margin 0.214;两种解读下 erosion 都编辑特异。",
    "RQ1_level_vs_change": "LEVEL(base ans_old 0.515→0.765、base CLR 0.582→0.86 均随 scale 升)≠ 我们量的 CHANGE(edited B0→B3)。此区分是枢轴、成立;但见 emergence 诚实条。",
-   "emergence_slope_honesty": "⚠per-case cluster-robust 涌现 slope 只有 CLR 显著(0.372[0.149,0.800] excl0);RR(0.047[−0.501,0.53])与 es_drop(0.033[−0.037,0.139]) 均【含零 n.s.】。故涌现-as-slope 唯一显著腿=CLR,而 CLR 与 base CLR 底噪(0.582→0.86)共线。=> 不能'降级 CLR 又声称涌现稳';capability-emergence 维持 supporting-trend(印证 MECH-led 降级),头牌压 M1 within-case + F1 change-control + 32B cell-level ES降幅 0.106[0.030,0.182]显著(≠per-case slope,是单模型 bootstrap)。",
    "CLR_denominator_artifact": "'edited CLR<base CLR=压制' 作废(分母错配,见 f1_edit_specificity._bonus_CORRECTED)。",
    "M1_scope": "M1 gate 的是 RQ3 修复的链中介@32B 单尺度,【不】背书 RQ2 跨尺度涌现;两条不同 claim,勿混。",
-   "Cap_upgrade": "Cap2(clr_rev slope)+Cap3(net-CLR=edited−base 同门 per-case slope + 回归 erosion~capability|base_recall)从【可选→必做】:封死 CLR 涌现 base-floor 共线的唯一路径。范围:只 gate CLR 涌现叙事,不 gate 头牌(F1/M1/32B ES降幅独立成立)。"
+   "Cap_upgrade": "Cap2(clr_rev slope)+Cap3(net-CLR=edited−base 同门 per-case slope + 回归 erosion~capability|base_recall)从【可选→必做】:封死 CLR 涌现 base-floor 共线的唯一路径。范围:只 gate CLR 涌现叙事,不 gate 头牌(F1/M1/32B ES降幅独立成立)。",
+   "emergence_slope_honesty_SUPERSEDED": "⚠per-case cluster-robust 涌现 slope 只有 CLR 显著(0.372[0.149,0.800] excl0);RR(0.047[−0.501,0.53])与 es_drop(0.033[−0.037,0.139]) 均【含零 n.s.】。故涌现-as-slope 唯一显著腿=CLR,而 CLR 与 base CLR 底噪(0.582→0.86)共线。=> 不能'降级 CLR 又声称涌现稳';capability-emergence 维持 supporting-trend(印证 MECH-led 降级),头牌压 M1 within-case + F1 change-control + 32B cell-level ES降幅 0.106[0.030,0.182]显著(≠per-case slope,是单模型 bootstrap)。",
+   "emergence_slope_honesty": "⚠[待 clean 重跑更新]原判'只 CLR per-case slope 显著、RR/es_drop n.s.'建立在【受污染】的 percase 上(32B B3 被 cf200sup 抑制实验覆盖 → es_drop/rr 被低估)。denylist 已加固(commit e21b67c)。干净 per-scale --glob 重跑后需重判:clean 32B(es_drop 0.106/rr 0.193)可能让 es_drop/rr 涌现 slope 复活;CLR base-floor 共线仍需 Cap3(net-CLR)判。当前【不下结论】。"
   },
   "_pending_draft_edits": [
    "abstract L13/17/21/44(32B headline)recall 锚 0.59→0.765(0.59 是 7B 值;base_probe.32B.answer_old_b0=0.765)。",
@@ -778,7 +779,7 @@
   "_note": "B-emergence:erosion 指标对 log10(参数量)pool 两族回归;slope CI 排零=涌现有统计支撑(非仅靠 2/6 per-cell 显著)。6 点小样、log-params 为能力代理(跨族 alignment 已论证)、不宣称 scaling law。OLS 解析 t-CI(df=n-2)+按点 bootstrap(n=10000,seed42)+逆方差 WLS+family 控制。src/emergence_regression.py 可复现。",
   "_percase_replacement": "【洞 fatal 实质封死·per-case 承重统计最终 6-cell 已跑】6 点 OLS 的 p<0.002 来自 point-resample 同 6 cell 均值(re-review wa6rxz0qp)→ 换 per-CASE 回归(每行=edit-case×尺度,~log10(params)+chain_len,family drop-one FE + 按 family 两级 cluster bootstrap=重采样单位=case nested in family,非 cell-mean)。**最终 6-cell(含 7B,无 WARN,rows=1196)**:CLR slope 0.372 [0.149,0.800] p=.0007 排零、within-Qwen CLR 0.365 [0.062,0.675] p=.010 排零;es_drop 0.033 [-0.037,0.139] p=.19、rr 0.047 [-0.501,0.530] p=.43 不显著=与 draft『foreground CLR』一致。**CLR 在 honest cluster bootstrap(K=2)下仍显著 → 制造显著性的 fatal 实质堵死**(5-cell 0.377→6-cell 0.372 稳健)。6 点 OLS 降描述性。残留(非阻塞):n 混(14/32/70B=cf100、1.5/7/8B 含 cf200,非全 headline n=200);CLR 结论不预期变。",
   "percase": {
-   "_status": "FINAL 6-cell (incl 7B; no WARN; rows=1196; n mixed cf100/cf200, not all headline n=200); two-level cluster bootstrap (case nested in family, K=2). 取代 6 点 OLS 为承重 emergence 统计。",
+   "_status": "⚠[数值待重跑,见 _POLLUTION_WARNING] FINAL 6-cell (incl 7B; no WARN; rows=1196; n mixed cf100/cf200, not all headline n=200); two-level cluster bootstrap (case nested in family, K=2). 取代 6 点 OLS 为承重 emergence 统计。",
    "clr": {
     "slope": 0.372,
     "ci": [
@@ -825,7 +826,8 @@
     "32B-Qwen",
     "8B-Llama",
     "70B-Llama"
-   ]
+   ],
+   "_POLLUTION_WARNING": "⚠⚠ POLLUTION(2026-07-02 抓,commit e21b67c):本 percase 用宽 glob *_ROME_cf*.jsonl 跑,而 infer_tag_meta 旧 denylist 不含 sup/scan/chk/test → 抑制实验(cf200sup)/layer扫(scanL*)/冒烟 被 last-write-wins 覆盖进 cell。铁证:32B 的 rr 应 0.193(clean cf200)却被 cf200sup 覆盖成 ≈0.092(RQ3 抑制值 0.085)。故下方 clr 0.372/es_drop 0.033/rr 0.047 【数值作废】,待干净 per-scale --glob 重跑(cf200/cf200c2/cf100 各一)。denylist 已加固 + 混-tag 告警。注:32B 被抑制污染=erosion 被【低估】,clean 重跑后 es_drop/rr 涌现 slope 可能【复活】(clean 32B es_drop 0.106/rr 0.193 远强于污染值)。"
   },
   "clr_robustness": {
    "_status": "CLR scorer-robustness (src/clr_robustness.py)。证 CLR 对别名 cutoff 与去污不敏感、趋势非 cutoff 造。注:glob 池化多个 ROME×CF shard(32B n_eff=1476),绝对 CLR 非 headline 口径;cutoff 对比同 case 内有效。",
