@@ -1,17 +1,21 @@
 #!/usr/bin/env bash
 # run_gpu_queue.sh —— v1.59 GPU 队列自动串跑(可断点续跑,抗夜间关机)
 # ---------------------------------------------------------------------------
-# 每个实例一条命令(H200 与 H100 并行,各跑自己 lane;kill-risk 项排在前):
-#   H200(32B fp32):  cd <项目根>; nohup bash run_gpu_queue.sh h200 > logs/queue_h200.log 2>&1 &
-#   H100(8/14B):     cd <项目根>; nohup bash run_gpu_queue.sh h100 > logs/queue_h100.log 2>&1 &
+# 【单实例全跑(H200,推荐)】一条命令按 kill-risk 顺序跑完全部 4 件(M4→G1→B22→S10-lite):
+#   cd <项目根>; nohup bash run_gpu_queue.sh all > logs/queue_all.log 2>&1 &
+#   (8B/14B 在 H200 fp32 显存富裕,同实例串跑即可;M4/G1=kill-risk 排前。)
+#
+# 【双实例分跑(H100 回来后用)】各跑自己 lane、并行:
+#   H200: nohup bash run_gpu_queue.sh h200 &   # M4 → B22
+#   H100: nohup bash run_gpu_queue.sh h100 &   # G1 → S10-lite
 #
 # 抗关机:实例夜里被关 → 进程在 wait 处被杀 → 未写 .done → 重启实例后【再跑同一条命令】即从断点续
 #   (harness 按 case_id 跳过已完成 case;已完成的整步靠 logs/<step>.done 跳过)。安全可重复执行。
 # 前置:环境变量 W(模型根,如 /inspire/qb-ilm/project/ai4education/ky26140);从项目根运行。
-# 监控:tail -f logs/queue_h200.log;单步结果 logs/<step>_score.log;分片进度 logs/<step>_r?.log。
+# 监控:tail -f logs/queue_all.log;单步结果 logs/<step>_score.log;分片进度 logs/<step>_r?.log。
 # ---------------------------------------------------------------------------
 set -uo pipefail
-LANE="${1:?用法: bash run_gpu_queue.sh h200|h100}"
+LANE="${1:?用法: bash run_gpu_queue.sh all|h200|h100}"
 : "${W:?环境变量 W 未设(模型根目录)}"
 export WHYAAAI_DTYPE=float32          # 两 lane 都用 fp32(Hopper bf16 ROME/MEMIT compute_v NaN 风险;14B/8B 求稳)
 export PYTHONPATH=source/EasyEdit
@@ -82,21 +86,23 @@ run_step(){
 }
 
 log "════════ GPU 队列启动 lane=${LANE} (WHYAAAI_DTYPE=${WHYAAAI_DTYPE}, W=${W}) ════════"
+
+# 各步定义(函数封装 → all/h200/h100 复用同一份定义,不重复;run_step 幂等按 .done 跳过)
+step_m4(){  run_step m4_32b       "DeepSeek-R1-Distill-Qwen-32B" ROME  experiments/probe32b_sup_strongcomp.yaml 0 \
+              'python src/score_pilot.py --config experiments/probe32b_sup_strongcomp.yaml --editor ROME'; }
+step_g1(){  run_step g1_8b        "DeepSeek-R1-Distill-Llama-8B"  ROME experiments/mquake8b_2hop_sup.yaml 0 \
+              'python src/multihop.py score --edited "results/probe/r1llama8b_ROME_mh2hopsup_r*of*.jsonl" --pool data/mquake_gated_clean.jsonl'; }
+step_b22(){ run_step b22_memit32b "DeepSeek-R1-Distill-Qwen-32B" MEMIT experiments/memit32b.yaml 1 \
+              'python src/score_pilot.py --config experiments/memit32b.yaml --editor MEMIT'
+            log "注:若 b22_memit32b 因 OOM/mom2 失败,手动改跑 memit14b.yaml(见其头注)"; }
+step_s10(){ run_step s10_14b      "DeepSeek-R1-Distill-Qwen-14B" ROME experiments/probe14b_sup.yaml 0 \
+              'python src/score_pilot.py --config experiments/probe14b_sup.yaml --editor ROME'; }
+
 case "$LANE" in
-  h200)   # 32B fp32:M4(kill-risk 先)→ B22 MEMIT(mom2 预热)
-    run_step m4_32b       "DeepSeek-R1-Distill-Qwen-32B" ROME  experiments/probe32b_sup_strongcomp.yaml 0 \
-      'python src/score_pilot.py --config experiments/probe32b_sup_strongcomp.yaml --editor ROME'
-    run_step b22_memit32b "DeepSeek-R1-Distill-Qwen-32B" MEMIT experiments/memit32b.yaml 1 \
-      'python src/score_pilot.py --config experiments/memit32b.yaml --editor MEMIT'
-    log "注:若 b22_memit32b 因 OOM/mom2 失败,手动改跑 memit14b.yaml(见其头注)"
-    ;;
-  h100)   # 8/14B:G1(kill-risk 先)→ S10-lite 14B T 臂
-    run_step g1_8b   "DeepSeek-R1-Distill-Llama-8B" ROME experiments/mquake8b_2hop_sup.yaml 0 \
-      'python src/multihop.py score --edited "results/probe/r1llama8b_ROME_mh2hopsup_r*of*.jsonl" --pool data/mquake_gated_clean.jsonl'
-    run_step s10_14b "DeepSeek-R1-Distill-Qwen-14B" ROME experiments/probe14b_sup.yaml 0 \
-      'python src/score_pilot.py --config experiments/probe14b_sup.yaml --editor ROME'
-    ;;
-  *) log "未知 lane: ${LANE}(要 h200 或 h100)"; exit 2 ;;
+  all)    step_m4; step_g1; step_b22; step_s10 ;;   # 全放一实例,kill-risk(M4/G1)先,再 B22/S10
+  h200)   step_m4; step_b22 ;;
+  h100)   step_g1; step_s10 ;;
+  *) log "未知 lane: ${LANE}(要 all / h200 / h100)"; exit 2 ;;
 esac
 
 log "════════ lane=${LANE} 队列结束。已完成步: $(ls logs/*.done 2>/dev/null | xargs -n1 basename 2>/dev/null | tr '\n' ' ') ════════"
