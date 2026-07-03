@@ -1515,5 +1515,86 @@
   "verdict": "★F2 CONFIRM:RR B0 0.000 ≈ B0P 0.040 ≪ B1 0.208(B0→B0P 仅 +0.040 vs B0P→B1 +0.168)→ 『无思考=编辑守住』【不是】ZeroThink 空块 artifact;RR 只在有【真推理内容】(B1)时跳,不随 think-块 wrapper(B0P)。ES-drop 同证:B0→B0P n.s. 且反向(B0P ES 0.715>0.625)、B0→B1 显著 0.130[0.060,0.205]。CLR:B0P≡0(sanity 过)、B1 0.465(真链泄漏)。→ 硬化头牌『erosion 随推理内容单调』,ZeroThink 锚点有效。",
   "_bonus": "B1(256-token 短链)RR 0.208 已 ≈ headline B3 RR 0.193、且已过 go/no-go RR≥0.20 → erosion 早饱和(短链即得大部分回退),支持『思考一展开就退』。",
   "_honest_wrinkle": "B0P ES(0.715)>B0 ES(0.625):ZeroThink 空块比极简 canned think 略欠编辑保持——不威胁去混淆(两者 RR 都≈0),反说明 ZeroThink 锚点【保守】(未人为夸大编辑守住)。"
+ },
+ "f3_sampling_robustness": {
+  "_status": "F3(depth-plan §五):温度采样鲁棒性——32B ROME×CF tag cf200samp,temp=0.6 × seed{0,1,2}(采样臂 n=600=200×3),greedy 同 run 对照(n=200)。堵 draft §3.3『声称做了 0.6×3 sampling arm 却零上报』。experiments/probe32b_sample.yaml;errors=16(~2.7%)。",
+  "sampling": {
+   "B0": {
+    "ES": 0.588,
+    "ESf": 0.7,
+    "RR": 0.071,
+    "RRs": 0.033,
+    "CLR": 0.0,
+    "Flip": 0.15,
+    "Loc": 0.968,
+    "n": 600
+   },
+   "B3": {
+    "ES": 0.469,
+    "ESf": 0.621,
+    "RR": 0.264,
+    "RRs": 0.093,
+    "CLR": 0.523,
+    "Flip": 0.229,
+    "Loc": 0.968,
+    "n": 597
+   },
+   "es_drop_B0toB3": [
+    0.09,
+    [
+     0.01,
+     0.171
+    ],
+    "CI>0 显著"
+   ],
+   "rr_ci_B3": [
+    0.264,
+    [
+     0.216,
+     0.312
+    ]
+   ],
+   "clr_ci_B3": [
+    0.523,
+    [
+     0.482,
+     0.563
+    ]
+   ]
+  },
+  "greedy_control": {
+   "B0": {
+    "ES": 0.625,
+    "RR": 0.0,
+    "CLR": 0.0,
+    "n": 200
+   },
+   "B3": {
+    "ES": 0.515,
+    "ESf": 0.64,
+    "RR": 0.208,
+    "RRs": 0.112,
+    "CLR": 0.485,
+    "Flip": 0.185,
+    "n": 200
+   },
+   "es_drop_B0toB3": [
+    0.11,
+    [
+     0.035,
+     0.185
+    ],
+    "CI>0 显著"
+   ],
+   "rr_ci_B3": [
+    0.208,
+    [
+     0.136,
+     0.28
+    ]
+   ]
+  },
+  "verdict": "★F3 CONFIRM(erosion 采样鲁棒):ES 降幅 采样 0.090[0.010,0.171] ≈ greedy 0.110[0.035,0.185],均显著、同量级 → 回退【不是】单条贪心脆性(中层近平局微扰即翻的质疑被否)。RR@B3 采样 0.264>greedy 0.208(采样更频=多样链更常重推 o_old,合机理);strict RRs 采样 0.093≈greedy 0.112;CLR@B3 采样 0.523≈greedy 0.485。go/no-go RR≥0.20 采样(0.264)/greedy(0.208)均过。→ 堵『声称做了没报』,头牌在采样下稳。",
+  "_note": "greedy 对照(ES 降幅 0.110/RR 0.208)复现 headline(0.106/0.193),内部一致=本 run 协议无漂移。"
  }
 }
