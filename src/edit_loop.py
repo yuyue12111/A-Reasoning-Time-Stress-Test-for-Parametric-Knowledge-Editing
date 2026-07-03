@@ -145,7 +145,10 @@ def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1,
                                       target_new=[c["o_new"]],
                                       subject=[c["s"]],          # ROME/MEMIT 必需
                                       sequential_edit=True)
-                sup_eff = None              # RQ3：仅 efficacy 探针压;locality/para 不碰 → Loc 结构性安全
+                sup_eff = None              # RQ3：默认仅 efficacy 探针压;locality/para 不碰 → Loc 结构性安全
+                # G1/B25(终极review):suppress.apply_to 可扩探针集(如 [efficacy,hop] 测 cond-c 盲区——
+                # 多跳 query 上开抑制器,hop-ES 掉=部署门看不到的编辑侧伤害)。缺省 ["efficacy"]=历史行为不变。
+                _sup_probes = set((suppress_cfg or {}).get("apply_to", ["efficacy"]))
                 if suppress_cfg:
                     if _sup_source == "o_new":
                         _tgt, _al = c["o_new"], _aliases               # 方向对照:压编辑值 → 若反降回退=符号错(近致命)
@@ -161,7 +164,7 @@ def run(cases, editor_name, hparams_path, budgets, out_path, rank=0, world=1,
                     for ptype, q in probes(c, probe_sel):
                         for decode, seed, temp, gk in arms:
                             cot, ans, _ = generate_with_budget(model, tok, q, b,
-                                suppress=(sup_eff if ptype == "efficacy" else None), **gk)
+                                suppress=(sup_eff if ptype in _sup_probes else None), **gk)
                             f.write(json.dumps({"case_id": c["case_id"],
                                 "editor": editor_name, "budget": b, "probe": ptype,
                                 "decode": decode, "seed": seed, "temperature": temp,

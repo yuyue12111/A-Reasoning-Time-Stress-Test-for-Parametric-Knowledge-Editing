@@ -1,0 +1,47 @@
+# M4/B24 · C 臂 = 压【同 relation 强竞争者】(特异性强对照) · 32B (终极review B24;卡时放开后升必做)
+# 攻的 claim:修复的 o_old 特异性现在只相对**惰性** placebo(P 臂无关词,链里本就不会出现)。
+# C 臂压"正确类型的强错误答案"(P103→另一门语言、P17→另一个国家;data/placebo_donors_strong.json,
+# src/placebo_donor.py --mode strong,seed42 BLIND 入库=预注册)。
+# 与 headline T 臂(probe32b_sup.yaml)同 edit/同 200 case/同 scope=think/同 α=8,仅 placebo_map 不同。
+# 【预注册判读】主端点=ES@B3 与 RR(与 battery 同口径):
+#   C−N ≈ 0(压强竞争者不改善)且 T−N 显著 → o_old 特异性坐实(比 T−P 强得多的对照);
+#   C−N ≈ T−N(压谁都修好)→ KILL:特异性软化为"压任何同类型强候选皆可"——须赶在 7/18 abstract 冻结前出数。
+# 【kill-risk 排序】本臂 + G1 最先上卡(结果改措辞);B22/B23 随后。
+# 跑(H200,32B fp32 需 141G;Hopper bf16 ROME compute_v 必 NaN → WHYAAAI_DTYPE=float32):
+#   export WHYAAAI_MODEL=$W/models/DeepSeek-R1-Distill-Qwen-32B; export WHYAAAI_DTYPE=float32
+#   for r in $(seq 0 7); do PYTHONPATH=source/EasyEdit python src/run_pilot.py \
+#       --config experiments/probe32b_sup_strongcomp.yaml --editor ROME --rank $r --world 8 --device $r & done; wait
+#   python src/score_pilot.py --config experiments/probe32b_sup_strongcomp.yaml --editor ROME
+#   对照:N 臂=rq3.baseline(RR 0.193/ES_B3 0.495)、T 臂=cf200sup、P 臂=cf200sup_placebo(cross_arm.py 出 C−N/C−T CI)
+model_tag: r1qwen32b
+seed: 42
+out_dir: results/probe
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+  stats_dir: ./data/stats_r1qwen32b
+  v_loss_layer: 63
+
+dataset:
+  tag: cf200sup_strong         # ★独立 tag(与 T/P/D 臂并列第 5 臂 C)
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 200
+
+budgets: [B0, B3]
+
+sampling:
+  enabled: false
+
+probes: [efficacy, locality]
+
+suppress:
+  penalty: 8                   # 同 T/P 臂(α=8,battery 同口径)
+  scope: think
+  source: placebo              # 复用 placebo 通道(edit_loop 吃 placebo_map,零 harness 改动)
+  placebo_map: data/placebo_donors_strong.json   # ★同 relation 强竞争者(vs P 臂的无关词)
+
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [12]

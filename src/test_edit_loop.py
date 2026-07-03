@@ -45,8 +45,11 @@ _ee.ROMEHyperParams = _ee.MEMITHyperParams = _ee.AlphaEditHyperParams = _ee.FTHy
 sys.modules["easyeditor"] = _ee
 
 _RAISE_GEN_ON = {"sub": None}       # 置某 prompt 子串则生成时抛错
+_SUP_SEEN = []                      # 每次 _gwb 收到的 suppress(None/生效)——apply_to 断言用
 _tb = types.ModuleType("think_budget")
-def _gwb(model, tok, q, b, do_sample=False, temperature=0.6, seed=None):
+def _gwb(model, tok, q, b, do_sample=False, temperature=0.6, seed=None, suppress=None, **kw):
+    # suppress kwarg 跟随 edit_loop 的 RQ3 调用(v1.27 曾漏更 mock 致全套 KeyError 变红,2026-07-03 修)
+    _SUP_SEEN.append({"q": q, "budget": b, "suppress": suppress})
     if _RAISE_GEN_ON["sub"] and _RAISE_GEN_ON["sub"] in q:
         raise RuntimeError("gen-boom")
     tag = f"s{seed}" if do_sample else "greedy"
@@ -65,6 +68,12 @@ for _pname in ("easyedit_qwen2_loader", "easyedit_mom2_dataset"):
     _m.apply = lambda: None
     sys.modules[f"vendor_patches.{_pname}"] = _m
 
+# suppress stub(edit_loop.run 内惰性 from suppress import ...;mock 的 tok="TOK" 无法真建 token ids)
+_sup = types.ModuleType("suppress")
+_sup.build_old_token_ids = lambda tok, tgt, aliases: [1, 2]
+_sup.make_processor = lambda ids, penalty: f"PROC(p={penalty})"
+sys.modules["suppress"] = _sup
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import edit_loop  # noqa: E402
 
@@ -77,7 +86,7 @@ def _cases(n=4):
             for i in range(n)]
 
 def _reset():
-    RESTORES.clear(); FakeEditor.instances.clear()
+    RESTORES.clear(); FakeEditor.instances.clear(); _SUP_SEEN.clear()
     FakeEditor.raise_on_subject = None; _RAISE_GEN_ON["sub"] = None
 
 def _run(**kw):
@@ -163,11 +172,41 @@ def test_provenance_header_written_once_and_resume_no_dup():
     assert sum(r.get("_meta") is True for r in raw2) == 1, "续跑不应重复写溯源头"
 
 
+def test_suppress_apply_to_default_efficacy_only():
+    # 默认(无 apply_to):suppress 只到 efficacy 探针,其余(para/locality/open)必须 None——历史行为锁定
+    _reset()
+    rows, _ = _run(cases=_cases(1), budgets=["B0"],
+                   suppress_cfg={"penalty": 8, "scope": "think"})
+    eff = [s for s in _SUP_SEEN if s["suppress"] is not None]
+    assert eff, "efficacy 探针应收到 suppress"
+    assert all(s["suppress"]["scope"] == "think" for s in eff)
+    # 非 efficacy 的 q(para/neighborhood/open)一律无 suppress
+    non_eff_q = [s["q"] for s in _SUP_SEEN if s["suppress"] is None]
+    assert any("pa0" in q or "nbr0" in q or "Tell me about" in q for q in non_eff_q), \
+        f"para/loc/open 应无 suppress, seen={_SUP_SEEN}"
+
+
+def test_suppress_apply_to_hop_g1():
+    # G1/B25:apply_to:[hop] → 只有 hop 探针收到 suppress,efficacy 反而 None
+    _reset()
+    cases = _cases(1)
+    cases[0]["hop_q"] = "Which continent is Subj0's home in?"
+    rows, _ = _run(cases=cases, budgets=["B0"],
+                   suppress_cfg={"penalty": 8, "scope": "think", "apply_to": ["hop"]})
+    hop_seen = [s for s in _SUP_SEEN if "continent" in s["q"]]
+    assert hop_seen and all(s["suppress"] is not None for s in hop_seen), \
+        f"hop 探针应收到 suppress, seen={_SUP_SEEN}"
+    eff_seen = [s for s in _SUP_SEEN if s["q"] == "Subj0 lives in"]
+    assert eff_seen and all(s["suppress"] is None for s in eff_seen), \
+        "apply_to:[hop] 下 efficacy 不应收到 suppress"
+
+
 TESTS = [test_sharding_partitions_by_index, test_subject_and_s_field_passed,
          test_open_probe_uses_s, test_restore_called_every_case, test_resume_skips_done,
          test_generation_error_still_restores_and_continues,
          test_edit_error_skips_restore_and_continues,
-         test_provenance_header_written_once_and_resume_no_dup]
+         test_provenance_header_written_once_and_resume_no_dup,
+         test_suppress_apply_to_default_efficacy_only, test_suppress_apply_to_hop_g1]
 
 
 def _main():

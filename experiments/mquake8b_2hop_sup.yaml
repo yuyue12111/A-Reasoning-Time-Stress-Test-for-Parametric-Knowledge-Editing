@@ -1,0 +1,49 @@
+# G1/B25 · cond-c 盲区:多跳 query 上开抑制器 · Llama-8B (终极review B25;卡时放开后升必做)
+# 攻的 claim:"zero collateral by construction"(抑制器只压 efficacy,locality/para 不碰)。
+# 盲区:部署门(genbench 无关任务)看不到【编辑相邻 query】的伤害——多跳题上模型须绕经被编辑关系推理,
+# 链内提及 o_old 可以是合法中间步;压 o_old 若把 hop 答案打掉 → collateral 存在、只是门外。
+# 设计:与 mquake8b_2hop.yaml 完全同协议(同 edit/同 gated 池/同 [hop] 探针/layer6/clamp2),
+# 仅加 suppress(α=8,scope=think,apply_to:[hop] ← edit_loop 新配置,默认 [efficacy] 不动历史行为)。
+# 【预注册判读】对照 = 已在盘的无抑制 mh2hop run(hits_new 0.188):
+#   hop-ES(hits_new)掉(配对 CI<0)→ KILL:"zero collateral by construction" 降为带三前提条件句(§7 改写);
+#   hop-ES 平 → 边界句可写"编辑相邻多跳 query 上未测得伤害"(有数替代 [pending] 自供状)。
+# 【kill-risk 排序】与 M4 并列最先上卡(结果改措辞)。
+# 跑(H200 fp32 或 4090 bf16——8B 两者皆可;fp32 更稳则 H200):
+#   export WHYAAAI_MODEL=$W/models/DeepSeek-R1-Distill-Llama-8B; export WHYAAAI_DTYPE=float32
+#   for r in $(seq 0 7); do PYTHONPATH=source/EasyEdit python src/run_pilot.py \
+#       --config experiments/mquake8b_2hop_sup.yaml --editor ROME --rank $r --world 8 --device $r & done; wait
+#   python src/multihop.py score --edited 'results/probe/r1llama8b_ROME_mh2hopsup_r*of*.jsonl' --pool data/mquake_gated_clean.jsonl
+#   对照打分(已在盘): ... --edited 'results/probe/r1llama8b_ROME_mh2hop_r*of*.jsonl' ...
+model_tag: r1llama8b
+seed: 42
+out_dir: results/probe
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+  stats_dir: ./data/stats_r1llama8b
+  v_loss_layer: 31
+  clamp_norm_factor: 2                                    # 同 mquake8b_2hop(跨架构 transfer 定)
+
+dataset:
+  tag: mh2hopsup                                          # ★独立 tag,不碰无抑制对照 mh2hop
+  path: data/mquake_gated_clean.jsonl                     # 同 gated 干净残池=150(与对照同 case 可配对)
+  fallback_path: data/mquake_gated.jsonl
+  n: 200
+
+budgets: [B0, B3]
+
+probes: [hop]
+
+sampling:
+  enabled: false
+
+suppress:
+  penalty: 8                   # 同 headline T 臂 α=8
+  scope: think
+  source: o_old                # 压被编辑事实的旧值(与 RQ3 修复完全同构)
+  apply_to: [hop]              # ★G1 核心:抑制器开到多跳探针(edit_loop 新配置)
+
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [6]

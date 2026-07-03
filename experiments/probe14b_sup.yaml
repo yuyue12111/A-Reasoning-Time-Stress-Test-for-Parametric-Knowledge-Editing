@@ -1,0 +1,45 @@
+# S10-lite · 14B 抑制 T 臂 —— 修复跨尺度复现 (终极review 后用户增列;卡时放开后升必做)
+# 攻的 claim:"training-free 修复"现只在 32B 单尺度验证(M1_scope 同限)。
+# 设计:14B ROME×CF 同 headline 协议(probe14b.yaml 的 200 case/layer12/v_loss_layer47)+
+# suppress(o_old,scope=think,α=8)——与 32B T 臂(probe32b_sup.yaml)完全同构。
+# N 臂(无抑制基线)已在盘:r1qwen14b_ROME_cf200_r*(headline,RR@B3 0.162)→ 只需本 T 臂。
+# 【预注册(S10 红队):主端点 = ES@B3(T−N),不钉 b0ok 门 RR(14B b0ok 分母 ~120 更小、RR 更脆)】
+#   判读:ES@B3(T)>ES@B3(N)=0.515 且配对 CI>0 → 修复跨尺度成立;≈0 → 修复措辞限定 32B(§7 已有此限)。
+#   RR/RRs 照报作上下界括号(B17 纪律),但 kill/confirm 只看 ES@B3。
+# 跑(H200,14B fp32 单卡即可;或 H100 bf16——14B 无 Hopper-NaN 顾虑但求稳仍建议 fp32):
+#   export WHYAAAI_MODEL=$W/models/DeepSeek-R1-Distill-Qwen-14B; export WHYAAAI_DTYPE=float32
+#   for r in $(seq 0 7); do PYTHONPATH=source/EasyEdit python src/run_pilot.py \
+#       --config experiments/probe14b_sup.yaml --editor ROME --rank $r --world 8 --device $r & done; wait
+#   python src/score_pilot.py --config experiments/probe14b_sup.yaml --editor ROME
+#   对照(在盘): python src/score_pilot.py --config experiments/probe14b.yaml --editor ROME
+model_tag: r1qwen14b
+seed: 42
+out_dir: results/probe
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-14B
+  stats_dir: ./data/stats_r1qwen14b
+  v_loss_layer: 47                                       # 14B=48 层,末层 idx 47
+
+dataset:
+  tag: cf200sup14b             # ★独立 tag;同 prefiltered 路径=与 headline 14B 同 200 case 可配对
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 200
+
+budgets: [B0, B3]
+
+sampling:
+  enabled: false
+
+probes: [efficacy, locality]
+
+suppress:
+  penalty: 8                   # 同 32B T 臂 α=8
+  scope: think
+  # source 缺省 = o_old(现 fix);apply_to 缺省 = [efficacy]
+
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [9]                # ★同 headline 14B 编辑层(probe14b.yaml layers:[9])——同层才能与 N 臂配对
