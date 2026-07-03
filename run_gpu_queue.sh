@@ -39,14 +39,17 @@ resolve_model(){   # $1=模型名(如 DeepSeek-R1-Distill-Qwen-32B);echo 含真�
   # 显式 override:export WHYAAAI_MODEL_<名去横杠点>=<目录> 可点名指定某模型(多步各自指定)
   local ov_key="WHYAAAI_MODEL_${name//[-.]/_}"; local ov="${!ov_key:-}"
   if [[ -n "$ov" ]] && _has_w "$ov"; then echo "$ov"; return 0; fi
+  # 候选根顺序 = 平台实测(2026-07-03 用户确认):8B/14B 在用户常规 models 目录;32B 在 global_public;
+  # 只有 70B 在 qb-ilm/whywhy(其它模型即便 qb-ilm 也有副本也不走那,以用户常规目录为先)。
   for cand in \
+      /inspire/hdd/project/ai4education/ky26140/why/models/"$name" \
+      "$(dirname "$PWD")/models/$name" \
       /inspire/hdd/global_public/public_models/deepseek-ai/"$name" \
       /inspire/hdd/global_public/public_models/*/"$name" \
-      "$W/models/$name" \
       /inspire/qb-ilm/project/ai4education/public/whywhy/models/"$name" \
+      /inspire/hdd/project/ai4education/public/Models/deepseek-ai/"$name" \
       /inspire/qb-ilm/project/ai4education/public/*/models/"$name" \
-      /inspire/hdd/project/ai4education/*/models/"$name" \
-      /inspire/hdd/project/ai4education/*/*/models/"$name"; do
+      "$W/models/$name"; do
     if _has_w "$cand"; then echo "$cand"; return 0; fi
   done
   return 1
