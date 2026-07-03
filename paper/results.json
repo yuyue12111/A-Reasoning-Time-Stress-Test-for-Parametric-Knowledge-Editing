@@ -708,8 +708,9 @@
     "Reflective-override": 0,
     "Recall": 0,
     "Associative": 0,
-    "fleiss_kappa": null,
-    "_note": "全 Bridge;含 2 条 clr_in_cot=False 经 spelling/etymology 线索被判 Bridge(非真 implicit-leak);κ 因全一类未定义=完美一致它是 Bridge。"
+    "fleiss_kappa": -0.091,
+    "_note": "全 Bridge(4/4);κ=-0.091(★2 连带修复:旧记 null+'全一类未定义'是错的——cf_17023 票=[Bridge,Bridge,Associative] 非全一类;口径=in-pop 4 case、仅路由类,与 summary_7b.json fleiss_kappa_overall 一致,程序复算 -0.0909)。⚠近全 Bridge 边际下 Pe≈0.847,单票分歧即把 κ 压负 → 负值≠随机差,须与一致率 P̄=0.833 同报(终极review B3)。含 2 条 clr_in_cot=False 经 spelling/etymology 线索被判 Bridge(非真 implicit-leak)。",
+    "raw_agreement_pbar": 0.833
    },
    "14B": {
     "n_population": 5,
@@ -719,7 +720,8 @@
     "Reflective-override": 0,
     "Recall": 0,
     "Associative": 0,
-    "fleiss_kappa": null
+    "fleiss_kappa": null,
+    "_kappa_note": "null 合法:唯一分歧票为 1 张 Excluded-held(非路由),'仅非排除类'口径下路由票全 Bridge=单一类 → κ 未定义;全票口径一致率 P̄=0.867(13/15)。与 7B 的 null 不同——7B 的异票是路由类(Associative),故 7B κ 可定义=-0.091。"
    },
    "32B": {
     "n_population": 10,
@@ -764,51 +766,69 @@
   ],
   "_orthogonal": "contests_edit 二元 stance(链逐字称 o_new 错)= pooled 15.8%,cross-cut 四类;κ 仅 32B/pooled 有意义(7B/14B 全 Bridge→κ 未定义);小 n 故低频类按定性存在性 + bootstrap CI 报。",
   "neutral_rerun_S1": {
-   "_status": "S1/M3 去污中性重跑(results/a3_neutral;src/chain_classify.py JUDGE_PROMPT_NEUTRAL)。",
+   "_status": "S1/M3 去污中性重跑(results/a3_neutral;src/chain_classify.py JUDGE_PROMPT_NEUTRAL)。★2 修复版:src/s1_record.py 按 (scale,case) 双键再生,可复算。",
    "pooled": {
-    "n_in_pop": 16,
+    "n_in_pop": 17,
     "dist": {
-     "Bridge": 13,
+     "Bridge": 14,
      "Recall": 2,
      "Reflective-override": 1
     },
-    "Bridge_pct": 0.812
+    "Bridge_pct": 0.824,
+    "fleiss_kappa_inpop": 0.765,
+    "raw_agreement_pbar": 0.9216
    },
    "per_scale": {
     "7b": {
      "n_in_pop": 3,
      "dist": {
       "Bridge": 3
-     }
+     },
+     "fleiss_kappa_inpop": null,
+     "raw_agreement_pbar": 1.0
     },
     "14b": {
-     "n_in_pop": 3,
+     "n_in_pop": 4,
      "dist": {
-      "Bridge": 2,
+      "Bridge": 3,
       "Recall": 1
-     }
+     },
+     "fleiss_kappa_inpop": 0.5862,
+     "raw_agreement_pbar": 0.8333
     },
     "32b": {
      "n_in_pop": 10,
      "dist": {
       "Bridge": 8,
-      "Recall": 1,
-      "Reflective-override": 1
-     }
+      "Reflective-override": 1,
+      "Recall": 1
+     },
+     "fleiss_kappa_inpop": 0.8266,
+     "raw_agreement_pbar": 0.9333
     }
    },
-   "population_flip_to_held": [
-    "cf_1130",
-    "cf_7744",
-    "cf_9994"
-   ],
-   "verdict": "★S1 去污+去优先级后:(1) Recall 0→2 = 'no flat recall/Recall=0' 部分仪器制造被证伪,须软化 contrib-2;(2) Bridge 仍主导(13/16≈81% vs 污染 89%)= 重构性回退核心存活;(3) Associative 仍=0 = 'no traceless leak/回退从不无声'(necessity traceless=0)去污后依然成立(最要紧必要性 claim 扛住);(4) population 3/18 迁移 HELD(cf_1130,cf_7744,cf_9994,判官敏感)。净:'Bridge 主导重构 + 从不无声' 存活,'Recall=0' 死,池敏感须诚实报。",
+   "population_flip_to_held": {
+    "flips": [
+     "cf_1130@14b",
+     "cf_7744@7b",
+     "cf_9994@32b"
+    ],
+    "rate_by_rows": "3/19",
+    "rate_by_unique_ids": "3/18",
+    "_note": "分母双口径:行=(scale,case);unique=跨尺度去重 case_id。"
+   },
+   "verdict": "★S1(★2 修复后):(1) Recall 0→2 = 'no flat recall' 部分仪器制造被证伪;(2) Bridge 仍主导(14/17≈82% vs 污染 89%);(3) Associative=0 = 'committed 回退从不 traceless' 去污后依然成立;(4) population 判官敏感 3/19 行(unique 口径 3/18)。",
    "draft_edits_pending": [
     "abstract/§1 contrib-2 '90% bridge, no flat recall' → 'bridge-dominant (~81% under neutral judges), with a small but non-zero flat-recall rate (~2/16) once the anti-recall prime is removed'",
     "§5 tab:taxonomy Recall=0 行 → 中性下 Recall≈2/16(报污染 vs 中性两列 + 一致性)",
     "necessity: Associative=0/traceless=0 存活(不改);但 'reconstructive re-derivation' 收紧为 'bridge-or-recall, never traceless'",
     "报 population 对判官 prompt 的敏感性(3/18 flip)为 limitation + 中性 run 作 robustness appendix"
-   ]
+   ],
+   "cross_scale_duplicate_cases": [
+    "cf_6933",
+    "cf_9255"
+   ],
+   "_offbyone_audit": "首版聚合按 case_id 单键 → cf_6933@14b(Bridge 3/3)被 cf_6933@32b(Recall 3/3)覆盖,曾记 pooled 16{13,2,1}/14b n=3;真值 pooled 17{14,2,1}/14b n=4。四次独立复算一致(终极review ★2)。"
   }
  },
  "emergence": {
