@@ -31,6 +31,22 @@ fi
 ts(){ date '+%F %T'; }
 log(){ echo "[$(ts)] $*"; }
 
+# 模型路径解析(照 run_a4_h200.sh 的验证器):不同尺度模型分散在 $W/models 与 GPFS public/whywhy/models
+# (如 70B 不在 $W/models);且 hdd 上常有【config 残桩、无 safetensors】会骗过 -e 检查 → 必须验真权重。
+_has_w(){ ls "$1"/*.safetensors >/dev/null 2>&1 || ls "$1"/*.bin >/dev/null 2>&1; }
+resolve_model(){   # $1=模型名(如 DeepSeek-R1-Distill-Qwen-32B);echo 含真权重的目录,找不到返回 1
+  local name="$1" cand
+  for cand in \
+      "$W/models/$name" \
+      /inspire/qb-ilm/project/ai4education/public/whywhy/models/"$name" \
+      /inspire/qb-ilm/project/ai4education/public/*/models/"$name" \
+      /inspire/hdd/project/ai4education/*/models/"$name" \
+      /inspire/hdd/project/ai4education/*/*/models/"$name"; do
+    if _has_w "$cand"; then echo "$cand"; return 0; fi
+  done
+  return 1
+}
+
 # 分片完整性守门:所有 NGPU 分片文件存在且非空(catch 整个 rank 启动即死=OOM/坏路径;
 # per-case 错误由 harness 写 error 行续跑、不算整片死)。返回 0=齐,1=缺。
 check_shards(){   # $1=cfg $2=editor
@@ -50,8 +66,16 @@ run_step(){
   local name="$1" model="$2" editor="$3" cfg="$4" preheat="$5" scorecmd="$6"
   if [[ -f "logs/${name}.done" ]]; then log "SKIP ${name}(已 .done)"; return 0; fi
   log "START ${name}  model=${model} editor=${editor} cfg=${cfg} preheat=${preheat}"
-  export WHYAAAI_MODEL="$W/models/${model}"
-  if [[ ! -e "$WHYAAAI_MODEL" ]]; then log "!! 模型路径不存在: $WHYAAAI_MODEL — 跳过 ${name}"; return 1; fi
+  local resolved
+  if resolved="$(resolve_model "$model")"; then
+    export WHYAAAI_MODEL="$resolved"
+    log "${name}: 模型解析 = $WHYAAAI_MODEL"
+  else
+    log "!! ${name}: 找不到 ${model} 的真权重(*.safetensors/*.bin)。试过 \$W/models、public/whywhy/models、public/*/models、hdd/*。"
+    log "   定位: find /inspire -maxdepth 6 -type d -iname '*${model}*' 2>/dev/null | head"
+    log "   手动: export WHYAAAI_MODEL_${model//[-.]/_}=<含 safetensors 的目录>  或直接改本脚本的候选根后重跑"
+    return 1
+  fi
 
   local start=0
   if [[ "$preheat" == "1" ]]; then    # MEMIT:mom2 预热=rank0 单进程先跑完,防 8 分片并发重复触发 mom2
