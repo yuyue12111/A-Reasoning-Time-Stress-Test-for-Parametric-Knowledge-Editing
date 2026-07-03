@@ -172,7 +172,8 @@
      0.835,
      0.93
     ],
-    "_note": "8B=layer6/clamp2 n=200(Loc 0.835 marginal);70B=layer14/**clamp4**(8B=clamp2 扫描定、70B 默认4=逐模型不同;CLR 对 clamp∈{2,3,4} 鲁棒 0.31-0.33、不驱动结论)model_parallel 2×4 fp32 **做厚到 n=200**(--drop-degenerate 丢 13 条 MP 间歇数值不稳退化 case→**n=187 干净**;内容触发长度无关检测,稳定 Qwen/8B 上丢~0;退化即编辑失败→丢弃方向有偏,仍报 with/without)。**★A4 做厚成果:ES降幅 0.107 [0.032,0.182] CI 排零=显著**(n=84 时 0.095 [-0.024,0.214] 不显著)→ **Qwen-32B(0.106)+Llama-70B(0.107)双高端点均显著、跨族对称**=不再是『仅 1/6 cell 显著』。跨族双点单调↑:Llama CLR 8B 0.340→70B 0.529、RR 0.144→0.175。跨族对齐:Llama-8B≈Qwen-7B(CLR .340/.335)、Llama-70B≈Qwen-32B(CLR .529/.545、ES降幅 .107/.106)→erosion 随规模/能力涨、与族无关=非 Math 特化伪影。论文 §3 注 70B n=187/丢13;§4 跨族曲线+双显著点。"
+    "_note": "8B=layer6/clamp2 n=200(Loc 0.835 marginal);70B=layer14/**clamp4**(8B=clamp2 扫描定、70B 默认4=逐模型不同;CLR 对 clamp∈{2,3,4} 鲁棒 0.31-0.33、不驱动结论)model_parallel 2×4 fp32 **做厚到 n=200**(--drop-degenerate 丢 13 条 MP 间歇数值不稳退化 case→**n=187 干净**;内容触发长度无关检测,稳定 Qwen/8B 上丢~0;退化即编辑失败→丢弃方向有偏,仍报 with/without)。**★A4 做厚成果:ES降幅 0.107 [0.032,0.182] CI 排零=显著**(n=84 时 0.095 [-0.024,0.214] 不显著)→ **Qwen-32B(0.106)+Llama-70B(0.107)双高端点均显著、跨族对称**=不再是『仅 1/6 cell 显著』。跨族双点单调↑:Llama CLR 8B 0.340→70B 0.529、RR 0.144→0.175。跨族对齐:Llama-8B≈Qwen-7B(CLR .340/.335)、Llama-70B≈Qwen-32B(CLR .529/.545、ES降幅 .107/.106)→erosion 随规模/能力涨、与族无关=非 Math 特化伪影。论文 §3 注 70B n=187/丢13;§4 跨族曲线+双显著点。",
+    "_70b_note": "headline 口径(70B 早停过滤 n=187):es_drop 0.107[0.032,0.182]/rr 0.175/clr 0.529;percase.cells_descriptive 的 70B(n=200 全量:0.11/0.1667/0.495)是无过滤口径——两口径主文 with/without filter 双报(B2⑦),draft 引 70B 数须注明口径。"
    }
   }
  },
@@ -578,7 +579,7 @@
    "n_b0": 200,
    "n_b3": 199,
    "delta_think": -0.021,
-   "_interp": "头牌尺度;base Δthink=−0.021(n=199,显著性未知见 f1_edit_specificity)vs edited RR=+0.193,margin=0.214→erosion 编辑特异。base CLR 0.829 与 edited CLR_b0ok 0.545 分母不同,勿直接相减(见 _bonus_CORRECTED)。"
+   "_interp": "头牌尺度;base Δthink=−0.021(n=199,显著性未知见 f1_edit_specificity)vs edited RR=+0.193,margin=0.214→erosion 编辑特异。base CLR 0.829 与 edited CLR@B3 0.545 **同为无门口径、直接可比**(★1):edited 恒低 base、gap≈0.29(见 emergence.cap3_netclr);真·CLR_b0ok(32B)≈0.45 是另一个数(plan:82)勿混。"
   },
   "f1_edit_specificity": {
    "_status": "F1(depth-plan §五 单点最高杠杆):未编辑 32B 基座同 200 CF 的 thinking-drift 对照(src/base_probe.py,同口径 metrics.hit/_without_subject)。",
@@ -586,8 +587,9 @@
    "edited_RR": 0.193,
    "effect_above_control": 0.214,
    "verdict": "★F1 edit-specific(闸门 held,措辞经对抗验证收紧):32B 未编辑基座 P(o_old) 思考 B0→B3 Δ=−0.021(n=199),编辑态 RR=0.193,margin=0.214。⚠skeptic#1 纠正:Δ=−0.021 的显著性【未知】(独立近似 SE≈0.043 是上界、配对更小→t≥0.49,方向未定),故【不可】断言'base 反向漂移';正确表述=base 无系统性向 o_old 漂移(Δ≈0),no-drift 与微弱 away-drift 两种解读下 RR 都不能归因于基座先验动力学。→ base ΔP(o_old) per-case 配对 bootstrap CI 从'可选'升【必需】。7B +0.08 是 Qwen-Math 小模型个例(margin≈0、ES降幅 n.s.)。头牌『thinking undoes EDITING』存活。",
-   "_bonus_CORRECTED": "⚠原 _bonus 的 'base CLR 0.829 > 编辑 CLR 0.545 → 编辑压住 o_old' 经对抗验证(skeptic#1)【作废】:分母错配——base CLR=cot_old/n 无条件全 n(base_probe.py:63),edited CLR_b0ok=n_clr_b0/n_b0 是 b0ok 门(排除 B0 就答旧的 case)。base 分母恰含最爱提 o_old 的 case(base ans_old 0.765),被 b0ok 门系统剔除→0.545<0.829 是分母 artifact 非'压制'证据。要证'编辑压制链提及'须在【同 b0ok 门】跑 base CLR(=Cap3)。方向上若真'编辑压低链内 o_old',反说明可观察 CLR 中介被编辑削弱(与 necessity held/多跳 neither 一致)、削弱而非支持'链是回退主渠道'。K1 保留:abstract 0.59 是 7B 误引给 32B headline,正确锚=32B 0.765。",
-   "_bonus_SUPERSEDED": "未编辑基座 B3 链含旧 CLR=0.829 > 编辑态 CLR@B3 0.545 → 基座自由提 o_old、编辑部分压住(与 knowledge-conflict 'why' 一致);base ans_old ~0.75 高=基座本就知 o_old(锚 §1 头牌尺度,补 K1:abstract 的 0.59 是 7B 误引给 32B,现有 32B=0.765)。"
+   "_bonus_SUPERSEDED": "未编辑基座 B3 链含旧 CLR=0.829 > 编辑态 CLR@B3 0.545 → 基座自由提 o_old、编辑部分压住(与 knowledge-conflict 'why' 一致);base ans_old ~0.75 高=基座本就知 o_old(锚 §1 头牌尺度,补 K1:abstract 的 0.59 是 7B 误引给 32B,现有 32B=0.765)。",
+   "_bonus_RECORRECTED": "★1 再更正(终极review 2026-07-03,四次独立复算):此前的'分母错配'更正**本身是错的**。四枚钉子:(a) metrics.py 的 CLR 无 b0ok 门(clr[b]+=hit(cot,o_old) 对全部 efficacy 行累加;b0ok 只门 rr/rrs)——0.545 是**无门口径**;(b) 0.545 三处同源全无门(rq3.baseline.CLR/sup_battery N 臂/percase 32B cell 0.5455=108/198);(c) 真·CLR_b0ok(32B)≈0.45(plan.md:82),与 0.545 是**两个不同的数**,勿混;(d) Cap3 逐 case 配对自证 gap 真实:edited CLR 恒低 base ≈0.29–0.49 且不随尺度扩。→ **base CLR 0.829 与 edited CLR 0.545 同构可比**,真实事实=编辑态链内 o_old 提及系统性低于 base 底噪、gap 平。**解读纪律**:这是 Cap3 退役 CLR 涌现的依据,并削弱'链是回退唯一主渠道'的强表述(skeptic#2 的方向点存活);**不作**'编辑压住 o_old'的 RQ2 正面证据用。(附带:base_probe.py 行号 cot_old 在 :62 非 :63。)",
+   "_bonus_CORRECTED_SUPERSEDED": "⚠此条的'分母错配/b0ok 门'论断已被 ★1 推翻,存档备审:⚠原 _bonus 的 'base CLR 0.829 > 编辑 CLR 0.545 → 编辑压住 o_old' 经对抗验证(skeptic#1)【作废】:分母错配——base CLR=cot_old/n 无条件全 n(base_probe.py:63),edited CLR_b0ok=n_clr_b0/n_b0 是 b0ok 门(排除 B0 就答旧的 case)。base 分母恰含最爱提 o_old 的 case(base ans_old 0.765),被 b0ok 门系统剔除→0.545<0.829 是分母 artifact 非'压制'证据。要证'编辑压制链提及'须在【同 b0ok 门】跑 base CLR(=Cap3)。方向上若真'编辑压低链内 o_old',反说明可观察 CLR 中介被编辑削弱(与 necessity held/多跳 neither 一致)、削弱而非支持'链是回退主渠道'。K1 保留:abstract 0.59 是 7B 误引给 32B headline,正确锚=32B 0.765。"
   },
   "1.5B": {
    "family": "Qwen",
@@ -637,7 +639,7 @@
    "_run": "wz4rou8q3(8-agent workflow:4-lens+kill→synth→2 skeptics;两 skeptics 均 refuted 综合的假支柱,已并入 corrected)",
    "F1_edit_specificity": "held——收紧为 'base 无漂移(Δ≈0,显著性待 per-case CI)' 而非 'base 反向漂移';margin 0.214;两种解读下 erosion 都编辑特异。",
    "RQ1_level_vs_change": "LEVEL(base ans_old 0.515→0.765、base CLR 0.582→0.86 均随 scale 升)≠ 我们量的 CHANGE(edited B0→B3)。此区分是枢轴、成立;但见 emergence 诚实条。",
-   "CLR_denominator_artifact": "'edited CLR<base CLR=压制' 作废(分母错配,见 f1_edit_specificity._bonus_CORRECTED)。",
+   "CLR_denominator_artifact": "⚠★1 推翻:skeptic#1 的'分母错配(b0ok 门)'论断错误——metrics.py CLR 无 b0ok 门,0.545 与 base 0.829 同构可比。存活的部分=skeptic#2 的方向点:edited CLR 恒低 base(gap 平,Cap3)削弱'链是回退唯一主渠道'的强表述;解读纪律见 f1_edit_specificity._bonus_RECORRECTED。",
    "M1_scope": "M1 gate 的是 RQ3 修复的链中介@32B 单尺度,【不】背书 RQ2 跨尺度涌现;两条不同 claim,勿混。",
    "Cap_upgrade": "Cap2(clr_rev slope)+Cap3(net-CLR=edited−base 同门 per-case slope + 回归 erosion~capability|base_recall)从【可选→必做】:封死 CLR 涌现 base-floor 共线的唯一路径。范围:只 gate CLR 涌现叙事,不 gate 头牌(F1/M1/32B ES降幅独立成立)。",
    "emergence_slope_honesty_SUPERSEDED": "⚠per-case cluster-robust 涌现 slope 只有 CLR 显著(0.372[0.149,0.800] excl0);RR(0.047[−0.501,0.53])与 es_drop(0.033[−0.037,0.139]) 均【含零 n.s.】。故涌现-as-slope 唯一显著腿=CLR,而 CLR 与 base CLR 底噪(0.582→0.86)共线。=> 不能'降级 CLR 又声称涌现稳';capability-emergence 维持 supporting-trend(印证 MECH-led 降级),头牌压 M1 within-case + F1 change-control + 32B cell-level ES降幅 0.106[0.030,0.182]显著(≠per-case slope,是单模型 bootstrap)。",
@@ -650,7 +652,7 @@
    "§3 或 §7 新增 6 尺度 base-probe 表(Family/Model/n/ans_old@B0/@B3/Δthink/base-CLR/ans_new)+ caption:base recall 与 base-CLR 均随 scale 升(混淆原料),erosion 量的是 edited CHANGE 非 base LEVEL。",
    "§RQ1 反混淆句:LEVEL vs CHANGE + 'confound 预测的 rising base-Δ 未观察到'(但注意 base Δ 显著性待 Cap3,勿说'反向漂移')。",
    "§RQ2 诚实重述:删'绝对 CLR 高=侵蚀'与'edited<base=压制';CLR 降 supporting trend;因果引 M1 within-case;明标 CLR 涌现 base-floor 未闭合(待 Cap3)。",
-   "limitation:70B base 未跑(Llama 高端无 F1 去混淆);F1 margin 是跨口径近似差待 Cap3 同门配对;per-case 唯一显著涌现是 CLR、RR/es_drop slope n.s.。"
+   "limitation(7/2 重跑后现行版):K=2 族的涌现推断边界(B5 口径:两高端 cell 各自显著+族内单调序承重,pooled/within 斜率降描述);CLR 涌现已退役(Cap3 net-CLR 含零);rr slope p=.052 擦边如实报;F1 margin 是跨口径近似差、per-case 配对 CI 待 B13;fix within-case 中介证据限 32B 单尺度(M1_scope);机理描述性 n 小+共享回退池(B9)。"
   ],
   "_six_scale_summary": {
    "_def": "6 尺度未编辑 base:answer_old_b0=知识天花板(LEVEL);chain_old_b3=base CLR 底噪(LEVEL);delta_think=B0→B3 净漂(CHANGE 对照)。",
@@ -678,7 +680,7 @@
     "32B": -0.021,
     "70B": 0.025
    },
-   "_note": "base recall 与 base CLR 底噪均随 scale 单调升(混淆原料);但 delta_think 全小(|Δ|≤0.08,多 ≤0.025)=思考不把 base 推向 o_old → erosion(edited CHANGE)非 base 动力学。70B CLR 底噪 0.905 最高=印证 Cap3『CLR 涌现是 base 底噪伪影』。"
+   "_note": "base recall 随 scale 单调升(0.515→0.785);base CLR 底噪随 scale **上升但个别点非单调**(14B 0.860>32B 0.829;Qwen 族内 .755→.860→.829)——表述勿用'均单调'。delta_think 全小(|Δ|≤0.08,多 ≤0.025)=思考不把 base 推向 o_old → erosion(edited CHANGE)非 base 动力学。70B CLR 底噪 0.905 最高=Cap3『CLR 涌现是 base 底噪伪影』的一致证据。"
   }
  },
  "rq2_taxonomy": {
@@ -833,7 +835,7 @@
  },
  "emergence": {
   "_note": "B-emergence:erosion 指标对 log10(参数量)pool 两族回归;slope CI 排零=涌现有统计支撑(非仅靠 2/6 per-cell 显著)。6 点小样、log-params 为能力代理(跨族 alignment 已论证)、不宣称 scaling law。OLS 解析 t-CI(df=n-2)+按点 bootstrap(n=10000,seed42)+逆方差 WLS+family 控制。src/emergence_regression.py 可复现。",
-  "_percase_replacement": "【洞 fatal 实质封死·per-case 承重统计最终 6-cell 已跑】6 点 OLS 的 p<0.002 来自 point-resample 同 6 cell 均值(re-review wa6rxz0qp)→ 换 per-CASE 回归(每行=edit-case×尺度,~log10(params)+chain_len,family drop-one FE + 按 family 两级 cluster bootstrap=重采样单位=case nested in family,非 cell-mean)。**最终 6-cell(含 7B,无 WARN,rows=1196)**:CLR slope 0.372 [0.149,0.800] p=.0007 排零、within-Qwen CLR 0.365 [0.062,0.675] p=.010 排零;es_drop 0.033 [-0.037,0.139] p=.19、rr 0.047 [-0.501,0.530] p=.43 不显著=与 draft『foreground CLR』一致。**CLR 在 honest cluster bootstrap(K=2)下仍显著 → 制造显著性的 fatal 实质堵死**(5-cell 0.377→6-cell 0.372 稳健)。6 点 OLS 降描述性。残留(非阻塞):n 混(14/32/70B=cf100、1.5/7/8B 含 cf200,非全 headline n=200);CLR 结论不预期变。",
+  "_percase_replacement": "【6 点 OLS→per-case 承重统计的替换记录;数值以 emergence.percase(CLEAN,rows=1194)为准】6 点 OLS 的 p<0.002 来自 point-resample 同 6 cell 均值 → 换 per-CASE 回归(每行=edit-case×尺度,~log10(params)+chain_len,family drop-one FE + 两级 cluster bootstrap)。⚠首跑(rows=1196)受 glob 污染已作废(v1.56);clean 值见 percase:es_drop 0.109[0.036,0.175] p=.003 显著、rr 0.644 p=.052 擦边、clr raw 显著但经 cap3_netclr 判为 base 底噪伪影退役。",
   "percase": {
    "_status": "CLEAN 6-cell(commit 后 glob 污染修复;显式 per-scale --glob:cf200/cf200c2/cf100,无混-tag 告警,rows=1194)。两级 cluster bootstrap(case nested in family,K=2)。取代 6 点 OLS 为承重 emergence 统计。★clean 后 es_drop 涌现【复活】显著(污染时被 cf200sup 抑制数据盖住)。",
    "clr": {
@@ -853,15 +855,6 @@
      "available": false
     },
     "_base_floor_caveat": "⚠Cap3 实测(emergence.cap3_netclr):raw CLR slope 强显著,但逐 case 减 base 底噪后 net_clr slope=0.049 [−0.024,0.122] p=.093 【含零不显著】 → CLR 涌现≈全由 base CLR 底噪(0.582→0.86 随 scale 升)共线解释,【非】编辑特异涌现。故 CLR 涌现【退役】、只作描述;capability-emergence 靠 es_drop(0.109 p=.003,编辑特异、非底噪)+ rr(p=.052 擦边)。clr_density(Cap1)显著但未扣 base、同受底噪嫌疑=suggestive。"
-   },
-   "within_qwen_clr": {
-    "slope": 0.365,
-    "ci": [
-     0.062,
-     0.675
-    ],
-    "p_le0": 0.01,
-    "excludes_zero": true
    },
    "es_drop": {
     "point": 0.1094,
@@ -918,7 +911,8 @@
      "n": 200,
      "es_drop": 0.11,
      "rr": 0.1667,
-     "clr": 0.495
+     "clr": 0.495,
+     "_note": "无过滤全量 n=200 口径;headline(早停过滤 n=187)=0.107/0.175/0.529 见 capability.families,勿混引。"
     },
     "Qwen-1.5B": {
      "n": 196,
@@ -1002,6 +996,16 @@
     "p_slope_le_0": 0.0007,
     "n_rows": 794,
     "n_boot_effective": 10000
+   },
+   "_superseded_within_qwen_clr_polluted": {
+    "slope": 0.365,
+    "ci": [
+     0.062,
+     0.675
+    ],
+    "p_le0": 0.01,
+    "excludes_zero": true,
+    "_warning": "⚠污染 glob 首跑值(0.365),已被 within_Qwen_clr(clean 1.1819)取代;存档防误取。"
    }
   },
   "clr_robustness": {
@@ -1273,7 +1277,7 @@
     }
    },
    "verdict": "★Cap3 定论:raw CLR slope 1.128[0.825,1.468]强显著 → net(减 base)0.049[−0.024,0.122] p=.093【含零】。逐尺度 net_clr≈平(−0.37/−0.49/−0.39/−0.29)=编辑 CLR 恒定低于 base ~0.38、gap 不随能力扩。→ CLR 涌现是 base 底噪伪影,【退役】为描述;base_clr==0 子集 slope 0.654 亦含零(n=178)。capability-emergence 由 es_drop(0.109 p=.003,编辑特异)接棒,不受影响。",
-   "_gap": "7B base 未进本次 --base-glob(net_clr 只 4 尺度);70B base 未跑。补 7B base(*_BASE_* 已在盘)可回填 5 尺度。"
+   "_gap": "7B base 未进本次 --base-glob(net_clr 现 4 尺度;7B *_BASE_* 在盘可回填→5);70B base **已跑**(2026-07-02,见 base_probe.70B/_70B_gap_closed)但其 per-case 行本地未证在盘,70B net_clr 回填按平台侧处理(B13)。回填不改结论(edited 0.495−base 0.905≈−0.41,合 ~−0.38 平线)。"
   }
  },
  "metric_validation": {
