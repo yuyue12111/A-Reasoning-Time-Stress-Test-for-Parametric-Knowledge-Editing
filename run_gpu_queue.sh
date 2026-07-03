@@ -36,7 +36,12 @@ log(){ echo "[$(ts)] $*"; }
 _has_w(){ ls "$1"/*.safetensors >/dev/null 2>&1 || ls "$1"/*.bin >/dev/null 2>&1; }
 resolve_model(){   # $1=模型名(如 DeepSeek-R1-Distill-Qwen-32B);echo 含真权重的目录,找不到返回 1
   local name="$1" cand
+  # 显式 override:export WHYAAAI_MODEL_<名去横杠点>=<目录> 可点名指定某模型(多步各自指定)
+  local ov_key="WHYAAAI_MODEL_${name//[-.]/_}"; local ov="${!ov_key:-}"
+  if [[ -n "$ov" ]] && _has_w "$ov"; then echo "$ov"; return 0; fi
   for cand in \
+      /inspire/hdd/global_public/public_models/deepseek-ai/"$name" \
+      /inspire/hdd/global_public/public_models/*/"$name" \
       "$W/models/$name" \
       /inspire/qb-ilm/project/ai4education/public/whywhy/models/"$name" \
       /inspire/qb-ilm/project/ai4education/public/*/models/"$name" \
