@@ -624,7 +624,14 @@
   },
   "70B": {
    "family": "Llama",
-   "_status": "NOT_RUN — Llama 高端无 F1 式 base Δthink 去混淆对照;不阻塞(70B 承重靠 ES 降幅显著);须在 limitation 显式标注。"
+   "answer_old_b0": 0.785,
+   "answer_old_b3": 0.81,
+   "delta_think": 0.025,
+   "chain_old_b3": 0.905,
+   "answer_new_b0": 0.01,
+   "answer_new_b3": 0.02,
+   "n": 200,
+   "_interp": "Llama 高端;base recall 0.785 与 base CLR 底噪 0.905 全表最高;Δthink=+0.025 小正=思考不推向 o_old。edited 70B RR=0.167(emergence.percase cells)→ margin=0.167−0.025=0.142 → F1 编辑特异【延伸到 Llama 高端】(补上原 NOT_RUN 缺口)。ans_new≈0.01-0.02 sanity ok。"
   },
   "_adversarial_verified": {
    "_run": "wz4rou8q3(8-agent workflow:4-lens+kill→synth→2 skeptics;两 skeptics 均 refuted 综合的假支柱,已并入 corrected)",
@@ -634,7 +641,8 @@
    "M1_scope": "M1 gate 的是 RQ3 修复的链中介@32B 单尺度,【不】背书 RQ2 跨尺度涌现;两条不同 claim,勿混。",
    "Cap_upgrade": "Cap2(clr_rev slope)+Cap3(net-CLR=edited−base 同门 per-case slope + 回归 erosion~capability|base_recall)从【可选→必做】:封死 CLR 涌现 base-floor 共线的唯一路径。范围:只 gate CLR 涌现叙事,不 gate 头牌(F1/M1/32B ES降幅独立成立)。",
    "emergence_slope_honesty_SUPERSEDED": "⚠per-case cluster-robust 涌现 slope 只有 CLR 显著(0.372[0.149,0.800] excl0);RR(0.047[−0.501,0.53])与 es_drop(0.033[−0.037,0.139]) 均【含零 n.s.】。故涌现-as-slope 唯一显著腿=CLR,而 CLR 与 base CLR 底噪(0.582→0.86)共线。=> 不能'降级 CLR 又声称涌现稳';capability-emergence 维持 supporting-trend(印证 MECH-led 降级),头牌压 M1 within-case + F1 change-control + 32B cell-level ES降幅 0.106[0.030,0.182]显著(≠per-case slope,是单模型 bootstrap)。",
-   "emergence_slope_honesty": "✅[clean 重跑更新,2026-07-02]污染修复后(commit e21b67c;32B 曾被 cf200sup 覆盖):es_drop 涌现【复活】显著=0.109[0.036,0.175] p=.003(污染时 0.033 n.s.);rr 0.644 p=.052 擦边;clr raw 强显著但 Cap3 net-CLR=0.049 含零=base 底噪伪影【退役】。→ capability-emergence 由 es_drop(编辑特异、非底噪)承重,比污染版('只 CLR、还共线')强得多。v1.55③ 的悲观部分被翻回。"
+   "emergence_slope_honesty": "✅[clean 重跑更新,2026-07-02]污染修复后(commit e21b67c;32B 曾被 cf200sup 覆盖):es_drop 涌现【复活】显著=0.109[0.036,0.175] p=.003(污染时 0.033 n.s.);rr 0.644 p=.052 擦边;clr raw 强显著但 Cap3 net-CLR=0.049 含零=base 底噪伪影【退役】。→ capability-emergence 由 es_drop(编辑特异、非底噪)承重,比污染版('只 CLR、还共线')强得多。v1.55③ 的悲观部分被翻回。",
+   "_70B_gap_closed": "2026-07-02:70B base 已跑(答旧 B0 0.785→B3 0.810,Δ +0.025;base CLR 0.905)→ 原 '70B base 未跑=Llama 高端无 F1 对照' 缺口关闭;F1 编辑特异现覆盖全 6 尺度(base 全尺度 Δthink 小、edited erosion 远强)。Cap3 net_clr 现可加 70B(edited 0.495−base 0.905=−0.41,合 ~−0.38 平线,不改结论)。"
   },
   "_pending_draft_edits": [
    "abstract L13/17/21/44(32B headline)recall 锚 0.59→0.765(0.59 是 7B 值;base_probe.32B.answer_old_b0=0.765)。",
@@ -643,7 +651,35 @@
    "§RQ1 反混淆句:LEVEL vs CHANGE + 'confound 预测的 rising base-Δ 未观察到'(但注意 base Δ 显著性待 Cap3,勿说'反向漂移')。",
    "§RQ2 诚实重述:删'绝对 CLR 高=侵蚀'与'edited<base=压制';CLR 降 supporting trend;因果引 M1 within-case;明标 CLR 涌现 base-floor 未闭合(待 Cap3)。",
    "limitation:70B base 未跑(Llama 高端无 F1 去混淆);F1 margin 是跨口径近似差待 Cap3 同门配对;per-case 唯一显著涌现是 CLR、RR/es_drop slope n.s.。"
-  ]
+  ],
+  "_six_scale_summary": {
+   "_def": "6 尺度未编辑 base:answer_old_b0=知识天花板(LEVEL);chain_old_b3=base CLR 底噪(LEVEL);delta_think=B0→B3 净漂(CHANGE 对照)。",
+   "answer_old_b0": {
+    "1.5B": 0.515,
+    "7B": 0.59,
+    "8B": 0.655,
+    "14B": 0.76,
+    "32B": 0.765,
+    "70B": 0.785
+   },
+   "base_clr_b3": {
+    "1.5B": 0.582,
+    "7B": 0.755,
+    "8B": 0.825,
+    "14B": 0.86,
+    "32B": 0.829,
+    "70B": 0.905
+   },
+   "delta_think": {
+    "1.5B": -0.01,
+    "7B": 0.08,
+    "8B": 0.02,
+    "14B": 0.01,
+    "32B": -0.021,
+    "70B": 0.025
+   },
+   "_note": "base recall 与 base CLR 底噪均随 scale 单调升(混淆原料);但 delta_think 全小(|Δ|≤0.08,多 ≤0.025)=思考不把 base 推向 o_old → erosion(edited CHANGE)非 base 动力学。70B CLR 底噪 0.905 最高=印证 Cap3『CLR 涌现是 base 底噪伪影』。"
+  }
  },
  "rq2_taxonomy": {
   "_status": "DONE —— 3-判官面板(workflow wbhgnlufw[14B+32B] + wuq9wq97k[7B],各链×3 判官读 RAW cot、strict precedence Reflective-override>Bridge>Recall>Associative、必引 verbatim span)→ src/chain_classify aggregate(多数决/3-way precedence)+ pool。LaTeX 表 results/a3/table_rq2.tex。",
