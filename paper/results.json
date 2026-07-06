@@ -202,7 +202,8 @@
     "N": 198,
     "T": 198,
     "D": 196,
-    "P": 199
+    "P": 199,
+    "C": 200
    },
    "marginal_B3": {
     "N": {
@@ -228,6 +229,12 @@
      "RR": 0.21,
      "RRs": 0.113,
      "CLR": 0.492
+    },
+    "C": {
+     "ES": 0.51,
+     "RR": 0.208,
+     "RRs": 0.112,
+     "CLR": 0.475
     }
    },
    "contrasts_B3_mean_ci_p": {
@@ -369,7 +376,8 @@
     }
    },
    "verdict": "★W1 三件套齐(prereg 全中):(1) **T−P 四指标全排零**(RR −0.095 p=.010 / CLR −0.228 p<.001 / RRs −0.057 p=.029 / ES +0.122 p=.002)=o_old 效应超 placebo floor=特异;(2) **P−N≈0**(RR 恰 0.0 / ES p=.71 / RRs p=.83 含零)=placebo 惰性=非通用链扰动;(3) **D−N ES −0.217 显著负**=方向特异(压 o_new 反恶化、RR/RRs 升)。**符号阶梯 D<N~P<T**(ES 0.281<0.495≈0.507<0.631)如预注册。→ RQ3 从'一个管用干预'升为'符号/特异/剂量(A2 α-sweep)受控的因果操控'。诚实:placebo CLR P−N −0.05 p=.054 边际(随机词微触链内泄漏),但被 o_old −0.276 碾压、T−P CLR −0.228 p<.001 仍稳。N/T 边际复现 headline(RR .193/.085、CLR .545/.263)=口径一致。",
-   "_main_report": "主报 effect-above-placebo = T−P:RR −0.095[−0.171,−0.029]、CLR −0.228[−0.294,−0.162]、ES +0.122[0.051,0.193],全排零。"
+   "_main_report": "主报 effect-above-placebo = T−P:RR −0.095[−0.171,−0.029]、CLR −0.228[−0.294,−0.162]、ES +0.122[0.051,0.193],全排零。",
+   "_C_arm_M4": "M4/B24(终极review;卡时放开后补,tag cf200sup_strong,errors=4):C=压同 relation 强竞争者(data/placebo_donors_strong.json,French→Russian 类,BLIND 预注册)。**C≈N≈P**(ES 0.510 vs N 0.495/P 0.507;RR 0.208 vs N 0.193/P 0.210)而 T−N=ES+0.136/RR−0.108 →压'正确类型的强错误答案'也不修复,只压 o_old 修复 = **o_old 特异性以最强对照坐实,NO KILL**。五臂图完整:T(压旧)修复 / D(压新)反伤 / P(无关词)惰性 / C(强竞争者)惰性。es_drop(C)=0.115[0.040,0.185] 显著 ≈ N 0.106(压竞争者不改变 erosion 本身,一致)。airtight 配对 CI:平台跑 cross_arm --arm N=probe32b.yaml --arm C=probe32b_sup_strongcomp.yaml。"
   },
   "alpha_sweep": {
    "_status": "DONE(A2 6/6;scope=think dose-response 5 点 + scope=all 消融 1 点;n=100,B3;run_a2_h200.sh)。证 penalty=8 非 cherry-pick + scope=think 是正确因果位点。",
@@ -510,6 +518,42 @@
     "RRfix_when_CLR_NOT_dropped": 0.042
    },
    "verdict": "★强 CONFIRM(硬化 RQ3 机理,非 kill):修复效应精确集中 CLR1 基线(T−N RR −0.289 p=.0002)、CLR0 基线≈0(+0.014 p=.72);2×2 RR 改善率 CLR-降 43% vs CLR-未降 4%(10×)。→ 『链内容中介答案』within-case 被证实(非仅边际 T−P),直接回应『suppress 每步减 penalty 可能不管 o_old 就改道』的循环质疑:无链内 o_old 可堵时修复什么也不做。"
+  },
+  "strong_competitor_M4": {
+   "_status": "M4/B24 DONE CONFIRM(无 kill)。详见 sup_battery._C_arm_M4 与 marginal_B3.C。",
+   "verdict": "★M4 CONFIRM:C−N≈0(RR +0.015/ES +0.015,噪声级)vs T−N(RR −0.108/ES +0.136)→ 修复非'压任何强候选皆可',o_old 特异;'特异性只相对惰性 placebo'的 draft 残余可升级为 T−C 对照。"
+  },
+  "s10_14b_fix_replication": {
+   "_status": "S10-lite(终极review 后增列;probe14b_sup.yaml,T 臂 scope=think α=8 layer9 同 headline 可配对,n=200,errors=0;N 臂=在盘 14B headline。prereg 主端点=ES@B3,不钉 b0ok-RR)。",
+   "T_arm": {
+    "ES_B0": 0.58,
+    "ES_B3": 0.65,
+    "ES_B3_ci": [
+     0.585,
+     0.715
+    ],
+    "RR_B3": 0.086,
+    "RRs_B3": 0.026,
+    "CLR_B3": 0.205,
+    "es_drop": -0.07,
+    "es_drop_ci": [
+     -0.15,
+     0.015
+    ],
+    "Loc": 0.94
+   },
+   "N_arm_headline": {
+    "ES_B3": 0.515,
+    "RR_B3": 0.162,
+    "es_drop": 0.04
+   },
+   "TminusN": {
+    "ES_B3": 0.135,
+    "RR_B3": -0.076,
+    "note": "主端点 ES@B3 T−N=+0.135(cell CI 几乎不重叠);RR 0.162→0.086 近减半;思考税 +0.04→−0.070(消除转负,CI 含 0)。"
+   },
+   "vs_32B": "镜像 32B T−N(ES +0.136/RR 0.193→0.085/税 0.106→−0.035)——**量级几乎逐项相同**。",
+   "verdict": "★S10-lite CONFIRM:training-free 修复在 14B 复现(prereg 主端点 ES@B3 T−N=+0.135),『修复是 32B 单点』被拆;M1 的 within-case 中介仍限 32B(M1_scope 不变,勿混)。airtight 配对 CI:cross_arm --arm N=probe14b.yaml --arm T=probe14b_sup.yaml。"
   }
  },
  "logitlens": {
@@ -652,7 +696,10 @@
    "§3 或 §7 新增 6 尺度 base-probe 表(Family/Model/n/ans_old@B0/@B3/Δthink/base-CLR/ans_new)+ caption:base recall 与 base-CLR 均随 scale 升(混淆原料),erosion 量的是 edited CHANGE 非 base LEVEL。",
    "§RQ1 反混淆句:LEVEL vs CHANGE + 'confound 预测的 rising base-Δ 未观察到'(但注意 base Δ 显著性待 Cap3,勿说'反向漂移')。",
    "§RQ2 诚实重述:删'绝对 CLR 高=侵蚀'与'edited<base=压制';CLR 降 supporting trend;因果引 M1 within-case;明标 CLR 涌现 base-floor 未闭合(待 Cap3)。",
-   "limitation(7/2 重跑后现行版):K=2 族的涌现推断边界(B5 口径:两高端 cell 各自显著+族内单调序承重,pooled/within 斜率降描述);CLR 涌现已退役(Cap3 net-CLR 含零);rr slope p=.052 擦边如实报;F1 margin 是跨口径近似差、per-case 配对 CI 待 B13;fix within-case 中介证据限 32B 单尺度(M1_scope);机理描述性 n 小+共享回退池(B9)。"
+   "limitation(7/2 重跑后现行版):K=2 族的涌现推断边界(B5 口径:两高端 cell 各自显著+族内单调序承重,pooled/within 斜率降描述);CLR 涌现已退役(Cap3 net-CLR 含零);rr slope p=.052 擦边如实报;F1 margin 是跨口径近似差、per-case 配对 CI 待 B13;fix within-case 中介证据限 32B 单尺度(M1_scope);机理描述性 n 小+共享回退池(B9)。",
+   "M4 后:§6 特异性句从 'vs inert placebo(T−P)' 升级为 'vs same-relation strong competitor(T−C,C≈N)';五臂图 N/T/D/P/C。",
+   "G1 后:§7 cond-c [pending] 自供 → 有数边界句(hop_ES 0.513→0.487 无伤,erosion 点估 0.188→0.104 CI 重叠;限 8B/2-hop)。",
+   "S10 后:§7 'fix 仅 32B 验证' limitation 改写为 '答案级修复 14B/32B 两尺度复现(T−N ES +0.135/+0.136);within-case 中介(M1)仍限 32B'。"
   ],
   "_six_scale_summary": {
    "_def": "6 尺度未编辑 base:answer_old_b0=知识天花板(LEVEL);chain_old_b3=base CLR 底噪(LEVEL);delta_think=B0→B3 净漂(CHANGE 对照)。",
@@ -1389,7 +1436,41 @@
    "_note": "8B 单跳 within-case 回退 RR=0.144 排零、边际 ES降幅≈0(ns)=同掩盖结构;多跳 within-case 0.188 与之同结构同尺度同族复现。"
   },
   "verdict": "★W3 多跳 propagation-erosion 显著(pooled 0.188 [0.083,0.292] 排零)→ 编辑向 2-hop 下游的传播在思考后被侵蚀,触及编辑事实在推理链中的下游使用,非单跳 cloze 表面伪影。与单跳 within-case 回退(8B RR 0.144 [0.088,0.208])同结构/同尺度/同族复现。三处诚实:(1) **边际 hop_ES 反升**(0.32→0.513)—— B0=ZeroThink 无 token 做不了 2-hop 推理,思考既补全未传播链(rescue)又侵蚀已传播链(erosion),净为正;故主报 b0_prop 门内 within-case(单跳 RR 同为 within-case 口径、边际 ES降幅亦≈0=同掩盖),不报边际。这是 ZeroThink×多跳结构性、非 bug。(2) **单模板主导**:pooled 显著主要由 P27(n=57、最多样、b0_prop=27、0.148 [0.037,0.296] 排零)扛;P495/P136 b0_prop≤8 欠功效、个体含零。(3) **侵蚀去向='neither'(8/9)非翻旧(1/9)**:多跳侵蚀=编辑传播衰减为噪声,非下游旧事实复辟(与单跳显式翻旧不同)。**32B 去留**:不升 —— 预注册升级门(n_b0_prop≥60 且 ≥4 powered templates)未达(48,仅 P27 有功效);within-case CI 已排零功效够;边际反升是结构性、32B 也消不掉。8B=有界深度结果;32B 多跳留 camera-ready/审稿响应。",
-  "scope_honest": "单族单尺度(8B);MQuAKE 模板/合成、推理面温和;pooled 显著 leans on 单模板 P27。立『erosion 非单跳 cloze 伪影』,不立硬/自然多步推理上的 erosion(写进 limitations 残余风险 #2)。"
+  "scope_honest": "单族单尺度(8B);MQuAKE 模板/合成、推理面温和;pooled 显著 leans on 单模板 P27。立『erosion 非单跳 cloze 伪影』,不立硬/自然多步推理上的 erosion(写进 limitations 残余风险 #2)。",
+  "g1_condc_suppressed": {
+   "_status": "G1/B25(终极review;mquake8b_2hop_sup.yaml,抑制器 apply_to:[hop],α=8/scope=think,同 gated 池 150,对照=无抑制 mh2hop)。",
+   "pooled": {
+    "n_b0_prop": 48,
+    "hop_ES_marginal": {
+     "B0": 0.32,
+     "B3": 0.487
+    },
+    "propagation_erosion_B0toB3": {
+     "rate": 0.104,
+     "ci": [
+      0.021,
+      0.188
+     ],
+     "decomp": {
+      "stays_new": 43,
+      "flips_to_old": 0,
+      "neither": 5
+     }
+    }
+   },
+   "baseline_no_suppress": {
+    "n_b0_prop": 48,
+    "hop_ES_B3": 0.513,
+    "erosion": 0.188,
+    "erosion_ci": [
+     0.083,
+     0.292
+    ],
+    "decomp": "39/1/8"
+   },
+   "sanity": "B0 完全不受影响(b0_prop 48=48、hop_ES@B0 0.32=0.32)——scope=think 下 B0 无链,构造正确。",
+   "verdict": "★G1 无 kill:抑制器开到多跳 query,hop_ES@B3 0.487 vs 无抑制 0.513(−0.026,噪声级)=**未测得编辑相邻侧伤害**;propagation-erosion 点估反而 0.188→0.104(flips_to_old 1→0,CI 重叠)=链级修复在 2-hop 上方向为【保护】而非伤害。§7 cond-c [pending] 自供状 → 可换有数边界句:'在 o_old 可为合法中间步的 2-hop 编辑 query 上开启抑制,未测得 hop 准确率下降(0.513→0.487,n=150);传播侵蚀点估减半(CI 重叠)'。诚实残余:−0.026 的小 dip 如实报作 bound;仅 8B/2-hop 一配置。"
+  }
  },
  "necessity": {
   "_status": "E-NECESSITY (depth-plan §第三轮 #2):自然回退的 in-chain re-derivation 观察性必要性,RQ2 判官链(results/a3/labels_*.jsonl),未重跑/未干预。src/necessity_check.py → results/necessity.json。",
@@ -1620,5 +1701,9 @@
   },
   "verdict": "★F3 CONFIRM(erosion 采样鲁棒):ES 降幅 采样 0.090[0.010,0.171] ≈ greedy 0.110[0.035,0.185],均显著、同量级 → 回退【不是】单条贪心脆性(中层近平局微扰即翻的质疑被否)。RR@B3 采样 0.264>greedy 0.208(采样更频=多样链更常重推 o_old,合机理);strict RRs 采样 0.093≈greedy 0.112;CLR@B3 采样 0.523≈greedy 0.485。go/no-go RR≥0.20 采样(0.264)/greedy(0.208)均过。→ 堵『声称做了没报』,头牌在采样下稳。",
   "_note": "greedy 对照(ES 降幅 0.110/RR 0.208)复现 headline(0.106/0.193),内部一致=本 run 协议无漂移。"
+ },
+ "memit_replication": {
+  "_status": "B22(终极review 全表最大单项,堵 R2 单编辑器):32B 首跑 FAILED——200/200 全 error 行(r1qwen32b_MEMIT_cf200memit_r*;错误内容待 grep 诊断:mom2/OOM/hparams 待分)。降级路径 memit14b.yaml(层带 [7..11] 中心=ROME 已验 layer9)按 review 预案启用。",
+  "verdict_pending": "无数据,无判读。诊断+14B 结果回来再记。"
  }
 }
