@@ -377,7 +377,7 @@
    },
    "verdict": "★W1 三件套齐(prereg 全中):(1) **T−P 四指标全排零**(RR −0.095 p=.010 / CLR −0.228 p<.001 / RRs −0.057 p=.029 / ES +0.122 p=.002)=o_old 效应超 placebo floor=特异;(2) **P−N≈0**(RR 恰 0.0 / ES p=.71 / RRs p=.83 含零)=placebo 惰性=非通用链扰动;(3) **D−N ES −0.217 显著负**=方向特异(压 o_new 反恶化、RR/RRs 升)。**符号阶梯 D<N~P<T**(ES 0.281<0.495≈0.507<0.631)如预注册。→ RQ3 从'一个管用干预'升为'符号/特异/剂量(A2 α-sweep)受控的因果操控'。诚实:placebo CLR P−N −0.05 p=.054 边际(随机词微触链内泄漏),但被 o_old −0.276 碾压、T−P CLR −0.228 p<.001 仍稳。N/T 边际复现 headline(RR .193/.085、CLR .545/.263)=口径一致。",
    "_main_report": "主报 effect-above-placebo = T−P:RR −0.095[−0.171,−0.029]、CLR −0.228[−0.294,−0.162]、ES +0.122[0.051,0.193],全排零。",
-   "_C_arm_M4": "M4/B24(终极review;卡时放开后补,tag cf200sup_strong,errors=4):C=压同 relation 强竞争者(data/placebo_donors_strong.json,French→Russian 类,BLIND 预注册)。**C≈N≈P**(ES 0.510 vs N 0.495/P 0.507;RR 0.208 vs N 0.193/P 0.210)而 T−N=ES+0.136/RR−0.108 →压'正确类型的强错误答案'也不修复,只压 o_old 修复 = **o_old 特异性以最强对照坐实,NO KILL**。五臂图完整:T(压旧)修复 / D(压新)反伤 / P(无关词)惰性 / C(强竞争者)惰性。es_drop(C)=0.115[0.040,0.185] 显著 ≈ N 0.106(压竞争者不改变 erosion 本身,一致)。airtight 配对 CI:平台跑 cross_arm --arm N=probe32b.yaml --arm C=probe32b_sup_strongcomp.yaml。"
+   "_C_arm_M4": "M4/B24(终极review;卡时放开后补,tag cf200sup_strong,errors=4):C=压同 relation 强竞争者(data/placebo_donors_strong.json,French→Russian 类,BLIND 预注册)。**C≈N≈P**(ES 0.510 vs N 0.495/P 0.507;RR 0.208 vs N 0.193/P 0.210)而 T−N=ES+0.136/RR−0.108 →压'正确类型的强错误答案'也不修复,只压 o_old 修复 = **o_old 特异性以最强对照坐实,NO KILL**。五臂图完整:T(压旧)修复 / D(压新)反伤 / P(无关词)惰性 / C(强竞争者)惰性。es_drop(C)=0.115[0.040,0.185] 显著 ≈ N 0.106(压竞争者不改变 erosion 本身,一致)。airtight 配对 CI:平台跑 cross_arm --arm N=probe32b.yaml --arm C=probe32b_sup_strongcomp.yaml。 配对 CI 待补:cross_arm 已加 C−N/T−C 对照(commit 后),重跑 --arm N/T/C 出 T−C 排零=airtight。"
   },
   "alpha_sweep": {
    "_status": "DONE(A2 6/6;scope=think dose-response 5 点 + scope=all 消融 1 点;n=100,B3;run_a2_h200.sh)。证 penalty=8 非 cherry-pick + scope=think 是正确因果位点。",
@@ -553,7 +553,42 @@
     "note": "主端点 ES@B3 T−N=+0.135(cell CI 几乎不重叠);RR 0.162→0.086 近减半;思考税 +0.04→−0.070(消除转负,CI 含 0)。"
    },
    "vs_32B": "镜像 32B T−N(ES +0.136/RR 0.193→0.085/税 0.106→−0.035)——**量级几乎逐项相同**。",
-   "verdict": "★S10-lite CONFIRM:training-free 修复在 14B 复现(prereg 主端点 ES@B3 T−N=+0.135),『修复是 32B 单点』被拆;M1 的 within-case 中介仍限 32B(M1_scope 不变,勿混)。airtight 配对 CI:cross_arm --arm N=probe14b.yaml --arm T=probe14b_sup.yaml。"
+   "verdict": "★S10-lite CONFIRM(airtight):14B T−N 配对四指标全排零(ES +0.135 p=.0006/RR −0.101 p=.025/RRs −0.040 p=.035/CLR −0.27 p=0)——修复跨尺度成立且 14B 的配对回退比 32B 更干净(32B RRs 擦边)。『修复是 32B 单点』拆掉;M1 within-case 中介仍限 32B(不混)。",
+   "TminusN_paired_ci": {
+    "ES": [
+     0.135,
+     [
+      0.055,
+      0.215
+     ],
+     0.0006
+    ],
+    "RR": [
+     -0.101,
+     [
+      -0.1919,
+      -0.0202
+     ],
+     0.0248
+    ],
+    "RRs": [
+     -0.0404,
+     [
+      -0.0808,
+      -0.0101
+     ],
+     0.0354
+    ],
+    "CLR": [
+     -0.27,
+     [
+      -0.335,
+      -0.205
+     ],
+     0.0
+    ],
+    "_note": "cross_arm 按 case_id 配对(N=probe14b.yaml, T=probe14b_sup.yaml)。**四指标全排零**——尤其 RR/RRs 配对 p=.025/.035 均显著,【比 32B 更干净】(32B 的 RRs T−N p=.073 擦边,终极review B17 点名);→ '修复砍半回退'在 14B 的最严配对口径下也成立,B17 的自伤风险在 14B 消失。"
+   }
   }
  },
  "logitlens": {
@@ -1704,6 +1739,7 @@
  },
  "memit_replication": {
   "_status": "B22(终极review 全表最大单项,堵 R2 单编辑器):32B 首跑 FAILED——200/200 全 error 行(r1qwen32b_MEMIT_cf200memit_r*;错误内容待 grep 诊断:mom2/OOM/hparams 待分)。降级路径 memit14b.yaml(层带 [7..11] 中心=ROME 已验 layer9)按 review 预案启用。",
-  "verdict_pending": "无数据,无判读。诊断+14B 结果回来再记。"
+  "verdict_pending": "无数据,无判读。诊断+14B 结果回来再记。",
+  "_diagnosis": "32B FAILED 根因=**CUDA OOM(非 mom2/hparams)**:32B fp32 权重 ~119GiB,MEMIT 多层(5 层)compute_v 梯度 + 逐层更新工作内存把 141G 顶爆(实测 allocated 129.96G,再要 7.5G 即 OOM;ROME 单层刚好塞下、MEMIT 多层不行)。对策梯度:①PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True + 层 5→3([11,12,13],仍多层满足 S7)重试 32B;②不行 → memit14b.yaml(14B fp32 仅 56GiB,H200/H100 均宽裕,guaranteed)。B22 只需一个第二编辑器现象点,14B 也够用(终极review 明载);优先拿到结果 > 拿到 32B。"
  }
 }

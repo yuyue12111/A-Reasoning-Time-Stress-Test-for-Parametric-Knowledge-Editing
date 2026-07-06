@@ -101,7 +101,9 @@ def main():
 
     # 预注册关键对照(存在的臂才算)
     contrasts = [("T", "N", "fix 效应(o_old-vs-零,非主报)"), ("T", "P", "★o_old 超 placebo 的 margin(主报特异性)"),
-                 ("D", "N", "★方向臂(压 o_new;符号错=近致命)"), ("P", "N", "placebo floor(链扰动,期望≈0)")]
+                 ("D", "N", "★方向臂(压 o_new;符号错=近致命)"), ("P", "N", "placebo floor(链扰动,期望≈0)"),
+                 ("C", "N", "强竞争者 floor(同 relation 强错答;M4,期望≈0=非通用)"),
+                 ("T", "C", "★o_old 超强竞争者 margin(M4 最强特异性;T−C 排零=o_old 特异)")]
     summ = {"arms_n": {k: len(v) for k, v in arms.items()}, "marginal": {k: marginal(v) for k, v in arms.items()}, "contrasts": {}}
     print(f"\n# 配对对照(armA − armB,均差 [95%CI] p):")
     for a, b, desc in contrasts:
