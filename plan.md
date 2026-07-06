@@ -273,6 +273,7 @@
   **【上卡顺序约束】kill-risk 先行:③M4+⑤G1 最先**(结果改措辞,晚了变写作期炸弹);①B22+②B23 随后(结果只会更硬/更诚实);④S10-lite/⑥B26 插空。零卡件(B15/B16/B8/B11/B13)仍第一优先照 D2-D4 走,与卡时无关。
   **【即使卡免费也不复活】**B27 E-CHAINSUB(瓶颈=provenance bug+设计自循环,非卡)、zsRE/AlphaEdit(MEMIT 后平坦区)、32B 多跳(预注册升级门未达)、prompted-CoT(工程量+双向预认)。
   **【本轮备货(见后续 commit)】**M4:placebo_donor `--mode strong`(同 relation 供体,BLIND seed 锁定入库=prereg)+`probe32b_sup_strongcomp.yaml`;G1:edit_loop suppress `apply_to` 配置(默认 [efficacy] 保持现行为)+`mquake8b_2hop_sup.yaml`;S10-lite:`probe14b_sup.yaml`(prereg 头注);B22:`memit32b.yaml`+mom2 预热命令;B23:logit_lens held+base 扩展。
+  **【批1 结果(7/3 晚,commit `4a5b271`)——kill-risk 两件全过,无写作期炸弹】**①**M4 CONFIRM**:C≈N≈P(ES 0.510/RR 0.208 vs N 0.495/0.193)而 T−N=+0.136/−0.108 → o_old 特异性以最强对照坐实;五臂图齐(T 修复/D 反伤/P 惰性/C 惰性)。②**G1 无 kill**:hop_ES@B3 0.487 vs 无抑制 0.513(−0.026 噪声级)、erosion 点估 0.188→0.104(CI 重叠)=修复在多跳上方向为保护;B0 sanity 完美。③**S10-lite CONFIRM**:14B T−N 主端点 ES@B3 +0.135、RR 0.162→0.086、税转负——逐项镜像 32B → 修复跨尺度成立(M1 中介仍限 32B)。④**B22-32B FAILED**:200/200 error 行,待 grep 诊断(mom2/OOM/hparams 待分);`memit14b.yaml` 降级预案启用。**剩**:B22 诊断+重跑(32B 修得动就修,否则 14B 定案)、B23 备货(logit-lens held)、B26 末位;配对 CI 补跑(cross_arm C−N/14B T−N)。
 
 ---
 
