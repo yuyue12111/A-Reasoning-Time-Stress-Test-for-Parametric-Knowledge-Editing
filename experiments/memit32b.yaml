@@ -1,14 +1,16 @@
 # B22 · MEMIT×CF 现象复制 · 32B —— 堵 R2"单编辑器,ROME 特有?"(终极review 全表最大单项)
 # 只测【现象】:ES 降幅(B0→B3)+ RR。不跑机理/修复/taxonomy,不牵动任何已写叙事。
-# 层带(S7 红队:多层,勿单层退化成 ROME 几何):7B MEMIT 默认 [4..8]/28(相对深度 0.14-0.29,中心 0.21);
-#   32B ROME 已锁 layer12/64(0.19)→ MEMIT 取以 12 为中心连续五层 [10,11,12,13,14](0.16-0.22)。
-#   若 B0 ES_b 偏低(<0.5)再扫 [8..12]/[12..16];MEMIT-32B 不可行(OOM/mom2 失败)→ 降 memit14b.yaml。
+# 层带(S7 红队:多层,勿单层退化成 ROME 几何):32B ROME 已锁 layer12/64(0.19)→ 以 12 为中心。
+#   ⚠首跑 5 层 [10..14] = CUDA OOM(32B fp32 权重 119GiB + MEMIT 多层 compute_v 工作内存爆 141G,
+#   实测 allocated 129.96G 再要 7.5G 即崩)。**对策已应用:降 3 层 [11,12,13](仍多层满足 S7)
+#   + 跑时加 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True(回收碎片)**。仍 OOM → 降 memit14b.yaml。
 # 【预注册判读】MEMIT ES 降幅 B0→B3 CI>0 或 RR@B3 与 ROME 同量级 → 现象非 ROME 特有,R2 拆掉;
 #   两皆平 → 如实报"MEMIT 上未复现"+ §7 改写(结果无论如何只让论文更硬或更诚实,无 kill 风险)。
 # ─────────────────────────────────────────────────────────────────────────
 # 跑(H200,32B fp32 需 141G;Hopper bf16 梯度优化 NaN 风险与 ROME 同 → WHYAAAI_DTYPE=float32):
 #   export WHYAAAI_MODEL=$W/models/DeepSeek-R1-Distill-Qwen-32B; export WHYAAAI_DTYPE=float32
-#   # ① mom2 预热(RUNBOOK §3:单进程先跑,防 8 分片并发重复触发 mom2;5 层×32B fp32 数小时,卡免费后可等)
+#   export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True    # ★OOM 对策:回收碎片(所有 rank 都要 export)
+#   # ① mom2 预热(RUNBOOK §3:单进程先跑,防 8 分片并发重复触发 mom2;3 层×32B fp32 数小时,卡免费后可等)
 #   PYTHONPATH=source/EasyEdit python src/run_pilot.py --config experiments/memit32b.yaml \
 #       --editor MEMIT --rank 0 --world 8 --device 0        # 跑完 ≥1 case(mom2 已缓存)后 Ctrl-C
 #   # ② 8 分片正式(rank0 续跑自动跳过已完成 case)
@@ -40,4 +42,4 @@ probes: [efficacy, locality]             # 只测现象 + Loc 合格线(≥0.85)
 editors:
   MEMIT:
     hparams: source/EasyEdit/hparams/MEMIT/qwen2.5-7b.yaml   # 同 ROME 策略:借 7B 架构模板,尺寸字段靠 override
-    layers: [10, 11, 12, 13, 14]         # ★多层带(S7);中心=ROME-32B 已验 layer12,相对深度 0.16-0.22
+    layers: [11, 12, 13]                 # ★3 层(OOM 对策;仍多层满足 S7);中心=ROME-32B 已验 layer12
