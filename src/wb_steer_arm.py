@@ -86,15 +86,22 @@ def cmd_extract(args):
                 hA, _ = _span_mean_hidden(model, tok, t.format(X=o_old), o_old)
                 hB, nB = _span_mean_hidden(model, tok, t.format(X=dn), dn)
                 vt.append(hA - hB); nrms.append(nB)
-            vt = __import__("torch").stack(vt)                   # [T,nL,H]
+            import torch as _t
+            vt = _t.stack(vt)                                    # [T,nL,H]
             v = vt.mean(0)
-            # G7:留一方向两两 cos(展平层维)
-            loo = __import__("torch").stack([vt[[j for j in range(len(TEMPLATES)) if j != i]].mean(0).flatten()
-                                             for i in range(len(TEMPLATES))])
-            loo = loo / loo.norm(dim=-1, keepdim=True)
-            cosm = (loo @ loo.T)
-            n = cosm.shape[0]
-            loo_cos = float((cosm.sum() - n) / (n * (n - 1)))
+            # G7 判据 = 个体模板方向两两 cos(展平层维)——真判别性指标。
+            #   留一均值(loo_cos)因 8 选 7 高度重叠→恒≈0.95+、几乎不判别(冒烟 g7_fail=0/25 即此),
+            #   降级为仅报告。个体方向各用不同中性实体→有真变异,pair_cos≥0.6 才是"概念方向主导模板噪声"。
+            flat = (vt.reshape(len(TEMPLATES), -1))
+            flat = flat / flat.norm(dim=-1, keepdim=True).clamp_min(1e-8)
+            cm = flat @ flat.T
+            T = cm.shape[0]
+            pair_cos = float((cm.sum() - T) / (T * (T - 1)))     # ★G7 判据:个体两两 cos 均值
+            loo = _t.stack([vt[[j for j in range(len(TEMPLATES)) if j != i]].mean(0).flatten()
+                            for i in range(len(TEMPLATES))])
+            loo = loo / loo.norm(dim=-1, keepdim=True).clamp_min(1e-8)
+            n = loo.shape[0]
+            loo_cos = float(((loo @ loo.T).sum() - n) / (n * (n - 1)))    # 仅报告(非判别)
             # 对 W_U[o_new 首 tok] 正交化(逐 id Gram-Schmidt);记录 pre-ortho cos
             pre = 0.0
             for tid in first_token_ids(tok, o_new, aliases, space_only=True):
@@ -102,17 +109,21 @@ def cmd_extract(args):
                 pre = max(pre, float((v / v.norm(dim=-1, keepdim=True) @ u).abs().max()))
                 v = v - (v @ u).unsqueeze(-1) * u
             v = v / v.norm(dim=-1, keepdim=True).clamp_min(1e-8)             # 逐层单位化
-            out[cid] = {"v": v.half(), "loo_cos": loo_cos, "cos_wu_onew_pre": pre,
-                        "resid_med": __import__("torch").stack(nrms).median(0).values}
+            out[cid] = {"v": v.half(), "pair_cos": pair_cos, "loo_cos": loo_cos, "cos_wu_onew_pre": pre,
+                        "resid_med": _t.stack(nrms).median(0).values}
             report["ok"] += 1
-            report["g7_fail"] += int(loo_cos < 0.6)
-            print(f"[{cid}] loo_cos={loo_cos:.3f} preWUcos={pre:.3f}")
+            report["g7_fail"] += int(pair_cos < 0.6)             # ★门判个体 pair_cos
+            print(f"[{cid}] pair_cos={pair_cos:.3f} loo_cos={loo_cos:.3f} preWUcos={pre:.3f}")
         except Exception as e:
             report["error"] += 1
             print(f"[fail] {cid}: {e}")
     __import__("torch").save(out, os.path.join(args.out_dir, f"directions_r{args.rank}of{args.world}.pt"))
-    print("# extract:", dict(report), "  G7 剔除率 =", report["g7_fail"], "/", report["ok"],
+    pcs = sorted(r["pair_cos"] for r in out.values())
+    med = pcs[len(pcs) // 2] if pcs else None
+    print("# extract:", dict(report), "  G7 剔除率(pair_cos<0.6)=", report["g7_fail"], "/", report["ok"],
           "(>20% → W-B 停,prereg G7)")
+    print(f"# pair_cos 分布(判别性指标): min={pcs[0]:.3f} med={med:.3f} max={pcs[-1]:.3f}" if pcs else "# 无 case",
+          "  ← 冻结前看这个决定 0.6 阈值是否合理(median 太低=概念方向法本身弱)")
 
 
 def cmd_run(args):
@@ -169,7 +180,7 @@ def cmd_run(args):
                 continue
             src = shuf.get(cid, cid) if args.arm == "Pshuf" else cid       # Pshuf:邻 case 的真方向
             rec = dirs.get(src) if dirs.get(src) else None
-            if rec is None or rec["loo_cos"] < 0.6:
+            if rec is None or rec.get("pair_cos", 0) < 0.6:               # G7 门:个体 pair_cos(非 loo_cos)
                 f.write(json.dumps({"case_id": cid, "skip": "no_direction_or_G7"}) + "\n"); f.flush()
                 continue
             v = rec["v"].float()                                           # [nL,H] 单位化
