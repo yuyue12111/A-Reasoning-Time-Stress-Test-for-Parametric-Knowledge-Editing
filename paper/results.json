@@ -1967,6 +1967,22 @@
    },
    "signal": "a2rev 61% vs a2held 32%(gap 29pp,贴 prereg A6 探索线 30pp,n 小待 case 级统计)= 表征率跟行为回退走;edited≈base(rev 组同 61%)→ A3 绕过说方向。跨编辑器(MEMIT)重现 ROME 侧待主分析对比。",
    "g3_base_note": "base 态 g3_pass=0 是构造性的(异模型重放 argmax 必低,med .879);G3 只门 edited 同模型重放,base 态走 G4/A3 口径——prereg 操作化注,开盲前记录。"
+  },
+  "rome14b": {
+   "_status": "W-A×ROME-14B 两态完(edited g3 med=.984;G2_fail 16/90≈18%=ROME-14B 重编辑复现偏低,如实报)。",
+   "edited_pos": {
+    "a1": "0/22",
+    "a2rev": "2/10",
+    "a2held": "5/34",
+    "calib": "3/8"
+   },
+   "base_pos": {
+    "a1": "10/31",
+    "a2rev": "5/10",
+    "a2held": "12/40",
+    "calib": "4/9"
+   },
+   "cross_editor_signal": "★ROME-14B: edited ≪ base(a1 0% vs 32%;a2rev 20% vs 50%)=ROME 广泛压制 o_old 表征(A3 压制说方向);MEMIT-14B: edited ≈ base(a2rev 61%=61%)=绕过说方向。行为学恰对应:MEMIT RR 0.333 > ROME-14B 0.162——编辑器留下的 o_old 表征越完整,思考越能重推出来 → 回退越多。潜在把 W-A 和 B22 焊起来的机理分化;⚠n 小(ROME a2rev=10 链)且链级未聚类,待 A3 配对 Δz 正式判。"
   }
  }
 }
