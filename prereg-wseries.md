@@ -79,6 +79,11 @@
 
 原版 traceless-回退检验(总体≈空)/「编辑层 vs band」对比及其图 / planning 因果读法 / "we measured the workspace"+ignition+全 J-lens 复制 / 跨层裸 logit 与绝对 onset 深度 / 全词表 rank 端点 / T-S 效应量比较 / CLR0∩回退 的 W-B 推断 / "从不无声" evidence-of-absence / 全局池化方向作主臂 / §1 workspace hook。
 
+## 7.5 扩展节(v1.63 扩展梯;主推断仍=greedy 32B W-A,扩展各带自门)
+
+- **G3s(采样链保真门,7/7 登记)**:采样链的 G3(argmax≥95%)口径错配(temp 0.6 下 argmax 一致率天然 ~0.88 且高=保真好)→ 采样链改判 **存盘 token ∈ teacher-forced top-20 ≥95%**(G3s)。greedy 链仍用 G3。首轮 s0 数据(g3_pass=0)按 G3s 重判,exploratory 标签待 G3s 通过率出来后定。
+- 扩展梯顺序:W-A×F3 采样(s0/s1/s2)→ W-A×MEMIT-14B → W-A×14B ROME → W-A×Llama-8B;各自 CONSORT 独立,不与主 W-A 混池。
+
 ## 8 跑前零卡必做(今天)
 
 1. **普查 n(A1 的门)**:`src/wa_census.py` 在平台跑(数据在平台),出 string-CLR0(宽表面形集)全体/∩回退/∩held 的 n → 回填本文件 §2-A1。

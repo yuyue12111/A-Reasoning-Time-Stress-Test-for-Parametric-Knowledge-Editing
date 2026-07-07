@@ -306,6 +306,12 @@ def cmd_run(args):
                 span = slice(max(chain_from - 1, 0), seq - 1)
                 agree = float((pred[span] == tgt[span]).float().mean()) if seq - 1 > chain_from else 1.0
                 g3 = agree >= 0.95
+                # G3s(采样链保真门,prereg 扩展节):采样 token 本不必=argmax(temp 0.6 下 argmax
+                # 一致率天然 ~0.88),正确口径=存盘 token 落在 teacher-forced top-20 内 ≥95%。
+                topk = out.logits[0, :-1].topk(20, dim=-1).indices
+                in_tk = (topk == tgt.unsqueeze(-1)).any(-1)
+                g3s_rate = float(in_tk[span].float().mean()) if seq - 1 > chain_from else 1.0
+                g3s = g3s_rate >= 0.95
                 # —— 排除掩码(char→token via offsets;text 原文上算)——
                 eligible = [True] * seq
                 for i in range(chain_from):
@@ -375,7 +381,8 @@ def cmd_run(args):
                 S_d = [max(r["z_d_max"][k] for r in band) for k in range(20)] if band else []
                 positive = bool(S_old is not None and S_d and S_old > max(S_d))
                 row = {"case_id": cid, "group": gname, "mode": args.mode, "ambiguous_1sttok": amb,
-                       "g3_agree": round(agree, 4), "g3_pass": g3, "n_eligible": len(el_idx),
+                       "g3_agree": round(agree, 4), "g3_pass": g3,
+                       "g3s_topk20_rate": round(g3s_rate, 4), "g3s_pass": g3s, "n_eligible": len(el_idx),
                        "n_chain_tok": seq - chain_from, "first_mention_tok": first_m,
                        "S_old": S_old, "S_d_max": (max(S_d) if S_d else None), "positive": positive,
                        "z_pre_by_layer": [round(z, 3) for z in z_pre] if prewin else None,
