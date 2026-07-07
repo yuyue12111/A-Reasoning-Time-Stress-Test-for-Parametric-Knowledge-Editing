@@ -1933,5 +1933,23 @@
    "result": "8 rank 合计 g7_fail=17/200=8.5%(<20% 门);pair_cos med≈0.66-0.70/min 0.535/max 0.78;preWUcos 0.03-0.06(方向几乎不含 o_new 泄漏)",
    "verdict": "★G7 PASS:概念方向在标准 diff-in-means(K=8 中性均值减数)下稳定——首次 fail 是单中性减数方差,非方向不存在。W-B 按 prereg 走 pilot α{1,2,5} n=30 → α* → 确证 S/Pshuf n=200。"
   }
+ },
+ "wa_extensions": {
+  "sampling_f3": {
+   "_status": "W-A×F3 采样扩展(s0/s1/s2,G3s 门 prereg §7.5)。",
+   "g3s": "237/237=100%(topk20 rate min .994)→ 入推断池;g3_agree(argmax)med .88=采样伪影确认",
+   "g2_caveat": "G2_fail 34/271≈12.5%(疑采样 b0ok vs greedy 复现口径错配,非编辑不稳;幸存者全过门,7/14 如实报)",
+   "raw_positives": {
+    "a1": "8/64",
+    "a2rev": "4/39",
+    "a2held": "12/110",
+    "calib": "1/24"
+   },
+   "note": "阳性率 ~11% ≈ 2.3× 零假设 4.8%;正式判定待 case 级聚类统计(同 case 3 seed 链非独立)。"
+  },
+  "memit14b_smoke": {
+   "g3_agree": 1.0,
+   "note": "greedy 链全精度重放;全量放行"
+  }
  }
 }
