@@ -696,6 +696,24 @@
     ],
     "_note": "cross_arm 按 case_id 配对(N=probe14b.yaml, T=probe14b_sup.yaml)。**四指标全排零**——尤其 RR/RRs 配对 p=.025/.035 均显著,【比 32B 更干净】(32B 的 RRs T−N p=.073 擦边,终极review B17 点名);→ '修复砍半回退'在 14B 的最严配对口径下也成立,B17 的自伤风险在 14B 消失。"
    }
+  },
+  "m5_reflect_stratification": {
+   "_status": "B12(M5 零卡前奏):T−N 修复效应按 N 链是否含反思标记(wait/actually/however/hmm 正则)分层,32B b0ok 门。",
+   "reflect_marked": {
+    "n": 114,
+    "TminusN_RR": -0.1053,
+    "ci": [
+     -0.1754,
+     -0.0439
+    ],
+    "excl0": true
+   },
+   "no_reflect": {
+    "n": 4,
+    "TminusN_RR": 0.0,
+    "note": "层近空"
+   },
+   "verdict": "★B12 DONE(退化分层=诚实观察):反思标记在 R1 链中近乎无处不在(114 vs 4)→ 该分层无判别力,但这本身有信息——反思是常量不是变量,不能作为区分『override 动作 vs o_old 内容』的杠杆;修复效应在反思链内显著(−0.105 排零)。M5 的 GPU 臂(压反思标记)维持 camera-ready,DROP 判定不变。"
   }
  },
  "logitlens": {
@@ -858,7 +876,8 @@
    "B15 PASS 后:contrib-3 升格版启用('grows with model capability — edit-specific and robust to per-case base-knowledge control');§4 加 B15 一句+分层彩蛋(燃料/引擎);图1 主板定 es_drop(G 节缓解:族内配对 CI+高端显著点高亮,RR 副板)。",
    "B11/K2′ 后:Discussion 的 KC 段可用主导措辞(25.0% vs 3.2%,8×)+ confabulation 注脚(1/31);与 B15 燃料/引擎互证。",
    "B16 后:contrib-2/§5 数字更新——'bridge-dominant (68%), flat recall a real minority (22%), never-silent 49/50(1 例分裂票)';taxonomy 表加 5 新 cell(含首批 Llama);R3 preempt 改写为'50 committed reversions across 7 cells/2 families'。",
-   "V1 后:§3 metric 段加 CLR 极性验证注脚(判官验 37 链:paper 口径假阳≈6%,主为否定式;M1/RQ3 用途免疫)。"
+   "V1 后:§3 metric 段加 CLR 极性验证注脚(判官验 37 链:paper 口径假阳≈6%,主为否定式;M1/RQ3 用途免疫)。",
+   "B7 后:logit-lens 全文统一 n=23、峰值层改 decoder 58(hs59)、'100% intact(n=23)'同句、降级为安装 sanity(B23 无窗版)。"
   ],
   "_six_scale_summary": {
    "_def": "6 尺度未编辑 base:answer_old_b0=知识天花板(LEVEL);chain_old_b3=base CLR 底噪(LEVEL);delta_think=B0→B3 净漂(CHANGE 对照)。",
@@ -2265,5 +2284,15 @@
    "RR": "1/31=0.032"
   },
   "verdict": "★KC 'why' 站稳(带诚实注脚):回退 8× 集中于 base 认识 o_old 的 case(25.0% vs 3.2%)=knowledge-conflict 是主导机制;base-无知层 1/31 的孤例=残余 confabulation 成分,注脚如实报。与 B15 分层(涌现集中 base_known)同构 —— 知识是燃料、能力是引擎,两处互证。"
+ },
+ "rq2_logitlens": {
+  "_authoritative_record": {
+   "_status": "B7(记录补齐):results/probe/logitlens_cf200_ROME_B3.jsonl 平台实测——解决 n 三处矛盾(23/19/10-17)。",
+   "n": 23,
+   "edit_intact_at_cloze": "23/23=100%",
+   "gap_top_median": 11.51,
+   "peak_layer": "hs 索引中位=59 → decoder 层 58(约定 hs[k]=decoder k−1;draft 旧引 56 需改)",
+   "caveats": "无对照/无 CI/近恒真设计(ROME 优化目标即此 logit)→ 按 B23 降级措辞:'编辑安装 sanity',abstract 不承重;'100% intact' 同句必附 n=23。"
+  }
  }
 }
