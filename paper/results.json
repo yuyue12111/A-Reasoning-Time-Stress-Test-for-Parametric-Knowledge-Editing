@@ -1865,7 +1865,7 @@
   "_note": "greedy 对照(ES 降幅 0.110/RR 0.208)复现 headline(0.106/0.193),内部一致=本 run 协议无漂移。"
  },
  "memit_replication": {
-  "_status": "B22(终极review 全表最大单项,堵 R2 单编辑器):MEMIT×CF 14B(memit14b.yaml,层 [7,8,9],n=200,errors=0,greedy)。32B 首跑 OOM(见 _diagnosis);14B 定案(review 明载 14B 也够用)。32B 重试(3 层+expandable_segments)状态另记,成则补 32B 行。",
+  "_status": "B22(终极review 全表最大单项,堵 R2 单编辑器):MEMIT×CF 14B(memit14b.yaml,层 [7,8,9],n=200,errors=0,greedy)。32B 首跑 OOM(见 _diagnosis);14B 定案(review 明载 14B 也够用)。32B 重试 INFEASIBLE(mom2 OOM,见 _32b_final);B22=MEMIT-14B 定案。",
   "model": "R1-Distill-Qwen-14B",
   "editor": "MEMIT",
   "layers": [
@@ -1916,7 +1916,8 @@
    ]
   ],
   "verdict": "★B22 CONFIRM(现象非 ROME 特有):MEMIT-14B ES 降幅 0.090[0.010,0.170]显著、RR@B3 0.333[0.250,0.426] **高于 ROME**(14B 0.162/32B 0.193)——第二编辑器上思考侵蚀更强,编辑安装 Loc 0.965 达标。R2『ROME 特有?』拆掉;abstract 的『(ROME/MEMIT)』括号现有数支撑。",
-  "_diagnosis": "32B FAILED 根因=**CUDA OOM(非 mom2/hparams)**:32B fp32 权重 ~119GiB,MEMIT 多层(5 层)compute_v 梯度 + 逐层更新工作内存把 141G 顶爆(实测 allocated 129.96G,再要 7.5G 即 OOM;ROME 单层刚好塞下、MEMIT 多层不行)。对策梯度:①PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True + 层 5→3([11,12,13],仍多层满足 S7)重试 32B;②不行 → memit14b.yaml(14B fp32 仅 56GiB,H200/H100 均宽裕,guaranteed)。B22 只需一个第二编辑器现象点,14B 也够用(终极review 明载);优先拿到结果 > 拿到 32B。"
+  "_diagnosis": "32B FAILED 根因=**CUDA OOM(非 mom2/hparams)**:32B fp32 权重 ~119GiB,MEMIT 多层(5 层)compute_v 梯度 + 逐层更新工作内存把 141G 顶爆(实测 allocated 129.96G,再要 7.5G 即 OOM;ROME 单层刚好塞下、MEMIT 多层不行)。对策梯度:①PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True + 层 5→3([11,12,13],仍多层满足 S7)重试 32B;②不行 → memit14b.yaml(14B fp32 仅 56GiB,H200/H100 均宽裕,guaranteed)。B22 只需一个第二编辑器现象点,14B 也够用(终极review 明载);优先拿到结果 > 拿到 32B。",
+  "_32b_final": "32B-MEMIT 判 INFEASIBLE 定案(2 次确认):3 层[11,12,13]+expandable_segments 下 mom2 协方差计算本身 OOM(32B fp32 权重 137G + mom2 前向 7.5G > 141G 单卡;非编辑步、非配置)。model_parallel 2×H200 理论可行但=平坦区收益(14B 已立)不值 setup/风险,按 17 天做减法纪律不做。附:该实例 WHYAAAI_WIKI_PARQUET 误匹配 .ko 韩语 wiki(find 抓错分片;正确须 20231101.en),即便不 OOM 语料也错——双重故障。**B22 以 MEMIT-14B 定案**(RR@B3 0.333>ROME,现象非 ROME 特有已立)。"
  },
  "wb_representation_repair": {
   "_status": "W-B 终局(confirm 完):B1 FAIL→appendix dissociation 负结果——概念级压链不修答案,反证修复必须在 token/承诺层。W 系列全部收官。",
