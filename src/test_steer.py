@@ -63,8 +63,77 @@ def test_layers_subset_and_negative_alpha():
     assert torch.allclose(o1, torch.zeros(1, 2, H)), "层子集外不应被挂钩"
 
 
+def test_generated_mode_prefill_skip_decode_inject():
+    # W-B(prereg §3):mode="generated" → prefill(seq>1)不注入,解码步(seq==1)注入
+    model = fake_model()
+    with steer.Steerer(model, DIRS, alpha=2.0, site="mlp", mode="generated"):
+        pre = model.model.layers[1].mlp(torch.randn(1, 5, H))    # prefill
+        step = model.model.layers[1].mlp(torch.randn(1, 1, H))   # 解码步
+    assert torch.allclose(pre, torch.zeros(1, 5, H)), "generated 模式 prefill 不应注入"
+    assert torch.allclose(step, torch.full((1, 1, H), 4.0)), "generated 模式解码步应 +α·v"
+
+
+def test_mask_mismatch_error_and_skip():
+    # 红队修:mask 失配默认必须抛错(旧行为=静默全局注入);skip=该步不注入
+    model = fake_model()
+    with steer.Steerer(model, DIRS, alpha=1.0, site="mlp") as st:          # 默认 on_mismatch="error"
+        st.set_positions(torch.tensor([True, False, True]))
+        try:
+            model.model.layers[0].mlp(torch.randn(1, 1, H))                # seq=1 ≠ mask len 3
+            raise AssertionError("失配应抛 RuntimeError(静默注入 bug 复活)")
+        except RuntimeError:
+            pass
+    with steer.Steerer(model, DIRS, alpha=1.0, site="mlp", on_mismatch="skip") as st:
+        st.set_positions(torch.tensor([True, False, True]))
+        out = model.model.layers[0].mlp(torch.randn(1, 1, H))
+    assert torch.allclose(out, torch.zeros(1, 1, H)), "on_mismatch=skip 失配步不应注入"
+
+
+def test_think_budget_scope_think_plumbing():
+    # 集成:generate_with_budget(steerer, scope=think) → 链期 enter、答案段前 hook 已摘净(断言不炸)
+    import types
+    sys.modules.setdefault("transformers", types.ModuleType("transformers"))   # _gen 惰性 import 防缺
+    import think_budget as tb
+
+    class _Enc(dict):
+        def to(self, *a, **k):
+            return self
+
+    class MockTok:
+        eos_token_id = 0; bos_token = None
+        def __call__(self, text, return_tensors=None, add_special_tokens=True, **kw):
+            ids = [hash(w) % 997 + 5 for w in text.split(" ") if w]
+            if return_tensors == "pt":
+                t = torch.tensor([ids or [0]], dtype=torch.long)
+                return _Enc(input_ids=t, attention_mask=torch.ones_like(t))
+            return {"input_ids": ids}
+        def decode(self, ids, skip_special_tokens=True):
+            return "alpha beta " + tb.THINK_END + " done"
+
+    class MockGenModel:
+        device = "cpu"
+        def generate(self, input_ids=None, attention_mask=None, **kw):
+            return torch.cat([input_ids, torch.tensor([[7, 8, 9]])], dim=1)
+
+    hooked = fake_model()
+    events = []
+    class RecSteerer(steer.Steerer):
+        def __enter__(self):
+            events.append("enter"); return super().__enter__()
+        def __exit__(self, *a):
+            events.append("exit"); return super().__exit__(*a)
+    st = RecSteerer(hooked, DIRS, alpha=1.0, site="mlp", mode="generated")
+    cot, ans, _ = tb.generate_with_budget(MockGenModel(), MockTok(), "q?", "B1",
+                                          steerer={"steerer": st, "scope": "think"})
+    assert events == ["enter", "exit"], f"链期应 enter/exit 恰一次: {events}"
+    assert not st._handles, "答案段后 hook 必须为空"
+    assert ans, "answer 应非空"
+
+
 TESTS = [test_global_mlp_adds_direction_then_removed, test_masked_positions,
-         test_attn_site_preserves_tuple, test_layers_subset_and_negative_alpha]
+         test_attn_site_preserves_tuple, test_layers_subset_and_negative_alpha,
+         test_generated_mode_prefill_skip_decode_inject, test_mask_mismatch_error_and_skip,
+         test_think_budget_scope_think_plumbing]
 
 
 def _main():

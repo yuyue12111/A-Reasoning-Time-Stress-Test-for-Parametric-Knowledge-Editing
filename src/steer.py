@@ -30,17 +30,26 @@ class Steerer:
             out = model.generate(...)
     """
 
-    def __init__(self, model, directions, alpha, site="mlp", layers=None):
+    def __init__(self, model, directions, alpha, site="mlp", layers=None,
+                 mode="all", on_mismatch="error"):
+        """mode: "all"=每次 forward 全位置注入(ThinkEdit 原语义) |
+                 "generated"=仅解码步(seq==1)注入、prefill(seq>1)跳过——W-B scope=think 的正确原语:
+                 KV-cache 增量解码下逐 token 偏置生成轨迹,chunk 重 prefill 不重复注入(与
+                 token 级抑制"只偏置生成"语义对齐,prereg-wseries §3)。
+           on_mismatch: set_positions 的 mask 长度与当前 seq 不符时 {"error","skip","inject"};
+                 默认 error——修 w4cxg65vd 红队抓的静默全局注入 bug(旧行为=悄悄 inject)。"""
         assert site in ("mlp", "attn")
+        assert mode in ("all", "generated") and on_mismatch in ("error", "skip", "inject")
         self.model, self.dirs, self.alpha, self.site = model, directions, alpha, site
+        self.mode, self.on_mismatch = mode, on_mismatch
         n = len(model.model.layers)
         self.layers = set(range(n)) if layers is None else set(layers)
         self._handles, self._mask = [], None
 
     def set_positions(self, mask):
         """条件化注入：mask 为 BoolTensor[seq]，仅在 True 的 token 位加方向。
-        注意：增量解码（KV cache）时每步 h 的 seq=1，需调用方逐步维护 mask；
-        本工具只在 mask 长度与当前 forward 的 seq 对齐时按位生效，否则全局注入。"""
+        增量解码(KV cache)时每步 seq=1,mask 与 seq 不符 → 按 on_mismatch 处理
+        (error=抛错 / skip=该步不注入 / inject=显式退化为全位置注入,须显式选择)。"""
         self._mask = mask
 
     def _hook(self, i):
@@ -48,9 +57,18 @@ class Steerer:
         def fn(module, inp, out):
             tup = isinstance(out, tuple)
             h = out[0] if tup else out
+            if self.mode == "generated" and h.shape[1] > 1:
+                return out                                   # prefill 跳过,只偏置解码步(seq==1)
             add = self.alpha * v.to(device=h.device, dtype=h.dtype)          # [hidden]
-            if self._mask is not None and self._mask.shape[-1] == h.shape[1]:
-                add = add.view(1, 1, -1) * self._mask.to(h.device, h.dtype).view(1, -1, 1)
+            if self._mask is not None:
+                if self._mask.shape[-1] == h.shape[1]:
+                    add = add.view(1, 1, -1) * self._mask.to(h.device, h.dtype).view(1, -1, 1)
+                elif self.on_mismatch == "error":
+                    raise RuntimeError(f"Steerer mask len {self._mask.shape[-1]} != seq {h.shape[1]}"
+                                       f"(增量解码步?);显式选 on_mismatch='skip'/'inject' 或用 mode='generated'")
+                elif self.on_mismatch == "skip":
+                    return out
+                # 'inject' → 落到全位置注入(显式选择才允许)
             h2 = h + add
             return (h2,) + tuple(out[1:]) if tup else h2
         return fn

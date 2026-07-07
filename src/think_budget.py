@@ -56,8 +56,14 @@ def _gen(model, tok, text, max_new, do_sample=False, temperature=0.6, logits_pro
 def _ntok(tok, s):
     return len(tok(s, add_special_tokens=False)["input_ids"])
 
-def generate_with_budget(model, tok, q, budget, do_sample=False, temperature=0.6, seed=None, suppress=None, answer_cap=256):
+def generate_with_budget(model, tok, q, budget, do_sample=False, temperature=0.6, seed=None, suppress=None, answer_cap=256,
+                         steerer=None):
     """返回 (cot, answer, full_text)。budget ∈ {B0,B0P,B1,B2,B3,B4}。
+
+    steerer(W-B,prereg-wseries §3): {"steerer": steer.Steerer, "scope": "think"|"all"}。
+      scope=think → 仅链生成期挂 hook(建 Steerer 用 mode="generated":只偏置解码步);
+      答案段前断言 hook 已摘干净(len(_handles)==0)——修红队抓的"答案段静默注入"。
+      与 suppress 互斥使用为宜(S 臂 vs T 臂;同用未定义为实验口径)。
 
     B0P (F2 去混淆臂)：LessThink 固定假思考——非空但**零推理内容**的 think 块（R-TOFU test.py:18）。
       对照 B0（空 think 块）。若 B0P 的 RR ≈ B0 ≪ B1，则「B0 低回退」不是空 scaffold 的模板 artifact，
@@ -71,28 +77,41 @@ def generate_with_budget(model, tok, q, budget, do_sample=False, temperature=0.6
     """
     if seed is not None:
         torch.manual_seed(seed)
+    import contextlib
+    _st = (steerer or {}).get("steerer")
+    _st_scope = (steerer or {}).get("scope", "think")
+    _chain_ctx = _st if (_st and _st_scope in ("think", "all")) else contextlib.nullcontext()
+    _ans_ctx = _st if (_st and _st_scope == "all") else contextlib.nullcontext()
+    def _assert_no_hooks():                 # W-B 红队修:scope=think 下答案段必须零 hook(防静默注入)
+        if _st is not None and _st_scope == "think":
+            assert not _st._handles, "steerer 必须在答案段前摘干净(scope=think)"
     def g(text, mx, use_sup=False):         # 闭包固化本次调用的解码臂，三处生成口径统一
         lp = suppress["processor"] if (use_sup and suppress) else None   # RQ3 抑制：按生成位点开关
         return _gen(model, tok, text, mx, do_sample=do_sample, temperature=temperature, logits_processor=lp)
     if budget == "B0":                      # ZeroThink: 逐字复用 R-TOFU 闭合空思考块
         text = ZEROTHINK.format(q=q)
-        ans = g(text, answer_cap, use_sup=bool(suppress) and suppress["scope"] == "all")   # B0 无链；仅 scope=all 压答案
+        with _ans_ctx:                      # B0 无链;steer 仅 scope=all 才作用于答案段
+            ans = g(text, answer_cap, use_sup=bool(suppress) and suppress["scope"] == "all")   # B0 无链；仅 scope=all 压答案
         return "", ans, text + ans
     if budget == "B0P":                     # F2 去混淆: LessThink 固定假思考(非空但零推理内容),对照 B0 空 scaffold
         text = LESSTHINK_CANNED.format(q=q)
         # 固定假思考正文 = 唯一"链"(prefill 死给,不由模型生成);按构造不含 o_old → CLR≡0(消混淆的对照锚)
-        ans = g(text, answer_cap, use_sup=bool(suppress) and suppress["scope"] == "all")   # 与 B0 同：仅 scope=all 压答案
+        with _ans_ctx:
+            ans = g(text, answer_cap, use_sup=bool(suppress) and suppress["scope"] == "all")   # 与 B0 同：仅 scope=all 压答案
         return LESSTHINK_COT, ans, text + ans
     prefix, cot, waits = TPL.format(q=q), "", 0
-    while True:
-        chunk = g(prefix + cot, max(64, CAP[budget] - _ntok(tok, cot)), use_sup=bool(suppress))   # 压链(think/all 都压)
-        if THINK_END in chunk:              # 模型自行结束思考
-            head = chunk.split(THINK_END)[0]
-            if budget == "B4" and waits < 2:       # s1 式强制延长
-                cot += head + WAIT; waits += 1; continue
-            cot += head; break
-        cot += chunk
-        if _ntok(tok, cot) >= CAP[budget]: break   # B1/B2 截断 / 预算耗尽
+    with _chain_ctx:                        # W-B:链生成期挂 steer hook(Steerer 应建为 mode="generated")
+        while True:
+            chunk = g(prefix + cot, max(64, CAP[budget] - _ntok(tok, cot)), use_sup=bool(suppress))   # 压链(think/all 都压)
+            if THINK_END in chunk:              # 模型自行结束思考
+                head = chunk.split(THINK_END)[0]
+                if budget == "B4" and waits < 2:       # s1 式强制延长
+                    cot += head + WAIT; waits += 1; continue
+                cot += head; break
+            cot += chunk
+            if _ntok(tok, cot) >= CAP[budget]: break   # B1/B2 截断 / 预算耗尽
+    _assert_no_hooks()                      # 答案段前:scope=think 的 hook 必已摘净
     text = prefix + cot + "\n" + THINK_END + "\n\n"
-    ans = g(text, answer_cap, use_sup=bool(suppress) and suppress["scope"] == "all")   # 答案段：仅 scope=all 压(think 只压链)
+    with _ans_ctx:
+        ans = g(text, answer_cap, use_sup=bool(suppress) and suppress["scope"] == "all")   # 答案段：仅 scope=all 压(think 只压链)
     return cot, ans, text + ans
