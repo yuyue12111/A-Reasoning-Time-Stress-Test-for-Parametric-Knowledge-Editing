@@ -32,6 +32,10 @@
 """
 import argparse, collections, glob as globlib, json, os, random, sys
 
+# H200 离线实例:模型全在本地 $W/models,禁 transformers/hub 例行 HEAD 联网(否则 5 次重试白等)。
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
+os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import metrics
 from wa_census import wide_hit
