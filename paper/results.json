@@ -857,7 +857,8 @@
    "M4/B17 后:§6 修复特异性主报改走 T−C(四指标全排零含 RRs p=.032)而非 T−N(RRs p=.073);B17 的'验证口径上不显著'风险消除,RRs 可安全进主表。",
    "B15 PASS 后:contrib-3 升格版启用('grows with model capability — edit-specific and robust to per-case base-knowledge control');§4 加 B15 一句+分层彩蛋(燃料/引擎);图1 主板定 es_drop(G 节缓解:族内配对 CI+高端显著点高亮,RR 副板)。",
    "B11/K2′ 后:Discussion 的 KC 段可用主导措辞(25.0% vs 3.2%,8×)+ confabulation 注脚(1/31);与 B15 燃料/引擎互证。",
-   "B16 后:contrib-2/§5 数字更新——'bridge-dominant (68%), flat recall a real minority (22%), never-silent 49/50(1 例分裂票)';taxonomy 表加 5 新 cell(含首批 Llama);R3 preempt 改写为'50 committed reversions across 7 cells/2 families'。"
+   "B16 后:contrib-2/§5 数字更新——'bridge-dominant (68%), flat recall a real minority (22%), never-silent 49/50(1 例分裂票)';taxonomy 表加 5 新 cell(含首批 Llama);R3 preempt 改写为'50 committed reversions across 7 cells/2 families'。",
+   "V1 后:§3 metric 段加 CLR 极性验证注脚(判官验 37 链:paper 口径假阳≈6%,主为否定式;M1/RQ3 用途免疫)。"
   ],
   "_six_scale_summary": {
    "_def": "6 尺度未编辑 base:answer_old_b0=知识天花板(LEVEL);chain_old_b3=base CLR 底噪(LEVEL);delta_think=B0→B3 净漂(CHANGE 对照)。",
@@ -1665,7 +1666,24 @@
     "TN": 32
    }
   },
-  "verdict": "★严口径 **RRs(去污,我们报的下界)与语义判官 Cohen κ=0.836 / 一致 0.93 / 精度 0.92** = 近乎一致 → 回退非子串伪影,W2 测量端立。loose RR 精度 0.48 = 按设计的上界(『守住+顺带提旧』),判官证实 loose 高估(FP 28)→ 真回退落在 RRs(下界)与 RR(上界)之间正是论文口径。RRs 侧 FP/FN 各小(2/4)。"
+  "verdict": "★严口径 **RRs(去污,我们报的下界)与语义判官 Cohen κ=0.836 / 一致 0.93 / 精度 0.92** = 近乎一致 → 回退非子串伪影,W2 测量端立。loose RR 精度 0.48 = 按设计的上界(『守住+顺带提旧』),判官证实 loose 高估(FP 28)→ 真回退落在 RRs(下界)与 RR(上界)之间正是论文口径。RRs 侧 FP/FN 各小(2/4)。",
+  "v1_clr_polarity": {
+   "_status": "B8/V1(终极review:CLR scorer 从未验极性,metrics.hit 无否定检查;workflow wtu31tkws,37 unique case × ≥2 判官,取自 5 个 reverted_* 池;⚠采样单位=unique case_id,同 case 跨 cell 的票被并池(cf_140/cf_13079 等),重复者全 genuine 不改结论;池为回退链(held 链未采,scope 注)。",
+   "raw": {
+    "n": 37,
+    "genuine": 28,
+    "false_positive": 5,
+    "split": 4,
+    "precision": "75.7%(split 不计入)"
+   },
+   "fp_taxonomy": {
+    "subject_restatement_only": "3 全票+1 分裂票",
+    "quotation_or_meta": 1,
+    "negation_only": 1
+   },
+   "paper_caliber_note": "★关键口径:4 个 subject-restatement 假阳来自 extract_reverted 的 clr_in_cot(未去主体);paper 的 CLR(metrics.score)先过 _without_subject 再判 → 这类假阳在 paper 口径下基本不存在。paper 口径估计:n≈33,genuine 28,真极性假阳(否定式/引用)= 2 → **假阳率 ≈6%(Wilson ~[1.7%,20%])**。",
+   "verdict": "★V1 DONE:CLR 阳性判定 ~94% 为真肯定性回忆(paper 口径);极性假阳(如 'not French')≈6%,= 描述性 CLR 水平值含 ~6% 通胀、非'开箱即中'级缺陷;M1/RQ3 的 CLR 用途(分层/构造性下降)对此不敏感(评审已判免疫)。写作时 CLR 水平值配此验证注脚即可。副产品:再证 _without_subject 清洗的必要性。"
+  }
  },
  "multihop": {
   "_status": "DONE(E-MULTIHOP/W3,Llama-8B × MQuAKE-CF 2-hop,greedy,B0/B3。ROME 编单事实→问绝不点名 o_old 的 2-hop 题→测编辑向下游传播 + 思考侵蚀。base-floor 门(丢未编辑基座靠先验就答出 o_new/o_old 的 case)+ recut(丢退化-new 模板 P140:new-gold 塌成单实体)→ 干净池 150。主估计量=b0_prop 门上的 propagation-erosion(配对 bootstrap)。src/multihop.py;run_mh_basefloor.sh/run_mh_edited.sh;panel wq9e477xn 修 scorer 变音符/短目标假阳 + recut + 口径)。",
