@@ -2001,5 +2001,42 @@
    "note": "edited 略低 base(部分压制,介于 ROME-14B 强压制与 MEMIT 保留之间)= 跨族第三点,压制是编辑器/配置连续量而非二元;跨族比较有 capability/base-recall 混淆,正式结论只在 within-model 的 A3 配对 Δz 上下。"
   },
   "_ladder_status": "四级扩展梯数据全齐(sampling/MEMIT-14B/ROME-14B/Llama-8B)+ 32B 主两态在平台;待:32B jsonl 回传→A1/A2/A3 case 级统计(7/14 裁决)。"
+ },
+ "wa_main": {
+  "_status": "W-A 32B 主分析(src/wa_main_analyze.py 修 fork 版 A2/G4 取数 bug;results/wa_main_analysis.json)。",
+  "gates": {
+   "G2": "~88% pass(12/102 fail)≥80% ✓",
+   "G3": "med .959,fail 19/82",
+   "G4_base_a1": "4/29=13.8% ≪70% FAIL",
+   "G5_premention": "65/65=100% PASS",
+   "amb_flag": "⚠误标 75/82(全变体口径同 distractor 修复前之病)——两版都报,含歧义版为主、注明仪器缺陷"
+  },
+  "A1": {
+   "main_no_amb": "1/4",
+   "sens_with_amb": "2/16 (12.5%, Wilson [.035,.360], binom p=.175)",
+   "verdict": "G4 FAIL → A1 的 null 不可解释:既不能说无声泄漏存在、也禁写'从不无声'(prereg 纪律);CLR0 链上探针对真事实的灵敏度只有 13.8%。"
+  },
+  "A2": {
+   "auc": 0.507,
+   "perm_p": 0.487,
+   "n": [
+    10,
+    30
+   ],
+   "med_rev": 4.61,
+   "med_held": 4.43,
+   "verdict": "★干净 NULL:回退与守住链的前窗 o_old 表征强度无差(G5=100% 两组都探得到)——表征在两种结局里同样升起,分岔在下游承诺。"
+  },
+  "A3": {
+   "all": "n=48 med −0.075 [−0.172,.016] 含 0",
+   "by_group": {
+    "a2rev": "n=8 −0.189 [−.498,.183]",
+    "a1": "n=16 −0.016",
+    "a2held": "n=20 −0.048"
+   },
+   "verdict": "edited≈base(CI 含 0,轻微负趋势)→ 32B ROME 绕过说方向;14B 扩展的跨编辑器分化(ROME 压制/MEMIT 保留)仍为链级探索信号。"
+  },
+  "headline_reading": "W-A 主结论(诚实版):①o_old 表征在提及前可靠升起(G5 100%)且回退/守住无差(A2 null)→ **表征在场≠行为回退,分岔在链的承诺层**——与 M1(链内容中介答案)和 held-14/14(必要不充分)在表征级会师;②无声总体(CLR0)上探针灵敏度不足(G4 fail),A1 不可判;③edited≈base(A3)→ 关联知识在编辑通路外完好=绕过说。三条都不改头牌,②如实报 limitation。",
+  "_verdict_714": "预判:W-A 以『G5+A2+A3 三件套』进 §5 一段+一图(suggest 档,C6 禁词过);A1 只报 CONSORT+不可判声明;扩展梯(采样入池/跨编辑器分化)作 appendix 探索。终判 7/14 内审。"
  }
 }
