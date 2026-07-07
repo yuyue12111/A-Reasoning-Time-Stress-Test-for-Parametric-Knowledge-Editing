@@ -88,13 +88,17 @@ def onset(curve, lo, hi, thr=2.0):
     return None
 
 
-def analyzed(rows):
-    """入分析:有 positive 字段(非门失败/skip/error)且 g3_pass 且 非 ambiguous。"""
+def analyzed(rows, require_g3=True):
+    """入分析:有 positive(非门失败/skip/error)且 非 ambiguous;require_g3=True 再要 g3_pass。
+    ⚠base 态:链由 edited 模型生成、对 base 是 off-policy(base g3_agree 天然低)——**不 g3 过滤**;
+    G3 只作 edited 的入组保真门(prereg §1)。base 只作同链参照(A3/G4),require_g3=False。"""
     out = collections.defaultdict(list)
     for r in rows:
         if r.get("positive") is None or "error" in r or "skip" in r or r.get("gate"):
             continue
-        if not r.get("g3_pass") or r.get("ambiguous_1sttok"):
+        if r.get("ambiguous_1sttok"):
+            continue
+        if require_g3 and not r.get("g3_pass"):
             continue
         out[r.get("group")].append(r)
     return out
@@ -131,14 +135,18 @@ def main():
     g3_vals = [r["g3_agree"] for r in ed if r.get("g3_agree") is not None]
     g3_med = sorted(g3_vals)[len(g3_vals) // 2] if g3_vals else None
 
-    A = analyzed(ed)
-    B = analyzed(ba)
-    res = {"consort": dict(con), "g3_agree_median": g3_med,
-           "band": args.band, "n_edited_rows": len(ed), "n_base_rows": len(ba)}
+    A = analyzed(ed, require_g3=True)                     # edited:入组门=G3 保真
+    B = analyzed(ba, require_g3=False)                    # base:同链参照,不 g3 过滤(off-policy)
+    pop = {r["case_id"] for grp in A.values() for r in grp}   # 分析总体=edited 过 G3 的 case
+    bmap = {r["case_id"]: r for grp in B.values() for r in grp}
+    res = {"consort": dict(con), "g3_agree_median": g3_med, "n_population": len(pop),
+           "band": args.band, "n_edited_rows": len(ed), "n_base_rows": len(ba),
+           "base_g3_median_offpolicy": (sorted(v)[len(v)//2] if (v:=[r["g3_agree"] for r in ba if r.get("g3_agree") is not None]) else None)}
 
-    # —— G4 灵敏度(base 在 a2 组 o_old 阳性率;o_old 在 base 是真事实,应可探)——
+    # —— G4 灵敏度(base 在 a2 组、限分析总体 的 o_old 阳性率;o_old 在 base 是真事实,应可探)——
     if ba:
-        b_a2 = B.get("a2rev", []) + B.get("a2held", [])
+        a2pop = [r["case_id"] for g in ("a2rev", "a2held") for r in A.get(g, [])]   # 限 edited 过门的 a2 case
+        b_a2 = [bmap[cid] for cid in a2pop if cid in bmap]
         pos = sum(1 for r in b_a2 if r["positive"])
         res["G4_base_sensitivity"] = {"n": len(b_a2), "positive": pos,
                                       "rate": round(pos / len(b_a2), 3) if b_a2 else None,
@@ -169,9 +177,8 @@ def main():
                              (f"★rev>held 单侧 p={mw['p_a_gt_b']} AUC={mw['auc']} → 回退链 o_old 表征在字面提及前更强(anticipatory,描述)"
                               if mw["p_a_gt_b"] < 0.05 else f"n.s.(p={mw['p_a_gt_b']}):无 anticipatory 差"))}
 
-    # —— A3 edited−base 配对 Δ(S_old)——
+    # —— A3 edited−base 配对 Δ(S_old);base 用同链参照(不 g3 过滤,见 bmap)——
     if ba:
-        bmap = {r["case_id"]: r for grp in B.values() for r in grp}
         diffs = []
         for grp in A.values():
             for r in grp:
