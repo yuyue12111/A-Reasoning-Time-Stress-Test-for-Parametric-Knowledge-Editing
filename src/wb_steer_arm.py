@@ -86,10 +86,14 @@ def cmd_extract(args):
             continue
         try:
             vt, nrms = [], []
-            for t, dn in zip(TEMPLATES, dl):                     # A=o_old 语境,B=同模板中性实体(无 o_old/o_new)
-                hA, _ = _span_mean_hidden(model, tok, t.format(X=o_old), o_old)
-                hB, nB = _span_mean_hidden(model, tok, t.format(X=dn), dn)
-                vt.append(hA - hB); nrms.append(nB)
+            import torch as _tt
+            for t in TEMPLATES:                                  # 终次尝试(v1.63):减数=K=8 中性实体均值(标准
+                hA, _ = _span_mean_hidden(model, tok, t.format(X=o_old), o_old)   # diff-in-means;修单中性减数
+                hBs = []                                         # 方差压低 pair_cos 的问题)。G7 再 fail=永久死。
+                for dn in dl:
+                    hB, nB = _span_mean_hidden(model, tok, t.format(X=dn), dn)
+                    hBs.append(hB); nrms.append(nB)
+                vt.append(hA - _tt.stack(hBs).mean(0))
             import torch as _t
             vt = _t.stack(vt)                                    # [T,nL,H]
             v = vt.mean(0)

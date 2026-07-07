@@ -160,7 +160,7 @@ def cmd_build_distractors(args):
 
 
 # ---------------------------------------------------------------- 分组(复用 census 逻辑)
-def load_groups(cfg, editor, cases, aliases):
+def load_groups(cfg, editor, cases, aliases, decode="greedy", seed_sel=None):
     ds = cfg["dataset"]
     pat = os.path.join(cfg["out_dir"], f"{cfg['model_tag']}_{editor}_{ds['tag']}_r*.jsonl")
     by = collections.defaultdict(dict)
@@ -170,7 +170,8 @@ def load_groups(cfg, editor, cases, aliases):
                 d = json.loads(line)
             except Exception:
                 continue
-            if d.get("probe") == "efficacy" and d.get("decode", "greedy") == "greedy" and d["case_id"] in cases:
+            if (d.get("probe") == "efficacy" and d.get("decode", "greedy") == decode
+                    and (seed_sel is None or d.get("seed") == seed_sel) and d["case_id"] in cases):
                 by[d["case_id"]][d["budget"]] = d
     groups = {"a1": [], "a2rev": [], "a2held": [], "calib": []}
     for cid in sorted(by):
@@ -205,7 +206,9 @@ def cmd_run(args):
     cases = {c["case_id"]: c for c in (json.loads(l) for l in open(cfg["dataset"].get("fallback_path", cfg["dataset"]["path"])))}
     aliases = json.load(open(args.aliases))
     distract = json.load(open(args.out_distractors))
-    groups = load_groups(cfg, args.editor, cases, aliases)
+    if args.tag:                                              # 扩展梯:覆盖 dataset.tag(如 cf200samp / cf200memit)
+        cfg["dataset"]["tag"] = args.tag
+    groups = load_groups(cfg, args.editor, cases, aliases, decode=args.decode, seed_sel=args.seed_select)
     want = set(args.groups.split(","))
     todo = [(g, r) for g in ("a1", "a2rev", "a2held", "calib") if g in want for r in groups[g]]
     if args.smoke:
@@ -417,6 +420,9 @@ def main():
     r.add_argument("--out-distractors", default="data/wa_distractors.json")
     r.add_argument("--out", required=True)
     r.add_argument("--smoke", type=int, default=0)
+    r.add_argument("--tag", default=None, help="覆盖 dataset.tag(扩展梯:cf200samp/cf200memit 等)")
+    r.add_argument("--decode", default="greedy", help="sample=F3 采样链")
+    r.add_argument("--seed-select", type=int, default=None, help="采样链只取该 seed(0/1/2 各跑一轮,输出分文件)")
     args = ap.parse_args()
     if args.cmd == "build-distractors":
         cmd_build_distractors(args)
