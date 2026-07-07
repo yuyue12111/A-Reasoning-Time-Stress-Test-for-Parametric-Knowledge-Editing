@@ -15,15 +15,20 @@
     calibration case 只出带建议,不入推断)。逐层 S 曲线存盘,onset(C1)离线算。
   A4:subject 末 tok / 链末 tok / 答案槽 的逐层 gap(o_new−o_old)同存。
 
-用法(平台 H200 单卡;32B fp32):
+用法(平台 8×H200;32B fp32,逐 case 独立 → rank/world/device 分片,同 run_pilot 约定):
   # ① 构建 distractor 池(一次,CPU+tokenizer;入库锁定)
   WHYAAAI_MODEL=$W/models/DeepSeek-R1-Distill-Qwen-32B python src/wa_probe.py build-distractors
-  # ② edited 态(重编辑;G1-G3 门内置)   [--groups a1,a2rev,a2held,calib] [--smoke 2]
+  # ② 冒烟(单卡 2 条,验证前向/显存/G3 门)
   WHYAAAI_MODEL=... WHYAAAI_DTYPE=float32 PYTHONPATH=source/EasyEdit python src/wa_probe.py run \
-      --config experiments/probe32b.yaml --mode edited --out results/wa/edited.jsonl
-  # ③ base 态(未编辑,同链;A3/G4)
-  WHYAAAI_MODEL=... WHYAAAI_DTYPE=float32 python src/wa_probe.py run \
-      --config experiments/probe32b.yaml --mode base --out results/wa/base.jsonl
+      --config experiments/probe32b.yaml --mode edited --smoke 2 --out results/wa/smoke.jsonl
+  # ③ edited 态 8 卡(G1-G3 门内置;输出自动 _r{rank}of8.jsonl)
+  for r in $(seq 0 7); do WHYAAAI_MODEL=... WHYAAAI_DTYPE=float32 PYTHONPATH=source/EasyEdit \
+      python src/wa_probe.py run --config experiments/probe32b.yaml --mode edited \
+      --rank $r --world 8 --device $r --out results/wa/edited.jsonl & done; wait
+  # ④ base 态 8 卡(未编辑,同链;A3/G4)
+  for r in $(seq 0 7); do WHYAAAI_MODEL=... WHYAAAI_DTYPE=float32 \
+      python src/wa_probe.py run --config experiments/probe32b.yaml --mode base \
+      --rank $r --world 8 --device $r --out results/wa/base.jsonl & done; wait
 """
 import argparse, collections, glob as globlib, json, os, random, sys
 
@@ -162,13 +167,18 @@ def cmd_run(args):
     todo = [(g, r) for g in ("a1", "a2rev", "a2held", "calib") if g in want for r in groups[g]]
     if args.smoke:
         todo = todo[:args.smoke]
-    print(f"# groups: {{ {', '.join(f'{g}:{len(v)}' for g, v in groups.items())} }}  todo={len(todo)}  mode={args.mode}")
+    dev = args.device if args.device is not None else args.rank
+    todo = [t for i, t in enumerate(todo) if i % args.world == args.rank]      # 8 卡分片(同 run_pilot 约定)
+    if args.world > 1 and args.out.endswith(".jsonl"):
+        args.out = args.out[:-6] + f"_r{args.rank}of{args.world}.jsonl"        # 每 rank 独立分片文件
+    print(f"# groups: {{ {', '.join(f'{g}:{len(v)}' for g, v in groups.items())} }}  "
+          f"本片={len(todo)}(rank {args.rank}/{args.world}, dev {dev})  mode={args.mode}  → {args.out}")
 
     # —— 模型加载:edited 复用 logit_lens 的 editor 通道;base 直接 AutoModel ——
     if args.mode == "edited":
         from run_pilot import resolve
         from edit_loop import HP_CLS, restore
-        R = resolve(cfg, args.editor, 0, 1, 0)
+        R = resolve(cfg, args.editor, args.rank, args.world, dev)
         hp = HP_CLS[args.editor].from_hparams(R["hparams"])
         for k, v in R["overrides"].items():
             setattr(hp, k, v)
@@ -186,7 +196,7 @@ def cmd_run(args):
         name = os.environ.get("WHYAAAI_MODEL")
         dtype = {"float32": torch.float32}.get(os.environ.get("WHYAAAI_DTYPE", "float32"), torch.float32)
         tok = fix_r1_tokenizer(AutoTokenizer.from_pretrained(name), name)
-        model = AutoModelForCausalLM.from_pretrained(name, torch_dtype=dtype, device_map="cuda").eval()
+        model = AutoModelForCausalLM.from_pretrained(name, torch_dtype=dtype, device_map=f"cuda:{dev}").eval()
         ed = None
     model.eval()
     W_U, norm = model.lm_head.weight, model.model.norm
@@ -353,6 +363,9 @@ def main():
     r.add_argument("--config", required=True)
     r.add_argument("--editor", default="ROME")
     r.add_argument("--mode", choices=["edited", "base"], required=True)
+    r.add_argument("--rank", type=int, default=0)
+    r.add_argument("--world", type=int, default=1)
+    r.add_argument("--device", type=int, default=None, help="不给则用 rank 作卡号")
     r.add_argument("--groups", default="a1,a2rev,a2held,calib")
     r.add_argument("--band", type=int, nargs=2, default=[16, 48])
     r.add_argument("--aliases", default="data/aliases.json")
