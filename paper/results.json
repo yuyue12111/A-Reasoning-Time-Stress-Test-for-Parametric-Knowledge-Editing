@@ -734,7 +734,9 @@
    "limitation(7/2 重跑后现行版):K=2 族的涌现推断边界(B5 口径:两高端 cell 各自显著+族内单调序承重,pooled/within 斜率降描述);CLR 涌现已退役(Cap3 net-CLR 含零);rr slope p=.052 擦边如实报;F1 margin 是跨口径近似差、per-case 配对 CI 待 B13;fix within-case 中介证据限 32B 单尺度(M1_scope);机理描述性 n 小+共享回退池(B9)。",
    "M4 后:§6 特异性句从 'vs inert placebo(T−P)' 升级为 'vs same-relation strong competitor(T−C,C≈N)';五臂图 N/T/D/P/C。",
    "G1 后:§7 cond-c [pending] 自供 → 有数边界句(hop_ES 0.513→0.487 无伤,erosion 点估 0.188→0.104 CI 重叠;限 8B/2-hop)。",
-   "S10 后:§7 'fix 仅 32B 验证' limitation 改写为 '答案级修复 14B/32B 两尺度复现(T−N ES +0.135/+0.136);within-case 中介(M1)仍限 32B'。"
+   "S10 后:§7 'fix 仅 32B 验证' limitation 改写为 '答案级修复 14B/32B 两尺度复现(T−N ES +0.135/+0.136);within-case 中介(M1)仍限 32B'。",
+   "J-lens/workspace(analysis/10):§5/§7 Discussion 加一段收敛性框架(编辑改自动通路,思考路由进工作空间重推 o_old;F2/M1/链级修复=其行为学签名;hedge,不宣称表征级证据)+ 引用 transformer-circuits 2026 workspace(引用前逐节复核原文)。",
+   "J-lens/workspace:§2 related 一行立界(他们研究工作空间本身、零编辑内容;我们=该框架在 editing 安全域首个行为学实例)。"
   ],
   "_six_scale_summary": {
    "_def": "6 尺度未编辑 base:answer_old_b0=知识天花板(LEVEL);chain_old_b3=base CLR 底噪(LEVEL);delta_think=B0→B3 净漂(CHANGE 对照)。",
