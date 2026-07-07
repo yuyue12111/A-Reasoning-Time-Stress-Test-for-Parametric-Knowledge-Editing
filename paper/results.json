@@ -1950,6 +1950,23 @@
   "memit14b_smoke": {
    "g3_agree": 1.0,
    "note": "greedy 链全精度重放;全量放行"
+  },
+  "memit14b": {
+   "_status": "W-A×MEMIT-14B 两态完(edited g3 med=1.0,G2_fail 10/89≈11%=MEMIT 重编辑复现率,如实报)。",
+   "edited_pos": {
+    "a1": "5/26",
+    "a2rev": "14/23=61%",
+    "a2held": "7/22=32%",
+    "calib": "1/8"
+   },
+   "base_pos": {
+    "a1": "11/36",
+    "a2rev": "14/23=61%",
+    "a2held": "8/22=36%",
+    "calib": "3/8"
+   },
+   "signal": "a2rev 61% vs a2held 32%(gap 29pp,贴 prereg A6 探索线 30pp,n 小待 case 级统计)= 表征率跟行为回退走;edited≈base(rev 组同 61%)→ A3 绕过说方向。跨编辑器(MEMIT)重现 ROME 侧待主分析对比。",
+   "g3_base_note": "base 态 g3_pass=0 是构造性的(异模型重放 argmax 必低,med .879);G3 只门 edited 同模型重放,base 态走 G4/A3 口径——prereg 操作化注,开盲前记录。"
   }
  }
 }
