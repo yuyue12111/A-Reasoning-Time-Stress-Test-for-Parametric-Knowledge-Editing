@@ -294,6 +294,7 @@
   ▸**Node-1 = W-B 第二次也是最后一次 prereg 尝试**:抽取改标准 diff-in-means(减数=**K=8 个中性实体均值**,同套跨模板;修单中性减数方差压低 pair_cos 的问题)。**硬边界:G7 再 fail(pair_cos med<0.6 或剔除>20%)→ 永久死,无第三次**;过 → pilot α{1,2,5}(7/9)→ 确证 S/Pshuf(7/10-11)→ 7/14 裁决。过则 W-C C3 因果臂复活。
   ▸**Node-2 = W-A 扩展梯(wa_probe 复用,零新统计口径,prereg 扩展节登记后跑)**:①**W-A×F3 采样链**(n≈597,A1 的 CLR0 总体扩 ~3×=最大功效增益)②**W-A×MEMIT-14B 链**(跨编辑器表征签名=机理普遍性)③W-A×14B ROME(尺度点)④W-A×Llama-8B(跨族)。各自 distractor 池 CPU 建。
   ▸**注意力协议**:结果只在每日两个检查点(早/晚)贴给 Claude;写作(7/8 解冻,B1 第一件)不因 GPU 中断;**7/22 写入截止不变**,过点只进 camera-ready;MEMIT-32B 重试/B26 照旧插空。
+  **【v1.63 在飞快照(7/7 深夜)】**W 系列数据全收:W-A 主分析完(A2 干净 null+G5 100%=表征在场≠回退分岔在承诺层;G4 fail→A1 不可判;A3 绕过说;commit `39ca2e9`)+扩展梯四级完(采样入池/ROME 压制 vs MEMIT 保留分化/8B 部分压制)。W-B:G7 PASS→pilot α*=1%(N 臂 LocAcc 基线实测 0.625,α=1% 掉幅≈0.5pt 过伤害门,`ccebabc`)→**确证臂 S/Pshuf n=200 在 Node-1 跑**。32B-MEMIT:Node-2 无官方数据集挂载(mom2 wikipedia 读不到,ConnectionError)→**排队 Node-1,W-B 确证完接跑**(WHYAAAI_WIKI_PARQUET 指挂载点)。待:W-B 确证出数→cross_arm B1/B2 端点;7/8 写作解冻(B1 第一件+B15);7/14 内审裁决。
   **【camera-ready 备忘(7/26 后才碰)】**J-lens 正式版、W-B 更稳抽取、W-A 法扩到自然必要性闭环(E-CHAINSUB 非循环替代)、M1 跨尺度、B23 held 臂正式统计。
 
 ---
