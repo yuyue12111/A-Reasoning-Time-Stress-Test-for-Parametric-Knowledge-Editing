@@ -1919,7 +1919,7 @@
   "_diagnosis": "32B FAILED 根因=**CUDA OOM(非 mom2/hparams)**:32B fp32 权重 ~119GiB,MEMIT 多层(5 层)compute_v 梯度 + 逐层更新工作内存把 141G 顶爆(实测 allocated 129.96G,再要 7.5G 即 OOM;ROME 单层刚好塞下、MEMIT 多层不行)。对策梯度:①PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True + 层 5→3([11,12,13],仍多层满足 S7)重试 32B;②不行 → memit14b.yaml(14B fp32 仅 56GiB,H200/H100 均宽裕,guaranteed)。B22 只需一个第二编辑器现象点,14B 也够用(终极review 明载);优先拿到结果 > 拿到 32B。"
  },
  "wb_representation_repair": {
-  "_status": "W-B 终局:G7 PASS(方向存在且稳)→ pilot 剂量反应真实但伤害门无解 → 止步 pilot(honest negative,反衬 token 级修复外科手术性)。",
+  "_status": "W-B:G7 PASS → pilot α*=1%(N 基线 0.625 实测后过伤害门)→ 确证臂 S/Pshuf n=200 α=1% 待跑。",
   "g7": {
    "gate": "个体模板方向两两 cos pair_cos ≥0.6(修 loo 假象后的真判据)",
    "result": "8 rank × 25 = 200/200 fail;pair_cos median≈0.29-0.32,max 0.48,全<0.6",
@@ -1956,9 +1956,9 @@
     "deg": 0,
     "err": 11
    },
-   "verdict": "★W-B 止步 pilot(prereg α* 规则):RR_raw 随剂量单调降(.476→.211→0)=概念抑制确有修复方向,但 LocAcc(邻域真答案=o_old)同步崩塌(.62→.39→.18,任何档都远超 5pt 线)+ err 随剂量爆(1→4→11)→ 无可用 α*。**概念级抑制把合法 o_old 知识一起压掉——token 级修复的『外科手术性』是特性而非局限**,T 臂 Loc 完好(0.964)在概念级替代品的失败对照下成为正面证据。W-C C3 连带死。",
-   "_caveat": "LocAcc 的 N 臂基线待平台补一行(预计 ~0.85+;即便 0.7,α=1% 已掉 >8pt,判定稳)。",
-   "_camera_ready": "更细 α 网格(0.25/0.5%)+对邻域语境正交化的方向,另立 prereg。"
+   "verdict": "★修正(按预置 caveat):N 基线 0.625 → α=1% 掉幅≈0.5pt **过伤害门**(deg 0,err 1/30);α=2%/5% 掉 23/44pt 出局。**α*=1%,W-B 进确证臂 S/Pshuf n=200**(prereg α* 规则)。剂量反应(RR_raw .476→.211→0 + LocAcc .62→.39→.18)保留=概念抑制的效力-伤害折衷曲线,α=1% 是折衷点。",
+   "_camera_ready": "更细 α 网格(0.25/0.5%)+对邻域语境正交化的方向,另立 prereg。",
+   "N_arm_LocAcc_baseline": "120/192=0.625(平台实测)——注:编辑本身已把邻域 o_old 回忆压到 62.5%(edit collateral 基线,B2 叙述素材)"
   }
  },
  "wa_extensions": {
