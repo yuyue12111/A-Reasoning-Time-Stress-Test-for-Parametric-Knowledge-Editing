@@ -1983,6 +1983,23 @@
     "calib": "4/9"
    },
    "cross_editor_signal": "★ROME-14B: edited ≪ base(a1 0% vs 32%;a2rev 20% vs 50%)=ROME 广泛压制 o_old 表征(A3 压制说方向);MEMIT-14B: edited ≈ base(a2rev 61%=61%)=绕过说方向。行为学恰对应:MEMIT RR 0.333 > ROME-14B 0.162——编辑器留下的 o_old 表征越完整,思考越能重推出来 → 回退越多。潜在把 W-A 和 B22 焊起来的机理分化;⚠n 小(ROME a2rev=10 链)且链级未聚类,待 A3 配对 Δz 正式判。"
-  }
+  },
+  "llama8b": {
+   "_status": "W-A×ROME-Llama-8B 两态完(edited g3 med=.963,G2_fail 15/100;Metaspace/BOS 修复在 TF 下成立)。",
+   "edited_pos": {
+    "a1": "11/37=30%",
+    "a2rev": "3/11",
+    "a2held": "10/30",
+    "calib": "6/7"
+   },
+   "base_pos": {
+    "a1": "18/44=41%",
+    "a2rev": "6/12=50%",
+    "a2held": "11/36",
+    "calib": "5/8"
+   },
+   "note": "edited 略低 base(部分压制,介于 ROME-14B 强压制与 MEMIT 保留之间)= 跨族第三点,压制是编辑器/配置连续量而非二元;跨族比较有 capability/base-recall 混淆,正式结论只在 within-model 的 A3 配对 Δz 上下。"
+  },
+  "_ladder_status": "四级扩展梯数据全齐(sampling/MEMIT-14B/ROME-14B/Llama-8B)+ 32B 主两态在平台;待:32B jsonl 回传→A1/A2/A3 case 级统计(7/14 裁决)。"
  }
 }
