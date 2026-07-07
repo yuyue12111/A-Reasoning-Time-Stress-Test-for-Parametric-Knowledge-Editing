@@ -104,10 +104,15 @@ def main():
     ap.add_argument("--gsm8k_budget", default="B3")
     ap.add_argument("--math_budget", default="B3M", help="MATH 链常 >8192,默认 B3M=16384 防截断")
     ap.add_argument("--answer_cap", type=int, default=512, help="答案段 token 上限(旧 256 截断答案重述→基线虚低)")
+    ap.add_argument("--gsm8k_data", default=None, help="B26:覆盖 GSM8K 数据文件(如 data/gsm8k_full.jsonl)")
+    ap.add_argument("--math_data", default=None, help="B26:覆盖 MATH 数据文件(如 data/math500_full.jsonl)")
+    ap.add_argument("--run_tag", default="", help="B26:输出后缀追加(如 nfull)——新 n 的分片/done 集不与旧 run 混池")
     args = ap.parse_args()
     cfg = yaml.safe_load(open(args.config))
     scope = args.force_scope or cfg["suppress"].get("scope", "all")
-    suffix = f"_{args.mode}_{scope}"          # 输出按 mode+scope 分文件 → 不同配置不串、不与旧污染run撞 done 集
+    suffix = f"_{args.mode}_{scope}" + (f"_{args.run_tag}" if args.run_tag else "")   # mode+scope+tag 分文件,不同 n 不混池
+    if args.gsm8k_data: BENCHES["gsm8k"] = args.gsm8k_data
+    if args.math_data: BENCHES["math"] = args.math_data
     if args.score:
         score(cfg, suffix)
         return
