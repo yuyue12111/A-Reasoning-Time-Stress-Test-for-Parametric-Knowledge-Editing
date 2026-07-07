@@ -1919,7 +1919,7 @@
   "_diagnosis": "32B FAILED 根因=**CUDA OOM(非 mom2/hparams)**:32B fp32 权重 ~119GiB,MEMIT 多层(5 层)compute_v 梯度 + 逐层更新工作内存把 141G 顶爆(实测 allocated 129.96G,再要 7.5G 即 OOM;ROME 单层刚好塞下、MEMIT 多层不行)。对策梯度:①PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True + 层 5→3([11,12,13],仍多层满足 S7)重试 32B;②不行 → memit14b.yaml(14B fp32 仅 56GiB,H200/H100 均宽裕,guaranteed)。B22 只需一个第二编辑器现象点,14B 也够用(终极review 明载);优先拿到结果 > 拿到 32B。"
  },
  "wb_representation_repair": {
-  "_status": "W-B(表征级抑制修复,prereg-wseries §3;wb_steer_arm.py extract)。**G7 门 STOP**(pre-registered)。",
+  "_status": "W-B 终次抽取(v1.63,K=8 中性均值减数)**G7 PASS** → pilot 进行中。首次 STOP 记录保留于 g7(粗抽取版)。",
   "g7": {
    "gate": "个体模板方向两两 cos pair_cos ≥0.6(修 loo 假象后的真判据)",
    "result": "8 rank × 25 = 200/200 fail;pair_cos median≈0.29-0.32,max 0.48,全<0.6",
@@ -1928,6 +1928,10 @@
   },
   "scope_note": "W-B=加法臂(plan v1.60⑤),非承重墙。headline 修复不受影响:RQ3 token 级抑制(T−N ES +0.136/RR 减半)、M1 within-case 中介、S10-lite 14B 复现、M4 五臂特异性 全部独立成立。",
   "honest_footnote": "诚实小注(hedge,不 over-claim):crude diff-in-means 未抽出稳定可注入的 o_old 方向,与'修复在 token/链级生效、而非经单一可提取概念向量'一致;但也可能只是抽取法太粗(单中性实体减数方差大)。",
-  "_camera_ready": "表征级结果留 camera-ready:换更稳的方向抽取(mean-over-K-neutrals 减数 / trained probe / J-lens),另立 prereg。"
+  "_camera_ready": "表征级结果留 camera-ready:换更稳的方向抽取(mean-over-K-neutrals 减数 / trained probe / J-lens),另立 prereg。",
+  "g7_retry": {
+   "result": "8 rank 合计 g7_fail=17/200=8.5%(<20% 门);pair_cos med≈0.66-0.70/min 0.535/max 0.78;preWUcos 0.03-0.06(方向几乎不含 o_new 泄漏)",
+   "verdict": "★G7 PASS:概念方向在标准 diff-in-means(K=8 中性均值减数)下稳定——首次 fail 是单中性减数方差,非方向不存在。W-B 按 prereg 走 pilot α{1,2,5} n=30 → α* → 确证 S/Pshuf n=200。"
+  }
  }
 }
