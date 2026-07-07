@@ -856,7 +856,8 @@
    "B22 后:§4/§7 加 MEMIT-14B 现象复制行(ES 降幅 0.090、RR@B3 0.333>ROME);§7 单编辑器 limitation 改写为'ROME+MEMIT 两编辑器复现';abstract '(ROME/MEMIT)' 括号保留(有数)。",
    "M4/B17 后:§6 修复特异性主报改走 T−C(四指标全排零含 RRs p=.032)而非 T−N(RRs p=.073);B17 的'验证口径上不显著'风险消除,RRs 可安全进主表。",
    "B15 PASS 后:contrib-3 升格版启用('grows with model capability — edit-specific and robust to per-case base-knowledge control');§4 加 B15 一句+分层彩蛋(燃料/引擎);图1 主板定 es_drop(G 节缓解:族内配对 CI+高端显著点高亮,RR 副板)。",
-   "B11/K2′ 后:Discussion 的 KC 段可用主导措辞(25.0% vs 3.2%,8×)+ confabulation 注脚(1/31);与 B15 燃料/引擎互证。"
+   "B11/K2′ 后:Discussion 的 KC 段可用主导措辞(25.0% vs 3.2%,8×)+ confabulation 注脚(1/31);与 B15 燃料/引擎互证。",
+   "B16 后:contrib-2/§5 数字更新——'bridge-dominant (68%), flat recall a real minority (22%), never-silent 49/50(1 例分裂票)';taxonomy 表加 5 新 cell(含首批 Llama);R3 preempt 改写为'50 committed reversions across 7 cells/2 families'。"
   ],
   "_six_scale_summary": {
    "_def": "6 尺度未编辑 base:answer_old_b0=知识天花板(LEVEL);chain_old_b3=base CLR 底噪(LEVEL);delta_think=B0→B3 净漂(CHANGE 对照)。",
@@ -1051,6 +1052,68 @@
    },
    "CLR0_paper_all_vs_wide": "paper 口径 CLR0=87 vs 宽口径 35(别名+子串抓回一半)",
    "verdict": "★最宽字符串口径下 traceless 回退 = 0/17:每一条 committed 回退的链都含 o_old 痕迹 → 『回退从不无声』的行为学底座在最宽口径下成立(本样本)。同时 CLR0_wide∩held=31/35=链不提 o_old 的 case 几乎全守住编辑(与 M1 链中介一致)。W-A A1 主总体=CLR0_wide 全体 n=35(claim=言语化是门控);traceless-回退检验按 prereg 声明本数据不可答(n=0<5)。"
+  },
+  "b16_widened_pool": {
+   "_status": "B16(终极review 池加宽;5 新 cell × 3 中性判官=205 calls,workflow wbho1h7a7;原始票 results/b16_verdicts.json)。来源:extract_reverted 于 F2-B1/F3-采样/8B/70B/1.5B;与原 neutral 17(7B/14B/32B greedy)并列报,不混池。",
+   "new_cells": {
+    "qwen1.5b-greedy": {
+     "chains": 5,
+     "in_pop": 2,
+     "dist": {
+      "Associative": 1,
+      "Bridge": 1
+     }
+    },
+    "llama8b-greedy": {
+     "chains": 15,
+     "in_pop": 7,
+     "dist": {
+      "Recall": 3,
+      "Bridge": 4
+     }
+    },
+    "qwen32b-F2B1": {
+     "chains": 18,
+     "in_pop": 10,
+     "dist": {
+      "Bridge": 7,
+      "Recall": 3
+     }
+    },
+    "qwen32b-sample": {
+     "chains": 14,
+     "in_pop": 6,
+     "dist": {
+      "Bridge": 5,
+      "Recall": 1
+     }
+    },
+    "llama70b-greedy": {
+     "chains": 16,
+     "in_pop": 8,
+     "dist": {
+      "Recall": 2,
+      "Reflective-override": 3,
+      "Bridge": 3
+     }
+    }
+   },
+   "combined_with_original": {
+    "total_in_pop": 50,
+    "dist": {
+     "Bridge": 34,
+     "Recall": 11,
+     "Reflective-override": 4,
+     "Associative": 1
+    },
+    "pct": {
+     "Bridge": "68%",
+     "Recall": "22%",
+     "RO": "8%",
+     "Associative": "2%"
+    }
+   },
+   "verdict": "★B16 DONE:机理分母 17→**50 committed reversions**(7 cell/2 族/3 解码-剂量配置)——R3『20 case 撑四结果』拆掉。跨族复现:Llama 8B/70B 同为 Bridge-or-Recall 主导。修正后的路由图景:Bridge 68% 主导、Recall 22%(S1 的'去 prime 后 Recall 非零'在大池坐实=flat recall 是真实少数路由)、RO 8%(且 3/4 在 70B/32B 高能力 cell=高能力才出现的观察,n 小只报计数)、**Associative 1/50(且该例 2-1 分裂票)= 'committed 回退几乎从不无声'在判官级+大池下成立**(与宽口径普查 0/17 互证)。"
   }
  },
  "emergence": {
