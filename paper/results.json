@@ -775,7 +775,16 @@
    "verdict": "★F1 edit-specific(闸门 held,措辞经对抗验证收紧):32B 未编辑基座 P(o_old) 思考 B0→B3 Δ=−0.021(n=199),编辑态 RR=0.193,margin=0.214。⚠skeptic#1 纠正:Δ=−0.021 的显著性【未知】(独立近似 SE≈0.043 是上界、配对更小→t≥0.49,方向未定),故【不可】断言'base 反向漂移';正确表述=base 无系统性向 o_old 漂移(Δ≈0),no-drift 与微弱 away-drift 两种解读下 RR 都不能归因于基座先验动力学。→ base ΔP(o_old) per-case 配对 bootstrap CI 从'可选'升【必需】。7B +0.08 是 Qwen-Math 小模型个例(margin≈0、ES降幅 n.s.)。头牌『thinking undoes EDITING』存活。",
    "_bonus_SUPERSEDED": "未编辑基座 B3 链含旧 CLR=0.829 > 编辑态 CLR@B3 0.545 → 基座自由提 o_old、编辑部分压住(与 knowledge-conflict 'why' 一致);base ans_old ~0.75 高=基座本就知 o_old(锚 §1 头牌尺度,补 K1:abstract 的 0.59 是 7B 误引给 32B,现有 32B=0.765)。",
    "_bonus_RECORRECTED": "★1 再更正(终极review 2026-07-03,四次独立复算):此前的'分母错配'更正**本身是错的**。四枚钉子:(a) metrics.py 的 CLR 无 b0ok 门(clr[b]+=hit(cot,o_old) 对全部 efficacy 行累加;b0ok 只门 rr/rrs)——0.545 是**无门口径**;(b) 0.545 三处同源全无门(rq3.baseline.CLR/sup_battery N 臂/percase 32B cell 0.5455=108/198);(c) 真·CLR_b0ok(32B)≈0.45(plan.md:82),与 0.545 是**两个不同的数**,勿混;(d) Cap3 逐 case 配对自证 gap 真实:edited CLR 恒低 base ≈0.29–0.49 且不随尺度扩。→ **base CLR 0.829 与 edited CLR 0.545 同构可比**,真实事实=编辑态链内 o_old 提及系统性低于 base 底噪、gap 平。**解读纪律**:这是 Cap3 退役 CLR 涌现的依据,并削弱'链是回退唯一主渠道'的强表述(skeptic#2 的方向点存活);**不作**'编辑压住 o_old'的 RQ2 正面证据用。(附带:base_probe.py 行号 cot_old 在 :62 非 :63。)",
-   "_bonus_CORRECTED_SUPERSEDED": "⚠此条的'分母错配/b0ok 门'论断已被 ★1 推翻,存档备审:⚠原 _bonus 的 'base CLR 0.829 > 编辑 CLR 0.545 → 编辑压住 o_old' 经对抗验证(skeptic#1)【作废】:分母错配——base CLR=cot_old/n 无条件全 n(base_probe.py:63),edited CLR_b0ok=n_clr_b0/n_b0 是 b0ok 门(排除 B0 就答旧的 case)。base 分母恰含最爱提 o_old 的 case(base ans_old 0.765),被 b0ok 门系统剔除→0.545<0.829 是分母 artifact 非'压制'证据。要证'编辑压制链提及'须在【同 b0ok 门】跑 base CLR(=Cap3)。方向上若真'编辑压低链内 o_old',反说明可观察 CLR 中介被编辑削弱(与 necessity held/多跳 neither 一致)、削弱而非支持'链是回退主渠道'。K1 保留:abstract 0.59 是 7B 误引给 32B headline,正确锚=32B 0.765。"
+   "_bonus_CORRECTED_SUPERSEDED": "⚠此条的'分母错配/b0ok 门'论断已被 ★1 推翻,存档备审:⚠原 _bonus 的 'base CLR 0.829 > 编辑 CLR 0.545 → 编辑压住 o_old' 经对抗验证(skeptic#1)【作废】:分母错配——base CLR=cot_old/n 无条件全 n(base_probe.py:63),edited CLR_b0ok=n_clr_b0/n_b0 是 b0ok 门(排除 B0 就答旧的 case)。base 分母恰含最爱提 o_old 的 case(base ans_old 0.765),被 b0ok 门系统剔除→0.545<0.829 是分母 artifact 非'压制'证据。要证'编辑压制链提及'须在【同 b0ok 门】跑 base CLR(=Cap3)。方向上若真'编辑压低链内 o_old',反说明可观察 CLR 中介被编辑削弱(与 necessity held/多跳 neither 一致)、削弱而非支持'链是回退主渠道'。K1 保留:abstract 0.59 是 7B 误引给 32B headline,正确锚=32B 0.765。",
+   "paired_ci": {
+    "n": 199,
+    "base_delta_ans_old": -0.0201,
+    "ci95": [
+     -0.0804,
+     0.0402
+    ],
+    "verdict": "★F1 airtight:per-case 配对 bootstrap CI 含 0 → base 无系统性向 o_old 漂移(Δ≈0),与收紧后表述完全一致;'必需'项闭。"
+   }
   },
   "1.5B": {
    "family": "Qwen",
@@ -846,7 +855,8 @@
    "J-lens/workspace:§2 related 一行立界(他们研究工作空间本身、零编辑内容;我们=该框架在 editing 安全域首个行为学实例)。",
    "B22 后:§4/§7 加 MEMIT-14B 现象复制行(ES 降幅 0.090、RR@B3 0.333>ROME);§7 单编辑器 limitation 改写为'ROME+MEMIT 两编辑器复现';abstract '(ROME/MEMIT)' 括号保留(有数)。",
    "M4/B17 后:§6 修复特异性主报改走 T−C(四指标全排零含 RRs p=.032)而非 T−N(RRs p=.073);B17 的'验证口径上不显著'风险消除,RRs 可安全进主表。",
-   "B15 PASS 后:contrib-3 升格版启用('grows with model capability — edit-specific and robust to per-case base-knowledge control');§4 加 B15 一句+分层彩蛋(燃料/引擎);图1 主板定 es_drop(G 节缓解:族内配对 CI+高端显著点高亮,RR 副板)。"
+   "B15 PASS 后:contrib-3 升格版启用('grows with model capability — edit-specific and robust to per-case base-knowledge control');§4 加 B15 一句+分层彩蛋(燃料/引擎);图1 主板定 es_drop(G 节缓解:族内配对 CI+高端显著点高亮,RR 副板)。",
+   "B11/K2′ 后:Discussion 的 KC 段可用主导措辞(25.0% vs 3.2%,8×)+ confabulation 注脚(1/31);与 B15 燃料/引擎互证。"
   ],
   "_six_scale_summary": {
    "_def": "6 尺度未编辑 base:answer_old_b0=知识天花板(LEVEL);chain_old_b3=base CLR 底噪(LEVEL);delta_think=B0→B3 净漂(CHANGE 对照)。",
@@ -1487,7 +1497,43 @@
     }
    },
    "verdict": "★Cap3 定论:raw CLR slope 1.128[0.825,1.468]强显著 → net(减 base)0.049[−0.024,0.122] p=.093【含零】。逐尺度 net_clr≈平(−0.37/−0.49/−0.39/−0.29)=编辑 CLR 恒定低于 base ~0.38、gap 不随能力扩。→ CLR 涌现是 base 底噪伪影,【退役】为描述;base_clr==0 子集 slope 0.654 亦含零(n=178)。capability-emergence 由 es_drop(0.109 p=.003,编辑特异)接棒,不受影响。",
-   "_gap": "7B base 未进本次 --base-glob(net_clr 现 4 尺度;7B *_BASE_* 在盘可回填→5);70B base **已跑**(2026-07-02,见 base_probe.70B/_70B_gap_closed)但其 per-case 行本地未证在盘,70B net_clr 回填按平台侧处理(B13)。回填不改结论(edited 0.495−base 0.905≈−0.41,合 ~−0.38 平线)。"
+   "_gap": "已闭:6 尺度全配对(full_6scale)。",
+   "full_6scale": {
+    "per_scale": {
+     "1.5B": -0.372,
+     "7B": -0.42,
+     "8B": -0.485,
+     "14B": -0.385,
+     "32B": -0.289,
+     "70B": -0.41
+    },
+    "net_clr": {
+     "slope": 0.0535,
+     "ci": [
+      -0.0083,
+      0.1496
+     ],
+     "excl0": false
+    },
+    "clr_raw_matched": {
+     "slope": 0.9662,
+     "ci": [
+      0.599,
+      1.3388
+     ],
+     "excl0": true
+    },
+    "clr_on_baseCLR0": {
+     "slope": 1.0705,
+     "ci": [
+      0.0925,
+      2.6986
+     ],
+     "excl0": true,
+     "_note": "base 从不泄漏的子集里 edited CLR 涌现排零(探索性;宽 CI)——非全部共线,但主端点 net_clr 仍含零,退役维持"
+    },
+    "verdict": "★6 尺度全量确认 4 尺度结论:net_clr 含零,CLR 涌现退役维持;gap 平(−0.29~−0.49)。7B/70B 回填完成(7B BASE 在 results/pilot 的 glob 坑已明)。"
+   }
   },
   "b15_base_recall_control": {
    "_status": "B15(终极review 证据侧最高优先=capability 第二支柱升格闸门;src/b15_regress.py,5 尺度 matched n=993,7B base 分片未进 glob 不影响)。",
@@ -2128,5 +2174,15 @@
   },
   "headline_reading": "W-A 主结论(诚实版):①o_old 表征在提及前可靠升起(G5 100%)且回退/守住无差(A2 null)→ **表征在场≠行为回退,分岔在链的承诺层**——与 M1(链内容中介答案)和 held-14/14(必要不充分)在表征级会师;②无声总体(CLR0)上探针灵敏度不足(G4 fail),A1 不可判;③edited≈base(A3)→ 关联知识在编辑通路外完好=绕过说。三条都不改头牌,②如实报 limitation。",
   "_verdict_714": "预判:W-A 以『G5+A2+A3 三件套』进 §5 一段+一图(suggest 档,C6 禁词过);A1 只报 CONSORT+不可判声明;扩展梯(采样入池/跨编辑器分化)作 appendix 探索。终判 7/14 内审。"
+ },
+ "rq2_kc": {
+  "_status": "B11/K2′(终极review;base B0 知识分层的编辑态回退率,32B cf200,b0ok 门)。",
+  "base_knows_o_old": {
+   "RR": "22/88=0.250"
+  },
+  "base_unknown": {
+   "RR": "1/31=0.032"
+  },
+  "verdict": "★KC 'why' 站稳(带诚实注脚):回退 8× 集中于 base 认识 o_old 的 case(25.0% vs 3.2%)=knowledge-conflict 是主导机制;base-无知层 1/31 的孤例=残余 confabulation 成分,注脚如实报。与 B15 分层(涌现集中 base_known)同构 —— 知识是燃料、能力是引擎,两处互证。"
  }
 }
