@@ -1024,6 +1024,22 @@
     "cf_9255"
    ],
    "_offbyone_audit": "首版聚合按 case_id 单键 → cf_6933@14b(Bridge 3/3)被 cf_6933@32b(Recall 3/3)覆盖,曾记 pooled 16{13,2,1}/14b n=3;真值 pooled 17{14,2,1}/14b n=4。四次独立复算一致(终极review ★2)。"
+  },
+  "wide_census_traceless": {
+   "_status": "W-A 跑前普查(src/wa_census.py,32B ROME×cf200 greedy;prereg-wseries §8-1)。宽口径=o_old+全别名(含<4字符)+大小写不敏感 substring(比 paper 判分口径宽得多,只用于普查/排除)。",
+   "n_paired": 151,
+   "n_subject_overlap_excluded": 47,
+   "b0ok": 109,
+   "reverted": 17,
+   "held": 92,
+   "CLR0_wide": {
+    "all": 35,
+    "and_reverted": 0,
+    "and_held": 31,
+    "and_nonb0ok": 4
+   },
+   "CLR0_paper_all_vs_wide": "paper 口径 CLR0=87 vs 宽口径 35(别名+子串抓回一半)",
+   "verdict": "★最宽字符串口径下 traceless 回退 = 0/17:每一条 committed 回退的链都含 o_old 痕迹 → 『回退从不无声』的行为学底座在最宽口径下成立(本样本)。同时 CLR0_wide∩held=31/35=链不提 o_old 的 case 几乎全守住编辑(与 M1 链中介一致)。W-A A1 主总体=CLR0_wide 全体 n=35(claim=言语化是门控);traceless-回退检验按 prereg 声明本数据不可答(n=0<5)。"
   }
  },
  "emergence": {

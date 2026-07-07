@@ -33,7 +33,8 @@
 
 **spike 判据(看数据前冻结)**:层带由 10 个 calibration case 定(排除出推断集,fallback=decoder 16–48);case 单标量 S_max=带×窗合格位 max z;**零分布=20 distractor 轮流当伪目标算同一 max-stat**,case 阳性=o_old 超全部 20 个(精确 p=1/21≈0.048)。
 
-- **A1 无声表征存在性**:总体=B3 全体 **string-CLR0(宽表面形集)∩ LLM-judge-clean** 链(n 跑前盘上算出写入本文件;judge=预注册 prompt 判"是否语义指涉 o_old";没跑判官只许写 no string-level trace)。判据=BH-FDR q<0.05 显著 case ≥3 **且**组阳性率 binomial 单侧 >4.8% + Wilson CI。null 只报灵敏度标定下的 Wilson 上界,**禁写"从不无声"**。**CLR0∩回退 n 另报;n<5 → 声明 traceless 回退本数据不可答(算干净),严禁换总体冠原 claim**。claim=「言语化是门控而非存在性开关」。
+- **A1 无声表征存在性**:总体=B3 全体 **string-CLR0(宽表面形集)∩ LLM-judge-clean** 链(judge=预注册 prompt 判"是否语义指涉 o_old";没跑判官只许写 no string-level trace)。判据=BH-FDR q<0.05 显著 case ≥3 **且**组阳性率 binomial 单侧 >4.8% + Wilson CI。null 只报灵敏度标定下的 Wilson 上界,**禁写"从不无声"**。claim=「言语化是门控而非存在性开关」。
+  **【n 回填(wa_census 2026-07-03,32B ROME×cf200 greedy)】**n_paired=151(subject-overlap 整条剔除 47);b0ok=109/回退=17/held=92;**A1 主总体 CLR0_wide=35**(∩held 31/∩非b0ok 4);**CLR0_wide∩回退=0 → 按 prereg 宣告 traceless 回退本数据不可答(干净)**——且此即可报事实:最宽口径下 0/17 回退无痕,necessity 行为学底座加强(入 results.json `rq2_taxonomy.wide_census_traceless`)。A2 组:回退∩CLR1_wide n=17 vs **held∩CLR1_wide n=61**(比原估 14 大;taxonomy-judged 14 作标注子集);calibration 10 case 从 held∩CLR1 取(排除出推断集)。paper 口径 CLR0=87 vs 宽口径 35(宽集必要性自证)。
 - **A2 anticipatory representation(纯描述,禁 planning/预谋因果措辞)**:回退 CLR1(≈17)vs held(14);前缀窗截止 o_old 首 token 出现位**前 5 token**;Mann-Whitney 回退>held 单侧 α=0.05 + AUC CI;lead-time 中位>0 Wilcoxon **且** distractor 无 anticipation(特异性)。
 - **A3 edited−base 配对估计量(非检验)**:同链 Δz case 中位+CI;解读表钉死:edited≈base→关联在编辑通路外完好(绕过说);edited≪base→编辑广泛压制表征(回退需另释)。**base=ceiling 参照,不是 null**(base 里 o_old 是真事实)。
 - **A4 编辑仍 installed(非 ROME 优化位)**:主体末 token/链末 token/答案槽的逐层 gap(o_new−o_old);回退链答案槽顶层 o_new 胜 ≥80%。
