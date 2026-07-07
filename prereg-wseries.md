@@ -10,6 +10,7 @@
 - 模型 R1-Distill-Qwen-32B / ROME layer-12 / 单条编辑协议 / B3 greedy / `WHYAAAI_DTYPE=float32`(H200)。
 - **层索引**:`hidden_states[0]`=embedding,`hs[k]`=decoder 层 k−1 输出;**编辑层 12 ↔ hs[13]**;图轴/文字统一 decoder 层号;转换函数单测锁死。(现版 `logit_lens.py:110-120` 拿 hs 索引当层号,off-by-one,须修。)
 - **铁律:永不跨层比裸 logit**。一切端点=层内位置内 **distractor 校准 z**:z(o_old)=(logit(o_old)−mean(logit(d₁..₂₀)))/std;20 个同 relation 干扰宾语(CF 同关系答案池,排 o_old/o_new/别名,首 token 无歧义,同类目)。
+  **【冒烟修正(7/7,冻结前;理由记录)】**歧义判据只看**带前导空格变体**的首 token(正文自然形)——首版对无空格小写变体也判,BPE 短首片一票否决了大半候选(实测 151/200 case 同 relation 池短缺)。同 relation 仍不足 20 → **跨 relation 频率回填补满 20 并打标**(`_stats_n_same_relation` 逐 case 记同 relation 数);主分析全 case,`n_same_relation<10` 子集做敏感性(类目 priming 校准力弱者)。检测集(o_old 探针)不变仍用全变体。
 - **只投影候选列**(~25 行 unembedding);全词表 rank 仅小样本描述图(k∈{1,5,50}),不做端点。
 - **探针 token 集**(修 `first_tok` 单点简并):{o_old+全别名(**不做 ≥4 字符过滤**,与 metrics 判分口径注释区分)}×{±前导空格×首字母大小写} 首 token 取 max;o_old 首 token 与链中其它词共享/高频通用词片 → ambiguous 标记,主分析剔除,含/不含两版敏感性。
 - 一切统计 **case 级**(位置级 ~5×10⁵/case 读数=伪重复,不做检验);配对 bootstrap 10k;跨 case BH-FDR q<0.05。

@@ -48,11 +48,13 @@ def surface_variants(word, aliases):
     return out
 
 
-def first_token_ids(tok, word, aliases):
-    """探针 token 集(修 first_tok 单点简并):变体×{带/不带前导空格}首 token 集合。"""
+def first_token_ids(tok, word, aliases, space_only=False):
+    """探针 token 集(修 first_tok 单点简并):变体×{带/不带前导空格}首 token 集合。
+    space_only=True → 只取带前导空格变体(正文自然形;歧义判据用它,否则无空格小写变体的
+    BPE 短首片会一票否决大半候选——冒烟实测 151/200 case 池短缺的根因)。"""
     ids = set()
     for v in surface_variants(word, aliases):
-        for pre in ("", " "):
+        for pre in ((" ",) if space_only else ("", " ")):
             t = tok(pre + v, add_special_tokens=False)["input_ids"]
             if t:
                 ids.add(t[0])
@@ -60,7 +62,8 @@ def first_token_ids(tok, word, aliases):
 
 
 def is_ambiguous(tok, ids):
-    """首 token 简并标记:任一首 token 解码后 ≤2 字符(去空格)= 高危共享词片。"""
+    """首 token 简并标记:任一首 token 解码后 ≤2 字符(去空格)= 高危共享词片。
+    ⚠调用方对 distractor 应传 space_only=True 的 ids(正文自然形);检测集(o_old)仍用全变体。"""
     for i in ids:
         if len(tok.decode([i]).strip()) <= 2:
             return True
@@ -88,32 +91,68 @@ def char_occurrences(text, variants):
 # ---------------------------------------------------------------- distractor 池
 def cmd_build_distractors(args):
     from transformers import AutoTokenizer
+    print("# 加载 tokenizer(仅 CPU,不载权重)…", flush=True)
     tok = AutoTokenizer.from_pretrained(os.environ.get("WHYAAAI_MODEL") or args.model)
-    cases = [json.loads(l) for l in open(args.cases)]
     aliases = json.load(open(args.aliases))
-    by_rel = collections.defaultdict(list)
-    for c in cases:
-        by_rel[c.get("r") or "_"].append(str(c["o_old"]))
+    pool_cases = [json.loads(l) for l in open(args.cases)]        # 候选池来源:全 CF(同 relation 候选丰富)
+    by_rel = collections.defaultdict(list)                        # relation → 去重的 o_old 候选串(池只需唯一串)
+    seen_rel = collections.defaultdict(set)
+    for c in pool_cases:
+        r, o = c.get("r") or "_", str(c["o_old"])
+        if o.lower() not in seen_rel[r]:
+            seen_rel[r].add(o.lower()); by_rel[r].append(o)
+    # 目标 case:只给要探的子集建(默认 cf200 config;无 config 才退回全量)
+    if args.config:
+        ds = __import__("yaml").safe_load(open(args.config))["dataset"]
+        tpath = ds["path"] if os.path.exists(ds["path"]) else ds.get("fallback_path", ds["path"])
+        target = [json.loads(l) for l in open(tpath)]
+        if ds.get("n"):
+            target = target[:ds["n"]]
+    else:
+        target = pool_cases
+    print(f"# 目标 case={len(target)}(候选池 relation 数={len(by_rel)},唯一候选串={sum(len(v) for v in by_rel.values())})", flush=True)
+
+    memo = {}                                                     # str → (ids, ambiguous):跨 case 复用,杀掉几亿次重复 tokenize
+    def ftids(v):
+        if v not in memo:
+            ids_all = first_token_ids(tok, v, aliases)                          # 检测/投影用全变体
+            ids_sp = first_token_ids(tok, v, aliases, space_only=True)          # 歧义只判正文自然形(带空格)
+            memo[v] = (ids_all, (not ids_sp) or is_ambiguous(tok, ids_sp))
+        return memo[v]
+
+    all_uniq = sorted({o for vs in by_rel.values() for o in vs})   # 跨 relation 回填池(频率代表已由去重前分布近似)
     rng = random.Random(42)
-    out, n_short = {}, 0
-    for c in sorted(cases, key=lambda x: x["case_id"]):
+    out, n_short_samerel, n_backfilled = {}, 0, 0
+    stats = {}
+    for c in sorted(target, key=lambda x: x["case_id"]):
         o_old, o_new = str(c["o_old"]), str(c["o_new"])
         lo, ln = o_old.lower(), o_new.lower()
-        pool, seen = [], set()
-        for v in by_rel[c.get("r") or "_"]:
+
+        def ok(v):
             vl = v.lower()
-            if vl in (lo, ln) or vl in seen or vl in lo or lo in vl or vl in ln or ln in vl:
-                continue
-            ids = first_token_ids(tok, v, aliases)
-            if not ids or is_ambiguous(tok, ids):
-                continue
-            seen.add(vl); pool.append(v)
+            if vl in (lo, ln) or vl in lo or lo in vl or vl in ln or ln in vl:
+                return False
+            ids, amb = ftids(v)
+            return bool(ids) and not amb
+
+        pool = [v for v in by_rel.get(c.get("r") or "_", []) if ok(v)]
         rng.shuffle(pool)
-        if len(pool) < 20:
-            n_short += 1
+        n_same = min(len(pool), 20)
+        if len(pool) < 20:                                         # 跨 relation 频率回填(prereg §0 注:打标)
+            n_short_samerel += 1
+            extra = [v for v in all_uniq if v not in pool and ok(v)]
+            rng.shuffle(extra)
+            pool = pool + extra[:20 - len(pool)]
+            if len(pool) == 20:
+                n_backfilled += 1
         out[c["case_id"]] = pool[:20]
+        stats[c["case_id"]] = n_same
+    out["_stats_n_same_relation"] = stats                          # 逐 case 同 relation 数(CONSORT/敏感性用)
     json.dump(out, open(args.out_distractors, "w"), ensure_ascii=False)
-    print(f"# distractor 池 → {args.out_distractors}  (同 relation<20 个的 case:{n_short},这些 case 剔除)")
+    full = sum(1 for k, v in out.items() if not k.startswith("_") and len(v) == 20)
+    print(f"# distractor 池 → {args.out_distractors}  ({len(out)-1} case;满 20 个:{full};"
+          f"同 relation 不足 20:{n_short_samerel}(其中回填补满 {n_backfilled});仍不足 20 的 run 时跳过)")
+    print(f"# 敏感性备注:主分析全 case;n_same_relation<10 的 case 子集做敏感性(prereg §0)。")
 
 
 # ---------------------------------------------------------------- 分组(复用 census 逻辑)
@@ -355,7 +394,9 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     b = sub.add_parser("build-distractors")
-    b.add_argument("--cases", default="data/counterfact.jsonl")
+    b.add_argument("--cases", default="data/counterfact.jsonl", help="候选池来源(全 CF)")
+    b.add_argument("--config", default="experiments/probe32b.yaml",
+                   help="只给该 config 的探测子集(cf200)建 distractor;设空串则全量")
     b.add_argument("--aliases", default="data/aliases.json")
     b.add_argument("--out-distractors", default="data/wa_distractors.json")
     b.add_argument("--model", default=None)
