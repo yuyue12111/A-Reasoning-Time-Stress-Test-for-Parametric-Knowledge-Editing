@@ -1919,7 +1919,7 @@
   "_diagnosis": "32B FAILED 根因=**CUDA OOM(非 mom2/hparams)**:32B fp32 权重 ~119GiB,MEMIT 多层(5 层)compute_v 梯度 + 逐层更新工作内存把 141G 顶爆(实测 allocated 129.96G,再要 7.5G 即 OOM;ROME 单层刚好塞下、MEMIT 多层不行)。对策梯度:①PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True + 层 5→3([11,12,13],仍多层满足 S7)重试 32B;②不行 → memit14b.yaml(14B fp32 仅 56GiB,H200/H100 均宽裕,guaranteed)。B22 只需一个第二编辑器现象点,14B 也够用(终极review 明载);优先拿到结果 > 拿到 32B。"
  },
  "wb_representation_repair": {
-  "_status": "W-B:G7 PASS → pilot α*=1%(N 基线 0.625 实测后过伤害门)→ 确证臂 S/Pshuf n=200 α=1% 待跑。",
+  "_status": "W-B 终局(confirm 完):B1 FAIL→appendix dissociation 负结果——概念级压链不修答案,反证修复必须在 token/承诺层。W 系列全部收官。",
   "g7": {
    "gate": "个体模板方向两两 cos pair_cos ≥0.6(修 loo 假象后的真判据)",
    "result": "8 rank × 25 = 200/200 fail;pair_cos median≈0.29-0.32,max 0.48,全<0.6",
@@ -1959,6 +1959,28 @@
    "verdict": "★修正(按预置 caveat):N 基线 0.625 → α=1% 掉幅≈0.5pt **过伤害门**(deg 0,err 1/30);α=2%/5% 掉 23/44pt 出局。**α*=1%,W-B 进确证臂 S/Pshuf n=200**(prereg α* 规则)。剂量反应(RR_raw .476→.211→0 + LocAcc .62→.39→.18)保留=概念抑制的效力-伤害折衷曲线,α=1% 是折衷点。",
    "_camera_ready": "更细 α 网格(0.25/0.5%)+对邻域语境正交化的方向,另立 prereg。",
    "N_arm_LocAcc_baseline": "120/192=0.625(平台实测)——注:编辑本身已把邻域 o_old 回忆压到 62.5%(edit collateral 基线,B2 叙述素材)"
+  },
+  "confirm_arms": {
+   "marginals": {
+    "S": "n144 ES .556/RR .180/CLR .417/LocAcc .570",
+    "Pshuf": "n144 ES .507/RR .189/CLR .465/LocAcc .597",
+    "N": "n198 ES .495/RR .193/CLR .545/LocAcc .625"
+   },
+   "B1_S_minus_Pshuf": {
+    "RR": "-.024 [-.098,+.049] 含0 ✗",
+    "ES": "+.078 [-.016,+.172] 含0",
+    "CLR": "-.078 [-.148,-.008] ✅"
+   },
+   "S_minus_N": {
+    "RR": "-.026 [-.092,+.040] 含0",
+    "ES": "+.092 [+.007,+.176] ✅",
+    "CLR": "-.141 [-.218,-.070] ✅"
+   },
+   "B2_LocAcc": {
+    "S_minus_Pshuf": "-.064 [-.119,-.008] 排零(S 比换向臂更伤邻域)",
+    "S_minus_N": "-.029 [-.094,+.036] 含0(点估 -2.9pt<5pt 线,CI 宽)"
+   },
+   "verdict": "★W-B 终裁(prereg B1 FAIL):概念方向注入**概念特异地压低链内 o_old 言语化**(S−Pshuf CLR −.078 排零)但**答案级回退纹丝不动**(RR 全含 0)——压概念的表达≠修复承诺;只有 token 级抑制(T 臂 RR .193→.085)修得动答案。与 W-A(表征在场≠回退,分岔在承诺层)完美互证:病灶在承诺层,概念层干预够得着链、够不着答案。按 prereg:正文禁 mediation/concept-level 修复措辞;W-B 进 appendix 作 dissociation 负结果;无第三次迭代。"
   }
  },
  "wa_extensions": {
