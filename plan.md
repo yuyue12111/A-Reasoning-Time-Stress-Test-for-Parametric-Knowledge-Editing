@@ -280,6 +280,7 @@
   ③ **【W-C·"编辑住在工作空间下面"实测】**W-A 数据免费出:o_old/o_new 可言语化 onset 层带 vs 编辑层(12/64≈0.19)→ 新故事承重钉从叙事变实测。
   ④ **【故事升级(结构不动)】**MECH-led/章节序/G 节裁决不变;机理解释框架升级为「编辑写进自动通路,思考路由进工作空间,工作空间重推旧世界,答案跟工作空间走」——§1 hook/§5 解释层/Discussion 理论对接;F2(B0P≈B0)/M1/链级修复 = 三个行为学签名。引用前逐节复核原文(analysis/10)。
   ⑤ **【纪律】**kill date 7/14:届时不干净整体降 camera-ready,写作照旧;写作窗(7/8 解冻/7/18 abstract)不动;全 J-lens(千-prompt Jacobian)不做;W 系列=加法臂非承重墙。红队 workflow 先审设计(复制效应/方向伤 Loc/base 对照口径)再写码。
+  ⑥ **【红队裁决落盘(`w4cxg65vd` → `prereg-wseries.md` 冻结版)】**4 个 fatal 全修入设计:(a) **原 W-A(a) traceless-回退检验总体≈空**(Associative=0/17、held 14/14 含 o_old)→ 主总体重铸为 B3 全体 string-CLR0 链(claim=言语化是门控),CLR0∩回退只报 n、n<5 声明不可答(算干净);(b) **复制效应/induction 头灌水** → token-id 级排除规则 + 20-distractor 置换 max-stat 校准(精确 p=1/21);(c) **W-B 方向抽取 o_old-vs-o_new=把答案写进残差流** → 改 o_old-vs-中性语境 + 对 W_U[o_new] 正交化 + P_shuf 臂(M4 C 臂表征级同构)+ LocAcc 共主伤害端点(旧 Loc 对概念抑制全盲);(d) **`steer.py:52` mask 失配静默全局注入** → on_mismatch 显式化 + 答案段零 hook 断言 + 两单测。效度门 G1–G7;层索引 off-by-one(编辑层 12↔hs[13])钉死。**④修正:§1 hook 维持现象主导,workspace 只进 Discussion(cite-as-frame)+ §2 立界行**(红队判 §1 workspace hook=借壳观感,砍)。零卡前置:`src/wa_census.py`(平台跑出 A1 的 n → 回填 prereg §2-A1)。下一步=按 prereg 写 W-A 探针 + W-B steer 修(7/8 24:00 冻结)。
 
 ---
 
