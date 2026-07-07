@@ -845,7 +845,8 @@
    "J-lens/workspace(analysis/10):§5/§7 Discussion 加一段收敛性框架(编辑改自动通路,思考路由进工作空间重推 o_old;F2/M1/链级修复=其行为学签名;hedge,不宣称表征级证据)+ 引用 transformer-circuits 2026 workspace(引用前逐节复核原文)。",
    "J-lens/workspace:§2 related 一行立界(他们研究工作空间本身、零编辑内容;我们=该框架在 editing 安全域首个行为学实例)。",
    "B22 后:§4/§7 加 MEMIT-14B 现象复制行(ES 降幅 0.090、RR@B3 0.333>ROME);§7 单编辑器 limitation 改写为'ROME+MEMIT 两编辑器复现';abstract '(ROME/MEMIT)' 括号保留(有数)。",
-   "M4/B17 后:§6 修复特异性主报改走 T−C(四指标全排零含 RRs p=.032)而非 T−N(RRs p=.073);B17 的'验证口径上不显著'风险消除,RRs 可安全进主表。"
+   "M4/B17 后:§6 修复特异性主报改走 T−C(四指标全排零含 RRs p=.032)而非 T−N(RRs p=.073);B17 的'验证口径上不显著'风险消除,RRs 可安全进主表。",
+   "B15 PASS 后:contrib-3 升格版启用('grows with model capability — edit-specific and robust to per-case base-knowledge control');§4 加 B15 一句+分层彩蛋(燃料/引擎);图1 主板定 es_drop(G 节缓解:族内配对 CI+高端显著点高亮,RR 副板)。"
   ],
   "_six_scale_summary": {
    "_def": "6 尺度未编辑 base:answer_old_b0=知识天花板(LEVEL);chain_old_b3=base CLR 底噪(LEVEL);delta_think=B0→B3 净漂(CHANGE 对照)。",
@@ -1487,6 +1488,45 @@
    },
    "verdict": "★Cap3 定论:raw CLR slope 1.128[0.825,1.468]强显著 → net(减 base)0.049[−0.024,0.122] p=.093【含零】。逐尺度 net_clr≈平(−0.37/−0.49/−0.39/−0.29)=编辑 CLR 恒定低于 base ~0.38、gap 不随能力扩。→ CLR 涌现是 base 底噪伪影,【退役】为描述;base_clr==0 子集 slope 0.654 亦含零(n=178)。capability-emergence 由 es_drop(0.109 p=.003,编辑特异)接棒,不受影响。",
    "_gap": "7B base 未进本次 --base-glob(net_clr 现 4 尺度;7B *_BASE_* 在盘可回填→5);70B base **已跑**(2026-07-02,见 base_probe.70B/_70B_gap_closed)但其 per-case 行本地未证在盘,70B net_clr 回填按平台侧处理(B13)。回填不改结论(edited 0.495−base 0.905≈−0.41,合 ~−0.38 平线)。"
+  },
+  "b15_base_recall_control": {
+   "_status": "B15(终极review 证据侧最高优先=capability 第二支柱升格闸门;src/b15_regress.py,5 尺度 matched n=993,7B base 分片未进 glob 不影响)。",
+   "baseline_matched": {
+    "slope": 0.1007,
+    "ci": [
+     0.0304,
+     0.1675
+    ],
+    "p": 0.0041
+   },
+   "controlled": {
+    "slope": 0.0992,
+    "ci": [
+     0.0283,
+     0.1674
+    ],
+    "p": 0.0041,
+    "covs": "chain_len+base_ans_old"
+   },
+   "stratified": {
+    "base_known_n696": {
+     "slope": 0.1268,
+     "ci": [
+      0.0378,
+      0.2093
+     ],
+     "excl0": true
+    },
+    "base_unknown_n297": {
+     "slope": 0.0432,
+     "ci": [
+      -0.1577,
+      0.1677
+     ],
+     "excl0": false
+    }
+   },
+   "verdict": "★B15 PASS(升格闸门过):控 per-case base_ans_old 后 es_drop 涌现 slope 几乎不变(.1007→.0992,p=.0041)→ capability-emergent erosion【非】知识覆盖伪影,contrib-3 用升格版(G 节预写);图1 主板=es_drop。分层机理彩蛋:涌现集中于 base 认识 o_old 的 case(.127 排零)、不认识的无信号(.043 含零)=知识是燃料、能力是引擎——与重推机理自洽(无处可推则无侵蚀),不是混淆而是机制一致性。"
   }
  },
  "metric_validation": {

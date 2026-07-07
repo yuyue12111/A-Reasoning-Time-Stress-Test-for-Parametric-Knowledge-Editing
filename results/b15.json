@@ -1,0 +1,64 @@
+{
+ "tags": {
+  "7.0B_Qwen": "cf200",
+  "70.0B_Llama": "cf100",
+  "8.0B_Llama": "cf200c2",
+  "14.0B_Qwen": "cf200",
+  "1.5B_Qwen": "cf200",
+  "32.0B_Qwen": "cf200"
+ },
+ "n_edited": 1194,
+ "n_matched": 993,
+ "scales_matched": [
+  "Qwen-1.5B",
+  "Llama-8.0B",
+  "Qwen-14.0B",
+  "Qwen-32.0B",
+  "Llama-70.0B"
+ ],
+ "baseline_matched": {
+  "point": 0.1007,
+  "ci95": [
+   0.0304,
+   0.1675
+  ],
+  "excludes_zero": true,
+  "p_slope_le_0": 0.0041,
+  "n_rows": 993,
+  "n_boot_eff": 10000
+ },
+ "b15_controlled": {
+  "point": 0.0992,
+  "ci95": [
+   0.0283,
+   0.1674
+  ],
+  "excludes_zero": true,
+  "p_slope_le_0": 0.0041,
+  "n_rows": 993,
+  "n_boot_eff": 10000
+ },
+ "strat_base_known": {
+  "point": 0.1268,
+  "ci95": [
+   0.0378,
+   0.2093
+  ],
+  "excludes_zero": true,
+  "p_slope_le_0": 0.0014,
+  "n_rows": 696,
+  "n_boot_eff": 10000
+ },
+ "strat_base_unknown": {
+  "point": 0.0432,
+  "ci95": [
+   -0.1577,
+   0.1677
+  ],
+  "excludes_zero": false,
+  "p_slope_le_0": 0.2847,
+  "n_rows": 297,
+  "n_boot_eff": 10000
+ },
+ "verdict": "★B15 PASS:控 base_ans_old 后 es_drop slope 仍排零(0.0992 [0.0283, 0.1674])→ contrib-3 用升格版(prereg 两版预写)。"
+}
