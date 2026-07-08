@@ -180,6 +180,7 @@
  "rq3": {
   "model": "32B",
   "n": 200,
+  "_n_note": "n=200 是名义档;RQ3 各臂【有效】n 见 sup_battery.n(N/T=198、D=196、P=199、C=200)——RR/CLR b0ok 门后以有效 n 为底(如 RR 0.1933=23/119、CLR 0.5455=108/198)。主表 32B 行应报有效 n=198(硬伤3,与 1.5B=196/70B=187 有效-n 约定一致)。",
   "scope": "think",
   "penalty": 8,
   "baseline": {
@@ -595,6 +596,7 @@
   },
   "clr_split_M1": {
    "_status": "M1 E-CLRZERO-SPLIT(src/m1_clrsplit.py,零卡再分析 N/T sup_battery,n=198):按基线 N 臂 per-case CLR 分层的 T−N 修复效应 + 2×2 中介。",
+   "_n_note": "分层 CLR1(106)+CLR0(90)=196,略少于 sup_battery N=198——N/T 配对交集(须两臂皆有效的 case)剔 2 条;写作引 M1 时用配对 n=196、勿与边际 198 混。",
    "CLR1_baseline": {
     "n": 106,
     "T_minus_N_RR": -0.2889,
@@ -864,7 +866,7 @@
    "answer_new_b0": 0.005,
    "answer_new_b3": 0.025,
    "n": 200,
-   "_interp": "涌现曲线中点;base CLR 底噪最高(0.860);ans_new_b3=0.025 略高(做 net 时留意)。edited RR 待回填(现仅'介于7B与32B')。"
+   "_interp": "涌现曲线中点;base CLR 底噪最高(0.860);ans_new_b3=0.025 略高(做 net 时留意)。edited RR=0.162(emergence.percase 14B cell;介于 7B 与 32B,单调成立)。"
   },
   "70B": {
    "family": "Llama",
@@ -914,7 +916,9 @@
    "[S1] limitation:population 对判官 prompt 的敏感性(3/18 unique flip)如实报 + 中性重跑作 robustness appendix。",
    "B13 后:F1 edit-specificity 的 per-case 配对 bootstrap CI 已闭(airtight)——base ΔP(o_old) B0→B3 = −0.020 [−0.080,+0.040] n=199 含零 → limitation 里所有 '配对 CI 待' 清零;§RQ1/§7 写 'base 无系统性向 o_old 漂移(配对 CI 含零)',仍禁 '反向漂移'。",
    "B12 后:M5 反思标记分层=退化观察(反思标记在 R1 链近乎无处不在,114 vs 4)→ 反思是常量非变量、不能作 'override 动作 vs o_old 内容' 的判别杠杆;修复效应在反思链内仍显著(T−N RR −0.105 [−0.175,−0.044] 排零)。§6 或 limitation 一句;M5 GPU 臂维持 camera-ready、DROP 不变。",
-   "W 系列(W-A/W-B)占位条——⚠内容待 7/14 内审裁决,勿据此开写正文。【禁】勿按 plan v1.62 '仪器诚实节 W-B G7 负结果一句' 写:该指令已被 v1.63/64 事实推翻(G7 二跑 PASS)。W-B 真相=G7-PASS → 确证臂 B1-FAIL 的 dissociation 才是负结果(概念方向注入压链内 o_old 言语化 S−Pshuf CLR −.078 排零,但答案回退 RR 全含零纹丝不动;prereg:appendix,正文禁 mediation/concept-fix 措辞,一句 cross-ref)。W-A 数字(诚实版,suggest 档):G5 premention 65/65=100% PASS、A2 AUC .507 perm p=.487 n=[10,30] 干净 null、A3 −0.075 [−0.172,+0.016] 含零(edited≈base 绕过说)、G4 fail(4/29)→ A1 不可判(既不能说无声泄漏存在也禁写'从不无声')。W-B appendix 三臂行:S n144 ES .556/RR .180/CLR .417/LocAcc .570;Pshuf n144 ES .507/RR .189/CLR .465/LocAcc .597;N n198 ES .495/RR .193/CLR .545/LocAcc .625。取数一律从 wa_main / wb_representation_repair.confirm_arms 数据块,勿从 _verdict_714 预判句。"
+   "W 系列(W-A/W-B)占位条——⚠内容待 7/14 内审裁决,勿据此开写正文。【禁】勿按 plan v1.62 '仪器诚实节 W-B G7 负结果一句' 写:该指令已被 v1.63/64 事实推翻(G7 二跑 PASS)。W-B 真相=G7-PASS → 确证臂 B1-FAIL 的 dissociation 才是负结果(概念方向注入压链内 o_old 言语化 S−Pshuf CLR −.078 排零,但答案回退 RR 全含零纹丝不动;prereg:appendix,正文禁 mediation/concept-fix 措辞,一句 cross-ref)。W-A 数字(诚实版,suggest 档):G5 premention 65/65=100% PASS、A2 AUC .507 perm p=.487 n=[10,30] 干净 null、A3 −0.075 [−0.172,+0.016] 含零(edited≈base 绕过说)、G4 fail(4/29)→ A1 不可判(既不能说无声泄漏存在也禁写'从不无声')。W-B appendix 三臂行:S n144 ES .556/RR .180/CLR .417/LocAcc .570;Pshuf n144 ES .507/RR .189/CLR .465/LocAcc .597;N n198 ES .495/RR .193/CLR .545/LocAcc .625。取数一律从 wa_main / wb_representation_repair.confirm_arms 数据块,勿从 _verdict_714 预判句。",
+   "硬伤3(主表 32B n,7/12 表格 pass 执行):Table 1 32B 行 n=200→198(与 1.5B=196/70B=187 有效-n 约定一致;RR 0.193=23/119、CLR 0.545=108/198 已以 198 为底)。⚠【不是盲改数字】:ES(B0)=0.595=119/200 是名义-200 口径,改 n 后须二选一——(a) ES 也重算到有效 198 集(0.595→约 0.596),或 (b) §3.6/§7 显式声明约定 'n=编辑后有效条数;ES 在全 efficacy 探针、RR/CLR 在 b0ok 门后' 并把 32B n 记 198。由 7/12 表格 pass 定,勿单改 Table 1 数字制造 ES 分母不一致。现有例外句 'n=200 except 1.5B 196, 70B 187' 补 'Qwen-32B 198'。",
+   "硬伤2(logit-lens 负带口径,draft 6 处,7/9 统一修):draft.md:34/45/65/183/298 + 图注 215-217 写 '负 gap 带在 layers 8–12 / around the edit layer (12)' 是 hs-索引口径错。logitlens.layers_sampled 是 hs 索引(gap 数组 len=nL+1),按 prereg hs[k]=decoder k−1:负带(−0.246@hs8 / −0.351@hs12)真值=**decoder 7–11,严格在编辑层(12)上游**。改后叙事更干净:'旧事实占优直到编辑层输入、在编辑层后翻正,与编辑恰在 12 层翻转读出一致'。⚠与已排队 B7(n=23 / 峰值 decoder 58 / 降级)是【两件事】,B7 不含负带。顺手:终极review B7 行 '56→60' 与权威 decoder 58 打架,统一从 rq2_logitlens._authoritative_record 出(峰值 hs 中位 59→decoder 58;60 vs 59=网格 argmax vs 逐 case 中位,两统计量并存非矛盾,报哪个须显式定义)。"
   ],
   "_six_scale_summary": {
    "_def": "6 尺度未编辑 base:answer_old_b0=知识天花板(LEVEL);chain_old_b3=base CLR 底噪(LEVEL);delta_think=B0→B3 净漂(CHANGE 对照)。",
@@ -1171,7 +1175,7 @@
      "Associative": "2%"
     }
    },
-   "verdict": "★B16 DONE:机理分母 17→**50 committed reversions**(7 cell/2 族/3 解码-剂量配置)——R3『20 case 撑四结果』拆掉。跨族复现:Llama 8B/70B 同为 Bridge-or-Recall 主导。修正后的路由图景:Bridge 68% 主导、Recall 22%(S1 的'去 prime 后 Recall 非零'在大池坐实=flat recall 是真实少数路由)、RO 8%(且 3/4 在 70B/32B 高能力 cell=高能力才出现的观察,n 小只报计数)、**Associative 1/50(且该例 2-1 分裂票)= 'committed 回退几乎从不无声'在判官级+大池下成立**(与宽口径普查 0/17 互证)。"
+   "verdict": "★B16 DONE:机理分母 17→**50 committed reversions**(7 cell/2 族/3 解码-剂量配置)——R3『20 case 撑四结果』拆掉。跨族复现:Llama 8B/70B 同为 Bridge-or-Recall 主导。修正后的路由图景:Bridge 68% 主导、Recall 22%(S1 的'去 prime 后 Recall 非零'在大池坐实=flat recall 是真实少数路由)、RO 8%(4/4 在高能力 cell:70B 3 + 32B 1=Reflective-override 只在高能力 cell 出现的观察,n 小只报计数)、**Associative 1/50(且该例 2-1 分裂票)= 'committed 回退几乎从不无声'在判官级+大池下成立**(与宽口径普查 0/17 互证)。"
   }
  },
  "emergence": {
@@ -1231,7 +1235,7 @@
      "available": false
     }
    },
-   "n_rows": 1196,
+   "n_rows": 1194,
    "n_families": 2,
    "cells_present": [
     "1.5B-Qwen",
@@ -2208,7 +2212,7 @@
     "S_minus_Pshuf": "-.064 [-.119,-.008] 排零(S 比换向臂更伤邻域)",
     "S_minus_N": "-.029 [-.094,+.036] 含0(点估 -2.9pt<5pt 线,CI 宽)"
    },
-   "verdict": "★W-B 终裁(prereg B1 FAIL):概念方向注入**概念特异地压低链内 o_old 言语化**(S−Pshuf CLR −.078 排零)但**答案级回退纹丝不动**(RR 全含 0)——压概念的表达≠修复承诺;只有 token 级抑制(T 臂 RR .193→.085)修得动答案。与 W-A(表征在场≠回退,分岔在承诺层)完美互证:病灶在承诺层,概念层干预够得着链、够不着答案。按 prereg:正文禁 mediation/concept-level 修复措辞;W-B 进 appendix 作 dissociation 负结果;无第三次迭代。"
+   "verdict": "★W-B 终裁(prereg B1 FAIL):概念方向注入**概念特异地压低链内 o_old 言语化**(S−Pshuf CLR −.078 排零)但**答案级回退纹丝不动**(RR 全含 0)——压概念的表达≠修复承诺;只有 token 级抑制(T 臂 RR .193→.085)修得动答案。与 W-A(表征在场≠回退,分岔在承诺层)完美互证:病灶在承诺层,概念层干预够得着链、够不着答案。按 prereg:正文禁 mediation/concept-level 修复措辞;W-B 进 appendix 作 dissociation 负结果;无第三次迭代。⚠措辞细分(卫生④):'答案级回退纹丝不动' 特指 **RR 全含零**(S−Pshuf/S−N 的 RR CI 皆含 0);但 S−N 的 **ES +.092 [.007,.176] 排零**(概念抑制确实小幅推高 ES),appendix 版须写 'RR 不动、ES 有小幅但 concept-vs-shuffle(B1)对照仍 null' 以免 'S−N ES 排零' 被读成答案级修复——B1(S−Pshuf)才是确证臂,其 ES 含零。"
   }
  },
  "wa_extensions": {
