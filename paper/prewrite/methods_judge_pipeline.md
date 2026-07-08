@@ -136,7 +136,7 @@ Reading of the ledger:
 - **Population membership is judge-sensitive**: $3/18$ unique cases ($3/19$ by
   (scale, case) rows) flip between in-population and held across prompt variants — reported
   as a limitation, with the neutral run standing as a robustness appendix.
-- The **Associative (residual / traceless catch-all) route is a near-empty minority**
+- The **Associative (residual catch-all) route is a near-empty minority**
   under judges (1/50 in the widened pool, and that one case is a 2–1 split), consistent
   with the widest-string census finding 0 of 17 committed reversions carrying no
   $o_{\mathrm{old}}$ trace. (Kept descriptive; full taxonomy claims live in §5.)

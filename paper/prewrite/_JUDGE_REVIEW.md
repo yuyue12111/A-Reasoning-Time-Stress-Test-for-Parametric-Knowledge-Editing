@@ -1,79 +1,80 @@
-# Prewrite materials — 判官对抗审查台账(judge review ledger)
+# Prewrite materials — 判官对抗审查台账(judge review ledger,权威配对版)
 
-gap-review `prewrite-materials` workflow(wf_cd30418a-ebe):10 份材料 draft→judge 对抗核。judge 逐条 Read `results.json` 核数字/引用池/禁区。**这是 fold-in(7/11–13)必读的修订清单**;🔧=已内联修、⏳=留 fold-in 修、✅=判官通过。取数纪律:折进 LaTeX 时一切数字仍从 `results.json` 复核。
+gap-review `prewrite-materials` workflow(wf_cd30418a-ebe;draft→judge,20 agents)。**判官经 resume 权威配对**(按 pipeline item 身份,重判于当前 results.json——含 C2/硬伤4 已落库),取代此前按内容手工匹配的旧版。judge 逐条 Read `results.json` 核数字/引用池/禁区。**fold-in(7/11–13)必读**;🔧=已内联修、⏳=留 fold-in、✅=判官通过。取数纪律:折 LaTeX 时数字仍从 results.json 复核。
 
-## 汇总
+## 汇总(权威配对)
 
-| 材料 | 判官裁决 | 处理 |
+| 材料 | 判官 | 处理 |
 |---|---|---|
-| `methods_llm_compliance.md` (llm-compliance-D6) | revise | 🔧 已修:κ=0.836 改标'judge-vs-rule 校验'(非 inter-judge);inter-judge=Fleiss κ 0.79;'three judges'→'three for taxonomy/validation, 2-of-3 for CLR-polarity' |
-| `aia_relevance.md` (relevance-必3) | ok | ✅ 判官 OK,已核数字/引用池——原样采用 |
-| `methods_level_vs_change.md` (level-change-D4) | revise | 🔧 已修:F1 no-drift 不再'family-wide 含 7B'——7B(+0.08 math-confound,margin≈0)显式排除 |
-| `ethics_reverting_truth.md` (ethics-必4) | revise | 🔧 已修:Recall 路由(22% 非全 re-derivation)改'a re-derivation or a direct recall';'within measurement noise'→'point est. within ±0.02, not certified' |
-| `methods_judge_pipeline.md` (judge-methods-D2) | revise | ⏳ fold-in 修:subject-scrub FP 计数(4+1+1=6 非 5,核 v1_clr_polarity)+ '85% Bridge'→P̄=0.833/Pe≈0.847 溯源 |
-| `anonymize_spec.md` (anonymize-E5) | revise | ⏳ fold-in 修:文件计数是 draft 估值(实测 WHYAAAI 53 非 38、终极review 16 非 11、results.json 2367 行);改实测或改'示例/dozens'口径 |
-| `supp_prereg_gates.md` (prereg-supp-D1) | revise | 🔧 已加 G5 更正 banner(冻结 max-stat 29.2%<50% 门不过;draft 的 100%/降 suggestive/待回传 均过期) |
-| `supp_distractor_lens.md` (distractor-lens-D3) | revise | 🔧 已加 G5 更正 banner(CONSORT G5 行须并列 z≥2 100% 与冻结 max-stat 29.2% 门不过) |
-| `release_and_licenses.md` (release-licenses-E4) | ok | ✅ OK;⏳ fold-in 补:因果 battery 五臂应含 C 臂(N/T/D/P/C,strong_competitor_M4),draft 漏 C |
-| `supp_manifest.md` (supp-manifest-E3) | ok | ✅ OK;⏳ fold-in 补 Source 行:memit_replication / rq3.sup_battery.contrasts / necessity.held / wide_census_traceless / G5 冻结 29.2% |
+| `aia_relevance.md` (relevance-必3) | ok | ✅ 判官零 issue,原样。非阻断建议:'halves'可作'more than halves'(0.085/0.193=44%);0.193 落主表时标有效 n=198/b0ok。 |
+| `ethics_reverting_truth.md` (ethics-必4) | ok | ✅ 判官通过。我另内联做了保守改进(Recall 22% 非全 re-derivation→'a re-derivation or a direct recall';B26 'measurement noise'→'点估内 ±0.02, not certified')——非必需但更精确,保留。 |
+| `methods_level_vs_change.md` (level-change-D4) | ok | ✅ 判官通过。我另内联做了保守改进(F1 no-drift 排 7B math-confound,+0.08 margin≈0)——非必需,保留。 |
+| `release_and_licenses.md` (release-licenses-E4) | ok | ✅ 判官通过,原样。 |
+| `supp_prereg_gates.md` (prereg-supp-D1) | revise | 🔧 已加 G5 更正 banner:body 把 G5 说成'降 suggestive / W-A 入 suggestive 档 / max-stat 待回传'均过期(冻结 max-stat 29.2%<50%=门不过;W-A 据 A2 null 不据 G5)。fold-in 以 banner 为准重写 S.4。 |
+| `supp_distractor_lens.md` (distractor-lens-D3) | revise | 🔧 'traceless' 禁词【已删/改写】(§7 A1 bullet)+ G5 更正 banner【已加,CONSORT G5 行并列 z≥2 100% 与冻结 29.2% 门不过】。注:A3 分组 n(a2rev 8+a1 16+a2held 20=44≠48)差 calib 4 未拆,非错。 |
+| `methods_llm_compliance.md` (llm-compliance-D6) | revise | 🔧 κ=0.836 改标 judge-vs-rule 校验(非 inter-judge)【已修】+ 'three judges'→'three for taxonomy/validation, 2-of-3 CLR-polarity'【已修】。⏳ fold-in:§3 表头'same three-judge protocol'各仪器协议不同(收紧)+ repro-checklist 补 multi-hop scorer-audit 仪器。 |
+| `methods_judge_pipeline.md` (judge-methods-D2) | revise | 🔧 'traceless' 禁词【已删】(§3 Associative 描述)。⏳ fold-in:①subject-scrub 假阳计数与 rq3.metric_validation 对齐 ②rerun-ledger 50-pool κ 列填 0.79(combined_50pool)。 |
+| `supp_manifest.md` (supp-manifest-E3) | revise | ⏳ fold-in:S14 run-ledger 'four 0.208' 实为 **3** 个 run 上下文(C 臂 marginal / F2-B1 / 另一),改计数。 |
+| `anonymize_spec.md` (anonymize-E5) | revise | ⏳ fold-in:文件计数是 draft 估值,实测 WHYAAAI=53(非 38)、终极review=16(非 11);改实测或改'dozens/示例'口径(计数非 load-bearing,scrub-grep 运行时自查真值)。 |
 
-## 各材料判官原始 findings(存档,fold-in 核对用)
-
-### `methods_llm_compliance.md` — llm-compliance-D6  [revise]
-**处理**:🔧 已修:κ=0.836 改标'judge-vs-rule 校验'(非 inter-judge);inter-judge=Fleiss κ 0.79;'three judges'→'three for taxonomy/validation, 2-of-3 for CLR-polarity'
-- ⚠ §3 判官段把 Cohen's κ=0.836 归入『every reported INTER-JUDGE agreement』属 mischaracterization/overclaim。results.json line 1714-1724 metric_validation.vs_RRs_strict_decontam:0.836 是【中性判官面板 vs 严去污 RRs 规则】的一致性(criterion validity,含 confusion TP23/FP2/FN4/TN58、precision 0.92/recall 0.85),即『判官 vs 打分规则』,不是判官彼此之间的一致。材料自报 source 描述本身写的就是『vs strict decontaminated reversion (RRs)』——与正文『inter-judge』自相矛盾。只有 Fleiss κ=0.52(line 1026 rq2_taxonomy.pooled.fleiss_kappa)才是真正的 inter-judge(多评委)统计。把两者并列为『inter-judge agreement』夸大了评委间信度证据。
-- ⚠ §3 一句的全称主张『Every LLM-derived label ... is produced by a fixed panel of THREE independent judges』被材料自己的 §3 清单证伪:CLR-polarity check 用的是 ≥2 判官(results.json line 1740 metric_validation.v1_clr_polarity._status:『37 unique case × ≥2 判官』),并非恒为三。全称『three』是轻度 overclaim,须收窄。
+## 各材料判官原始 findings(权威,fold-in 核对用)
 
 ### `aia_relevance.md` — relevance-必3  [ok]
-**处理**:✅ 判官 OK,已核数字/引用池——原样采用
+**处理**:✅ 判官零 issue,原样。非阻断建议:'halves'可作'more than halves'(0.085/0.193=44%);0.193 落主表时标有效 n=198/b0ok。
 
-### `methods_level_vs_change.md` — level-change-D4  [revise]
-**处理**:🔧 已修:F1 no-drift 不再'family-wide 含 7B'——7B(+0.08 math-confound,margin≈0)显式排除
-- ⚠ (i) overclaim: 'the base thinking-drift stays small (|Δ|≤0.08, mostly ≤0.025), so this holds family-wide' extends F1 edit-specificity to all six scales, but results.json explicitly excludes 7B — base_probe.7B delta_think=+0.08 equals the 7B edited RR=0.08 (capability.families.R1-Distill-Qwen.rr[1]=0.08) → margin≈0, flagged in base_probe.7B._interp ('margin≈0 不可分辨→7B 降级只作曲线低端') and f1_edit_specificity.verdict ('7B +0.08 是 Qwen-Math 小模型个例(margin≈0)'). Clean separation is a 32B headline (margin 0.214) + 70B extension (margin 0.142), so 'family-wide' is stronger than the data and contradicts the material's own cross-ref-map scope ('32B 单尺度 + 6 尺度 delta_think 小').
 
-### `ethics_reverting_truth.md` — ethics-必4  [revise]
-**处理**:🔧 已修:Recall 路由(22% 非全 re-derivation)改'a re-derivation or a direct recall';'within measurement noise'→'point est. within ±0.02, not certified'
-- ⚠ OVERCLAIM (primary, easy fix): prose 句『the committed reversions we study are almost never silent, each leaving a verbalized re-derivation in the chain (§taxonomy)』把全部回退称作 re-derivation,错标了 22% (11/50) 的 Recall 路由 —— results.json:969 明确 Recall=『直陈值无中介』(直接复述,非再推导),只有 68% Bridge 才是『经命名中介推出』的 re-derivation。且项目已显式裁定把『reconstructive re-derivation』收紧为『bridge-or-recall, never traceless』(results.json:915/1093 _pending_draft_edits [S1]);本材料回退到被收紧掉的措辞。此外『almost never silent』(2% Associative=无声)与『each leaving...』自相矛盾——那 1/50 Associative(残差 implicit-leak)恰恰不留清晰言语化痕迹,『each』过度绝对。
-- ⚠ OVERCLAIM (borderline, 建议收紧): §边界(i)『leaves general-task accuracy within measurement noise (§deploy)』—— 项目 B26 裁决(results.json:720-746 + _CORRECTION)明确:全量 n 下两比例 90%CI 未收进 ±0.02(GSM8K ±0.0217、MATH [−0.061,+0.041]),【不写 certified equivalent】、不得暗示统计等价。『within measurement noise』暗含『与噪声不可分辨=统计等价』,超出可认证范围。点估口径(GSM8K +0.005/MATH 0.000,§deploy 交叉引的是 genbench 通过门的点估)成立,但措辞需降到点估+门内、勿暗示等价。
+### `ethics_reverting_truth.md` — ethics-必4  [ok]
+**处理**:✅ 判官通过。我另内联做了保守改进(Recall 22% 非全 re-derivation→'a re-derivation or a direct recall';B26 'measurement noise'→'点估内 ±0.02, not certified')——非必需但更精确,保留。
 
-### `methods_judge_pipeline.md` — judge-methods-D2  [revise]
-**处理**:⏳ fold-in 修:subject-scrub FP 计数(4+1+1=6 非 5,核 v1_clr_polarity)+ '85% Bridge'→P̄=0.833/Pe≈0.847 溯源
-- 🔢 §1 (subject-scrub 'Downstream validation' paragraph): 'of 5 raw false positives, 4 are subject-restatement (3 unanimous + 1 split vote), vs. 1 quotation/meta and 1 negation-only' sums to 6 items (4+1+1) inside the 5-FP bucket. Per results.json the buckets are DISJOINT: metric_validation.v1_clr_polarity.raw = {false_positive:5, split:4, genuine:28, n:37}. fp_taxonomy = {subject_restatement_only:'3 全票+1 分裂票', quotation_or_meta:1, negation_only:1}. So the 5 raw FPs decompose as 3 subject-restatement(unanimous) + 1 quotation/meta + 1 negation-only = 5; the '1 split vote' subject case lives in raw.split=4, NOT in raw.false_positive=5. The material's own next sentence correctly states '5 false-positive / 4 split' as disjoint, so the paragraph is internally self-contradictory. This misattributes the split-vote into the FP count.
-- 🔢 §2b (minor / provenance): '≈85%-Bridge base rate' at 7B is not a results.json value. results.json gives rq2_taxonomy.per_scale.7B raw_agreement_pbar=0.833 and note Pe≈0.847. Source the number to P̄=0.833 (or Pe≈0.847) rather than an unsourced '≈85%'.
 
-### `anonymize_spec.md` — anonymize-E5  [revise]
-**处理**:⏳ fold-in 修:文件计数是 draft 估值(实测 WHYAAAI 53 非 38、终极review 16 非 11、results.json 2367 行);改实测或改'示例/dozens'口径
-- 🔢 §1 L6 表 + §2:『WHYAAAI ... 38 tracked files』/『touch 38 files for WHYAAAI alone』—— 实测 git grep -lI WHYAAAI = 53 个跟踪文件(排 experiments/ 亦有 31;working-tree 全类型 189),无任何口径 = 38;差 15。此数支撑 §2『allowlist 优于 blacklist』论证。
-- 🔢 §2:『11 for 终极review』—— 实测 git grep -lI 终极review = 16 个文件,非 11;差 5。
-- 🔢 引言 + §5:results.json『grown to ~2.3k lines』—— 实测 paper/results.json = 2367 行(近 ~2.4k),『~2.3k』偏低(近似值,低 severity)。
-- ⚠ §1 overclaim: 标题声明『(Concrete instances confirmed by a repo scan on 2026-07-08.)』,但 L3 行把本地路径 /Users/whyu/… 归到『some src/*.py』被同日扫描反证 —— tracked 与 working-tree 的 src/*.py 均无 /Users/(git grep -lI 与 grep -rlI 皆空)。src/*.py 真实泄漏是 WHYAAAI 代号(13 文件)+ 中文 docstring(62 文件)+ /inspire 仅在 src/vendor_patches/{easyedit_mom2_dataset.py,test_mom2_dataset.py}。把扫描反证的泄漏点标为 scan-confirmed 即 overclaim;且实操风险:实现者照 L3 grep src 找 /Users/ 空手→可能漏掉真正需清洗的代号/中文 docstring。同一『scan-confirmed』框架下的 38/11 计数也被同日扫描反证(见 number_errors),整条『confirmed by repo scan 2026-07-08』断言不可靠。
+### `methods_level_vs_change.md` — level-change-D4  [ok]
+**处理**:✅ 判官通过。我另内联做了保守改进(F1 no-drift 排 7B math-confound,+0.08 margin≈0)——非必需,保留。
 
-### `supp_prereg_gates.md` — prereg-supp-D1  [revise]
-**处理**:🔧 已加 G5 更正 banner(冻结 max-stat 29.2%<50% 门不过;draft 的 100%/降 suggestive/待回传 均过期)
-- 🔢 G5 max-stat 数值缺失且与源冲突:材料称『A prereg-correct max-stat recomputation requires the per-distractor base jsonl and is deferred』(尚未算/待办)。但 results.json wa_main.gates.G5_premention 与 wa_main._g5_硬伤4.maxstat_frozen 记录该重算已于 2026-07-08 完成 = 19/65 = 29.2%(src/wa_g5_maxstat.py；窗=el_idx，literal [m−20,m−1] 口径 ≤29%)，且 29.2% < prereg 50% 地板=门不过。materials 把『已算且失败(29.2%)』写成『deferred』，数字与源不符。
-- 🔢 G5 Status/Observed 单元格数值不完整:Observed 只写『65/65 = 100% under a fixed z≥2 threshold』，漏记同源的冻结判据实测 19/65 = 29.2%(FAIL)；Status『suggestive support』与源判定(冻结口径不过门/W-A void 区间)不符。
-- ⚠ 【overclaim / 承重档位拔高】G5 被写成『downgraded from a certified gate to suggestive support』，且让 G5 继续给 W-A 提供『suggestive support』。但权威源(results.json wa_main.gates.G5_premention / _g5_硬伤4 / prereg-wseries §7.5 line 86)判定:冻结口径(distractor max-stat)= 19/65 = 29.2% < prereg 50% 地板 → 按 G5 阈值行(『<50% ⇒ W-A void』)这是 FAIL，不是 suggestive。硬纪律#3『凡 suggestive 不写 confirmed / 凡 null 只写 null』的镜像:此处把一个 FAIL 写成 suggestive=过度宣称。正确档位:G5 在冻结口径下不过门，W-A 唯一承重腿=A2 干净 null(results.json 明写『承重腿=A2 null，不依赖 G5 阈值』)。
-- ⚠ 【取数纪律 / 选择性引用】材料自报的数字来源 `wa_main.gates.G5_premention` 同一字段里既有『65/65=100%(z≥2)』也有『=19/65=29.2% … 冻结口径下 premention 灵敏度门不过』。材料只摘对己有利的 100% 与『frozen criterion=max-stat』标签，删掉同字段内失败的 29.2%，属从源字段挑子集。
-- ➖ 骨架点名『G5 post-hoc z≥2 降 suggestive 见硬伤4』——但硬伤4 的权威落点是冻结 max-stat=29.2%<50% 地板=门不过(prereg-wseries §7.5 line 86 / results.json _g5_硬伤4)。材料缺这条硬伤4 正解:未披露 max-stat 已重算=29.2% 及其 FAIL 结论，也未据此把 W-A 承重腿显式收敛到 A2 null。
-
-### `supp_distractor_lens.md` — distractor-lens-D3  [revise]
-**处理**:🔧 已加 G5 更正 banner(CONSORT G5 行须并列 z≥2 100% 与冻结 max-stat 29.2% 门不过)
-- 🔢 §5 G5 caveat: 'A prereg-correct max-stat G5 requires re-transferring results/wa/base_r*of8.jsonl (per-distractor z) for recomputation' is FALSE. paper/results.json wa_main._g5_硬伤4._status = '本地 wa base 分片可算 → 已算,非只 flag'(src/wa_g5_maxstat.py, results/wa_g5_maxstat.json) — the recomputation is DONE. Value: maxstat_frozen = 19/65 = 29.2% (a2rev 5/16, a2held 13/41, calib 1/8).
-- 🔢 §5 CONSORT table G5 row + §7 G5 bullet report G5 as '65/65 = 100% (post-hoc z≥2)' with no counterpart. The z≥2 = 65/65 = 100% figure itself matches wa_main._g5_硬伤4.z2_variant, but omitting the frozen criterion makes the reported G5 value wrong-in-context: authoritative wa_main.gates.G5_premention now states z≥2's 100% '严重高估' and the binding frozen value is 19/65 = 29.2% < 50% floor.
-- ⚠ OVERCLAIM (G5): §5 caveat says G5 is 'downgraded from a gate to suggestive support' and §7 says it 'supports rather than gates'. Authoritative paper/results.json wa_main._g5_硬伤4.interpretation = '冻结口径 G5=29.2%<50% 地板=premention 灵敏度门不过' (frozen max-stat = 29.2%, BELOW the prereg 50% floor = gate FAILS). Per prereg-wseries §1 G5 is a three-tier rule ('≥80% PASS;<50% W-A 作废;50–80% suggestive'); 29.2% sits in the <50% VOID tier, not the 50–80% 'suggestive' tier. Reporting a floor-failing gate as favorable 'suggestive support' is an overclaim; prereg action_714 forbids it verbatim ('禁再报 G5=100% PASS' and requires stating '严格 max-stat 仅 29%').
-- ⚠ DISCIPLINE (stale-source): the material reproduces the superseded prereg-wseries §7.5 framing ('G5 只作 suggestive; max-stat 待回传重算'). §7.5 in prereg-wseries.md is itself stale — results.json (the binding 取数真源) has since replaced it with the computed 29.2% floor-fail. Numbers/reading must follow results.json, not the stale prereg §7.5 sentence.
-- ➖ The load-bearing frozen distractor max-stat result is entirely absent: wa_main._g5_硬伤4.maxstat_frozen = 19/65 = 29.2% (< prereg 50% floor), with per-group breakdown a2rev 5/16, a2held 13/41, calib 1/8. This is the single most consequential W-A number added since the material was drafted and it is not in the appendix.
-- ➖ The prereg §1 G5 three-tier rule (<50% → W-A voided; 50–80% → suggestive; ≥80% → PASS) is not stated; the material only cites the ≥80% PASS threshold, so a reader cannot see that 29.2% falls in the VOID tier.
-- ➖ The action_714 decision fork is not represented: wa_main._g5_硬伤4.action_714 = W-A must either (a) drop '可靠升起', restate as 'o_old systematically elevated vs distractor mean (z≥2) but strict max-stat only 29%' with A2 null load-bearing, OR (b) demote the whole section to appendix. The material's 'G5+A2+A3 三件套' framing predates this fork.
-- ➖ The window_caveat (max-stat window = el_idx whole eligible pre-window, wider than prereg-literal [m-20,m-1]; true narrow-window max-stat ≤ 29%) is omitted — relevant because it can only make G5 worse, not better.
 
 ### `release_and_licenses.md` — release-licenses-E4  [ok]
-**处理**:✅ OK;⏳ fold-in 补:因果 battery 五臂应含 C 臂(N/T/D/P/C,strong_competitor_M4),draft 漏 C
-- ➖ 制品清单(A.4)『因果对照 battery』行只列 N/T/D/P 却标『五臂』,漏 results.json 里承重的 C 臂(same-relation strong competitor,sup_battery._C_arm_M4 / strong_competitor_M4;T−C 四指标全排零、坐实 o_old 特异性);results.json 的规范五臂集是 N/T/D/P/C(见 _pending_draft_edits『M4 后…五臂图 N/T/D/P/C』)。manifest 对该 battery 的描述不完整。
+**处理**:✅ 判官通过,原样。
 
-### `supp_manifest.md` — supp-manifest-E3  [ok]
-**处理**:✅ OK;⏳ fold-in 补 Source 行:memit_replication / rq3.sup_battery.contrasts / necessity.held / wide_census_traceless / G5 冻结 29.2%
-- ➖ §1 Source 列缺 `memit_replication`（含 `._diagnosis`/`._32b_final` 32B 双故障脚注）。MEMIT 复现是 §2 自查判定的 load-bearing（abstract 已许诺『(ROME/MEMIT)』、必进正文 §4），但 S3 Source=marginal_B3/cross_arm_paired_ci/alpha_sweep、S12 Source=capability._bos_note/f2.arms.B0P，两处均未指向 memit_replication，折 LaTeX 时无从溯 ES 0.54→0.45 / drop 0.090 / RR 0.333 / Loc 0.965 的取数路径。
-- ➖ §1 S3 Source 缺 `rq3.sup_battery.contrasts_B3_mean_ci_p`。S3 material 明列 T−P/D−N/P−N 配对对照，且 T−P（RR −0.095[−0.171,−0.029]）是 §6 headline=load-bearing；但这三组只存在于 contrasts_B3_mean_ci_p，而 Source 只写 marginal_B3 / cross_arm_paired_ci（后者仅含 T−N/C−N/T−C）/ alpha_sweep→T−P 源路径缺席。
-- ➖ never-silent / 重推必要性（§2 row 判『✅ 正文承重』）的两个源在 §1 Source 列无归属：`necessity.held`（held 14/14）与 `rq2_taxonomy.wide_census_traceless`（0/17）。§2 把 census 全表映到 S8，但 S8 Source=wa_main.*/wa_extensions._ladder_status，不含 wide_census_traceless；S4 Source=pooled/neutral_rerun_S1/b16_widened_pool 也不含；necessity 整块无任何 §1 归属行。
-- ➖ G5 冻结 max-stat 口径值缺席：自报数字块与 §1 S8 material 只给 post-hoc『z≥2 65/65』，未并列冻结判据实测 19/65=29.2%（wa_main._g5_硬伤4.maxstat_frozen，<50% 地板=gate 不过）。S8 material 自称『G5 全结果 + G5 post-hoc 披露』，则冻结口径值须同现，否则『全结果/披露』不完整。
+
+### `supp_prereg_gates.md` — prereg-supp-D1  [revise]
+**处理**:🔧 已加 G5 更正 banner:body 把 G5 说成'降 suggestive / W-A 入 suggestive 档 / max-stat 待回传'均过期(冻结 max-stat 29.2%<50%=门不过;W-A 据 A2 null 不据 G5)。fold-in 以 banner 为准重写 S.4。
+
+- 🔢 S.4 G5 注:『A prereg-correct max-stat recomputation requires the per-distractor base jsonl and is deferred』——与 results.json 冲突。wa_main._g5_硬伤4.maxstat_frozen = 『19/65=29.2%』(2026-07-08 已用 src/wa_g5_maxstat.py 算出;a2rev 5/16、a2held 13/41、calib 1/8),prereg-wseries.md §7.5 line 86 亦明记『【7/8 已算,数据本地在盘】=19/65=29.2%』。冻结 max-stat G5 既非 deferred 亦非缺失,而是=29.2%,材料完全漏报此数,且『deferred』为不实陈述。(注:窗口 caveat——29.2% 算于 el_idx 更宽前窗,是上界,真 [m-20,m-1] ≤29%;仍远低于 50% 地板。)
+- ⚠ S.4 G5 行 Status「downgraded from gate to suggestive support」+ 注「G5 is downgraded from a certified gate to suggestive support」= OVERCLAIM。冻结口径实测值 29.2%(results.json wa_main._g5_硬伤4.maxstat_frozen)落在 prereg 的 <50% = W-A void/fail 档,不在 suggestive(50–80%)档(prereg-wseries.md §5 line 27:≥80% PASS;<50%→W-A 作废;50–80%→suggestive)。results.json 明写「冻结口径 G5=29.2%<50% 地板=premention 灵敏度门不过」「禁再报 'G5=100% PASS'」。把一个 below-floor 的失败门写成『suggestive support』是把 null/fail 说成部分正证。诚实口径:冻结 max-stat premention 门不过,『表征提及前可靠升起』不作为冻结门成立,W-A 靠不依赖阈值的 A2 null 承重。
+- ⚠ S.4 G5 注推导出的『W-A therefore enters at the suggestive tier only』其立论依据(G5=suggestive)不成立;W-A 只应以 A2 干净 null(AUC 0.507, perm p 0.487)+ G4 fail 声明为据,而非把 G5 说成 suggestive 支持。
+
+### `supp_distractor_lens.md` — distractor-lens-D3  [revise]
+**处理**:🔧 'traceless' 禁词【已删/改写】(§7 A1 bullet)+ G5 更正 banner【已加,CONSORT G5 行并列 z≥2 100% 与冻结 29.2% 门不过】。注:A3 分组 n(a2rev 8+a1 16+a2held 20=44≠48)差 calib 4 未拆,非错。
+
+- 🔢 G5 frozen max-stat is STALE / contradicted. Material (§5 caveat) states the prereg-correct max-stat G5 'requires re-transferring `results/wa/base_r*of8.jsonl` (per-distractor z) for recomputation (prereg-wseries §7.5)', implying it is not yet done. results.json wa_main._g5_硬伤4.maxstat_frozen = '19/65=29.2% (a2rev 5/16, a2held 13/41, calib 1/8)' and wa_main.gates.G5_premention explicitly report it as ALREADY computed and < the prereg 50% floor; prereg §7.5 line 86 struck the 'need to re-transfer' text ('~~若要...须回传~~ 【7/8 已算,数据本地在盘】'). The authoritative 29.2% number is omitted entirely. FIX: report 65/65=100% strictly as the z≥2 variant AND report frozen max-stat G5 = 19/65 = 29.2% < 50% floor = gate fails.
+- 🔢 (Inherited from source, not a transcription error) A3 subgroup ns do not sum to the total: material copies results.json faithfully (all n=48; a2rev n=8 + a1 n=16 + a2held n=20 = 44), leaving 4 cases uncategorized. Numbers match wa_main.A3 exactly so this is not a material-introduced mismatch, but the 44 vs 48 gap should be reconciled or the groups declared non-partitioning before fold-in.
+- ⚠ OVERCLAIM (G5 status). §5 caveat + §7 frame G5 as merely 'downgraded from a gate to suggestive support' / 'suggestive only', and say the prereg-correct max-stat 'requires re-transferring results/wa/base_r*of8.jsonl ... for recomputation'. But results.json wa_main._g5_硬伤4.maxstat_frozen and prereg-wseries §7.5 (line 86) both show the frozen distractor max-stat G5 was ALREADY computed = 19/65 = 29.2%, which is BELOW the prereg 50% floor => the frozen premention sensitivity gate FAILS. Presenting a failed frozen gate as 'suggestive support' while omitting 29.2% understates the failure. Per prereg §7.5 the honest read is: gate does NOT pass; only A2 null (independent of G5) is load-bearing. This is an overclaim-by-omission relative to results.json.
+- ⚠ FORBIDDEN-WORD caution (borderline). §7 A1 bullet prints "'never traceless' / 'never silent'". prereg-wseries §5 lists 'traceless' as a 全文禁词 whose only exception is 'A1 判官级门过' — but A1's G4 gate FAILED (13.8% ≪ 70%), so the exception is unmet. The material carefully attributes the phrasing to the wide-census/taxonomy (which results.json necessity + wide_census_traceless DO endorse) and explicitly disclaims A1, so it is borderline rather than flatly forbidden — but the loaded term should be reworded to a string-level statement to stay clean of §5.
+- ⚠ External cite-as-frame refs (2606.13603 'Beyond the Commitment Boundary', 2605.06723) cannot be verified from results.json; they are permitted as cite-as-frame by prereg §5 and are correctly gated/Discussion-only/subject=[cite], but the arXiv IDs and titles are unverifiable from the provided sources and must be confirmed before fold-in.
+- ➖ Honest frozen-gate G5 result absent. The appendix bills itself as 'the entirety of the instrument's credibility record', but omits the prereg-frozen max-stat G5 = 19/65 = 29.2% (< 50% floor) that exists in results.json (wa_main._g5_硬伤4 / gates.G5_premention). An instrument-credibility CONSORT must carry this failing frozen-gate number, not defer it as 'pending recomputation'.
+- ➖ All other skeleton components are present and correct: 20 same-relation distractor z-calibration (§1–§2), permutation max-stat exact p=1/21 (§4), six token-id-level position-exclusion classes incl. induction/copy-head suffix guard (§3), CONSORT with edited/base per-gate n + G2/G3 fail + amb flag (§5–§6), decoder-index convention hs[k]=decoder k−1 / edit layer 12 = hs[13] (§1), and the 7/14 W-A admission gate (header + checklist item 7). No further skeleton gaps.
+
+### `methods_llm_compliance.md` — llm-compliance-D6  [revise]
+**处理**:🔧 κ=0.836 改标 judge-vs-rule 校验(非 inter-judge)【已修】+ 'three judges'→'three for taxonomy/validation, 2-of-3 CLR-polarity'【已修】。⏳ fold-in:§3 表头'same three-judge protocol'各仪器协议不同(收紧)+ repro-checklist 补 multi-hop scorer-audit 仪器。
+
+- ⚠ §1 判官段(§3 drop-in 句)把 Cohen's κ=0.836 归为『inter-judge agreement(判官间一致)』——错。results.json 的 0.836 出自 metric_validation.vs_RRs_strict_decontam.cohen_kappa,是【中性判官面板 vs 去污 RRs 规则】的判官-规则一致度(scorer-validation 口径),不是判官彼此之间的一致。材料自己的 §2 声明('two scorer-validation studies')和自报来源表('Cohen's kappa vs. strict decontaminated reversion (RRs)')都把它写成 judge-vs-rule,唯独 §3 prose 把它抬成 inter-judge reliability=对内矛盾+overclaim。只有 Fleiss κ=0.52(rq2_taxonomy.pooled)才是真 inter-judge。
+- ⚠ §1 首句『Every LLM-derived label in this work is produced by a fixed panel of three independent judges』属 overclaim,被材料自己 §3 清单推翻:CLR-polarity check 明列『≥2 judges』(v1_clr_polarity._status:『37 unique case × ≥2 判官』),multi-hop scorer-audit panel 判官数未给定。并非全部标签都出自『固定三判官』。
+- ⚠ §3 清单表头『All are the same three-judge, majority-vote / strict-precedence protocol』属 overclaim:各仪器协议不同——taxonomy=strict precedence 三判官;neutral reversion-validation=OLD/NEW/NEITHER 多数决(非 strict precedence);CLR-polarity=≥2 判官极性判定;multi-hop=scorer-audit 纠错。不是『同一协议』。
+- ➖ §2 repro-checklist 声明行不 exhaustive:只枚举 taxonomy + 两个 scorer-validation study,漏掉 §3 清单里列为第 4 仪器的 multi-hop scorer-audit panel(§RQ1 2-hop,LLM 判官纠 scorer 变音符/短目标假阳)。合规政策要求把所有 LLM 使用披露完整;该 panel 是评测仪器、非『incidental drafting/coding』,应进声明的仪器清单。
+
+### `methods_judge_pipeline.md` — judge-methods-D2  [revise]
+**处理**:🔧 'traceless' 禁词【已删】(§3 Associative 描述)。⏳ fold-in:①subject-scrub 假阳计数与 rq3.metric_validation 对齐 ②rerun-ledger 50-pool κ 列填 0.79(combined_50pool)。
+
+- 🔢 §1 假阳分类 'of 5 raw false positives, 4 are subject-restatement (3 unanimous + 1 split vote), vs. 1 quotation/meta and 1 negation-only' —— 与 results.json rq3.metric_validation.v1_clr_polarity 不符。raw.false_positive=5、raw.split=4 是两个独立桶(1741-1746)。fp_taxonomy(1748-1752)=subject_restatement_only '3 全票+1 分裂票'、quotation_or_meta 1、negation_only 1。故 5 个 FP 的构成恰=3(主体复述,全票)+1(引用/meta)+1(否定)=5,只有 3/5 FP 是 subject-restatement;那个 '+1 分裂票' subject-restatement 属于另设的 split=4 桶、不在 5 个 FP 内。材料把 split 折进 FP 得 '4 of 5',且 3(全票)+1(split)+1+1=6 条被塞进一个 5 条的池=off-by-one 自相矛盾(材料同段 precision 行又正确写 '5 false-positive / 4 split' 两桶分列,内部打架)。正确:'3 of the 5 raw FPs are subject-restatement (all unanimous); a further subject-restatement is 1 of the 4 split-vote cases → 4 across the FP+split pool'。定性结论(subject-restatement 为 FP 主类)在 3/5 下仍成立,仅计数需改。
+- ⚠ 禁词 'traceless': §3 写 'The Associative (residual / traceless catch-all) route ...'。prereg-wseries.md §5 全文禁词表把 'traceless' 列为禁用,例外仅 'A1 判官级门过'。但 A1 未过关(results.json base_probe._pending_draft_edits/W 系列:G4 fail 4/29 → A1 不可判、wide_census CLR0_wide∩reverted=0 按 prereg 声明『本数据不可答』)——被点名的 A1 judge gate 恰未通过。佐证 0/17 又是 string-level 普查(wide_census_traceless._status 明言宽口径 substring、非判官验证)。故字面 'traceless' 应替换为 'residual / no-quotable-span catch-all' 或 'never-silent(判官义)'。注:b16 verdict 原文用的是 '从不无声/never silent',非 traceless。
+- ➖ §3 rerun ledger 表 '50-pool' 行的 Fleiss κ 列写 '—',但该 headline 池的判官一致性已在 results.json b16_widened_pool._kappa_C2.combined_50pool 落定:in-pop 路由 Fleiss κ=0.790(P̄=0.893)、panel κ=0.875(P̄=0.921)、new33-only κ=0.789。材料自己在 §2b 立的原则是『report κ alongside raw agreement』,却让承重 headline 池 κ 缺席——应把 0.790 填入该行(或表注),与原 17-池 0.765 一致这点亦可一并说明。
+
+### `supp_manifest.md` — supp-manifest-E3  [revise]
+**处理**:⏳ fold-in:S14 run-ledger 'four 0.208' 实为 **3** 个 run 上下文(C 臂 marginal / F2-B1 / 另一),改计数。
+
+- 🔢 S14 run-ledger 描述句『四个「0.208」溯源』计数与 results.json 不符:results.json 中 RR 点估=0.208 只有 3 个不同 run 上下文——rq3.sup_battery.marginal_B3.C.RR(C 臂,cf200sup_strong)/ f2_zerothink_deconfound.arms.B1.RR(cf200f2)/ f3_sampling_robustness.greedy_control.B3.RR(cf200samp greedy)。其余 0.208 出现均为 CI 上界(capability.families.R1-Distill-Llama.rr_ci 的 8B 上界 [0.088,0.208]、multihop.single_hop_anchor_8B.RR_ci 上界、以及各 rr_ci 内的点值副本),不是需在 ledger 里按 run-tag 消歧的独立回退-RR 值。『四』应核为『三』,或显式声明计入 CI 界的口径。这是全篇唯一数字瑕疵、非承重、build-time 可一行修复。
+
+### `anonymize_spec.md` — anonymize-E5  [revise]
+**处理**:⏳ fold-in:文件计数是 draft 估值,实测 WHYAAAI=53(非 38)、终极review=16(非 11);改实测或改'dozens/示例'口径(计数非 load-bearing,scrub-grep 运行时自查真值)。
+
+- 🔢 §2 ("a blacklist scrub ... would have to touch **38 files for WHYAAAI alone**") and §1 leak-table row L6 ("`WHYAAAI`... **38 tracked files**"): the count is wrong. `git grep -lI 'WHYAAAI'` at committed HEAD 955dda3 (2026-07-08, the same date the spec claims it scanned) returns **53** files, not 38. No charitable subset matches 38 either: excluding *.md internal docs = 45; code/config-only (yaml+sh+py+json) = 45. This is a ~28% undercount, and for a release-scrub spec it understates the residual-leak surface (the exact failure mode the tool guards against). Not a results.json value; verified against repo ground truth.
+- 🔢 §2 ("and **11 for `终极review`**"): wrong count. `git grep -lI '终极review'` at HEAD returns **16** files (analysis/10_jlens_workspace.md, 5×experiments/*.yaml, gap-review-charter.md, gap-review.md, paper/results.json, plan.md, results/a3_neutral/summary.json, review-charter.md, 4×src/*.py), not 11. No natural subset yields 11.
