@@ -745,6 +745,7 @@
   }
  },
  "logitlens": {
+  "_superseded_by": "rq2_logitlens._authoritative_record(B7 权威 n=23 / 峰值 decoder 58 / 降级为安装 sanity)。本顶层块=首版 32B 单跑记录,数字保留供审计但【写作勿取数】。⚠layers_sampled 是 hs 索引(gap 数组 len=nL+1),按 prereg hs[k]=decoder k−1:负 gap 带(−0.246@hs8 / −0.351@hs12)真值=decoder 7–11,严格在编辑层(12)上游——draft 六处'around edit layer 12'口径错,归 硬伤2(7/9)统一修。",
   "model": "32B",
   "edit_layer": 12,
   "n_layers": 64,
@@ -891,9 +892,9 @@
    "abstract L13/17/21/44(32B headline)recall 锚 0.59→0.765(0.59 是 7B 值;base_probe.32B.answer_old_b0=0.765)。",
    "§4 L164 / §7 L280 的 0.59 保留不动(7B math-confound 段,口径对)。",
    "§3 或 §7 新增 6 尺度 base-probe 表(Family/Model/n/ans_old@B0/@B3/Δthink/base-CLR/ans_new)+ caption:base recall 与 base-CLR 均随 scale 升(混淆原料),erosion 量的是 edited CHANGE 非 base LEVEL。",
-   "§RQ1 反混淆句:LEVEL vs CHANGE + 'confound 预测的 rising base-Δ 未观察到'(但注意 base Δ 显著性待 Cap3,勿说'反向漂移')。",
-   "§RQ2 诚实重述:删'绝对 CLR 高=侵蚀'与'edited<base=压制';CLR 降 supporting trend;因果引 M1 within-case;明标 CLR 涌现 base-floor 未闭合(待 Cap3)。",
-   "limitation(7/2 重跑后现行版):K=2 族的涌现推断边界(B5 口径:两高端 cell 各自显著+族内单调序承重,pooled/within 斜率降描述);CLR 涌现已退役(Cap3 net-CLR 含零);rr slope p=.052 擦边如实报;F1 margin 是跨口径近似差、per-case 配对 CI 待 B13;fix within-case 中介证据限 32B 单尺度(M1_scope);机理描述性 n 小+共享回退池(B9)。",
+   "§RQ1 反混淆句:LEVEL vs CHANGE + 'confound 预测的 rising base-Δ 未观察到'(base Δ 显著性已由 B13/F1 paired CI 闭合:Δ≈0 含零;仍勿说'反向漂移')。",
+   "§RQ2 诚实重述:删'绝对 CLR 高=侵蚀'与'edited<base=压制';CLR 降 supporting trend;因果引 M1 within-case;CLR 涌现 base-floor 已闭(Cap3 net-CLR 含零→退役,勿再写'未闭合待 Cap3')。",
+   "limitation(7/2 重跑后现行版):K=2 族的涌现推断边界(B5 口径:两高端 cell 各自显著+族内单调序承重,pooled/within 斜率降描述);CLR 涌现已退役(Cap3 net-CLR 含零);rr slope p=.052 擦边如实报;F1 margin 是跨口径近似差、per-case 配对 CI 已闭(B13:base Δ −0.020[−0.080,+0.040] n=199 含零=无系统性漂移);fix within-case 中介证据限 32B 单尺度(M1_scope);机理描述性 n 小+共享回退池(B9)。",
    "M4 后:§6 特异性句从 'vs inert placebo(T−P)' 升级为 'vs same-relation strong competitor(T−C,C≈N)';五臂图 N/T/D/P/C。",
    "G1 后:§7 cond-c [pending] 自供 → 有数边界句(hop_ES 0.513→0.487 无伤,erosion 点估 0.188→0.104 CI 重叠;限 8B/2-hop)。",
    "S10 后:§7 'fix 仅 32B 验证' limitation 改写为 '答案级修复 14B/32B 两尺度复现(T−N ES +0.135/+0.136);within-case 中介(M1)仍限 32B'。",
@@ -903,10 +904,17 @@
    "M4/B17 后:§6 修复特异性主报改走 T−C(四指标全排零含 RRs p=.032)而非 T−N(RRs p=.073);B17 的'验证口径上不显著'风险消除,RRs 可安全进主表。",
    "B15 PASS 后:contrib-3 升格版启用('grows with model capability — edit-specific and robust to per-case base-knowledge control');§4 加 B15 一句+分层彩蛋(燃料/引擎);图1 主板定 es_drop(G 节缓解:族内配对 CI+高端显著点高亮,RR 副板)。",
    "B11/K2′ 后:Discussion 的 KC 段可用主导措辞(25.0% vs 3.2%,8×)+ confabulation 注脚(1/31);与 B15 燃料/引擎互证。",
-   "B16 后:contrib-2/§5 数字更新——'bridge-dominant (68%), flat recall a real minority (22%), never-silent 49/50(1 例分裂票)';taxonomy 表加 5 新 cell(含首批 Llama);R3 preempt 改写为'50 committed reversions across 7 cells/2 families'。",
+   "B16 后:contrib-2/§5 数字更新——'bridge-dominant (68%), flat recall a real minority (22%), never-silent 49/50(1 例分裂票)';taxonomy 表加 5 新 cell(含首批 Llama);R3 preempt 改写为'50 committed reversions across 7 cells/2 families'。【headline 裁决 2026-07-08 必1】contrib-2 主口径=50-池 68%(B16);17-池中性重跑 82.4% 仅作伴报一句(neutral-judge robustness,勿混池,遵 b16_widened_pool 并列不混池纪律);S1 旧 '~81%/~90% bridge' 一律 superseded。",
    "V1 后:§3 metric 段加 CLR 极性验证注脚(判官验 37 链:paper 口径假阳≈6%,主为否定式;M1/RQ3 用途免疫)。",
    "B7 后:logit-lens 全文统一 n=23、峰值层改 decoder 58(hs59)、'100% intact(n=23)'同句、降级为安装 sanity(B23 无窗版)。",
-   "B26 后:§6 部署门用全量 n(1319/500);报点估 Δ(GSM8K +0.000/MATH −0.010,均<±0.02)+ 90%CI,措辞='deployment-caliber suppression leaves general-task accuracy within ±0.02 (point est.), CIs bound but not TOST-certified(paired per-item deferred)';acc_off 0.868/0.618 证旧 worstcase=harness 病(§7/附录一句)。**不写 certified equivalent**。"
+   "B26 后:§6 部署门用全量 n(1319/500);报点估 Δ(GSM8K +0.000/MATH −0.010,均<±0.02)+ 90%CI,措辞='deployment-caliber suppression leaves general-task accuracy within ±0.02 (point est.), CIs bound but not TOST-certified(paired per-item deferred)';acc_off 0.868/0.618 证旧 worstcase=harness 病(§7/附录一句)。**不写 certified equivalent**。",
+   "[S1→superseded-by-B16] contrib-2 旧 '~81% bridge / small flat-recall'(neutral_rerun_S1 17-池)已被 B16 50-池 68% 取代作 headline;17-池 82.4% 仅作中性重跑伴报一句。原始存 rq2_taxonomy.neutral_rerun_S1。",
+   "[S1→superseded-by-B16] §5 tab:taxonomy Recall 行:S1 '中性下 Recall≈2/16' 升为 B16 大池 Recall 22%(11/50);污染 vs 中性 17-池 vs 50-池并列不混。",
+   "[S1] necessity 段:Associative=0/traceless=0 存活(不改);'reconstructive re-derivation' 收紧为 'bridge-or-recall, never traceless'(与 B16 Associative 1/50、宽口径普查 0/17 互证)。",
+   "[S1] limitation:population 对判官 prompt 的敏感性(3/18 unique flip)如实报 + 中性重跑作 robustness appendix。",
+   "B13 后:F1 edit-specificity 的 per-case 配对 bootstrap CI 已闭(airtight)——base ΔP(o_old) B0→B3 = −0.020 [−0.080,+0.040] n=199 含零 → limitation 里所有 '配对 CI 待' 清零;§RQ1/§7 写 'base 无系统性向 o_old 漂移(配对 CI 含零)',仍禁 '反向漂移'。",
+   "B12 后:M5 反思标记分层=退化观察(反思标记在 R1 链近乎无处不在,114 vs 4)→ 反思是常量非变量、不能作 'override 动作 vs o_old 内容' 的判别杠杆;修复效应在反思链内仍显著(T−N RR −0.105 [−0.175,−0.044] 排零)。§6 或 limitation 一句;M5 GPU 臂维持 camera-ready、DROP 不变。",
+   "W 系列(W-A/W-B)占位条——⚠内容待 7/14 内审裁决,勿据此开写正文。【禁】勿按 plan v1.62 '仪器诚实节 W-B G7 负结果一句' 写:该指令已被 v1.63/64 事实推翻(G7 二跑 PASS)。W-B 真相=G7-PASS → 确证臂 B1-FAIL 的 dissociation 才是负结果(概念方向注入压链内 o_old 言语化 S−Pshuf CLR −.078 排零,但答案回退 RR 全含零纹丝不动;prereg:appendix,正文禁 mediation/concept-fix 措辞,一句 cross-ref)。W-A 数字(诚实版,suggest 档):G5 premention 65/65=100% PASS、A2 AUC .507 perm p=.487 n=[10,30] 干净 null、A3 −0.075 [−0.172,+0.016] 含零(edited≈base 绕过说)、G4 fail(4/29)→ A1 不可判(既不能说无声泄漏存在也禁写'从不无声')。W-B appendix 三臂行:S n144 ES .556/RR .180/CLR .417/LocAcc .570;Pshuf n144 ES .507/RR .189/CLR .465/LocAcc .597;N n198 ES .495/RR .193/CLR .545/LocAcc .625。取数一律从 wa_main / wb_representation_repair.confirm_arms 数据块,勿从 _verdict_714 预判句。"
   ],
   "_six_scale_summary": {
    "_def": "6 尺度未编辑 base:answer_old_b0=知识天花板(LEVEL);chain_old_b3=base CLR 底噪(LEVEL);delta_think=B0→B3 净漂(CHANGE 对照)。",
@@ -1074,6 +1082,7 @@
     "_note": "分母双口径:行=(scale,case);unique=跨尺度去重 case_id。"
    },
    "verdict": "★S1(★2 修复后):(1) Recall 0→2 = 'no flat recall' 部分仪器制造被证伪;(2) Bridge 仍主导(14/17≈82% vs 污染 89%);(3) Associative=0 = 'committed 回退从不 traceless' 去污后依然成立;(4) population 判官敏感 3/19 行(unique 口径 3/18)。",
+   "_draft_edits_status": "⚠已并入 base_probe._pending_draft_edits(2026-07-08 必1 归一 pass):#1/#2 标 superseded-by-B16(headline=50-池 68%,17-池 82.4% 伴报),#3/#4 存活。下方 draft_edits_pending 为存档原文,写作以 _pending_draft_edits 为准、勿双取。",
    "draft_edits_pending": [
     "abstract/§1 contrib-2 '90% bridge, no flat recall' → 'bridge-dominant (~81% under neutral judges), with a small but non-zero flat-recall rate (~2/16) once the anti-recall prime is removed'",
     "§5 tab:taxonomy Recall=0 行 → 中性下 Recall≈2/16(报污染 vs 中性两列 + 一致性)",
