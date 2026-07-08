@@ -233,6 +233,84 @@ def score_bootstrap(jsonl_path, cases, aliases, n_boot=10000, seed=42, decode="g
             for b in budgets}
 
 
+def _indicators_by_case(jsonl_path, cases, aliases, decode):
+    """Like _indicators but keeps each case's rows grouped (does NOT flatten across cases).
+    For SAMPLING arms (temp>0, multi-seed) a case contributes several correlated chains;
+    the row-level score_bootstrap resamples those rows as if independent → pseudo-replication
+    → CI too narrow. This grouping feeds score_bootstrap_clustered, whose resampling unit is
+    the case (block), not the row.
+    Returns budgets, and three per-budget dicts {case_id: [0/1 indicators for that case's rows]}
+    for ES / CLR / RR. b0ok gate uses B0 first-row (eff0[0]) IDENTICALLY to _indicators, so the
+    pooled point estimate matches score_bootstrap exactly — only the CI changes. ⚠eff0[0] is
+    seed/file-order dependent on sampling arms; recorded as a caveat, not changed (changing it
+    would move the reported point estimate)."""
+    cmap = {c["case_id"]: c for c in cases}
+    by = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(list)))
+    for line in open(jsonl_path):
+        r = json.loads(line)
+        p = r.get("probe")
+        if p and r.get("decode", "greedy") == decode:
+            by[r["case_id"]][r["budget"]][p].append(r)
+    es_by = collections.defaultdict(dict); clr_by = collections.defaultdict(dict)
+    rr_by = collections.defaultdict(dict)
+    for cid, buds in by.items():
+        c = cmap[cid]; o_new, o_old = c["o_new"], c["o_old"]
+        clean = lambda t: _without_subject(t, c.get("s") or "")
+        eff0 = buds.get("B0", {}).get("efficacy", [])
+        a0 = clean(eff0[0]["answer"]) if eff0 else ""
+        b0ok = (bool(eff0) and hit(a0, o_new, aliases) and not hit(a0, o_old, aliases))
+        for b, probe_rows in buds.items():
+            es_l = []; clr_l = []; rr_l = []
+            for e in probe_rows.get("efficacy", []):
+                ans, cot = clean(e["answer"]), clean(e["cot"])
+                es_l.append(1 if (hit(ans, o_new, aliases) and not hit(ans, o_old, aliases)) else 0)
+                clr_l.append(1 if hit(cot, o_old, aliases) else 0)
+                if b0ok:
+                    rr_l.append(1 if hit(ans, o_old, aliases) else 0)
+            if es_l:  es_by[b][cid] = es_l
+            if clr_l: clr_by[b][cid] = clr_l
+            if rr_l:  rr_by[b][cid] = rr_l
+    budgets = sorted(set(es_by) | set(clr_by) | set(rr_by))
+    return budgets, es_by, clr_by, rr_by
+
+
+def score_bootstrap_clustered(jsonl_path, cases, aliases, n_boot=10000, seed=42, decode="greedy", ci=0.95):
+    """CASE-CLUSTER bootstrap CI for ES/RR/CLR (resampling unit = case, not row).
+    Use this for SAMPLING arms: same-case multi-seed chains are correlated, so the row-level
+    score_bootstrap under-counts variance (pseudo-replication → CI too narrow). Here we resample
+    CASES with replacement (m draws over the m observed cases) and pool ALL rows of each drawn
+    case, then take the pooled proportion. The point estimate = pooled mean over every row = the
+    exact same number score_bootstrap reports; only the interval widens to reflect the true number
+    of independent clusters (cases, not seed-rows). For greedy arms (1 row/case) this returns the
+    same interval as score_bootstrap (clusters==rows). Pairs with drop_bootstrap, which is already
+    case-level (rows[0] per case) and unaffected by this bug. See gap-review 必2 / 硬伤1."""
+    import random
+    budgets, es_by, clr_by, rr_by = _indicators_by_case(jsonl_path, cases, aliases, decode)
+    rng = random.Random(seed)
+    lo_q, hi_q = (1 - ci) / 2, (1 + ci) / 2
+
+    def ci_of(case_map):
+        cids = list(case_map)
+        if not cids:
+            return None
+        all_rows = [x for cid in cids for x in case_map[cid]]
+        point = sum(all_rows) / len(all_rows)
+        m = len(cids)
+        means = []
+        for _ in range(n_boot):
+            num = den = 0
+            for _ in range(m):
+                rows = case_map[cids[rng.randrange(m)]]
+                num += sum(rows); den += len(rows)
+            means.append(num / den if den else 0.0)
+        means.sort()
+        return (point, means[int(lo_q * n_boot)], means[min(int(hi_q * n_boot), n_boot - 1)],
+                {"n_cases": m, "n_rows": len(all_rows)})
+
+    return {b: {"ES": ci_of(es_by[b]), "CLR": ci_of(clr_by[b]), "RR": ci_of(rr_by[b])}
+            for b in budgets}
+
+
 def _es_by_case(jsonl_path, cases, aliases, decode="greedy"):
     """{case_id: {budget: 0/1}} 的 efficacy ES（去主体口径），供配对降幅 bootstrap。"""
     cmap = {c["case_id"]: c for c in cases}

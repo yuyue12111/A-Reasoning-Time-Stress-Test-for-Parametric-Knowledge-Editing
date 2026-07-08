@@ -211,10 +211,53 @@ def test_drop_bootstrap():
         assert -1 <= lo <= pt <= hi <= 1, f"{b} 降幅 CI 异常(应 -1≤lo≤点估≤hi≤1): {d[b]}"
 
 
+def _scenario_sampling(path):
+    """采样臂：4 case,每 case B3 有 3 条【同 seed 完全一致】行 → 组内完美相关。
+    行级 bootstrap 把 12 行当独立(CI 过窄=伪复制);case 聚类 bootstrap 只见 4 簇(CI 更宽)。
+    o_old=Paris, o_new=Rome;cf_0/cf_1 守住(Rome)、cf_2/cf_3 回退(Paris)。"""
+    rows = []
+    for cid in ("cf_0", "cf_1", "cf_2", "cf_3"):     # B0 都答 o_new → b0ok=True
+        rows.append({"case_id": cid, "budget": "B0", "probe": "efficacy",
+                     "decode": "sample", "seed": 0, "answer": "Rome", "cot": ""})
+    for cid, ans in (("cf_0", "Rome"), ("cf_1", "Rome"), ("cf_2", "Paris"), ("cf_3", "Paris")):
+        for s in (0, 1, 2):                          # 3 条一致 seed 行
+            rows.append({"case_id": cid, "budget": "B3", "probe": "efficacy",
+                         "decode": "sample", "seed": s, "answer": ans,
+                         "cot": ("it is Paris" if ans == "Paris" else "")})
+    with open(path, "w", encoding="utf-8") as f:
+        for r in rows:
+            f.write(json.dumps(r) + "\n")
+
+
+def test_score_bootstrap_clustered():
+    fd, path = tempfile.mkstemp(suffix=".jsonl"); os.close(fd)
+    _scenario_sampling(path)
+    cases = [{"case_id": c, "o_old": "Paris", "o_new": "Rome"} for c in ("cf_0","cf_1","cf_2","cf_3")]
+    row = metrics.score_bootstrap(path, cases, {}, n_boot=2000, seed=1, decode="sample")
+    cl = metrics.score_bootstrap_clustered(path, cases, {}, n_boot=2000, seed=1, decode="sample")
+    cl2 = metrics.score_bootstrap_clustered(path, cases, {}, n_boot=2000, seed=1, decode="sample")
+    os.remove(path)
+    # (1) 点估三指标都与行级一致(0.5)——聚类只改 CI 不改点估
+    for m in ("ES", "RR", "CLR"):
+        assert abs(cl["B3"][m][0] - 0.5) < 1e-9, f"{m} 点估应 0.5(与行级同): {cl['B3'][m]}"
+        assert abs(cl["B3"][m][0] - row["B3"][m][0]) < 1e-9, f"{m} 点估须=行级 {row['B3'][m][0]}"
+    # (2) 组内完美相关下,聚类 CI 必宽于行级 CI(伪复制被纠正)
+    for m in ("ES", "RR", "CLR"):
+        rw = row["B3"][m]; cw = cl["B3"][m]
+        assert (cw[2] - cw[1]) > (rw[2] - rw[1]), \
+            f"{m} 聚类 CI 应宽于行级: 聚类{cw[1:3]} vs 行级{rw[1:3]}"
+    # (3) meta 记 n_cases=4 / n_rows=12;可复现;区间合法
+    assert cl["B3"]["ES"][3] == {"n_cases": 4, "n_rows": 12}, f"meta: {cl['B3']['ES'][3]}"
+    assert cl == cl2, "同 seed 聚类 bootstrap 应可复现"
+    for m in ("ES", "RR", "CLR"):
+        pt, lo, hi = cl["B3"][m][:3]
+        assert 0 <= lo <= pt <= hi <= 1, f"{m} 聚类 CI 越界: {cl['B3'][m]}"
+
+
 TESTS = [test_hit_alias_case_and_none, test_score_exact,
          test_paraphrase_locality_and_decode_filter, test_none_metrics_when_probe_absent,
          test_flip_analysis, test_score_esf_and_flip, test_subject_substring_guard,
-         test_score_bootstrap, test_drop_bootstrap]
+         test_score_bootstrap, test_drop_bootstrap, test_score_bootstrap_clustered]
 
 
 def _main():

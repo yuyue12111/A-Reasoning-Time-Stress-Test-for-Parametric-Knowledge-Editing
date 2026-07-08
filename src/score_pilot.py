@@ -44,6 +44,9 @@ def main():
     ap.add_argument("--editor", required=True)
     ap.add_argument("--boot", type=int, default=10000, help="bootstrap 次数(plan §2.5 n=10000)；0 跳过")
     ap.add_argument("--decode", default="greedy", help="解码臂 greedy/sample（采样臂须 sampling.enabled 跑过）")
+    ap.add_argument("--cluster", action="store_true",
+                    help="额外出【case 聚类】bootstrap CI（采样臂必用:同 case 多 seed 链非独立,"
+                         "行级重采样=伪复制→CI 过窄;聚类按 case 整块重采样。见 gap-review 必2/硬伤1）")
     ap.add_argument("--drop-degenerate", action="store_true",
                     help="丢弃【答案退化(模型损坏)】的整条 case —— 抢救 model_parallel 70B 部分 case 被编辑累积搞坏的分片")
     args = ap.parse_args()
@@ -99,6 +102,18 @@ def main():
         cif = lambda t: f"{t[0]:.3f} [{t[1]:.3f},{t[2]:.3f}]" if t else "—"
         for b in bs:
             print(f"{b:<7}{cif(bs[b]['ES']):>24}{cif(bs[b]['RR']):>24}{cif(bs[b]['CLR']):>24}")
+
+        if args.cluster:                           # gap-review 必2：case 聚类 CI（采样臂唯一正确口径）
+            cbs = metrics.score_bootstrap_clustered(merged, cases, aliases, n_boot=args.boot, decode=args.decode)
+            print(f"\n【case 聚类】95% bootstrap CI (n={args.boot}, 重采样单位=case,非 row)——采样臂多 seed 链非独立、行级 CI 伪复制过窄:")
+            print(f"{'budget':<7}{'ES [lo, hi]':>24}{'RR [lo, hi]':>24}{'CLR [lo, hi]':>24}{'  n_case/n_row'}")
+            cif4 = lambda t: f"{t[0]:.3f} [{t[1]:.3f},{t[2]:.3f}]" if t else "—"
+            meta = lambda b: next((cbs[b][m][3] for m in ("ES","RR","CLR") if cbs[b].get(m)), {})
+            for b in cbs:
+                mt = meta(b)
+                print(f"{b:<7}{cif4(cbs[b]['ES']):>24}{cif4(cbs[b]['RR']):>24}{cif4(cbs[b]['CLR']):>24}"
+                      f"  {mt.get('n_cases','?')}/{mt.get('n_rows','?')}")
+            print("  ↑点估与行级完全相同,只 CI 变宽;贪心臂(1 row/case)聚类=行级。写作/发布用【聚类】口径(呼应 draft §3.6 'resampling n facts')。")
 
         drop = metrics.drop_bootstrap(merged, cases, aliases, base="B0", n_boot=args.boot, decode=args.decode)
         print(f"\nES 降幅 ES(B0)−ES(b) 配对 bootstrap（plan §2.5；越想越退主判据，CI 全>0=显著回退）：")
