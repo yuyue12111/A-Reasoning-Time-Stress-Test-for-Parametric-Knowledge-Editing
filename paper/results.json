@@ -1177,11 +1177,11 @@
    },
    "_kappa_C2": {
     "_status": "C2(gap-review;src/b16_kappa.py 从 results/b16_verdicts.json 补算,3 中性判官)——给 68% 合并池的判官一致性基座(原 50-池合并表无 κ)。",
-    "panel_all_votes": "全 68 新链×6 类目(含 Excluded-held/degenerate=in-pop 判定+路由整体信度):Fleiss κ=0.863,P̄=0.912",
-    "inpop_routing": "33 in-pop 链路由 κ=0.789,P̄=0.879——与原 17-池 fleiss_kappa_inpop=0.765 同量级(substantial→almost-perfect)",
+    "combined_50pool": "★真·合并 50-池(原 neutral 17 + 新 33;src/b16_kappa.py 载 a3_neutral/verdicts_all + b16_verdicts):**in-pop 路由 Fleiss κ=0.790(P̄=0.893)、panel κ=0.875(P̄=0.921)**;neutral-17 复算 κ=0.765 自洽(=neutral_rerun_S1 记录)。→ 68% headline 的一致性基座=κ 0.79(substantial)。",
+    "new33_only": "新 5 cell 子集(33 in-pop):κ=0.789 P̄=0.879;panel(68 新链×6 类目)κ=0.863 P̄=0.912。",
     "per_cell_inpop_kappa": "qwen32b-F2B1=1.0/qwen32b-sample=1.0/llama70b=0.870/llama8b=0.391(n=7)/qwen1.5b=0.25(n=2);低端两 cell κ 低=小 n 不稳(同 7B κ=−0.091 现象,与 P̄ 同报)",
-    "provenance_inpop": "50-池=原 17(7B/14B/32B greedy 中性)+ 新 33(qwen32b-F2B1 10 / llama70b 8 / llama8b 7 / qwen32b-sample 6 / qwen1.5b 2);各 cell 名即 run/解码 provenance,jsonl=results/b16_verdicts.json",
-    "write_note": "写作报 68% headline 时伴报『panel κ=0.863;in-pop 路由 κ=0.789,与原池 0.765 一致』;低端小 cell 报计数+P̄、勿单报其 κ。"
+    "provenance_inpop": "50-池=原 17(7B/14B/32B greedy 中性,a3_neutral)+ 新 33(qwen32b-F2B1 10 / llama70b 8 / llama8b 7 / qwen32b-sample 6 / qwen1.5b 2,b16_verdicts);各 cell 名即 run/解码 provenance",
+    "write_note": "写作报 68% headline 伴报『合并 50-池 in-pop κ=0.790、panel κ=0.875;与原 17-池 0.765 一致』;低端小 cell 报计数+P̄、勿单报其 κ。table_rq2.tex 已按此重生成(两池并列+κ 行)。"
    },
    "verdict": "★B16 DONE:机理分母 17→**50 committed reversions**(7 cell/2 族/3 解码-剂量配置)——R3『20 case 撑四结果』拆掉。跨族复现:Llama 8B/70B 同为 Bridge-or-Recall 主导。修正后的路由图景:Bridge 68% 主导、Recall 22%(S1 的'去 prime 后 Recall 非零'在大池坐实=flat recall 是真实少数路由)、RO 8%(4/4 在高能力 cell:70B 3 + 32B 1=Reflective-override 只在高能力 cell 出现的观察,n 小只报计数)、**Associative 1/50(且该例 2-1 分裂票)= 'committed 回退几乎从不无声'在判官级+大池下成立**(与宽口径普查 0/17 互证)。"
   }

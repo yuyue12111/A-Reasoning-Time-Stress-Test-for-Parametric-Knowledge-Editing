@@ -69,6 +69,24 @@ def main():
     # provenance:33 in-pop 链各来自哪个 cell(run/解码编码在 cell 名里)
     out["provenance_inpop"] = collections.Counter(c["cell"] for c in inpop)
 
+    # ③ 合并 50-池(原 neutral 17 + 新 33)——给 68% headline 一个真·合并 κ
+    neu_path = os.path.join(_ROOT, "results", "a3_neutral", "verdicts_all.jsonl")
+    if os.path.exists(neu_path):
+        neu = [json.loads(l) for l in open(neu_path) if l.strip()]
+        neu_chains = [{"votes": [v.get("primary") for v in r["votes"]],
+                       "in_pop": sum(1 for v in r["votes"] if v.get("in_population")) >= 2} for r in neu]
+        new_chains = [{"votes": c["votes"], "in_pop": c["in_pop"]} for c in pc]
+        comb = neu_chains + new_chains
+        comb_ip = [c for c in comb if c["in_pop"]]
+        kp, pbp, _, _, Np = fleiss(_counts(comb))
+        ki, pbi, _, _, Ni = fleiss(_counts(comb_ip))
+        kn, _, _, _, _ = fleiss(_counts([c for c in neu_chains if c["in_pop"]]))
+        out["combined_50pool"] = {
+            "panel_all_votes": {"n": Np, "fleiss_kappa": round(kp, 4), "raw_agreement_pbar": round(pbp, 4)},
+            "inpop_routing": {"n": Ni, "fleiss_kappa": round(ki, 4), "raw_agreement_pbar": round(pbi, 4)},
+            "neutral17_inpop_kappa_sanity": round(kn, 4) if kn is not None else None,
+            "_note": "合并=原 neutral 17(a3_neutral/verdicts_all)+新 33(b16);neutral17 κ 应≈0.765(neutral_rerun_S1 记录)=复算自洽。"}
+
     dst = os.path.join(_ROOT, "results", "b16_kappa.json")
     json.dump(out, open(dst, "w"), ensure_ascii=False, indent=1)
     print(json.dumps(out, ensure_ascii=False, indent=1))
