@@ -83,6 +83,7 @@
 
 - **G3s(采样链保真门,7/7 登记)**:采样链的 G3(argmax≥95%)口径错配(temp 0.6 下 argmax 一致率天然 ~0.88 且高=保真好)→ 采样链改判 **存盘 token ∈ teacher-forced top-20 ≥95%**(G3s)。greedy 链仍用 G3。首轮 s0 数据(g3_pass=0)按 G3s 重判,exploratory 标签待 G3s 通过率出来后定。
 - 扩展梯顺序:W-A×F3 采样(s0/s1/s2)→ W-A×MEMIT-14B → W-A×14B ROME → W-A×Llama-8B;各自 CONSORT 独立,不与主 W-A 混池。
+- **G5 操作化偏离(7/8 事后登记,诚实标注;硬伤4)**:冻结 prereg 的 spike 判据(§本文 line 37)把 premention 检出钉为 **distractor max-stat**——o_old 的「带×窗 max-z」须超全部 20 个 distractor(每个 distractor 同法算,精确 p=1/21≈0.048)。但实跑 `src/wa_main_analyze.py`(键 `G5_base_premention_z2`)用的是 **固定 z≥2 阈值**(band[16,48] 的 `zpre_max≥2`),并非 max-stat。git 考古:该操作化随分析脚本 + `G5=100%` 结果在**同一 commit 39ca2e9(2026-07-07 15:37)落地**,无更早冻结 z≥2 的记录 → **无法证明 z≥2 早于开盲**。故按 v1.61「操作化改动开盲前须写进 prereg」纪律【不】追认为 prereg 变体;W-A 报告句如实标 **"G5 operationalized post-hoc (fixed z≥2 variant; the frozen criterion was a distractor max-stat)"**,`G5=100%` 读作「z≥2 口径下基座前窗普遍可探到 o_old」而非 prereg-认证的灵敏度门。**降级**:§6 表「W-A 干净」里的「G5≥80%」从硬门降为 **suggestive 支持**(A2 null / A3 / G4 走各自冻结口径,不受牵连)。**7/14 裁决材料**:若要 prereg-正确的 max-stat G5,须回传 `results/wa/base_r*of8.jsonl`(含 per-distractor `z_pre_by_layer`)按 max-stat 重算;在此之前 G5 只作 suggestive。
 
 ## 8 跑前零卡必做(今天)
 
