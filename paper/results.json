@@ -726,7 +726,7 @@
      -0.0217,
      0.0217
     ],
-    "tost": "⚠CI 超界,报 Δ+CI 不称等价"
+    "tost": "未证(90%CI ±0.0217 略超 ±0.02);点估 Δ 0.000"
    },
    "math500": {
     "n": 500,
@@ -737,10 +737,11 @@
      -0.0607,
      0.0407
     ],
-    "tost": "⚠CI 超界,报 Δ+CI 不称等价"
+    "tost": "未证(90%CI [−0.061,+0.041] 超 ±0.02;n=500 功效不足);点估 Δ −0.010"
    },
    "baseline_health": "★acc_off 全量=GSM8K 0.868/MATH 0.618——远高于旧最坏界 harness 的 0.535/0.150(B3 截断病),证实旧 worstcase 是 harness 欠测非真伤;部署口径基线健康。",
-   "verdict": "★B26 DONE:部署门从'点估通过'升级为'TOST 认证':chain-only 抑制器对非编辑 query 通用能力GSM8K Δ +0.000 / MATH Δ −0.010,全量 n 下 90%CI 收紧;'bounded null'→接近'certified equivalent within ±0.02'(MATH 的 CI 上界贴界处如实报 Δ+CI)。RQ3 部署安全腿闭合。"
+   "verdict": "★B26 诚实版:全量 n 下 chain-only 抑制器对非编辑 query 通用能力【点估 Δ≈0】(GSM8K +0.000 / MATH −0.010,均 <±0.02);但**保守两比例 90%CI 未收进 ±0.02**,等价【未认证】。根因:off/on 同题同模型高度相关,配对(McNemar)CI 会紧得多,但 per-item 配对数据未回传(只回了聚合 acc)。→ 写作口径:报『点估 Δ + 90%CI』,称『point-equivalent / Δ 落在 ±0.02 内』,**不称 certified equivalent**;若要认证需平台回传 per-item off/on 命中(camera-ready 可补,非必需)。acc_off 0.868/0.618 证旧 worstcase 是 harness 病仍成立。",
+   "_CORRECTION": "⚠上一 commit(8d748e8)标题'TOST 认证'【过度宣称】:实算两比例(未配对)90%CI 超 ±0.02(GSM8K ±0.0217,MATH [−0.061,+0.041])→ 等价【未证】。诚实版见下。"
   }
  },
  "logitlens": {
@@ -905,7 +906,7 @@
    "B16 后:contrib-2/§5 数字更新——'bridge-dominant (68%), flat recall a real minority (22%), never-silent 49/50(1 例分裂票)';taxonomy 表加 5 新 cell(含首批 Llama);R3 preempt 改写为'50 committed reversions across 7 cells/2 families'。",
    "V1 后:§3 metric 段加 CLR 极性验证注脚(判官验 37 链:paper 口径假阳≈6%,主为否定式;M1/RQ3 用途免疫)。",
    "B7 后:logit-lens 全文统一 n=23、峰值层改 decoder 58(hs59)、'100% intact(n=23)'同句、降级为安装 sanity(B23 无窗版)。",
-   "B26 后:§6 部署门用全量 n(1319/500)+ TOST 表述(GSM8K Δ 0.000/MATH −0.010,90%CI);acc_off 0.868/0.618 证旧 worstcase 是 harness 病(§7 或附录一句);删'bounded null'改'certified within ±0.02'(MATH 贴界如实)."
+   "B26 后:§6 部署门用全量 n(1319/500);报点估 Δ(GSM8K +0.000/MATH −0.010,均<±0.02)+ 90%CI,措辞='deployment-caliber suppression leaves general-task accuracy within ±0.02 (point est.), CIs bound but not TOST-certified(paired per-item deferred)';acc_off 0.868/0.618 证旧 worstcase=harness 病(§7/附录一句)。**不写 certified equivalent**。"
   ],
   "_six_scale_summary": {
    "_def": "6 尺度未编辑 base:answer_old_b0=知识天花板(LEVEL);chain_old_b3=base CLR 底噪(LEVEL);delta_think=B0→B3 净漂(CHANGE 对照)。",
