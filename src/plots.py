@@ -1,9 +1,13 @@
-"""论文出图(plan v1.27)。从 paper/results.json + (有则)logit-lens jsonl 出三图/表 → paper/*.pdf+png。
+"""论文出图(plan v1.66 / gap-review 必5 重写)。从 paper/results.json + (有则)logit-lens jsonl 出图/表 → paper/*.pdf+png。
 
-  python src/plots.py [--results paper/results.json] [--logitlens results/probe/logitlens_cf200_ROME_B3.jsonl]
+  python src/plots.py [--results paper/results.json] [--logitlens ...] [--clr-teaching]
 
-图1 = capability 曲线(ES 降幅/CLR/RR × 模型规模,带 CI,ES 降幅标显著性);
-图2 = logit-lens 逐层 gap=logit(o_new)−logit(o_old)(有 jsonl 走全分辨率+band,否则用 results.json 采样点);
+图1(重写,承重规格)= **ES 降幅主板**(族内配对 CI + Qwen-32B/Llama-70B 双星标,承重)
+                    + **RR 单调副板**(承重支撑)
+                    + **CLR 可选教学板**(`--clr-teaching`;必带 base 底噪虚线=edited CLR 贴 base 底噪→net-CLR≈0 退役)。
+   ——旧版把 CLR 画成与 ES 降幅并列主面板,会被审稿人当涌现主证据(与 CLR 退役裁决自相矛盾);故 CLR 降为默认不出的教学板。
+图2 = logit-lens 逐层 gap=logit(o_new)−logit(o_old)。⚠横轴是 hs 索引(硬伤2:负带真值=decoder 7–11 编辑层上游),
+      draft 口径统一在 硬伤2 修;此处按 hs 采样点画,标注编辑层。
 图3 = RQ3 A/B(baseline vs suppress;genbench 填了就并入)。纯 CPU,只需 matplotlib。
 """
 import argparse, json, os
@@ -36,37 +40,99 @@ def _families(cap):
 _FAM_STYLE = [("#1f77b4", "o", "-"), ("#ff7f0e", "s", "--"), ("#9467bd", "D", "-.")]
 
 
-def fig1_capability(cap):
-    """capability-emergent 跨族曲线:1×3 面板(ES 降幅 / CLR / RR),每族一条线、带 CI、ES 降幅标显著性。
-    单族数据时退化为 3 面板各一条线(仍可读),不报错。族里缺某指标/缺 CI 都跳过、不崩。"""
+def _pkey(p):
+    """param(float)→ base_clr_b3 的 scale 键:1.5→'1.5B'、7→'7B'、70→'70B'(:g 去尾零)。"""
+    return f"{p:g}B"
+
+
+def _series(ax, x, y, ci, **kw):
+    """画一条带(可选)非对称 CI 误差棒的线;缺 CI 就退化成普通线。"""
+    if ci and len(ci) == len(y):
+        lo = [v - c[0] for v, c in zip(y, ci)]; hi = [c[1] - v for v, c in zip(y, ci)]
+        ax.errorbar(x, y, yerr=[lo, hi], capsize=3, **kw)
+    else:
+        ax.plot(x, y, **kw)
+
+
+def fig1_capability(cap, base_clr=None, clr_teaching=False):
+    """capability-emergent 跨族图(gap-review 必5 承重规格):
+      主板 = ES 降幅(族内配对 CI + 高端显著 cell 双星标 0.106/0.107)——承重;
+      副板 = RR 单调曲线(带 CI)——承重支撑;
+      [可选] 教学板 = CLR(edited)vs base 底噪(虚线)——edited 贴 base 底噪→net-CLR≈0,退役,默认不出。
+    单族数据不崩;族里缺某指标/CI 跳过。70B 取数走 capability.families headline(n=187)。"""
     fams = _families(cap)
-    metrics = [("es_drop", "ES drop (B0→B3)"), ("clr", "CLR (chain leak)"), ("rr", "RR (answer reverts)")]
-    fig, axes = plt.subplots(1, 3, figsize=(11.5, 3.4))
     allx = sorted({p for _, s in fams for p in s.get("params_b", [])})
-    for ax, (key, ylabel) in zip(axes, metrics):
+    ncol = 3 if (clr_teaching and base_clr) else 2
+    wr = [1.55, 1.05, 1.05][:ncol]
+    fig, axes = plt.subplots(1, ncol, figsize=(4.15 * ncol + 0.4, 3.7),
+                             gridspec_kw={"width_ratios": wr})
+    ax_es, ax_rr = axes[0], axes[1]
+
+    # ── 主板:ES 降幅(承重)──
+    for (fname, s), (color, marker, ls) in zip(fams, _FAM_STYLE):
+        x = s.get("params_b"); y = s.get("es_drop")
+        if not x or not y:
+            continue
+        _series(ax_es, x, y, s.get("es_drop_ci"), label=fname, color=color, marker=marker, ls=ls, lw=2)
+        for xi, d, sig in zip(x, y, s.get("es_drop_sig", [False] * len(x))):   # 高端显著 cell 双星标+值
+            if sig:
+                ax_es.annotate(f"$\\star$ {d:.3f}", (xi, d), textcoords="offset points",
+                               xytext=(6, 6), color=color, fontsize=11, fontweight="bold")
+    ax_es.axhline(0, color="gray", lw=0.8, ls=":")
+    ax_es.set_ylabel(r"ES drop  (ES$_{B_0}$ $-$ ES$_{B_3}$)")
+    ax_es.set_title("Edit erosion — load-bearing\n(significant only at matched high-end cells)", fontsize=9)
+
+    # ── 副板:RR 单调(承重支撑)──
+    for (fname, s), (color, marker, ls) in zip(fams, _FAM_STYLE):
+        x = s.get("params_b"); y = s.get("rr")
+        if not x or not y:
+            continue
+        _series(ax_rr, x, y, s.get("rr_ci"), label=fname, color=color, marker=marker, ls=ls, lw=2)
+    ax_rr.set_ylabel(r"RR  (answer reverts to $o_\mathrm{old}$)")
+    ax_rr.set_title("Reversion rate — monotone (supporting)", fontsize=9)
+
+    # ── 可选教学板:CLR vs base 底噪(退役证据)──
+    if clr_teaching and base_clr:
+        ax_clr = axes[2]
         for (fname, s), (color, marker, ls) in zip(fams, _FAM_STYLE):
-            x = s.get("params_b"); y = s.get(key)
+            x = s.get("params_b"); y = s.get("clr")
             if not x or not y:
                 continue
-            ci = s.get(key + "_ci")
-            if ci and len(ci) == len(y):
-                lo = [v - c[0] for v, c in zip(y, ci)]; hi = [c[1] - v for v, c in zip(y, ci)]
-                ax.errorbar(x, y, yerr=[lo, hi], label=fname, color=color, marker=marker, ls=ls, capsize=3, lw=2)
-            else:
-                ax.plot(x, y, label=fname, color=color, marker=marker, ls=ls, lw=2)
-            if key == "es_drop":                                   # 显著性星标(逐族同色)
-                for xi, d, sig in zip(x, y, s.get("es_drop_sig", [False] * len(x))):
-                    if sig:
-                        ax.annotate("*", (xi, d), textcoords="offset points", xytext=(4, 4), color=color, fontsize=14)
-        ax.axhline(0, color="gray", lw=0.8, ls=":")
+            ax_clr.plot(x, y, label=f"{fname} (edited)", color=color, marker=marker, ls=ls, lw=2)
+            bf = [base_clr.get(_pkey(p)) for p in x]
+            if all(v is not None for v in bf):
+                ax_clr.plot(x, bf, label=f"{fname} (base floor)", color=color, ls=":",
+                            lw=1.6, marker="x", alpha=0.85)
+        ax_clr.set_ylim(0, 1)
+        ax_clr.set_ylabel(r"CLR  (chain leak of $o_\mathrm{old}$)")
+        ax_clr.set_title("CLR vs base noise floor — teaching\n(edited tracks base $\\Rightarrow$ net-CLR$\\approx$0, retired)", fontsize=9)
+
+    for ax in axes:                                   # x 轴统一 log + 尺度刻度
         if allx:
-            ax.set_xscale("log"); ax.set_xticks(allx); ax.set_xticklabels([f"{p}B" for p in allx], fontsize=8)
-        ax.set_xlabel("model size (params)"); ax.set_ylabel(ylabel); ax.grid(alpha=0.25)
-    if len(fams) > 1:
-        axes[0].legend(fontsize=7, frameon=False)          # 多族才需图例(单族族名即标题)
-    fig.suptitle("Thinking erodes editing — capability-emergent" + (" (cross-family)" if len(fams) > 1 else ""), y=1.03)
+            ax.set_xscale("log"); ax.set_xticks(allx); ax.set_xticklabels([f"{p:g}B" for p in allx], fontsize=8)
+        ax.set_xlabel("model size (params, log)"); ax.grid(alpha=0.25)
+    axes[0].legend(fontsize=7, frameon=False, loc="upper left")
+    if clr_teaching and base_clr:
+        axes[2].legend(fontsize=6, frameon=False, loc="upper left")
+    fig.suptitle("Thinking erodes editing — capability-emergent (cross-family)", y=1.02, fontsize=11)
     fig.tight_layout()
     _save(fig, "fig1_capability"); plt.close(fig)
+    _print_fig1_caption()
+
+
+def _print_fig1_caption():
+    """打印建议 LaTeX caption(B5 纪律;写进 .tex 前复核数字)——图本身保持干净,统计措辞随文走。"""
+    print("  [fig1 建议 caption(B5 纪律,入 .tex 前逐字复核)]:")
+    print("    Thinking erodes parametric edits, and the erosion is capability-emergent. "
+          "Main: ES drop (ES@$B_0$ $-$ ES@$B_3$) across two R1-distilled families "
+          "(Qwen 1.5--32B, Llama 8--70B), with within-family paired 95\\% bootstrap CIs. "
+          "The drop is individually significant only at the two matched high-end cells "
+          "(Qwen-32B 0.106 [0.030,0.182]; Llama-70B 0.107 [0.032,0.182], $n{=}187$) --- "
+          "these are the load-bearing evidence. Secondary: reversion rate RR rises monotonically. "
+          "The pooled per-case capability slope (0.109, $p{=}.003$) is SUPPORTING, not six independent "
+          "per-cell tests (no family-wise correction claimed). We read this as a capability contrast, "
+          "not a smooth scaling law. [CLR teaching panel, if shown: edited CLR tracks the unedited base "
+          "noise floor (0.58$\\to$0.91); net-CLR$\\approx$0, so CLR is retired as emergence evidence.]")
 
 
 def fig2_logitlens(ll, jsonl):
@@ -122,13 +188,16 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--results", default=os.path.join(_ROOT, "paper", "results.json"))
     ap.add_argument("--logitlens", default=os.path.join(_ROOT, "results", "probe", "logitlens_cf200_ROME_B3.jsonl"))
+    ap.add_argument("--clr-teaching", action="store_true",
+                    help="fig1 加 CLR 教学板(带 base 底噪虚线;默认关=省 float 预算、避免 CLR 被当涌现主证据)")
     args = ap.parse_args()
     R = json.load(open(args.results))
+    base_clr = ((R.get("base_probe", {}) or {}).get("_six_scale_summary", {}) or {}).get("base_clr_b3")
     print("出图 →")
-    fig1_capability(R["capability"])
+    fig1_capability(R["capability"], base_clr=base_clr, clr_teaching=args.clr_teaching)
     fig2_logitlens(R["logitlens"], args.logitlens)
     fig3_rq3(R["rq3"])
-    print("完成。genbench 数填进 results.json 后重跑即并入图3。")
+    print("完成。genbench 数填进 results.json 后重跑即并入图3;fig1 CLR 教学板用 --clr-teaching 开。")
 
 
 if __name__ == "__main__":
