@@ -8,7 +8,7 @@ AAAI-27 投稿项目，代号「越想越退」(Thinking Undoes Editing)：量�
 
 ## 硬约束（不可违反）
 
-1. **截止**: abstract 2026-07-20，全文 2026-07-27（UTC-12）。go/no-go 硬节点 **6/22**（判据在 plan §Phase 1）。
+1. **截止**（gap-review E1 多源亲核,2026-07-08 更新;OpenReview 上再终核）: abstract **2026-07-21**、全文 **2026-07-28**、supplementary+code **2026-07-31**（均 UTC-12）。**内部冻结**=abstract 7/18 / 全文 7/25（各留 3 天缓冲）。checklist 随全文 7/28 单独上传且计入决策。**Phase-1=3 人审全文 + AI 辅助评审、无 rebuttal**→全文数字一致性是生死件（详见 plan v1.67）。
 2. **单条编辑协议**（用户已签字）：主实验逐条 edit → 全预算档生成 → restore；批量编辑只作消融。还原机制证据见 `analysis/01_easyedit.md` §3。
 3. **`source/` 下第三方代码只读**。需要改动 → fork 相关文件进 `src/vendor_patches/` 并记录 diff。
 4. **口径纪律**: EasyEdit 自带 rewrite_acc（logits 口径）≠ 我们的 ES_b（生成式口径），两者永不混用混排。
