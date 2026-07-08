@@ -2045,20 +2045,28 @@
    "rr_ci_B3": [
     0.264,
     [
-     0.216,
-     0.312
+     0.195,
+     0.336
     ],
-    "⚠行级 CI【伪复制】=597 row(199 case×3 seed)当独立重采样;聚类待重算(点估 0.264 不变、CI 加宽,gap-review 预期 ~[0.19,0.34]内)"
+    "★写作口径=case 聚类 CI(n_case=199,重采样单位=case);行级伪复制版 [0.216,0.312] 已弃(点估同 0.264)。落于 gap-review 预期 ~[0.19,0.34];RR 点估 0.264>0.20 稳,下界 0.195 略低 0.20 但 CI 排零。"
    ],
    "clr_ci_B3": [
     0.523,
     [
-     0.482,
-     0.563
+     0.462,
+     0.583
     ],
-    "⚠行级 CI【伪复制】,同 rr_ci_B3;聚类待重算(点估 0.523 不变、CI 加宽)"
+    "★写作口径=case 聚类 CI(n_case=199);行级伪复制版 [0.482,0.563] 已弃(点估同 0.523)。CLR 强显著(下界 0.462≫0)。"
    ],
-   "_ci_必2_fix": "★硬伤1/必2(2026-07-08):score_bootstrap 按 row 重采样→采样臂同 case 3 seed 链被当独立=伪复制,rr_ci_B3/clr_ci_B3/边际 ES CI 皆过窄,与 draft:114 承诺 'bootstrap over edited facts (resampling n facts)' 互证为假。修:metrics.score_bootstrap_clustered(重采样单位=case,整块;b0ok 门仍用 eff0[0]、口径注明)+ score_pilot --cluster;单测 test_score_bootstrap_clustered 过(点估不变、CI 加宽)。**es_drop_B0toB3 [0.01,0.171] 不受影响**——走 drop_bootstrap→_es_by_case(每 case rows[0],本就 case 级配对)。待用户在 F3 jsonl 所在机(CPU,无需 GPU)重算落库:`python src/score_pilot.py --config experiments/probe32b_sample.yaml --editor ROME --decode sample --cluster --boot 10000`(greedy_control 臂 1 row/case,聚类=行级、不必改)。"
+   "es_ci_B3_cluster": [
+    0.469,
+    [
+     0.414,
+     0.523
+    ],
+    "边际 ES 聚类 CI(n_case=199);B0 ES 聚类 0.588[0.530,0.645](n_case=200)。"
+   ],
+   "_ci_必2_fix": "★硬伤1/必2 DONE(2026-07-08,用户回传聚类重算):score_bootstrap 按 row 重采样→采样臂同 case 3 seed 链被当独立=伪复制,与 draft:114 'resampling n facts' 承诺互证为假。修=metrics.score_bootstrap_clustered(重采样单位=case 整块;b0ok 门仍 eff0[0])+ score_pilot --cluster + 单测。**结果(聚类 vs 行级,点估全同、CI 如预期加宽)**:B3 RR 0.264 行[0.216,0.312]→聚类[0.195,0.336];B3 CLR 0.523 行[0.482,0.563]→聚类[0.462,0.583];B3 边际 ES 0.469 聚类[0.414,0.523]。**es_drop 0.090[0.010,0.171] 不受影响**(drop_bootstrap 本就 case 级 rows[0],用户跑同确认✅CI>0 显著)。→ 写作全用聚类口径,draft:114 声明与释出代码(score_pilot --cluster)一致化;行级 CI 作废、勿再引。命令(可复现):`python src/score_pilot.py --config experiments/probe32b_sample.yaml --editor ROME --decode sample --cluster --boot 10000`。"
   },
   "greedy_control": {
    "B0": {
