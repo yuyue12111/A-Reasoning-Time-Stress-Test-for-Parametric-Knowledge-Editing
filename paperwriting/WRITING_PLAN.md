@@ -9,12 +9,14 @@
 
 **身份**：reasoning-time evaluation / safety stress test（评测证书失效边界），不是"现象+机理+修复"三段论。
 
-**主 claim（英文措辞冻结）**：
-> Direct-answer edit success is an **insufficient certificate** for reasoning-model deployment.
-> We provide a controlled reasoning-time stress test, show the failure it reveals, and demonstrate
-> that this failure admits a **chain-localized causal control point**.
+**Title（2026-07-14 冻结）**：*Direct-Answer Edit Success Is Not Enough: A Reasoning-Time Stress Test for Parametric Knowledge Editing*（裁决记录见 `title_abstract.md`）。
 
-- 用 *insufficient*，禁用 *invalid*（很多部署确是直接回答；prior work 已批评 teacher-forcing 评测；我们证明的是"遗漏一类重要 failure mode"）。
+**主 claim（英文措辞冻结，与 title 同步为 "not enough" 措辞）**：
+> Direct-answer edit success is **not enough** to certify knowledge edits for reasoning-model
+> deployment. We provide a controlled reasoning-time stress test, show the failure it reveals, and
+> demonstrate that this failure admits a **chain-localized causal control point**.
+
+- 用 *not enough / insufficient*，禁用 *invalid*（很多部署确是直接回答；prior work 已批评 teacher-forcing 评测；我们证明的是"遗漏一类重要 failure mode"）；标题与散文均避免名词化 *certificate/certified* 以免暗示形式化认证体系（动词 certify 可用）。
 - 独有性卖点不是"评测有效性"四个字（SCR/ReCoE/CRANE/Inverse-Scaling 都在附近），而是**六元合取**：
   ① single-edit + 生成式词界判分；② 同一编辑 B0→native chain 的 paired change；③ unedited-base/B0P/sampling 三重控制；④ 两族固定 checkpoint 高端点对称显著；⑤ 只动 think span、答案 logits untouched 的 signed 因果干预；⑥ ROME/MEMIT/active-paraphrase 的有限迁移。
 
