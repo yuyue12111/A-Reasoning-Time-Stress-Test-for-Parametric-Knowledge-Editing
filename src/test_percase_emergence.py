@@ -56,6 +56,27 @@ def _synth_rows(true_slope, fam_offsets, n_per_cell=120, chain_noise=8.0,
     return rows
 
 
+def _synth_shared_case_rows(true_slope=0.12, n_cases=140, seed=31):
+    """Each fact appears at every fixed checkpoint, matching the case-block target design."""
+    rng = np.random.default_rng(seed)
+    grid = {"Qwen": [1.5, 7.0, 14.0, 32.0], "Llama": [8.0, 70.0]}
+    fact_noise = rng.normal(0, 0.12, n_cases)
+    rows = []
+    for k in range(n_cases):
+        for fam, sizes in grid.items():
+            fam_off = 0.08 if fam == "Llama" else 0.0
+            for pb in sizes:
+                rows.append({
+                    "case_id": f"cf_{k}", "family": fam, "params_b": pb,
+                    "log_params": float(np.log10(pb)),
+                    "chain_len": float(180 + rng.normal(0, 5)),
+                    "es_drop": float(fam_off + true_slope * np.log10(pb) + fact_noise[k]
+                                     + rng.normal(0, 0.03)),
+                    "rr": None, "clr": 0, "b0ok": True,
+                })
+    return rows
+
+
 # ------------------------------------------------------------------------------
 # 1. 已知正斜率 → CI 排零且套住真值
 # ------------------------------------------------------------------------------
@@ -141,6 +162,35 @@ def test_cluster_bootstrap_wider_than_case_only():
     cw = cluster["ci95"][1] - cluster["ci95"][0]
     nw = _case_only_ci_same_design(rows, "es_drop", B=3000, seed=7)
     assert cw > nw, f"cluster CI 宽度 {cw:.4f} 应 > case-only(同设计) {nw:.4f}（两级注入 between-family 方差）"
+
+
+def test_case_block_keeps_all_checkpoint_rows_together():
+    rows = _synth_shared_case_rows(n_cases=60)
+    blocks = pe._case_block_map(rows, "es_drop")
+    assert len(blocks) == 60
+    assert all(len(block) == 6 for block in blocks.values())
+    res = pe.case_block_bootstrap_ci(
+        rows, "es_drop", binary=False, control_chain=True, B=1200, seed=37)
+    assert res["n_case_blocks"] == 60 and res["n_rows"] == 360
+    assert res["bootstrap_unit"].startswith("unique case_id")
+    assert res["ci95"][0] > 0, res
+
+
+def test_analyze_promotes_case_block_and_retains_old_sensitivity():
+    rows = _synth_shared_case_rows(n_cases=50)
+    out = pe.analyze(rows, B=500, seed=41, control_chain=True)
+    assert out["es_drop"]["n_case_blocks"] == 50
+    assert out["es_drop"]["inference_scope"].startswith("fact-sampling")
+    assert out["_family_row_sensitivity"]["es_drop"]["n_families"] == 2
+
+
+def test_fixed_checkpoint_pair_is_same_fact_paired():
+    rows = _synth_shared_case_rows(true_slope=0.2, n_cases=90)
+    out = pe.paired_checkpoint_diff(rows, "Qwen", 32, 14, B=1000, seed=43)
+    truth = 0.2 * (np.log10(32) - np.log10(14))
+    assert out["n_pairs"] == 90
+    assert abs(out["mean_high_minus_low"] - truth) < 0.03, (out, truth)
+    assert out["ci95"][0] > 0, out
 
 
 # ------------------------------------------------------------------------------
@@ -240,6 +290,63 @@ def test_load_percase_rows_mirrors_metrics():
     assert any("7.0B_Qwen" in k or "7B_Qwen" in k.replace(".0", "") for k in tags) or ("7.0B_Qwen" in tags)
 
 
+def test_duplicate_world_equivalent_rows_are_deduplicated_with_provenance():
+    tmp = tempfile.mkdtemp()
+    cases = [{"case_id": "cf_0", "s": "S", "o_old": "old", "o_new": "new"}]
+    b0 = {"case_id": "cf_0", "budget": "B0", "probe": "efficacy",
+          "decode": "greedy", "answer": "new", "cot": ""}
+    b3 = {"case_id": "cf_0", "budget": "B3", "probe": "efficacy",
+          "decode": "greedy", "answer": "old", "cot": "old"}
+    shard0 = os.path.join(tmp, "r1qwen7b_ROME_cf_r0of3.jsonl")
+    shard1 = os.path.join(tmp, "r1qwen7b_ROME_cf_r1of3.jsonl")
+    shard2 = os.path.join(tmp, "r1qwen7b_ROME_cf_r2of3.jsonl")
+    with open(shard0, "w") as f:
+        f.write(json.dumps(b0) + "\n")
+        f.write(json.dumps(b3) + "\n")
+    with open(shard1, "w") as f:  # byte-identical duplicate
+        f.write(json.dumps(b0) + "\n")
+        f.write(json.dumps(b3) + "\n")
+    with open(shard2, "w") as f:  # same parsed rows, different key order/spacing
+        f.write(json.dumps(b0, sort_keys=True, separators=(",", ":")) + "\n")
+        f.write(json.dumps(b3, sort_keys=True, separators=(",", ":")) + "\n")
+
+    rows, _tags, provenance = pe.load_percase_rows(
+        [shard0, shard1, shard2], cases, {}, return_provenance=True)
+    assert len(rows) == 1 and rows[0]["es_drop"] == 1
+    audit = provenance["duplicate_world_audit"]
+    assert audit["status"] == "PASS"
+    assert audit["n_duplicate_keys"] == 2
+    assert audit["n_duplicate_rows_deduplicated"] == 4
+    for item in audit["duplicate_keys"]:
+        assert item["copies_total"] == 3
+        assert item["byte_identical_duplicates"] == 1
+        assert item["normalized_json_equal_duplicates"] == 1
+        assert [(s["path"], s["line"]) for s in item["sources"]]
+
+
+def test_duplicate_world_conflict_fails_instead_of_last_write_wins():
+    tmp = tempfile.mkdtemp()
+    cases = [{"case_id": "cf_0", "s": "S", "o_old": "old", "o_new": "new"}]
+    shard0 = os.path.join(tmp, "r1qwen7b_ROME_cf_r0of2.jsonl")
+    shard1 = os.path.join(tmp, "r1qwen7b_ROME_cf_r1of2.jsonl")
+    row0 = {"case_id": "cf_0", "budget": "B3", "probe": "efficacy",
+            "decode": "greedy", "answer": "old", "cot": "old"}
+    row1 = {**row0, "answer": "new"}
+    with open(shard0, "w") as f:
+        f.write(json.dumps(row0) + "\n")
+    with open(shard1, "w") as f:
+        f.write(json.dumps(row1) + "\n")
+    try:
+        pe.load_percase_rows([shard0, shard1], cases, {})
+    except ValueError as exc:
+        msg = str(exc)
+        assert "conflicting duplicate world" in msg
+        assert "differing_fields=['answer']" in msg
+        assert f"{shard0}:1" in msg and f"{shard1}:1" in msg
+    else:
+        raise AssertionError("inconsistent duplicate world was silently accepted")
+
+
 def test_infer_tag_meta():
     assert pe.infer_tag_meta("r1qwen7b_ROME_cf_r0.jsonl") == (7.0, "Qwen")
     assert pe.infer_tag_meta("r1qwen1.5b_ROME_cf_r3.jsonl") == (1.5, "Qwen")
@@ -292,9 +399,14 @@ TESTS = [
     test_zero_slope_binary_clr_ci_contains_zero,
     test_positive_slope_binary_clr_excludes_zero,
     test_cluster_bootstrap_wider_than_case_only,
+    test_case_block_keeps_all_checkpoint_rows_together,
+    test_analyze_promotes_case_block_and_retains_old_sensitivity,
+    test_fixed_checkpoint_pair_is_same_fact_paired,
     test_single_scale_family_no_crash,
     test_within_family_ci_qwen,
     test_load_percase_rows_mirrors_metrics,
+    test_duplicate_world_equivalent_rows_are_deduplicated_with_provenance,
+    test_duplicate_world_conflict_fails_instead_of_last_write_wins,
     test_infer_tag_meta,
 ]
 

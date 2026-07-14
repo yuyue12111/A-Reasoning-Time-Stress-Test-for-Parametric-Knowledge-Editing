@@ -86,12 +86,13 @@ def main():
 
     fmt = lambda x: f"{x:>8.3f}" if isinstance(x, float) else f"{'—':>8}"   # None → 占位（该档无该探针）
     print(f"# editor={args.editor}  shards={len(shards)}  错误行={n_err}  解码臂={args.decode}  o_old/o_new 源={src}")
-    print(f"{'budget':<7}{'n':>5}{'ES':>8}{'ESf':>8}{'RR':>8}{'RRs':>8}{'CLR':>8}{'Flip':>8}{'PS':>8}{'Loc':>8}  (n_para/n_loc)")
+    print(f"{'budget':<7}{'n':>5}{'ES':>8}{'ESf':>8}{'RR':>8}{'RRs':>8}{'CLR':>8}{'Flip':>8}{'PS':>8}{'Loc':>8}  (rr_n/n_para/n_loc)")
     for b in res:
         r = res[b]
         print(f"{b:<7}{r['n']:>5}{fmt(r['ES'])}{fmt(r['ESf'])}{fmt(r['RR'])}{fmt(r['RRs'])}{fmt(r['CLR'])}"
-              f"{fmt(r['Flip'])}{fmt(r['PS'])}{fmt(r['Loc'])}  ({r['n_para']}/{r['n_loc']})")
+              f"{fmt(r['Flip'])}{fmt(r['PS'])}{fmt(r['Loc'])}  ({r['rr_n']}/{r['n_para']}/{r['n_loc']})")
     print("RR=答案含旧(上界,含'守住+顺带提旧')  RRs=答案含旧且不含新(下界,ES镜像,最干净回退)  真回退率在两者之间")
+    print("Loc=locality answer 未直接泄漏 o_new；不检查邻域答案正确性，不能单独称完整 locality preservation")
     print("\nES=严格(命中 o_new 且不含 o_old)  ESf=首段断言(答案首立场=编辑)  Flip=答案内两立场都现(先新后旧)"
           "  —— ESf≫ES 且 Flip↑ = 答案内『越想越退』(07 教训, FlipPoint 见 analysis/09)")
 
@@ -125,7 +126,8 @@ def main():
     os.remove(merged)
     print("\ngo/no-go (plan §Phase 1): RR(natural=B3)≥0.20 或 ES 自 B0 降幅≥0.20pp，"
           "且 ≥60% 回退案例可归因反思片段（人工审计 30 条）。")
-    print("layer 扫合格线 (plan §7): B0 下 ES≥0.90 & Loc≥0.85，否则该编辑器结果整体作废。")
+    print("layer 选择纪律 (plan v1.18/§7): 在 Loc≥0.85 前提下取生成式 B0 ES 最高的层；"
+          "旧 ES≥0.90 是 rewrite_acc 数字误植，不用于生成式结果作废。")
 
 
 if __name__ == "__main__":

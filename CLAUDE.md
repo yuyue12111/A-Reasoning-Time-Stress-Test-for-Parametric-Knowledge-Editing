@@ -4,7 +4,7 @@
 
 AAAI-27 投稿项目，代号「越想越退」(Thinking Undoes Editing)：量化参数知识编辑（ROME/MEMIT/AlphaEdit）在 R1 式推理模型上随思考预算增加而被推翻的现象 + 机理 + training-free 修补。
 
-**读单（按序）：`plan.md` 头部 v1.x 变更日志（当前 **v1.15**，本项目唯一权威计划）→ `sumandplan1.md` §5/§6（进度总结 + 带日期作战序列，工作以此为准）→ `phase-1.md`（换 session 交接，按需）→ `analysis/00–09_*.md`（复现/实验/方法笔记）→ `RUNBOOK.md`（算卡手册）。** 与 plan 冲突的一切行为都需要先改 plan（版本号 +0.1 并写变更记录），再执行。**算卡/内网窗口照 `RUNBOOK.md` 自助执行（pilot harness 串通、23+ mock 单测全绿、ROME-on-MPS 真权重端到端验证过、qwen pilot-blocker 已修，无 Claude 也能跑完 pilot）。**
+**读单（按序）：`plan.md` 头部 v1.x 变更日志（当前 **v1.89**，本项目唯一权威计划）→ `paperwriting/WRITING_PLAN.md`（唯一有效写作计划）→ `paperwriting/results.json`（数字真源）→ `analysis/11–16_*.md` 与对应 prereg（X/P0/CPU closeout 最新证据）→ `RUNBOOK.md`（仅在确有 GPU 任务时）。** `sumandplan1.md` §5/§6 与 `phase-1.md` 是 6 月历史快照，不得覆盖 plan 头部或复活已停止队列。与 plan 冲突的一切行为都需要先升 plan 版本并写变更记录，再执行。
 
 ## 硬约束（不可违反）
 
@@ -21,25 +21,26 @@ AAAI-27 投稿项目，代号「越想越退」(Thinking Undoes Editing)：量�
 papers/   论文 PDF（repro_/ref_ 前缀）   source/  第三方仓库（只读, 各自带 .git）
 analysis/ 复现/实验/方法笔记 00–09      src/     我们的代码 + test_*（mock）+ vendor_patches/
 data/     清洗数据(大文件 gitignore,     results/ 实验 jsonl（gitignore，脚本再生）
-          build_dataset.py 再生)        experiments/ pilot.yaml（就位）   paper/ LaTeX（待建）
+          build_dataset.py 再生)        experiments/ pilot.yaml（就位）   paperwriting/ 写作真源(results.json/WRITING_PLAN/LaTeX；原 paper/ 已更名防与 papers/ 混淆)
 ```
 
 若 papers/ 或 source/ 为空：`bash setup_workspace.sh`（幂等，已存在则跳过）。
 
-## 当前状态（2026-06-12；权威进度看 `sumandplan1.md`）
+## 当前状态（2026-07-13；权威进度只看 `plan.md` 头部）
 
-- [x] Phase 0 复现六笔记 01–06 齐（W1 硬节点 6/17 提前达成）+ 数据三源清洗（CF/zsRE/MQuAKE）
-- [x] pilot harness 串通（think_budget/edit_loop/metrics/run_pilot/prefilter/score_pilot/steer）+ 23+ mock 单测全绿
-- [x] 本地 M5/MPS 真权重验证：预算控制器（07）+ **参数版 ROME-on-MPS 端到端跑通（08，无算子墙）**
-- [x] **P0 开窗前三件 + qwen pilot-blocker（本轮 6/12）**：① qwen 路由修复（`vendor_patches/easyedit_qwen2_loader.py`）② 0.6×3 采样臂 + Locality/Paraphrase 判分 + jsonl 溯源头 ③ ROME-on-MPS 首信号；④ FlipPoint 判分模块
-- [ ] **唯一落后项 = GPU 真跑**（pilot/mom2，卡实验室专网；脚本就绪，开窗即跑——见 `RUNBOOK.md`）
+- [x] X2/X3/P1 GPU 运行完成；X1 预注册 fixed-replay 为 **9/18 FAIL**，永久停止五臂，不筛 case。
+- [x] P0 membership/route/crosswalk 完成：corrected taxonomy n=41，Bridge/Recall/RO/Associative=27/11/3/0；logit-lens per-item crosswalk 仅因缺 raw 文件阻塞。
+- [x] Percase/B15-B0/Cap3/F3/X2/X3 CPU closeout 全部闭合；最终 audit PASS，B15-B0 两侧 duplicate audit 和 budget provenance 均 PASS。
+- [x] GPU 和服务器 CPU 科学队列清空；P0 logit-lens 只是缺 raw dependency 的非承重 optional block。
+- [x] 最终科学 review + 三方仲裁 + GPT-5.6 复核完成（v1.89 落库）。
+- [ ] **唯一当前任务 = 写作冲刺**，按 `paperwriting/WRITING_PLAN.md` 执行。
 
-## 立即任务队列 —— **以 `sumandplan1.md` §6 为准**（本节只给指针，勿照旧清单）
+## 立即任务队列 —— **以 `plan.md v1.89` + `paperwriting/WRITING_PLAN.md` 为准**
 
-作战序列与日期敏感项全在 `sumandplan1.md` §6.1（本地）/§6.2（行政）/§6.3（GPU 窗口剧本）。当前剩余主线：
-- **§6.1-⑤ 文档同步**（本轮进行中）→ **§6.1-⑥ P2**（GSM8K-200/MATH500-100 子集、Qwen3 预研、aliases 富集、steer 方向抽取、bootstrap CI + plots 骨架）
-- **行政线（用户负责，提醒即可）**：OpenReview 注册（隐形死线）、CFP 核对、H200 排队申请；**每周一 plan §8 增量查新**（≥6/15）
-- **GPU 窗口**：照 `RUNBOOK.md`（mom2→预过滤→layer 小扫→pilot→打分→**10% 边界校准**→审计→6/22 go/no-go）；**组内启智平台＝全离线部署：人工 UI 操作看 `qz_quickstart.md`，技术作战层看 `interplan2.md`**（平台实测在 `report.md`；interplan.md 仅 §1/§8/§9 仍有效）
+1. **投稿前科学队列=零**（不跑 B15 interaction、不烧 X-A 池、不加任何新数字）。
+2. W1（→7/18）：LaTeX 主文件 + 唯一 abstract（insufficient-certificate 身份）+ Fig.1 认证缺口图 + claim hierarchy。
+3. W2（7/19–23）主文四节 → W3（7/24–25）机器对账 + 禁语扫描 + hostile review → 7/28 提交 → R 段 supplementary/provenance manifest。
+4. 旧 `paper/draft.md` 是**违规数字的历史底稿**（≥15 处与真源不一致，X1 零披露）：只作素材参考，一切数字从 `paperwriting/results.json` 正向取。
 
 ## 防雷清单（前人血泪，违反必翻车）
 

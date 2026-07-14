@@ -2,11 +2,12 @@
 
 问:我们的 o_old 抑制修复伤不伤通用推理?
 设计:**部署时修复只对被编辑的 query 生效**(非编辑 query 不挂 suppress → 通用能力按构造不受影响)。
-本测给【最坏界】:在 GSM8K/MATH 上对【所有编辑 o_old 的并集 token】施 scope=all 抑制(远超实际部署),
+本测给【最坏界】:在 GSM8K/MATH 上对【全 CounterFact 的 o_old 首-token 并集】施 scope=all 抑制(远超实际部署),
 看 acc 掉多少。若并集最坏界都 acc 几乎不掉 → 修复对通用推理的附带损害可忽略。
 
   # 8 卡分片(基座、不编辑):
-  for r in $(seq 0 7); do python src/genbench.py --config experiments/probe32b_sup.yaml --rank $r --world 8 & done; wait
+  for r in $(seq 0 7); do python src/genbench.py --config experiments/probe32b_sup.yaml \
+      --mode union --force_scope all --edit_data data/counterfact.jsonl --rank $r --world 8 & done; wait
   # 汇总:
   python src/genbench.py --config experiments/probe32b_sup.yaml --score
 
@@ -18,6 +19,38 @@ import metrics
 
 
 BENCHES = {"gsm8k": "data/gsm8k_200.jsonl", "math": "data/math500_100.jsonl"}
+_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def _existing_path(path):
+    """Resolve a config/CLI path from cwd or repository root; return None if absent."""
+    if not path:
+        return None
+    candidates = [path] if os.path.isabs(path) else [path, os.path.join(_ROOT, path)]
+    for candidate in candidates:
+        if os.path.exists(candidate):
+            return os.path.abspath(candidate)
+    return None
+
+
+def resolve_edit_source(cfg, override=None):
+    """Choose the facts whose old-value tokens form the suppressor set.
+
+    A caller-provided ``override`` is authoritative.  Otherwise mirror the experiment
+    loader: prefer ``dataset.path`` when it exists and fall back only when it does not.
+    Union stress tests over the full CounterFact collection must therefore pass
+    ``--edit_data data/counterfact.jsonl`` explicitly; this prevents a prefiltered
+    path and a full-pool fallback from being silently interchanged.
+    """
+    ds = cfg["dataset"]
+    requested = [override] if override else [ds.get("path"), ds.get("fallback_path")]
+    for path in requested:
+        resolved = _existing_path(path)
+        if resolved:
+            return resolved
+    raise FileNotFoundError(
+        "No edit-source dataset found; checked " + ", ".join(repr(p) for p in requested if p)
+    )
 
 
 def old_ids(tok, src, aliases, mode="union"):
@@ -107,6 +140,9 @@ def main():
     ap.add_argument("--gsm8k_data", default=None, help="B26:覆盖 GSM8K 数据文件(如 data/gsm8k_full.jsonl)")
     ap.add_argument("--math_data", default=None, help="B26:覆盖 MATH 数据文件(如 data/math500_full.jsonl)")
     ap.add_argument("--run_tag", default="", help="B26:输出后缀追加(如 nfull)——新 n 的分片/done 集不与旧 run 混池")
+    ap.add_argument("--edit_data", default=None,
+                    help="显式指定构造 o_old token 集的事实文件。union 最坏界应传 data/counterfact.jsonl；"
+                         "未给时优先 dataset.path，缺失才回退 fallback_path。")
     args = ap.parse_args()
     cfg = yaml.safe_load(open(args.config))
     scope = args.force_scope or cfg["suppress"].get("scope", "all")
@@ -131,12 +167,12 @@ def main():
     model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=dtype).to(dev).eval()
 
     aliases = json.load(open(args.aliases))
-    src = cfg["dataset"].get("fallback_path", cfg["dataset"]["path"])
+    src = resolve_edit_source(cfg, args.edit_data)
     ids = old_ids(tok, src, aliases, mode=args.mode)
     sup = {"processor": make_processor(ids, cfg["suppress"]["penalty"]), "scope": scope}
     print(f"[genbench] mode={args.mode} scope={scope} o_old_token数={len(ids)} "
           f"penalty={cfg['suppress']['penalty']} budget(gsm8k={args.gsm8k_budget},math={args.math_budget}) "
-          f"answer_cap={args.answer_cap} dev={dev} suffix={suffix}")
+          f"answer_cap={args.answer_cap} edit_source={src} dev={dev} suffix={suffix}")
 
     op = out_path(cfg, args.rank, suffix)
     os.makedirs(cfg["out_dir"], exist_ok=True)

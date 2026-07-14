@@ -4,7 +4,7 @@
 不再只靠 per-cell 显著(2/6)。报 OLS 解析 t-CI + 按点 bootstrap CI(无 scipy)+ 逆方差 WLS(用各点已有 CI)+ family 控制。
 口径诚实:6 点小样、log-params 是能力代理(跨族 alignment 已论证)、family 差异作 robustness 看,不宣称 scaling law。
 
-用法:python src/emergence_regression.py        # 读 paper/results.json,打印 + 写 results.json.emergence
+用法:python src/emergence_regression.py        # 读 paperwriting/results.json,打印 + 写 results.json.emergence
 """
 import json
 import numpy as np
@@ -133,7 +133,7 @@ def robustness(metric, fams):
 
 
 def main():
-    R = json.load(open("paper/results.json"))
+    R = json.load(open("paperwriting/results.json"))
     fams = R["capability"]["families"]
     out = {"_note": "B-emergence:erosion 指标对 log10(参数量)pool 两族回归;slope CI 排零=涌现有统计支撑(非仅靠 2/6 per-cell 显著)。6 点小样、log-params 为能力代理(跨族 alignment 已论证)、不宣称 scaling law。OLS 解析 t-CI(df=n-2)+按点 bootstrap(n=10000,seed42)+逆方差 WLS+family 控制。src/emergence_regression.py 可复现。"}
     print(f"{'metric':<10}{'OLS slope':>12}{'95% CI':>22}{'R2':>7}{'boot p(≤0)':>12}{'排零':>6}  per-family")
@@ -149,7 +149,7 @@ def main():
               f"all-excl-0={rb['lopo_all_exclude_zero']} | drop-Llama={rb['lofo'].get('drop_R1-Distill-Llama',{}).get('ci')} "
               f"drop-Qwen-slope={rb['lofo'].get('drop_R1-Distill-Qwen',{}).get('slope')}")
     R["emergence"] = out
-    json.dump(R, open("paper/results.json", "w"), ensure_ascii=False, indent=2)
+    json.dump(R, open("paperwriting/results.json", "w"), ensure_ascii=False, indent=2)
     print("\n# → results.json.emergence 写入")
     print("# 解读:slope>0 且 CI 排零 = '随 log-能力涨'有统计支撑;per-family 同号 = 族内也成立。")
 

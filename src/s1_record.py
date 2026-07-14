@@ -125,7 +125,7 @@ def main():
         json.dump(summary, f, ensure_ascii=False, indent=2)
 
     # ---- 同步 results.json ----
-    rj = "paper/results.json"
+    rj = "paperwriting/results.json"
     pj = json.load(open(rj, encoding="utf-8"), object_pairs_hook=collections.OrderedDict)
     tax = pj["rq2_taxonomy"]
     node = tax.get("neutral_rerun_S1", collections.OrderedDict())
@@ -149,7 +149,7 @@ def main():
     for sc, v in per_scale.items():
         print(f"  [{sc}] n={v['n_in_pop']} {v['dist']} κ={v['fleiss_kappa_inpop']} P̄={v['raw_agreement_pbar']}")
     print("cross-scale dups:", cross_dups, " flips:", summary["population_flip_to_held"]["rate_by_rows"])
-    print("→ results/a3_neutral/summary.json + paper/results.json rq2_taxonomy.neutral_rerun_S1 已再生")
+    print("→ results/a3_neutral/summary.json + paperwriting/results.json rq2_taxonomy.neutral_rerun_S1 已再生")
     return 0
 
 

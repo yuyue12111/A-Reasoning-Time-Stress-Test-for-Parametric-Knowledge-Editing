@@ -1,0 +1,33 @@
+# X3/T · ROME-32B active-paraphrase 修复（prereg-x2-x3.md）。
+# suppress 必须对 efficacy/para0/para1 三类逐字接线；只写 paraphrase 别名不算。
+model_tag: r1qwen32b
+seed: 42
+out_dir: results/probe
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+  stats_dir: ./data/stats_r1qwen32b
+  v_loss_layer: 63
+  model_parallel: true
+
+dataset:
+  tag: cf200para_sup_mp2
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 200
+
+budgets: [B0, B3]
+sampling:
+  enabled: false
+probes: [efficacy, paraphrase]
+
+suppress:
+  penalty: 8
+  scope: think
+  source: o_old
+  apply_to: [efficacy, para0, para1]
+
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [12]

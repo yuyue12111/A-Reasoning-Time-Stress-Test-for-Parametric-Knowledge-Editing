@@ -31,13 +31,21 @@ def build_old_token_ids(tok, o_old, aliases):
 
 
 def make_processor(ids, penalty):
-    """返回 transformers LogitsProcessor：对 ids 的 logit 减 penalty(logit 空间常数减法)。"""
+    """返回可审计的 LogitsProcessor：对 ids 的 logit 减 penalty。
+
+    ``calls`` 只记录处理器真正进入解码循环的次数。它让 smoke 能区分“YAML 选中了
+    para0/para1”与“processor 实际被 generate 调用”；scope=think 的 B0 按构造 calls=0。
+    """
     from transformers import LogitsProcessor
 
     idl = sorted(ids)
 
     class _OldTokenPenalty(LogitsProcessor):
+        def __init__(self):
+            self.calls = 0
+
         def __call__(self, input_ids, scores):
+            self.calls += 1
             if idl:
                 scores[:, idl] = scores[:, idl] - penalty
             return scores

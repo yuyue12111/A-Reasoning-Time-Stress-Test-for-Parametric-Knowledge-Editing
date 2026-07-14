@@ -1,0 +1,19 @@
+# X1 Stage-0 natural-chain fixed replay gate (plan v1.79 / prereg-x1.md).
+# Source population and chains are frozen in data/x1_replay_manifest.jsonl.
+model_tag: r1qwen32b
+tag: x1_nat_replay_v1
+out_dir: results/x1
+manifest: data/x1_replay_manifest.jsonl
+manifest_sha256: 7397f4da0680a6937e8ada4795ffa2444c8724f0d230352bcb53c91993334a2a
+sample_source_audit: results/x1_sample_source_audit.json
+answer_cap: 256
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+  stats_dir: ./data/stats_r1qwen32b
+  v_loss_layer: 63
+  model_parallel: true
+
+editor:
+  hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+  layers: [12]

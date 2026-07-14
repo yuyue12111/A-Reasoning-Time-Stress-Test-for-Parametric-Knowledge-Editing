@@ -1,0 +1,48 @@
+# P1 fresh-B0 stability diagnostic: two-H200 balanced topology (plan v1.81 / prereg-p1-reload.md).
+model_tag: r1qwen32b
+seed: 42
+out_dir: results/p1
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+  stats_dir: ./data/stats_r1qwen32b
+  v_loss_layer: 63
+  model_parallel: true
+
+dataset:
+  tag: p1_reload
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 18
+  case_ids:
+    - cf_140
+    - cf_18471
+    - cf_19889
+    - cf_1235
+    - cf_17423
+    - cf_21770
+    - cf_14660
+    - cf_7868
+    - cf_9255
+    - cf_6933
+    - cf_10410
+    - cf_18494
+    - cf_15609
+    - cf_19573
+    - cf_2443
+    - cf_390
+    - cf_15396
+    - cf_5492
+
+budgets: [B0]
+sampling:
+  enabled: false
+probes: [efficacy]
+diagnostics:
+  weight_delta: true
+  chunk_elems: 1000000
+
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [12]

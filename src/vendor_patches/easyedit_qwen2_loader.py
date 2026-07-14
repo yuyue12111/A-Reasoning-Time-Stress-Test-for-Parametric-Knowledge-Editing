@@ -52,9 +52,9 @@ class PatchedAutoModelForCausalLM:
         # 全精度规避（H200 80G 装 fp32 28GB 绰绰有余）。bf16 与 fp32 指数范围相同，差在尾数精度。
         kwargs["dtype"] = os.environ.get("WHYAAAI_DTYPE", "bfloat16")
         # ⚠ 多卡分布策略覆盖（仅当 editor 已因 model_parallel 给了 device_map 时才动）：
-        # editor.py 写死 device_map='auto'，而 'auto' 会**贪心填满 GPU0**（~79G/80G）再溢出到下一张，
-        # 导致 32B fp32(130G)跨卡时 GPU0 几乎填满→KV/compute 一分配即 OOM。设 WHYAAAI_DEVICE_MAP=balanced_low_0
-        # 让 accelerate **均摊且 GPU0 留最空**（生成期激活/embedding 主要落 GPU0）。单卡(device_map=None)不受影响。
+        # editor.py 写死 device_map='auto'，会贪心填卡并挤掉 KV/ROME 临时空间。具体策略由 launcher 冻结：
+        # 32B fp32 的 2×H200 rescue 用 balanced（两卡均分且都留大余量）；更多卡、需要特意给 GPU0
+        # 留空间的任务才可用 balanced_low_0。单卡(device_map=None)不受影响。
         _dm = os.environ.get("WHYAAAI_DEVICE_MAP")
         if _dm and kwargs.get("device_map"):
             kwargs["device_map"] = _dm

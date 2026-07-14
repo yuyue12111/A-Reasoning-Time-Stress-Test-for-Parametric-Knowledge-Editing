@@ -19,7 +19,7 @@ import metrics
 import audit_reversions
 from score_pilot import _is_degenerate
 
-PREC = ["Reflective-override", "Bridge", "Recall", "Associative"]      # 决策树优先级(高→低);3-way split 时取最高
+PREC = ["Reflective-override", "Bridge", "Recall", "Associative"]      # 稳定展示顺序；绝不用于打破投票平局
 PRIMARIES = set(PREC)
 
 JUDGE_PROMPT_TEMPLATE = """You are one of three independent expert judges classifying HOW a reasoning chain re-surfaced an OLD fact after a knowledge edit. A model was edited so that (<<SUBJECT>>, relation) -> "<<O_NEW>>" (NEW). With no thinking the model answered NEW (edit installed). With long thinking the chain below settled on "<<O_OLD>>" (OLD). A separate probe proves the edit is STILL INSTALLED in the weights — so the chain is ROUTING AROUND an intact edit, NOT recalling decayed weights. Your job is to name the ROUTE, descriptively. Make NO claim that OLD is correct or that the edit weakened.
@@ -67,6 +67,16 @@ RULES: You MUST quote a verbatim span for RECALL/BRIDGE/REFLECTIVE-OVERRIDE; if 
 Output ONLY a JSON object matching the schema. No prose outside it."""
 
 JUDGE_PROMPTS = {"main": JUDGE_PROMPT_TEMPLATE, "neutral": JUDGE_PROMPT_NEUTRAL}
+DEFAULT_JUDGE_PROMPT = "neutral"
+
+
+class RouteAdjudicationRequired(ValueError):
+    """No route has a two-vote majority; a fresh adjudication is required."""
+
+    def __init__(self, case_id, labels):
+        self.case_id = case_id
+        self.labels = list(labels)
+        super().__init__(f"{case_id}: route votes have no majority; adjudication required: {self.labels}")
 
 # 判官输出 JSON schema(传给 workflow 的 agent schema;与 output_record_schema 同源)
 JUDGE_OUTPUT_SCHEMA = {
@@ -89,7 +99,7 @@ JUDGE_OUTPUT_SCHEMA = {
 }
 
 
-def build_prompt(row, template=JUDGE_PROMPT_TEMPLATE):
+def build_prompt(row, template=JUDGE_PROMPT_NEUTRAL):
     p = template
     for k, v in (("<<SUBJECT>>", row.get("s") or ""), ("<<O_NEW>>", row["o_new"]),
                  ("<<O_OLD>>", row["o_old"]), ("<<COT>>", row.get("cot") or ""),
@@ -129,7 +139,11 @@ def gate_exclusion(row, pf):
 
 
 def aggregate_votes(case_id, votes, pf):
-    """3 判官投票 → 主标签 + 正交字段。held(commit_new) 优先;多数决;3-way split 走 precedence。"""
+    """3 判官投票 → 主标签 + 正交字段。
+
+    held(commit_new) 多数优先；route 必须获得至少两票。1-1-1 或其它无多数情形
+    一律 hard-fail，交给 fresh adjudication，禁止按标签展示顺序偷偷裁决。
+    """
     rec = {"case_id": case_id, "overlap_subject": pf["overlap_subject"],
            "prefeatures": pf, "votes": [v.get("primary") for v in votes]}
     held = sum(1 for v in votes if v.get("commits_new") or v.get("in_population") is False)
@@ -142,10 +156,8 @@ def aggregate_votes(case_id, votes, pf):
     cnt = Counter(labels)
     if cnt and cnt.most_common(1)[0][1] >= 2:
         primary, split = cnt.most_common(1)[0][0], False
-    elif labels:                                                  # 3-way 全不同 → 取 precedence 最高
-        primary, split = min(labels, key=lambda l: PREC.index(l)), True
     else:
-        primary, split = "Associative", True
+        raise RouteAdjudicationRequired(case_id, labels)
     subs = [v.get("associative_subtype") for v in votes
             if v.get("primary") == "Associative" and v.get("associative_subtype")]
     assoc_sub = (Counter(subs).most_common(1)[0][0] if subs else "ramble") if primary == "Associative" else None
@@ -279,7 +291,7 @@ def _read_jsonl(p):
 def cmd_emit(args):
     aliases = json.load(open("data/aliases.json"))
     rows = _read_jsonl(args.reverted)
-    template = JUDGE_PROMPTS[getattr(args, "prompt", "main")]      # main=原(污染) / neutral=S1 去污+去优先级
+    template = JUDGE_PROMPTS[getattr(args, "prompt", DEFAULT_JUDGE_PROMPT)]  # main 仅供历史显式复现
     os.makedirs(os.path.dirname(args.out_prompts) or ".", exist_ok=True)
     n_prompt = n_excl = 0
     with open(args.out_prompts, "w") as fp, open(args.out_prefeatures, "w") as ff:
@@ -351,7 +363,8 @@ def main():
     sub = ap.add_subparsers(dest="mode", required=True)
     e = sub.add_parser("emit"); e.add_argument("--reverted", required=True)
     e.add_argument("--out-prompts", required=True); e.add_argument("--out-prefeatures", required=True)
-    e.add_argument("--prompt", default="main", choices=["main", "neutral"], help="neutral=S1/M3 去污+去优先级判官(中性重跑)")
+    e.add_argument("--prompt", default=DEFAULT_JUDGE_PROMPT, choices=["main", "neutral"],
+                   help="默认 neutral；main 仅供显式历史复现，含已知 conclusion prime")
     a = sub.add_parser("aggregate"); a.add_argument("--prefeatures", required=True)
     a.add_argument("--verdicts", default=None); a.add_argument("--out-labels", required=True)
     a.add_argument("--summary", required=True)

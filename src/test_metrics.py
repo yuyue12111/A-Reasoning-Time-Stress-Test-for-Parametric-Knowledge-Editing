@@ -45,9 +45,9 @@ def test_score_exact():
     out = metrics.score(path, cases, aliases)
     os.remove(path)
 
-    exp = {"B0": {"ES": 1.0, "CLR": 0.0, "RR": 0.0, "n": 2},
-           "B1": {"ES": 0.5, "CLR": 0.5, "RR": 0.5, "n": 2},
-           "B2": {"ES": 1.0, "CLR": 0.0, "RR": 0.0, "n": 1}}
+    exp = {"B0": {"ES": 1.0, "CLR": 0.0, "RR": 0.0, "n": 2, "rr_n": 2},
+           "B1": {"ES": 0.5, "CLR": 0.5, "RR": 0.5, "n": 2, "rr_n": 2},
+           "B2": {"ES": 1.0, "CLR": 0.0, "RR": 0.0, "n": 1, "rr_n": 1}}
     assert set(out) == set(exp), f"预算档不符: {set(out)}"
     for b, e in exp.items():
         for k, v in e.items():
@@ -113,6 +113,21 @@ def test_flip_analysis():
     # 先旧后新（链内自我纠正）→ first=old,last=new
     fb = metrics.flip_analysis("Jupiter, wait no, it is Mars", "Mars", "Jupiter", al)
     assert fb["first"] == "old" and fb["last"] == "new" and fb["flipped"], f"先旧后新: {fb}"
+    # last 必须看各立场的【末次】出现，而不是比较两者首现位置。
+    # old→new→old：虽然 new 首现得更晚，最终落定仍是 old。
+    f_old_new_old = metrics.flip_analysis(
+        "Jupiter, perhaps Mars, but finally Jupiter", "Mars", "Jupiter", al)
+    assert (f_old_new_old["first"], f_old_new_old["last"], f_old_new_old["flipped"]) \
+        == ("old", "old", True), f"old→new→old 的 last 应为 old: {f_old_new_old}"
+    assert f_old_new_old["flip_pos"] == f_old_new_old["new_pos"], \
+        f"首次翻转点应仍是中间首次出现的 new: {f_old_new_old}"
+    # new→old→new：虽然 old 首现得更晚，最终落定仍是 new。
+    f_new_old_new = metrics.flip_analysis(
+        "Mars, perhaps Jupiter, but finally Mars", "Mars", "Jupiter", al)
+    assert (f_new_old_new["first"], f_new_old_new["last"], f_new_old_new["flipped"]) \
+        == ("new", "new", True), f"new→old→new 的 last 应为 new: {f_new_old_new}"
+    assert f_new_old_new["flip_pos"] == f_new_old_new["old_pos"], \
+        f"首次翻转点应仍是中间首次出现的 old: {f_new_old_new}"
     # 干净命中 o_new（含别名）/ 干净命中 o_old / 都无
     assert metrics.flip_analysis("It is the Red Planet", "Mars", "Jupiter", al) \
         == {"first": "new", "last": "new", "flipped": False, "flip_pos": None,

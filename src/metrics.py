@@ -65,8 +65,8 @@ def first_mention(text, target, aliases):
 def last_mention(text, target, aliases):
     """target(含别名)在 text 中最晚出现的字符位置；无则 -1。大小写不敏感。
     与 first_mention 配套：判『答案落定立场』须比【末次】提及，不能只比首现序——
-    flip_analysis 的 last 比的是 o_new/o_old 各自【首现】谁更晚，会把『先断言新、末尾
-    顺带提/否定一句旧』误判成回退（审计分桶 held），系统性高估 RR。词边界 + 丢短码同 hit。"""
+    否则『new→old→new』会因 old 的首现晚于 new 而被误判为最终回退。
+    词边界 + 丢短码同 hit。"""
     t = (text or "").lower()
     best = -1
     for c in _safe_cands(target, aliases):
@@ -102,7 +102,9 @@ def flip_analysis(text, o_new, o_old, aliases):
     if has_old and not has_new:
         return {**none, "first": "old", "last": "old", "old_pos": op_}
     first = "new" if np_ < op_ else "old"        # 先现者=首段立场
-    last = "new" if np_ > op_ else "old"          # 后现者=落定立场（与 first 相反）
+    nl_ = last_mention(text, o_new, aliases)
+    ol_ = last_mention(text, o_old, aliases)
+    last = "new" if nl_ > ol_ else "old"           # 末次提及者=落定立场（不必与 first 相反）
     return {"first": first, "last": last, "flipped": True,
             "flip_pos": max(np_, op_), "new_pos": np_, "old_pos": op_}
 
@@ -119,9 +121,11 @@ def score(jsonl_path, cases, aliases, decode="greedy"):
       RRs = P(answer 含 o_old 且不含 o_new | B0 成功)   strict 口径=下界（ES 镜像，最干净的回退）
       CLR = 1{cot 含 o_old}                                 （链内旧知识泄漏，efficacy 的 cot）
       PS  = 1{para_answer 命中 o_new 且不含 o_old}          （改述泛化/portability，para* 探针）
-      Loc = 1{locality_answer **不含** o_new}               （局部性：编辑未泄漏到邻域）
-            —— 邻域 prompt 是同关系的其它主体(CF)或无关问题(zsRE)，编辑应不波及，
-               故"邻域答案未出现 o_new"=局部性保持。合格线 plan §7：B0 下 ES≥90% & Loc≥85%。
+      Loc = 1{locality_answer **不含** o_new}               （仅衡量目标值未直接泄漏到邻域）
+            —— 该指标不检查邻域答案是否正确/与编辑前一致；拒答、错答、乱码也可能得 1。
+               因此科学命名应为 target-value non-leakage，不能单独宣称完整 locality preservation。
+               层选择纪律 plan v1.18/§7：
+               在 Loc≥85% 前提下取生成式 B0 ES 最高层；旧 ES≥90% 是 rewrite_acc 数字误植。
     某档某指标无对应探针行时该指标返回 None（如 MQuAKE 无 paraphrases → PS=None）。
     """
     cmap = {c["case_id"]: c for c in cases}
@@ -177,7 +181,7 @@ def score(jsonl_path, cases, aliases, decode="greedy"):
     return {b: {"ES": rate(es[b], n[b]), "RR": rate(rr[b], rr_n[b]), "RRs": rate(rrs[b], rr_n[b]), "CLR": rate(clr[b], n[b]),
                 "ESf": rate(esf[b], n[b]), "Flip": rate(flip[b], n[b]),
                 "PS": rate(ps[b], ps_n[b]), "Loc": rate(loc[b], loc_n[b]),
-                "n": n[b], "n_para": ps_n[b], "n_loc": loc_n[b]}
+                "n": n[b], "rr_n": rr_n[b], "n_para": ps_n[b], "n_loc": loc_n[b]}
             for b in sorted(set(n) | set(ps_n) | set(loc_n))}
 
 

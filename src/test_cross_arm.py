@@ -1,9 +1,102 @@
-"""E-SUP-BATTERY 统计核单测(纯函数,无 GPU):跨臂配对差 + placebo 供体构建。
+"""E-SUP-BATTERY 统计核单测(纯函数,无 GPU):跨臂配对差 + 输入去重审计 + placebo 供体构建。
 运行：python src/test_cross_arm.py （或 pytest）。
 """
-import sys, os
+import sys, os, json, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cross_arm, placebo_donor
+
+
+def _per_case_fixture(tmp):
+    cases_path = os.path.join(tmp, "cases.jsonl")
+    with open(cases_path, "w") as f:
+        f.write(json.dumps({"case_id": "c0", "s": "Subject", "o_old": "Paris", "o_new": "Rome"}) + "\n")
+    cfg = {"out_dir": tmp, "model_tag": "model", "dataset": {"tag": "tag", "path": cases_path}}
+    return cfg
+
+
+def _write(path, rows, **json_kw):
+    with open(path, "w") as f:
+        for row in rows:
+            f.write(json.dumps(row, **json_kw) + "\n")
+
+
+def test_per_case_equivalent_duplicate_worlds_are_deduplicated_and_audited():
+    tmp = tempfile.mkdtemp()
+    cfg = _per_case_fixture(tmp)
+    rows = [
+        {"case_id": "c0", "budget": "B0", "probe": "efficacy", "decode": "greedy",
+         "seed": None, "temperature": None, "answer": "Rome", "cot": ""},
+        {"case_id": "c0", "budget": "B3", "probe": "efficacy", "decode": "greedy",
+         "seed": None, "temperature": None, "answer": "Paris", "cot": "Paris"},
+    ]
+    p0 = os.path.join(tmp, "model_ROME_tag_r0.jsonl")
+    p1 = os.path.join(tmp, "model_ROME_tag_r1.jsonl")
+    p2 = os.path.join(tmp, "model_ROME_tag_r2.jsonl")
+    _write(p0, rows)
+    _write(p1, rows)  # byte-identical copies
+    _write(p2, rows, sort_keys=True, separators=(",", ":"))  # parsed-row equivalent
+
+    out, audit = cross_arm.per_case(cfg, "ROME", "B3", return_audit=True)
+    assert out == {"c0": {"ES": 0, "CLR": 1, "RR": 1, "RRs": 1}}, out
+    assert audit["status"] == "PASS" and audit["n_unique_worlds"] == 2
+    assert audit["n_duplicate_keys"] == 2 and audit["n_duplicate_rows_deduplicated"] == 4
+    for item in audit["duplicate_keys"]:
+        assert item["copies_total"] == 3
+        assert item["byte_identical_duplicates"] == 1
+        assert item["normalized_json_equal_duplicates"] == 1
+        assert [(source["path"], source["line"]) for source in item["sources"]]
+
+
+def test_per_case_conflicting_duplicate_world_is_hard_failure_with_both_locations():
+    tmp = tempfile.mkdtemp()
+    cfg = _per_case_fixture(tmp)
+    base = {"case_id": "c0", "budget": "B3", "probe": "efficacy", "decode": "greedy",
+            "seed": None, "temperature": None, "answer": "Paris", "cot": "Paris"}
+    p0 = os.path.join(tmp, "model_ROME_tag_r0.jsonl")
+    p1 = os.path.join(tmp, "model_ROME_tag_r1.jsonl")
+    _write(p0, [base])
+    _write(p1, [{**base, "answer": "Rome"}])
+    try:
+        cross_arm.per_case(cfg, "ROME", "B3")
+    except ValueError as exc:
+        msg = str(exc)
+        assert "conflicting duplicate world" in msg
+        assert "differing_fields=['answer']" in msg
+        assert f"{p0}:1" in msg and f"{p1}:1" in msg
+    else:
+        raise AssertionError("conflicting duplicate world was silently last-write-wins")
+
+
+def test_sampling_seeds_are_distinct_trajectories_and_require_explicit_selection():
+    tmp = tempfile.mkdtemp()
+    cfg = _per_case_fixture(tmp)
+    rows = []
+    for seed, b3_answer in ((0, "Paris"), (1, "Rome")):
+        rows.extend([
+            {"case_id": "c0", "budget": "B0", "probe": "efficacy", "decode": "sample",
+             "seed": seed, "temperature": 0.6, "answer": "Rome", "cot": ""},
+            {"case_id": "c0", "budget": "B3", "probe": "efficacy", "decode": "sample",
+             "seed": seed, "temperature": 0.6, "answer": b3_answer,
+             "cot": ("Paris" if b3_answer == "Paris" else "")},
+        ])
+    path = os.path.join(tmp, "model_ROME_tag_r0.jsonl")
+    _write(path, rows)
+
+    seed0, audit0 = cross_arm.per_case(
+        cfg, "ROME", "B3", decode="sample", seed=0, return_audit=True)
+    seed1, audit1 = cross_arm.per_case(
+        cfg, "ROME", "B3", decode="sample", seed=1, return_audit=True)
+    assert seed0["c0"]["RR"] == 1 and seed1["c0"]["RR"] == 0
+    assert audit0["n_unique_worlds"] == audit1["n_unique_worlds"] == 2
+    assert audit0["n_duplicate_keys"] == audit1["n_duplicate_keys"] == 0
+    try:
+        cross_arm.per_case(cfg, "ROME", "B3", decode="sample")
+    except ValueError as exc:
+        msg = str(exc)
+        assert "multiple independent trajectories" in msg and "select one with seed" in msg
+        assert f"{path}:2" in msg and f"{path}:4" in msg
+    else:
+        raise AssertionError("multiple sampling seeds were silently collapsed")
 
 
 def test_paired_diff_clean_separation():

@@ -1,6 +1,6 @@
-"""论文出图(plan v1.66 / gap-review 必5 重写)。从 paper/results.json + (有则)logit-lens jsonl 出图/表 → paper/*.pdf+png。
+"""论文出图(plan v1.66 / gap-review 必5 重写)。从 paperwriting/results.json + (有则)logit-lens jsonl 出图/表 → paperwriting/*.pdf+png。
 
-  python src/plots.py [--results paper/results.json] [--logitlens ...] [--clr-teaching]
+  python src/plots.py [--results paperwriting/results.json] [--logitlens ...] [--clr-teaching]
 
 图1(重写,承重规格)= **ES 降幅主板**(族内配对 CI + Qwen-32B/Llama-70B 双星标,承重)
                     + **RR 单调副板**(承重支撑)
@@ -20,9 +20,9 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def _save(fig, name):
     for ext in ("pdf", "png"):
-        p = os.path.join(_ROOT, "paper", f"{name}.{ext}")
+        p = os.path.join(_ROOT, "paperwriting", f"{name}.{ext}")
         fig.savefig(p, bbox_inches="tight", dpi=200)
-    print(f"  写出 paper/{name}.pdf+png")
+    print(f"  写出 paperwriting/{name}.pdf+png")
 
 
 def _families(cap):
@@ -186,7 +186,7 @@ def fig3_rq3(rq):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--results", default=os.path.join(_ROOT, "paper", "results.json"))
+    ap.add_argument("--results", default=os.path.join(_ROOT, "paperwriting", "results.json"))
     ap.add_argument("--logitlens", default=os.path.join(_ROOT, "results", "probe", "logitlens_cf200_ROME_B3.jsonl"))
     ap.add_argument("--clr-teaching", action="store_true",
                     help="fig1 加 CLR 教学板(带 base 底噪虚线;默认关=省 float 预算、避免 CLR 被当涌现主证据)")

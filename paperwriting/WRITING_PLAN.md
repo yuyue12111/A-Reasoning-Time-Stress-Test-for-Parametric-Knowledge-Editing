@@ -1,0 +1,103 @@
+# WRITING_PLAN.md · 最终写作作战计划（plan v1.89 的执行层）
+
+> 状态：**唯一有效的写作计划**（2026-07-14 仲裁定稿，整合三方审计 + GPT-5.6 复核裁决）。
+> 数字唯一真源 = `paperwriting/results.json`（原 `paper/` 已更名，5 个 src 脚本路径已同步修复）。
+> 铁律：任何数字/显著性/认证措辞先有 results.json JSON path 再落笔（plan v1.65/v1.69）；
+> **投稿前科学队列 = 零**（不跑 B15 interaction、不烧 X-A 池、不加 seed/数据集/编辑器）。
+
+## 0. 论文身份与主 claim（冻结）
+
+**身份**：reasoning-time evaluation / safety stress test（评测证书失效边界），不是"现象+机理+修复"三段论。
+
+**主 claim（英文措辞冻结）**：
+> Direct-answer edit success is an **insufficient certificate** for reasoning-model deployment.
+> We provide a controlled reasoning-time stress test, show the failure it reveals, and demonstrate
+> that this failure admits a **chain-localized causal control point**.
+
+- 用 *insufficient*，禁用 *invalid*（很多部署确是直接回答；prior work 已批评 teacher-forcing 评测；我们证明的是"遗漏一类重要 failure mode"）。
+- 独有性卖点不是"评测有效性"四个字（SCR/ReCoE/CRANE/Inverse-Scaling 都在附近），而是**六元合取**：
+  ① single-edit + 生成式词界判分；② 同一编辑 B0→native chain 的 paired change；③ unedited-base/B0P/sampling 三重控制；④ 两族固定 checkpoint 高端点对称显著；⑤ 只动 think span、答案 logits untouched 的 signed 因果干预；⑥ ROME/MEMIT/active-paraphrase 的有限迁移。
+
+## 1. 三条贡献与证据阶梯（每条注 JSON path）
+
+### C1 · Reasoning-time evaluation gap（主贡献）
+- Qwen-32B ES-drop `.106[.030,.182]`、Llama-70B `.107[.032,.182]`（`capability.families`，六格仅此两格显著，明写 fixed-checkpoint scope）
+- 编辑特异：base drift `−.0201[−.0804,.0402]` null（`base_probe.f1_edit_specificity.paired_ci`）
+- 内容驱动：B0/B0P/B1 RR `0/.040/.208`（`f2_zerothink_deconfound`；B0P=固定假思考，非等长 filler，如实写）
+- 采样稳健：F3 以 ES-drop `.117[.067,.169]` 承重（`f3_sampling_robustness.sampling_primary_complete_cases`）；RR 若写必须精确注 estimand（equal-case conditional `.305` vs trajectory-weighted `87/350=.249`），不写"比旧值更强"
+- B15 只说"二值 base-recall 不能完全解释"（`.1005→.0837`，衰减 16.7%，`b15_base_recall_control.b0_primary`）；known/unknown 分层**无 interaction 检验**，不写 effect modification
+- per-case slope `.1094[.0417,.1770]` 与 RR slope `.6444[.1985,1.1427]` 均为 **supporting outcome**（同六 checkpoint、同事实池、RR 经 b0ok 门后 689 rows——不是"第二条独立趋势线"，不用于抬 capability 叙事）
+
+### C2 · Causal diagnosis, not natural mediation（第二贡献）
+证据阶梯**分层报告**（诚实分层本身是 Alignment track 的审计味卖点）：
+- logit-lens：installation sanity（n=23，重施编辑后裸 cloze 首 token pairwise gap，无对照）
+- P0 taxonomy：观察性 route census——n=41 实例 / **33 个独立事实**、Bridge 27/Recall 11/RO 3/Assoc 0、κ=.813（`rq2_taxonomy.p0_corrected_taxonomy`）；CLR 无判别力（OLD 13/13 但非 OLD 18/20 也有 CLR，`p0_downstream_crosswalk`）
+- M1：baseline-risk enrichment（CLR1 层 `−.289 p=.0002` vs CLR0 `+.014 p=.72`，CLR0 有 N_RR=0 地板，`rq3.clr_split_M1`）——写 near-necessity，不写 mediation
+- W-B：概念方向压链（CLR `−.078` 排零）不修答案（RR/ES 含零，`wb_representation_repair.confirm_arms`）= "减少概念表达不充分"的诚实反例
+- T/D/P/C 五臂：**唯一真因果**，识别的是 chain-local old-token control point（`rq3.sup_battery`）
+- **X1 一句正文披露**：预注册 replay 载具门 9/18 FAIL、未救门（`x1_replay_gate.gate`）；完整 gate 表进 supplementary
+- 合法机理句式：*failure coexists with an installed cloze edit; native chains frequently expose Bridge/Recall routes; an old-token-specific intervention in the chain causally changes the untouched answer.*
+- 禁写：re-derivation **causes** the failure / 41/41 证明重推导 / content-driven mechanism 已闭合 / semantic mediation / commitment layer located
+
+### C3 · Bounded mitigation transfer（第三贡献）
+- ROME-32B：T−C 四端点排零（ES `+.1212` RR `−.0943` RRs `−.0566 p=.032`，`rq3.sup_battery.cross_arm_paired_ci`）；T−N 严口径 `p=.073` 如实报；回退 headline 用 RRs/RR 夹层句式（loose 判官精度仅 0.48，`metric_validation`）
+- ROME-14B 复制：**T−N**（14B 无 C 臂，`rq3.s10_14b_fix_replication.TminusN_paired_ci`）
+- MEMIT-14B X2：ES `+.100[.040,.160]` 正、**strict RRs null 并报**（`rq3.x2_memit14b_repair_replication.contrasts_B3.T_minus_C`）；现象行必须带 fresh-N 括注（es_drop `.060[−.020,.140]` ns，`_baseline_discrepancy`）
+- X3：**active lexical paraphrase transfer**（T−C strict PS `+.055[.020,.0925]`），禁写 semantic paraphrase robustness；内容审计 30/40、11/20、κ=.444 如实报
+- C 臂限定语：strong-competitor donor 解码期基本不活跃（B3 改变行 T=109 vs C=18；X3 215 vs 24，`audit.b3_different_probe_rows_vs_N`）→ 写 "above an inert and a largely-inactive strong-competitor control"
+- Loc 只称 target-value non-leakage（`metrics.py` docstring 自认）；genbench 点估等价 + TOST 未认证（`rq3.genbench_b26_tost`），禁写 safety equivalence
+- 定位 = mechanistic probe / edit-aware decoding guard，禁写通用方法或部署级修复
+
+## 2. 图表计划
+
+- **Fig.1 = 认证缺口图，不是 scaling 曲线**。Panel A：六个 fixed checkpoint 的 paired B0/B3 ES change（高端两点突出）；Panel B：32B 的 base/B0P/sampling 控制。raw CLR 与 scale 回归**不得**成为第一视觉。`plots.py` 已按承重规格重写（commit 99dbcfb），需按本节微调面板顺序。
+- Fig.2：机理证据阶梯（cloze 完好 + 路由普查 + 五臂森林图可并入）。
+- Table：RQ3 主表（N/T 对照 + 三轴迁移分层）；`table_rq2.tex` 需从 n=41 taxonomy 重生成（现为已作废 50-池版本）。
+- 预注册 FAIL/gate 全表进 supplementary，正文各一句话（X1 FAIL、W-B null、G5 FAIL 均不可藏）。
+
+## 3. 禁语清单（对账时全文扫描，零命中才准冻结）
+
+`invalid certificate` / `capability-emergent`（headline）/ `scaling law` / `fuel`、`vanishes`（B15 分层无 interaction 检验）/ `re-derivation causes` / `semantic mediation`、`mediates`、`necessity`（近似词用 near-necessity）/ `semantic paraphrase robustness` / `equivalence certified`、`TOST-certified` / `prevents`、`blocks`、`robust to bypass` / 不带夹层限定的 `halves reversion` / `first to discover` / `preregistered` 用于任何无结果前冻结证据的分析。
+
+## 4. 日历（硬线：abstract 7/21、全文 7/28、supp+code 7/31，UTC-12；内部冻结 7/18 / 7/25）
+
+| 段 | 日期 | 内容 | 完成判据 |
+|---|---|---|---|
+| D0 | 7/14–15 | ① 诚实 snapshot commit（见 §5）② LaTeX 主文件建立（AAAI 模板+骨架+bib 起步）③ Fig.1 面板顺序调整 | 主文件可编译 |
+| W1 | –7/18 | ① 唯一 abstract（从冻结块正向写，n=41 taxonomy、RRs/RR 夹层、insufficient-certificate 主 claim）② 三贡献 claim hierarchy 定稿 ③ Fig.1 定稿 ④ §1 引言 | abstract 内部冻结 |
+| W2 | 7/19–23 | 主文四节顺序：§3 evaluation gap → §4 causal diagnosis → §5 bounded guard → §2 related work（SCR=2503.05212、ReCoE=Hua et al. 2401.17585 分拆；新增 Thinking-to-Recall 2603.09906 / LightEdit 2604.19089 / DeCK 2405.11613 / CRANE 2606.09033 / Inverse-Scaling 2507.14417 / belief-depth 2510.17941；维持 controlled-conjunction 定位）→ §6/§7 | 全文初稿 |
+| W3 | 7/24–25 | **只做对账与 hostile review**：① 机器对账（写 checker：全文数字 ↔ results.json path 逐一校验）② 禁语扫描 ③ 判官式全文攻击 ④ abstract↔全文同源核对 | 全文内部冻结 7/25 |
+| 缓冲 | 7/26–27 | 只修不加；任何新数字不进 | — |
+| 提交 | 7/28 | 全文 + checklist | — |
+| R | 7/29–31 | supplementary（prereg gate 全表含 X1/X2/X3/P0/P1 + provenance manifest）+ code 匿名化（按 `prewrite/anonymize_spec.md`、`release_and_licenses.md`）| **上传的 prereg 集合与正文披露逐一一致** |
+| 检查点 | 7/22 | 全文完成度 <70% → 砍 supplementary 深度与图精修，**绝不砍对账** | — |
+| 快扫 | 7/21 | 15 分钟增量查新，只为 §2 补引，不改主张 | — |
+
+## 5. Provenance 政策（GPT-5.6 复核裁决采纳）
+
+- **现在 commit 不能追溯性证明 preregistration**。禁止把 dirty tree 按想象的历史顺序拆成"当时的冻结 commit"，禁止任何形式的历史回填。
+- 做法：**一次诚实 snapshot commit**（消息明写"snapshot as of 2026-07-14, not retroactive freeze evidence"）+ `paperwriting/provenance_manifest.md`（R 段完成），区分两类：
+  - **真·结果前冻结证据**：results.json/audit 块内先于结果落账的 SHA256（如 x1 manifest、p0 判官文件）、服务器文件时间戳、平台日志——这些可称 *prospectively specified*；
+  - **事后记录**：其余一律称 *pre-specified protocol recorded before analysis* 或直接说明 provenance 限制。
+- 7/8 前已 commit 的 prereg（esup 等）保留 git hash 引用；X 系列以 SHA-in-artifact 链为准。
+
+## 6. 叙事工具政策（Idea2Story, arXiv:2601.20833）
+
+- 仅作**人工故事结构 checklist**（谁是主角 / 旧假设是什么 / 我们重定义了哪个问题）用于 W1 的引言与 abstract 打磨。
+- **禁止**：跑其 pipeline、下载其仓库代码进本仓、让任何叙事工具接触数字真源（其示例 `final_story.json` 会在实验前生成虚构结果数字——与本项目数字铁律直接冲突）。
+- 本项目的回答：主角=「编辑认证证书」；旧假设=「直接回答的编辑成功 ⇒ 部署可靠」；重定义=「编辑评测必须包含 reasoning-time stress test，且失败存在链内因果控制点」。
+
+## 7. 投稿后轨道（S 轨，7/29 起，与本次提交完全隔离）
+
+- **X-A 同快照五臂语义充分性**：独立研究轨。7/29 后才允许烧池（700–900 fresh CF×32B/ROME×B0+B3，双 8×H200 fp32 `WHYAAAI_DTYPE=float32`）；prereg v2 那时冻结并 commit（含 answer-only membership 前置门、P1/P2 端点、stop rules）。8/9 事后分解仅作内部 go 判断依据，**永不作为载具成功率证据报告**。产出用途：Phase-2 rebuttal（10/19–25，若进入且规则允许）→ camera-ready/扩展版 → 下一轮投稿升级件。
+- 正文**不**把未运行的 X-A 设计列为贡献或"已冻结下一步"；§6 limitation 仅一句注明识别自然中介所需的实验形态（词法正交受控链替换）留作 future work。
+- 其余 camera-ready 备忘照旧（J-lens 正式版、W-A 扩展、B23 held 臂等，plan 既有清单）。
+
+## 8. 定稿判据（7/25 冻结时逐项打勾）
+
+① checker 通过：全文每个数字有 results.json path；② 禁语清单零命中；③ X1 FAIL / X2 strict null / X3 content audit / W-B null / G5 FAIL 全部可见；④ X2/X3 结果已写入（含 "repair not yet tested with MEMIT" 类过期句清零）；⑤ abstract 与全文数字逐一同源；⑥ taxonomy 全文统一 n=41/33 facts/κ=.813；⑦ Fig.1 第一视觉=认证缺口；⑧ related work 引用归属正确；⑨ provenance manifest 与上传 prereg 集合一致；⑩ 正文无未运行实验的结果性陈述。
+
+## 9. 预期与止损
+
+- 预期：模态面板 `5/6/6`，P(accept)≈45–50%；clear accept 需真语义中介或跨数据集强复制，**本窗口不现实，不追**。
+- 止损：若 7/22 检查点触发，按 §4 降级；若期间发现新 HIGH 撞车，只改 §2 定位语，不改证据结构、不开实验。

@@ -1,0 +1,33 @@
+# X2/C · MEMIT-14B 同 relation 强竞争者抑制对照（prereg-x2-x3.md）。
+# 与 X2/T 仅 source/供体不同；C−N 应与零相容，防“压任意强候选都能修”的替代解释。
+model_tag: r1qwen14b
+seed: 42
+out_dir: results/probe
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-14B
+  stats_dir: ./data/stats_r1qwen14b
+  v_loss_layer: 47
+
+dataset:
+  tag: cf200memit_strong
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 200
+
+budgets: [B0, B3]
+sampling:
+  enabled: false
+probes: [efficacy, locality]
+
+suppress:
+  penalty: 8
+  scope: think
+  source: placebo
+  placebo_map: data/placebo_donors_strong.json
+  apply_to: [efficacy]
+
+editors:
+  MEMIT:
+    hparams: source/EasyEdit/hparams/MEMIT/qwen2.5-7b.yaml
+    layers: [7, 8, 9]

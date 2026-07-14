@@ -1,5 +1,28 @@
 {
- "_note": "论文图表数据源(去污判分口径,plan v1.26/v1.27)。ROME × CounterFact, greedy, n=200。genbench 出后填。",
+ "_note": "Authoritative numeric source. Read each block's _status before using numbers. As of plan v1.88, the shared-disk CPU closeout is PASS for percase/B15-B0/Cap3/F3/X2/X3. All claims remain bounded by fixed-checkpoint, complete-case, editor/model, and lexical-endpoint ceilings. Official X1 9/18 FAIL is immutable; the optional P0 logit-lens per-item crosswalk remains explicitly blocked.",
+ "cpu_closeout_v1_88": {
+  "status": "PASS",
+  "audit": {
+   "path": "results/cpu_closeout_audit.json",
+   "sha256": "158e2a4597086dccf48b804a50f227091ce1623de967c4bc060a24687d875fac",
+   "failures": [],
+   "warnings": [
+    "F3 excludes the three missing B3 seed pairs for cf_10436 and uses the frozen complete-case estimand over 199 cases/597 pairs.",
+    "F3 retains 16 upstream OOM error rows as provenance; only cf_10436 lacks a primary B3 endpoint.",
+    "The optional P0 logit-lens crosswalk remains BLOCKED_MISSING_PER_ITEM_ARTIFACT; this does not gate the six core CPU analyses."
+   ]
+  },
+  "artifacts": {
+   "percase_caseblock": "32a35c7c4ff26819372a4287568ac9869c76496d4b6b91176c87187d7591d1a4",
+   "b15_caseblock_B0": "3a663c447031a14b2f0f58d1f7eb8b09892d8c20543e92ce688da98b657c8d0f",
+   "b15_caseblock_B3_sensitivity_only": "f1833e95d58c4dee7949c072e6d3a7ae1baa438f8e5215dbe0ab400972c6e6e1",
+   "cap3_caseblock": "288cf5a14d1fb0521b1d8ec6b619f85a0e1606bbf59a52ecc76982c7a4b75991",
+   "f3_sampling_recalc": "0f0b779f86c6b4a86a8d8bbeb60409ac84a370ff58a3e69a6f5add14ea5f5833",
+   "x2_memit14b_crossarm_v2": "e11666014d70b9e57b858a7daf32e368e5278f99924e17a3f44223a4d5fbbe2f",
+   "x3_para_crossarm_v2": "ba2b3caaf365b56dc7cfb62a71d836f4fe6c56bc549f4e6e5fb2e0dcac4746ee"
+  },
+  "claim_ceiling": "The percase/B15/Cap3 intervals quantify fact-sampling uncertainty conditional on observed fixed checkpoints, not a model-population scaling law or capability causality. B15 rejects full explanation by the measured binary B0 base-recall proxy, not all residual knowledge/capability confounding. X2/X3 retain their editor/model/benchmark and lexical-endpoint boundaries."
+ },
  "capability": {
   "_schema": "families[name] = {params_b, es_b0, es_b3, es_drop, es_drop_ci, es_drop_sig, rr, rr_ci, clr, clr_ci};新点直接 append 进对应族的每个数组(须 results.json 真实数,[pending] 的点先别加);plots.fig1 每族一条线。flat 旧式(顶层直接放数组)仍兼容=单族 Qwen。",
   "_bos_note": "口径:R1-Distill-Qwen/Llama tokenizer 均 add_bos_token=False。旧 Qwen 7/14/32B 实际无 BOS 跑出(鲁棒、趋势干净);Llama 缺 BOS 退化故必补 BOS。BOS A/B(1.5B,n=40,同 40 case):ON vs OFF 的 ES@B0 0.525/0.550、ES@B3 0.550/0.575、ES降幅 −0.025/−0.025(同)、CLR 0.275/0.225、RR 0.048/0.045 —— 差异 ≤1–2 case、CI 大幅重叠 → BOS 对 Qwen 无材料级影响,旧 Qwen 点有效、跨族对比不被 BOS 混淆。论文 §3 注此 robustness。",
@@ -578,7 +601,7 @@
    "_note": "部署口径双双过门(GSM8K Δ+0.005 / MATH 0.000,均≤0.02)→ 抑制器对非编辑通用能力近零伤害。绝对值从最坏界 harness 的 0.535/0.150 涨回 0.855/0.700=印证旧低分是 B3=8192 截断伪影(B3M=16384 解),非模型不行。注:single+think 误施于全部通用 query 仍是上界——部署时抑制器只在编辑 query 触发、非编辑 Δ=0 by construction。"
   },
   "genbench_worstcase": {
-   "_note": "病态最坏界(并集全部 o_old + scope=all,远超部署)+ harness 欠测(base 32B GSM8K 0.535/MATH 0.150 远低于已知 ~0.95/0.90:think_budget B3=8192 截 MATH 长链于 boxed 前、答案段 256 截重述)→ Δ 既不能证伤也不能证不伤=uninformative,仅留作 stress-test 上界。面板 wjt97ozxo 已裁定 RQ3=SURVIVE-WITH-REFRAME(主腿在被编辑 query 答案上、与此正交)。部署口径门待修 harness(已加 B3M=16384/answer_cap/解除 scope 硬编码,commit 见 git)后 single+think 复测。",
+   "_note": "HISTORICAL/SUPERSEDED stress test. 病态最坏界(并集全部 o_old + scope=all,远超部署)+ harness 欠测(base 32B GSM8K 0.535/MATH 0.150 远低于健康基线)使其 uninformative。修复后的部署口径全量结果已在 rq3.genbench_b26_tost 落账；本块不再触发待跑任务。",
    "gate": "|delta_acc|<=0.02",
    "gate_pass": false,
    "gsm8k": {
@@ -699,6 +722,692 @@
     "_note": "cross_arm 按 case_id 配对(N=probe14b.yaml, T=probe14b_sup.yaml)。**四指标全排零**——尤其 RR/RRs 配对 p=.025/.035 均显著,【比 32B 更干净】(32B 的 RRs T−N p=.073 擦边,终极review B17 点名);→ '修复砍半回退'在 14B 的最严配对口径下也成立,B17 的自伤风险在 14B 消失。"
    }
   },
+  "x2_memit14b_repair_replication": {
+   "_status": "PASS(X2;prereg-x2-x3.md;fresh-N/T/C 同协议;n=200/arm;32 shards/arm;0 errors)。T−C ES@B3 确认性对比 PASS；RR/CLR 同向、严口径 RRs 为 null。C−N 与 0 相容但不是等价认证。v1.87 duplicate-safe CPU rescore 与旧数字零漂移。",
+   "source": {
+    "audit_attachment": "/Users/whyu/.codex/attachments/a182907e-4c64-4dc5-9d63-5b43ff3f8b7f/pasted-text.txt",
+    "audit_attachment_sha256": "145cf47593fa90a6d40156f2b529a436c6280f0d3e3ad187feb177cc8280355f",
+    "server_artifacts": [
+     "results/x2_full_audit.json",
+     "results/x2_memit14b_crossarm.json",
+     "results/x2_memit14b_crossarm_v2.json",
+     "results/x2_n_config.txt",
+     "results/logs/x2_N_score.txt",
+     "results/logs/x2_T_score.txt",
+     "results/logs/x2_C_score.txt",
+     "results/logs/x2_crossarm.txt",
+     "results/probe/r1qwen14b_MEMIT_cf200memit_freshn_r*.jsonl",
+     "results/probe/r1qwen14b_MEMIT_cf200memit_sup_r*.jsonl",
+     "results/probe/r1qwen14b_MEMIT_cf200memit_strong_r*.jsonl"
+    ],
+    "cpu_rescore_v2": {
+     "path": "results/x2_memit14b_crossarm_v2.json",
+     "sha256": "e11666014d70b9e57b858a7daf32e368e5278f99924e17a3f44223a4d5fbbe2f",
+     "role": "duplicate-safe CPU rescore; preserves the full-audit/runtime provenance rather than replacing it",
+     "duplicate_world_audit": "PASS for N/T/C; 400 unique worlds per arm; zero duplicate keys or deduplicated rows"
+    },
+    "n_config": "experiments/memit14b_freshn.yaml",
+    "n_config_reason": "旧 N 在先前 smoke audit 中因缺 code/runtime/actual-model provenance 触发 preregistered fresh-N；full audit 中 fresh N/T/C 达 strict provenance parity。"
+   },
+   "protocol": {
+    "model": "DeepSeek-R1-Distill-Qwen-14B",
+    "editor": "MEMIT",
+    "dataset": "CounterFact prefiltered, frozen seed-42 order",
+    "layers": [
+     7,
+     8,
+     9
+    ],
+    "arms": {
+     "N": "fresh no suppression",
+     "T": "suppress o_old",
+     "C": "suppress frozen same-relation strong competitor"
+    },
+    "n_per_arm": 200,
+    "b0ok_n": 112,
+    "budgets": [
+     "B0",
+     "B3"
+    ],
+    "decode": "greedy",
+    "penalty": 8,
+    "scope": "think",
+    "dtype": "float32",
+    "no_bos": true,
+    "bootstrap": "case-paired, 10000 resamples, seed 42"
+   },
+   "audit": {
+    "status": "PASS",
+    "failures": [],
+    "warnings": [
+     "T/C server upload lacked .git metadata; exact per-file code_sha256 was authoritative and matched."
+    ],
+    "shards": {
+     "N": 32,
+     "T": 32,
+     "C": 32
+    },
+    "errors": {
+     "N": 0,
+     "T": 0,
+     "C": 0
+    },
+    "b0_byte_identity": {
+     "T_vs_N": {
+      "compared_probe_rows": 400,
+      "different": 0,
+      "missing": 0
+     },
+     "C_vs_N": {
+      "compared_probe_rows": 400,
+      "different": 0,
+      "missing": 0
+     },
+     "note": "400 是 200 cases×{efficacy,locality} 的 probe rows，不是 400 cases。"
+    },
+    "b3_different_probe_rows_vs_N": {
+     "T": 109,
+     "C": 18,
+     "probe": "efficacy only"
+    },
+    "mom2_cache_load_lines": 192,
+    "provenance_parity": "strict"
+   },
+   "marginal": {
+    "B0_all_arms_exact": {
+     "n": 200,
+     "ES": 0.56,
+     "ES_count": 112,
+     "ES_ci": [
+      0.49,
+      0.63
+     ],
+     "ESf": 0.65,
+     "RR": 0.0,
+     "RRs": 0.0,
+     "CLR": 0.0,
+     "Flip": 0.145,
+     "Loc": 0.96
+    },
+    "B3": {
+     "N": {
+      "n": 200,
+      "ES": 0.5,
+      "ES_count": 100,
+      "ES_ci": [
+       0.43,
+       0.57
+      ],
+      "ESf": 0.605,
+      "RR": 0.2054,
+      "RR_count_over_b0ok": "23/112",
+      "RR_ci": [
+       0.134,
+       0.286
+      ],
+      "RRs": 0.0714,
+      "RRs_count_over_b0ok": "8/112",
+      "CLR": 0.46,
+      "CLR_count": 92,
+      "CLR_ci": [
+       0.39,
+       0.53
+      ],
+      "Flip": 0.165,
+      "Loc": 0.965
+     },
+     "T": {
+      "n": 200,
+      "ES": 0.615,
+      "ES_count": 123,
+      "ES_ci": [
+       0.545,
+       0.68
+      ],
+      "ESf": 0.655,
+      "RR": 0.0982,
+      "RR_count_over_b0ok": "11/112",
+      "RR_ci": [
+       0.045,
+       0.152
+      ],
+      "RRs": 0.0446,
+      "RRs_count_over_b0ok": "5/112",
+      "CLR": 0.235,
+      "CLR_count": 47,
+      "CLR_ci": [
+       0.175,
+       0.295
+      ],
+      "Flip": 0.065,
+      "Loc": 0.965
+     },
+     "C": {
+      "n": 200,
+      "ES": 0.515,
+      "ES_count": 103,
+      "ES_ci": [
+       0.445,
+       0.585
+      ],
+      "ESf": 0.61,
+      "RR": 0.1964,
+      "RR_count_over_b0ok": "22/112",
+      "RR_ci": [
+       0.125,
+       0.277
+      ],
+      "RRs": 0.0714,
+      "RRs_count_over_b0ok": "8/112",
+      "CLR": 0.455,
+      "CLR_count": 91,
+      "CLR_ci": [
+       0.385,
+       0.525
+      ],
+      "Flip": 0.16,
+      "Loc": 0.965
+     }
+    },
+    "es_drop_B0_to_B3": {
+     "N": [
+      0.06,
+      [
+       -0.02,
+       0.14
+      ]
+     ],
+     "T": [
+      -0.055,
+      [
+       -0.14,
+       0.03
+      ]
+     ],
+     "C": [
+      0.045,
+      [
+       -0.035,
+       0.125
+      ]
+     ]
+    }
+   },
+   "contrasts_B3": {
+    "T_minus_C": {
+     "ES": {
+      "n": 200,
+      "mean": 0.1,
+      "ci": [
+       0.04,
+       0.16
+      ],
+      "p_bootstrap": 0.002
+     },
+     "RR": {
+      "n": 112,
+      "mean": -0.0982,
+      "ci": [
+       -0.1696,
+       -0.0268
+      ],
+      "p_bootstrap": 0.0126
+     },
+     "RRs": {
+      "n": 112,
+      "mean": -0.0268,
+      "ci": [
+       -0.0804,
+       0.0268
+      ],
+      "p_bootstrap": 0.3998
+     },
+     "CLR": {
+      "n": 200,
+      "mean": -0.22,
+      "ci": [
+       -0.28,
+       -0.165
+      ],
+      "p_bootstrap_raw": 0.0,
+      "report_as": "p<0.0002 (10000-bootstrap resolution; not an exact p-value)"
+     }
+    },
+    "C_minus_N": {
+     "ES": {
+      "n": 200,
+      "mean": 0.015,
+      "ci": [
+       0.0,
+       0.035
+      ],
+      "p_bootstrap": 0.0948
+     },
+     "RR": {
+      "n": 112,
+      "mean": -0.0089,
+      "ci": [
+       -0.0268,
+       0.0
+      ],
+      "p_bootstrap": 0.7364
+     },
+     "RRs": {
+      "n": 112,
+      "mean": 0.0,
+      "ci": [
+       0.0,
+       0.0
+      ],
+      "p_bootstrap": 1.0
+     },
+     "CLR": {
+      "n": 200,
+      "mean": -0.005,
+      "ci": [
+       -0.025,
+       0.01
+      ],
+      "p_bootstrap": 0.7762
+     }
+    },
+    "T_minus_N": {
+     "ES": {
+      "n": 200,
+      "mean": 0.115,
+      "ci": [
+       0.055,
+       0.175
+      ],
+      "p_bootstrap": 0.0004
+     },
+     "RR": {
+      "n": 112,
+      "mean": -0.1071,
+      "ci": [
+       -0.1786,
+       -0.0357
+      ],
+      "p_bootstrap": 0.0066
+     },
+     "RRs": {
+      "n": 112,
+      "mean": -0.0268,
+      "ci": [
+       -0.0804,
+       0.0268
+      ],
+      "p_bootstrap": 0.3998
+     },
+     "CLR": {
+      "n": 200,
+      "mean": -0.225,
+      "ci": [
+       -0.285,
+       -0.165
+      ],
+      "p_bootstrap_raw": 0.0,
+      "report_as": "p<0.0002 (10000-bootstrap resolution; not an exact p-value)"
+     }
+    }
+   },
+   "preregistered_decision": {
+    "_role": "HISTORICAL_JOINT_GATE_AUDIT_ONLY; C-N compatibility is not equivalence and T-N direction is non-gating",
+    "primary_T_minus_C_ES_ci_above_zero": true,
+    "C_minus_N_ES_RR_RRs_compatible_with_zero": true,
+    "T_minus_N_repair_direction": true,
+    "overall": "PASS",
+    "strict_RRs_significant": false
+   },
+   "sound_inference_decision": {
+    "status": "PASS",
+    "confirmatory_endpoint": "T-C strict ES at B3",
+    "criterion": "paired case bootstrap CI lower bound > 0",
+    "T_minus_C_confirmed": true,
+    "C_minus_N": "compatible with zero; equivalence NOT TESTED",
+    "T_minus_N": "descriptive/non-gating",
+    "strict_RRs": "null"
+   },
+   "claim_ceiling": "合法结论：在严格同协议 MEMIT-14B 上，think-only o_old suppression 相比同关系强竞争者使 B3 strict ES +10.0pp[4.0,16.0]、loose RR −9.8pp[−17.0,−2.7]，支持修复跨编辑器转移。必须同报 RRs null；C−N 只是与 0 相容而非等价认证；本次不是完整五臂复制。",
+   "_baseline_discrepancy": {
+    "fresh_X2_N": "B0 ES .560;B3 ES .500;es_drop .060[-.020,.140];RR .205",
+    "legacy_memit_replication_B22": "B0 ES .540;B3 ES .450;es_drop .090[.010,.170];RR .333",
+    "rule": "不得覆盖/合并旧 memit_replication。X2 因 N/T/C 严格配平可承重修复因果对比，但 fresh N 不再次支持显著 MEMIT ES erosion；旧 B22 的 cohort/code/runtime provenance 需另行补齐或降级。"
+   }
+  },
+  "x3_rome32b_active_paraphrase": {
+   "_status": "PASS with v1.87 inference refresh complete. Fresh mp2 N/T/C has n=200 cases/arm, 400 para rows/arm, 32 shards/arm, 0 errors. The sound confirmatory result is T-C strict-PS CI above zero. The legacy three-condition joint gate is retained only as historical audit because C-N CI inclusion of zero is not equivalence and T-N positivity is non-gating. Fixed-N-B0 old-only secondary remains directional/null (110<140 cases).",
+   "source": {
+    "audit_attachment": "/Users/whyu/.codex/attachments/6c9ec587-36e6-45b4-aaac-59d3f77863af/pasted-text.txt",
+    "audit_attachment_sha256": "88df989a5f3a9b1bec69ca2bbd9632653c71dbb2c94fed7d13a6b775bc85f89b",
+    "server_artifacts": [
+     "results/x3_full_audit.json",
+     "results/x3_para_crossarm.json",
+     "results/x3_para_crossarm_v2.json",
+     "results/x3_day0.json",
+     "results/x3_para_audit20.json",
+     "results/logs/x3_N_score.txt",
+     "results/logs/x3_T_score.txt",
+     "results/logs/x3_C_score.txt",
+     "results/logs/x3_crossarm.txt",
+     "results/probe/r1qwen32b_ROME_cf200para_freshn_mp2_r*.jsonl",
+     "results/probe/r1qwen32b_ROME_cf200para_sup_mp2_r*.jsonl",
+     "results/probe/r1qwen32b_ROME_cf200para_strong_mp2_r*.jsonl"
+    ],
+    "day0_sha256": "39592a0b42c60d1c72592a7c627afc7bc8967fe82780d0cba8320f7051f63346",
+    "paraphrase_manifest20_sha256": "374efa6d6156809c5e11cd3f39ca4b2ba938745e8da75170aa5084e03de0d035",
+    "cpu_rescore_v2": {
+     "path": "results/x3_para_crossarm_v2.json",
+     "sha256": "ba2b3caaf365b56dc7cfb62a71d836f4fe6c56bc549f4e6e5fb2e0dcac4746ee",
+     "role": "sound inference-label refresh; all endpoint values are unchanged from the original aggregate",
+     "duplicate_boundary": "cross_arm_para hard-fails duplicate selected keys, but v2 does not serialize a trajectory-aware release-grade duplicate audit; retain the full audit and raw shards"
+    },
+    "note": "The full-audit, score reports, cross-arm aggregate, legacy Day-0 summary, and seed-42 20-case paraphrase manifest have now been returned. Three independent content audits were subsequently merged in results/x3_para_audit20_labels.json. Raw shards and all server artifacts must be retained for release-grade reproduction."
+   },
+   "legacy_day0_audit": {
+    "role": "audit-only legacy N from experiments/probe32b.yaml; never pooled with the final fresh-mp2 N/T/C arms",
+    "selected_cases": 200,
+    "shards": 8,
+    "error_rows": 10,
+    "B0": {
+     "PS": 0.3625,
+     "observed_cases": 200,
+     "observed_rows": 400,
+     "missing_rows": 0,
+     "missing_rate": 0.0
+    },
+    "B3": {
+     "PS_observed_rows": 0.42346938775510207,
+     "observed_cases": 197,
+     "observed_rows": 392,
+     "missing_rows": 8,
+     "missing_rate": 0.02
+    },
+    "b0_success_gate": {
+     "cases": 110,
+     "rows": 145,
+     "case_gate_rate": 0.55,
+     "row_gate_rate": 0.3625
+    },
+    "claim_ceiling": "This documents the legacy pre-run audit and its missingness. It is not an estimate for the final fresh-mp2 N arm and does not alter the X3 primary endpoint."
+   },
+   "paraphrase_manifest20_audit": {
+    "seed": 42,
+    "n_unique_cases": 20,
+    "n_paraphrases": 40,
+    "recorded_question_slots": 80,
+    "present_recorded_questions": 78,
+    "missing_recorded_questions": [
+     "cf_8371/B3/para0",
+     "cf_8371/B3/para1"
+    ],
+    "present_questions_exactly_match_frozen_paraphrases": true,
+    "qualitative_label_fields_present": false,
+    "status": "MANIFEST VERIFIED; LABELS STORED SEPARATELY",
+    "claim_ceiling": "The seed-42 audit sample and prompt identity are verified here; qualitative labels are in the separate three-judge aggregate below."
+   },
+   "paraphrase_content_audit20": {
+    "status": "PASS",
+    "source": {
+     "aggregate": {
+      "path": "results/x3_para_audit20_labels.json",
+      "sha256": "3c9eb3035059afa09f1fbecd06872bebc03c33e940e9ae3d76f17c265df300fb"
+     },
+     "judge_files": {
+      "J1": "c0e1364cd0aabac97d89ec3e6e749c0cb3c6fbbc1857e8f1aca4ab9aa011c1f7",
+      "J2": "663ae31603b31eb105ff9b396e5075ddc68512d16e4add6d393b1ac97c3c29b1",
+      "J3": "38893135194845afaf98edd3138c4c3a756f203c7d2f748eb36776de026aa8df"
+     }
+    },
+    "unit": "40 frozen paraphrases nested in 20 cases; three repeated ratings per paraphrase are not independent samples",
+    "majority_counts": {
+     "readable": "36/40",
+     "answerable_same_fact": "30/40",
+     "prefix_changes_requested_fact": "2/40",
+     "audit_valid": "30/40",
+     "cases_with_both_paraphrases_audit_valid": "11/20"
+    },
+    "agreement": {
+     "readable": {
+      "raw_pairwise": "112/120=.9333",
+      "fleiss_kappa": 0.6296296296296295
+     },
+     "answerable_same_fact": {
+      "raw_pairwise": "92/120=.7667",
+      "fleiss_kappa": 0.44444444444444464,
+      "unanimous": 26,
+      "two_one": 14
+     },
+     "prefix_changes_requested_fact": {
+      "raw_pairwise": "120/120=1.0",
+      "fleiss_kappa": 1.0
+     }
+    },
+    "invalid_item_ids": [
+     "cf_3952|para0",
+     "cf_17506|para0",
+     "cf_17506|para1",
+     "cf_14138|para0",
+     "cf_20733|para1",
+     "cf_8371|para1",
+     "cf_5076|para0",
+     "cf_2477|para0",
+     "cf_14464|para0",
+     "cf_9994|para0"
+    ],
+    "interpretation": "The audit rejects the assumption that the frozen CounterFact paraphrases are uniformly clean: 10/40 fail the majority same-fact/readability/prefix criterion, and exact relation preservation has only moderate inter-rater agreement. This does not filter cases or change the preregistered X3 strict lexical PS PASS, but it lowers the semantic-generalization ceiling: X3 is evidence for active repair on the benchmark's supplied paraphrase strings, not 40/40 verified semantic paraphrases.",
+    "claim_ceiling": "Descriptive audit only. No row is removed, the preregistered X3 primary endpoint and PASS remain unchanged, and semantic validity is not inferred from lexical PS."
+   },
+   "protocol": {
+    "model": "DeepSeek-R1-Distill-Qwen-32B",
+    "editor": "ROME layer 12, v_loss_layer 63",
+    "dataset": "CounterFact prefiltered, frozen seed-42 order",
+    "arms": {
+     "N": "fresh no suppression",
+     "T": "suppress o_old on efficacy, para0, and para1",
+     "C": "suppress frozen same-relation strong competitor on efficacy, para0, and para1"
+    },
+    "n_cases_per_arm": 200,
+    "n_paraphrase_rows_per_arm": 400,
+    "budgets": [
+     "B0",
+     "B3"
+    ],
+    "decode": "greedy",
+    "penalty": 8,
+    "scope": "think",
+    "dtype": "float32",
+    "no_bos": true,
+    "capacity": "two H200s per process, model_parallel=true, WHYAAAI_DEVICE_MAP=balanced",
+    "bootstrap": "paired by case_id+paraphrase_probe; 10000 resamples of whole case_id clusters; seed 42"
+   },
+   "audit": {
+    "status": "PASS",
+    "failures": [],
+    "warnings": [
+     "N/T/C uploaded server checkout lacked .git metadata; exact per-file code_sha256 remains authoritative."
+    ],
+    "fresh_n_required": false,
+    "shards": {
+     "N": 32,
+     "T": 32,
+     "C": 32
+    },
+    "errors": {
+     "N": 0,
+     "T": 0,
+     "C": 0
+    },
+    "b0_byte_identity": {
+     "T_vs_N": {
+      "compared_probe_rows": 600,
+      "different": 0,
+      "missing": 0
+     },
+     "C_vs_N": {
+      "compared_probe_rows": 600,
+      "different": 0,
+      "missing": 0
+     },
+     "note": "600=200 cases x {efficacy,para0,para1}; B0 scope=think is a construction identity check."
+    },
+    "b3_different_probe_rows_vs_N": {
+     "T": 215,
+     "C": 24,
+     "out_of": 400,
+     "probes": "para0+para1 only"
+    }
+   },
+   "marginal": {
+    "B0_all_arms_exact": {
+     "n_cases": 200,
+     "n_paraphrase_rows": 400,
+     "ES_efficacy": 0.595,
+     "PS": 0.3625
+    },
+    "B3": {
+     "N": {
+      "ES_efficacy": 0.495,
+      "RR": 0.193,
+      "RRs": 0.092,
+      "CLR": 0.55,
+      "PS": 0.42
+     },
+     "T": {
+      "ES_efficacy": 0.63,
+      "RR": 0.084,
+      "RRs": 0.042,
+      "CLR": 0.265,
+      "PS": 0.4775
+     },
+     "C": {
+      "ES_efficacy": 0.49,
+      "RR": 0.193,
+      "RRs": 0.092,
+      "CLR": 0.555,
+      "PS": 0.4225
+     }
+    },
+    "es_drop_B0_to_B3": {
+     "N": [
+      0.1,
+      [
+       0.025,
+       0.175
+      ]
+     ],
+     "T": [
+      -0.035,
+      [
+       -0.11,
+       0.04
+      ]
+     ],
+     "C": [
+      0.105,
+      [
+       0.03,
+       0.18
+      ]
+     ]
+    }
+   },
+   "primary_strict_PS_B3": {
+    "T_minus_C": {
+     "n_cases": 200,
+     "n_rows": 400,
+     "T": 0.4775,
+     "C": 0.4225,
+     "mean": 0.055,
+     "ci": [
+      0.02,
+      0.0925
+     ],
+     "p_bootstrap": 0.003
+    },
+    "C_minus_N": {
+     "n_cases": 200,
+     "n_rows": 400,
+     "C": 0.4225,
+     "N": 0.42,
+     "mean": 0.0025,
+     "ci": [
+      -0.0075,
+      0.0125
+     ],
+     "p_bootstrap": 0.8226
+    },
+    "T_minus_N": {
+     "n_cases": 200,
+     "n_rows": 400,
+     "T": 0.4775,
+     "N": 0.42,
+     "mean": 0.0575,
+     "ci": [
+      0.02,
+      0.095
+     ],
+     "p_bootstrap": 0.0014
+    }
+   },
+   "fixed_N_B0_gate_secondary_old_only": {
+    "gate": {
+     "n_cases": 110,
+     "n_rows": 145,
+     "preregistered_confirmatory_floor_cases": 140,
+     "status": "directional_low_gate_n"
+    },
+    "T_minus_C": {
+     "T": 0.055172,
+     "C": 0.068966,
+     "mean": -0.013793,
+     "ci": [
+      -0.041958,
+      0.013699
+     ],
+     "p_bootstrap": 0.4498
+    },
+    "C_minus_N": {
+     "mean": -0.006897,
+     "ci": [
+      -0.021739,
+      0.0
+     ],
+     "p_bootstrap": 0.7274
+    },
+    "T_minus_N": {
+     "mean": -0.02069,
+     "ci": [
+      -0.053691,
+      0.006993
+     ],
+     "p_bootstrap": 0.254
+    },
+    "measurement_note": "The implementation calls this old_commit, but it is the strict lexical indicator hit(o_old) and not hit(o_new), not an answer-judge semantic commitment label."
+   },
+   "preregistered_decision": {
+    "_role": "HISTORICAL_PREREGISTERED_GATE_AUDIT_ONLY",
+    "_warning": "C-N CI contains zero is compatibility, not equivalence; T-N point positivity is not an inferential pass condition",
+    "primary_T_minus_C_PS_ci_above_zero": true,
+    "C_minus_N_PS_ci_contains_zero": true,
+    "T_minus_N_PS_positive": true,
+    "overall": "PASS",
+    "secondary_confirmatory": false
+   },
+   "sound_inference_decision": {
+    "status": "PASS",
+    "x3_primary_confirmed": true,
+    "confirmatory_endpoint": "T-C strict lexical PS at B3 over paired para0+para1 rows",
+    "criterion": "paired case-cluster bootstrap CI lower bound > 0",
+    "C_minus_N": {
+     "status": "COMPATIBLE_WITH_ZERO",
+     "equivalence": "NOT_TESTED; no prospectively specified margin"
+    },
+    "T_minus_N": "descriptive/non-gating",
+     "artifact_refresh": "COMPLETE: results/x3_para_crossarm_v2.json; sha256=ba2b3caaf365b56dc7cfb62a71d836f4fe6c56bc549f4e6e5fb2e0dcac4746ee"
+   },
+   "claim_ceiling": "合法结论：在同协议 ROME-32B 上，把既有 think-only o_old suppressor 主动应用到 CounterFact 的两个 paraphrase probes 后，相比同关系强竞争者，B3 strict lexical paraphrase success 提高 5.5pp [2.0,9.25]；C-N 与 0 相容且 T-N 同向。不得写 passive paraphrase portability、语义 committed-old 显著下降、通用改写鲁棒性或 sequence-level 覆盖；次级 old-only 比较因门后仅 110 cases 且 CI 含 0，只作 directional/null。X3 按 prereg add-only，不进入 abstract。"
+  },
   "m5_reflect_stratification": {
    "_status": "B12(M5 零卡前奏):T−N 修复效应按 N 链是否含反思标记(wait/actually/however/hmm 正则)分层,32B b0ok 门。",
    "reflect_marked": {
@@ -745,6 +1454,231 @@
    "verdict": "★B26 诚实版:全量 n 下 chain-only 抑制器对非编辑 query 通用能力【点估 Δ≈0】(GSM8K +0.000 / MATH −0.010,均 <±0.02);但**保守两比例 90%CI 未收进 ±0.02**,等价【未认证】。根因:off/on 同题同模型高度相关,配对(McNemar)CI 会紧得多,但 per-item 配对数据未回传(只回了聚合 acc)。→ 写作口径:报『点估 Δ + 90%CI』,称『point-equivalent / Δ 落在 ±0.02 内』,**不称 certified equivalent**;若要认证需平台回传 per-item off/on 命中(camera-ready 可补,非必需)。acc_off 0.868/0.618 证旧 worstcase 是 harness 病仍成立。",
    "_CORRECTION": "⚠上一 commit(8d748e8)标题'TOST 认证'【过度宣称】:实算两比例(未配对)90%CI 超 ±0.02(GSM8K ±0.0217,MATH [−0.061,+0.041])→ 等价【未证】。诚实版见下。"
   }
+ },
+ "x1_replay_gate": {
+  "_status": "DONE; preregistered Stage-0 FAIL. Technical/provenance gates all PASS, but fixed natural-chain replay vehicle did not reach the frozen 80% stability threshold; authored five-arm X1 is stopped.",
+  "protocol": {
+   "model": "DeepSeek-R1-Distill-Qwen-32B",
+   "editor": "ROME",
+   "edit_layer": 12,
+   "dtype": "float32",
+   "no_bos": true,
+   "capacity": "2xH200 per process, 4 processes, device_map=balanced",
+   "n_frozen": 18,
+   "source_composition": {
+    "main_b3_greedy": 10,
+    "f2_b1_greedy": 5,
+    "f3_historical_sample_seed2": 3
+   },
+   "case_success": "fresh B0 strict ES AND replay answer majority-judged OLD",
+   "pass_threshold": "at least 15/18 (point estimate >=0.80)"
+  },
+  "technical_audit": {
+   "sample_source_seed2": "PASS; raw cf200samp reconstructs 14/14 historical rows with identical case IDs, COT, and answer",
+   "smoke": "PASS; 4/4, 4 shards, 0 errors",
+   "full": "PASS; 18/18, 4 shards, 0 errors",
+   "failures": [],
+   "sources": [
+    "results/x1_sample_source_audit.json",
+    "results/x1_replay_smoke_audit.json",
+    "results/x1_replay_full_audit.json",
+    "results/x1_replay_judge_sample.jsonl",
+    "results/x1_replay_judge_verdicts.jsonl",
+    "results/x1_replay_gate.json"
+   ]
+  },
+  "gate": {
+   "status": "FAIL",
+   "success": 9,
+   "n": 18,
+   "rate": 0.5,
+   "wilson95": [
+    0.2903,
+    0.7097
+   ],
+   "required": 15,
+   "b0_strict": 14,
+   "judge_old_majority": 12,
+   "rule_conjunction_loose": 14,
+   "rule_conjunction_strict": 9,
+   "both_answers": 5,
+   "note": "B0 strict alone capped the conjunction at 14/18 before judging; answer-only OLD majority was independently only 12/18, so the failure does not hinge on the added B0 sanity."
+  },
+  "judge_agreement": {
+   "judges": 3,
+   "votes": 54,
+   "unanimous_cases": "17/18",
+   "fleiss_kappa": 0.9195,
+   "majority": {
+    "old": 12,
+    "new": 1,
+    "neither": 5
+   },
+   "reading": "High agreement rules out judge noise as the explanation for the failed gate."
+  },
+  "by_source": {
+   "main_b3_greedy": {
+    "n": 10,
+    "b0_strict": 10,
+    "judge_old": 6,
+    "success": 6
+   },
+   "f2_b1_greedy": {
+    "n": 5,
+    "b0_strict": 1,
+    "judge_old": 4,
+    "success": 1
+   },
+   "f3_historical_sample_seed2": {
+    "n": 3,
+    "b0_strict": 3,
+    "judge_old": 2,
+    "success": 2
+   }
+  },
+  "interpretation": "The preregistered vehicle fails: four of five F2-sourced cases do not reproduce strict B0 installation, and replay OLD-majority is only 12/18. The completed post-hoc P0 crosswalk independently finds that only 13/18 frozen source answers semantically commit OLD (five are NEITHER), so the source pool was not uniformly committed-old. This diagnosis does not alter the official 9/18 FAIL or stop rule.",
+  "posthoc_membership_warning": "RESOLVED DIAGNOSTICALLY. P0 answer-only membership over the frozen source chains gives OLD/NEW/NEITHER=13/0/5: main=6/0/4, F2=5/0/0, historical sample=2/0/1. Corrected denominators are post-hoc only; the official preregistered 9/18 FAIL is unchanged.",
+  "p0_source_membership_crosswalk": {
+   "status": "PASS",
+   "source": {
+    "path": "results/p0_downstream_crosswalk.json",
+    "sha256": "f034a5f41368effd392a647ebcde7e17f194f3405316f0678a5399747776b4a4"
+   },
+   "n": 18,
+   "old_new_neither": [
+    13,
+    0,
+    5
+   ],
+   "by_source": {
+    "main_b3_greedy": [
+     6,
+     0,
+     4
+    ],
+    "f2_b1_greedy": [
+     5,
+     0,
+     0
+    ],
+    "f3_historical_sample_seed2": [
+     2,
+     0,
+     1
+    ]
+   },
+   "non_old_item_ids": [
+    "a3|32b|cf_19889",
+    "a3|32b|cf_1235",
+    "a3|32b|cf_14660",
+    "a3|32b|cf_10410",
+    "b16|qwen32b-sample|cf_390"
+   ],
+   "official_gate": "UNCHANGED: preregistered 9/18 FAIL",
+   "claim_ceiling": "Post-hoc source-membership diagnostic only; no recomputation, rescue, filtering, or reopening of X1."
+  },
+  "p1_reload_capacity_diagnostic": {
+   "_status": "DONE; extended deterministic CPU audit PASS (status=PASS, failures=[], warnings=[], extended_audit_status=PASS). P1 closes topology/node/reload/answer-surface/recorded-update-magnitude explanations for the frozen current-snapshot diagnostic only.",
+   "source": {
+    "returned_attachment": "/Users/whyu/.codex/attachments/2f46e14d-255b-4145-955c-8441d699f682/pasted-text.txt",
+    "returned_attachment_sha256": "70b506e3971e738fb4173574101e12b56de4ce54ee5ed707f443276e238d3ea2",
+    "attachment_note": "The pasted attachment begins after the outer opening brace and is not itself valid JSON. The authoritative raw first-pass artifact remains the server file.",
+    "server_first_pass_summary": "results/p1_reload_summary.json",
+    "server_extended_summary": "results/p1_reload_summary_v2.json",
+    "server_extended_summary_sha256": "cbb969d79b0a4682e28d83bfc672870b93ea8800eb2643735f7f70960e702d41",
+    "raw_pattern": "results/p1/r1qwen32b_ROME_p1_reload_node{A,B}_{single,mp2}_rep{0,1,2}_r*of*.jsonl"
+   },
+   "protocol": {
+    "model": "DeepSeek-R1-Distill-Qwen-32B",
+    "editor": "ROME layer 12, v_loss_layer 63",
+    "endpoint": "fresh B0 strict ES only",
+    "n_frozen_cases": 18,
+    "nodes": 2,
+    "topologies": [
+     "single-H200",
+     "2xH200 balanced model parallel"
+    ],
+    "reloads_per_node_topology": 3,
+    "n_expected_case_edits": 216
+   },
+   "behavior": {
+    "completed_case_edits": "216/216",
+    "all_12_cells": {
+     "strict_b0": "14/18",
+     "rate": 0.777778,
+     "by_source": {
+      "main_b3_greedy": "10/10",
+      "f2_b1_greedy": "1/5",
+      "f3_historical_sample_seed2": "3/3"
+     }
+    },
+    "topology_mp2_minus_single": {
+     "node_A": "0 [0,0]",
+     "node_B": "0 [0,0]",
+     "pooled_node_stratified": "0 [0,0]"
+    },
+    "node_A_minus_B": {
+     "single": "0 [0,0]",
+     "mp2": "0 [0,0]"
+    },
+    "within_cell_reload_instability": {
+     "strict_flag_changes": 0,
+     "answer_hash_changes": 0,
+     "weight_delta_changes": 0
+    },
+    "cross_cell_answer_stability": {
+     "cases_exact_across_all_12_runs": 18,
+     "cases_with_any_cross_cell_difference": []
+    },
+    "case_stability": "All 18 cases are either 12/12 strict successes or 0/12 strict successes; the four stable failures are cf_18471, cf_18494, cf_15609, and cf_2443, all from the F2 stratum."
+   },
+   "recorded_weight_update_audit": {
+    "edited_weight_names": [
+     "model.layers.12.mlp.down_proj.weight"
+    ],
+    "relative_l2_mp2_minus_single": "0 [0,0] on A, B, and pooled node-stratified comparisons",
+    "relative_l2_node_A_minus_B": "0 [0,0] for single and mp2",
+    "failed_cases": {
+     "effective_n_cases": 4,
+     "execution_records": 48,
+     "mean_delta_l2": 6.005357827855959,
+     "mean_relative_l2": 0.02278112383426385,
+     "mean_max_abs_delta": 0.03455685684457421
+    },
+    "succeeded_cases": {
+     "effective_n_cases": 14,
+     "execution_records": 168,
+     "mean_delta_l2": 5.965006457635151,
+     "mean_relative_l2": 0.022628052262471995,
+     "mean_max_abs_delta": 0.03403158871723073
+    },
+    "reading": "There is no zero-update or obvious small-update separation for failed cases. The 48/168 execution counts are twelve exact repeats of 4/14 cases and are not independent inferential units. Norm equality does not establish elementwise tensor equality or a semantic mechanism."
+   },
+   "provenance_audit": {
+    "reported_signature_counts": {
+     "code_sha256": 1,
+     "software": 1,
+     "model_runtime_common": 1,
+     "runtime_env_common": 1
+    },
+    "config_sha256_per_topology": {
+     "single": "9cc6e1cd5e88960500b1aeea99b4efa9e0148d78c63c8ce987d947f189bc6e79",
+     "mp2": "e197e2ae4f4338f2e31984ca8f58578c0622b3afff55bbf878f2fe3d5b7cf08d"
+    },
+    "scorer_parity_pass": true,
+    "release_boundary": "The summary serializes signature counts rather than the concrete signatures. Raw shard metadata remains necessary for third-party provenance verification; all-null-but-identical fields are not independently excluded by the summary alone."
+   },
+   "interpretation": "Across the returned P1 cells, the four frozen fresh-B0 failures do not support a single-versus-mp2 topology, H200-node, repeated-reload, answer-surface nondeterminism, or recorded update-magnitude explanation, and remain concentrated in the F2-enriched frozen stratum.",
+   "unresolved": "P1 has no historical-runtime comparator, so it cannot distinguish case/cohort fragility from historical-versus-current protocol drift or their interaction. It does not identify an F2 mechanism and does not prove that the four cases are intrinsically uneditable.",
+   "diagnostics_status": {
+    "behavioral_endpoint": "terminal",
+    "extended_cpu_audit": "PASS",
+    "restore_limit": "The run exercised finally:restore without row errors, but no post-restore numerical checksum was recorded."
+   },
+   "claim_ceiling": "Diagnostic only. P1 does not alter the official preregistered X1 9/18 FAIL, authorize case filtering, or reopen the stopped five-arm experiment."
+  },
+  "decision": "STOP X1: do not author or run OLD-SEM/NEUTRAL/OLD-LEX/BRIDGE-LEX/NEW-SEM; no successful-case filtering, seed swap, chain truncation, layer/answer-cap tuning, source expansion, or other result-driven rescue.",
+  "claim_ceiling": "On the preregistered committed-reversion-enriched set, the fixed natural-chain replay vehicle failed its stability gate. This invalidates the planned five-arm identification strategy for this submission; it does not show that chain semantics can never causally influence answers."
  },
  "logitlens": {
   "_superseded_by": "rq2_logitlens._authoritative_record(B7 权威 n=23 / 峰值 decoder 58 / 降级为安装 sanity)。本顶层块=首版 32B 单跑记录,数字保留供审计但【写作勿取数】。⚠layers_sampled 是 hs 索引(gap 数组 len=nL+1),按 prereg hs[k]=decoder k−1:负 gap 带(−0.246@hs8 / −0.351@hs12)真值=decoder 7–11,严格在编辑层(12)上游——draft 六处'around edit layer 12'口径错,归 硬伤2(7/9)统一修。",
@@ -887,7 +1821,7 @@
    "M1_scope": "M1 gate 的是 RQ3 修复的链中介@32B 单尺度,【不】背书 RQ2 跨尺度涌现;两条不同 claim,勿混。",
    "Cap_upgrade": "Cap2(clr_rev slope)+Cap3(net-CLR=edited−base 同门 per-case slope + 回归 erosion~capability|base_recall)从【可选→必做】:封死 CLR 涌现 base-floor 共线的唯一路径。范围:只 gate CLR 涌现叙事,不 gate 头牌(F1/M1/32B ES降幅独立成立)。",
    "emergence_slope_honesty_SUPERSEDED": "⚠per-case cluster-robust 涌现 slope 只有 CLR 显著(0.372[0.149,0.800] excl0);RR(0.047[−0.501,0.53])与 es_drop(0.033[−0.037,0.139]) 均【含零 n.s.】。故涌现-as-slope 唯一显著腿=CLR,而 CLR 与 base CLR 底噪(0.582→0.86)共线。=> 不能'降级 CLR 又声称涌现稳';capability-emergence 维持 supporting-trend(印证 MECH-led 降级),头牌压 M1 within-case + F1 change-control + 32B cell-level ES降幅 0.106[0.030,0.182]显著(≠per-case slope,是单模型 bootstrap)。",
-   "emergence_slope_honesty": "✅[clean 重跑更新,2026-07-02]污染修复后(commit e21b67c;32B 曾被 cf200sup 覆盖):es_drop 涌现【复活】显著=0.109[0.036,0.175] p=.003(污染时 0.033 n.s.);rr 0.644 p=.052 擦边;clr raw 强显著但 Cap3 net-CLR=0.049 含零=base 底噪伪影【退役】。→ capability-emergence 由 es_drop(编辑特异、非底噪)承重,比污染版('只 CLR、还共线')强得多。v1.55③ 的悲观部分被翻回。",
+   "emergence_slope_honesty": "[CLOSED v1.87] results/percase_caseblock.json passed duplicate-world and unique-case block audits. The authoritative six-checkpoint es_drop slope is 0.1094[0.0417,0.1770], with facts rather than rows resampled. This supports a positive scale association conditional on the observed checkpoints; it is not a model-population scaling law or a causal capability effect.",
    "_70B_gap_closed": "2026-07-02:70B base 已跑(答旧 B0 0.785→B3 0.810,Δ +0.025;base CLR 0.905)→ 原 '70B base 未跑=Llama 高端无 F1 对照' 缺口关闭;F1 编辑特异现覆盖全 6 尺度(base 全尺度 Δthink 小、edited erosion 远强)。Cap3 net_clr 现可加 70B(edited 0.495−base 0.905=−0.41,合 ~−0.38 平线,不改结论)。"
   },
   "_pending_draft_edits": [
@@ -903,10 +1837,13 @@
    "J-lens/workspace(analysis/10):§5/§7 Discussion 加一段收敛性框架(编辑改自动通路,思考路由进工作空间重推 o_old;F2/M1/链级修复=其行为学签名;hedge,不宣称表征级证据)+ 引用 transformer-circuits 2026 workspace(引用前逐节复核原文)。",
    "J-lens/workspace:§2 related 一行立界(他们研究工作空间本身、零编辑内容;我们=该框架在 editing 安全域首个行为学实例)。",
    "B22 后:§4/§7 加 MEMIT-14B 现象复制行(ES 降幅 0.090、RR@B3 0.333>ROME);§7 单编辑器 limitation 改写为'ROME+MEMIT 两编辑器复现';abstract '(ROME/MEMIT)' 括号保留(有数)。",
+   "X2 后:§6/正文或 supplementary 加 fresh-protocol MEMIT-14B N/T/C 修复复制——主报 T−C ES +0.100[0.040,0.160]、RR −0.098[−0.170,−0.027]、CLR −0.220[−0.280,−0.165]；C−N 的 ES/RR/RRs 与 0 相容，T−N 同方向。必须同报 RRs −0.027[−0.080,+0.027] null；禁写 C≡N、所有回退口径显著或完整五臂复制。fresh N 的 es_drop .060[−.020,.140] 与 legacy B22 .090[.010,.170] 不同，二者分块、不得用 X2 再背书 B22 现象显著性。权威路径=rq3.x2_memit14b_repair_replication。",
+   "X3 后:add-only 写入正文或 supplementary——在 suppressor 主动接到 para0/para1 时，strict lexical PS 的 T−C=+0.055[+0.020,+0.0925]、C−N=+0.0025[−0.0075,+0.0125]、T−N=+0.0575[+0.020,+0.095]，主门 PASS。必须同报固定 N-B0 门仅110 cases<140，strict old-only T−C −0.0138[−0.0420,+0.0137] null。禁写 passive paraphrase portability、semantic committed-old 显著下降、任意改写/sequence-level 鲁棒或跨模型/编辑器泛化；X3 不进 abstract。权威路径=rq3.x3_rome32b_active_paraphrase。",
+   "X1 Stage-0 后:词法正交五臂【停止，不入正文正贡献】。若 supplementary/limitations 需要交代，只写预注册 fixed-natural-chain replay gate FAIL：技术18/18无错，但 B0 strict=14/18、answer-only judge OLD=12/18、联合成功=9/18=.500[Wilson .290,.710]，门=15/18；17/18判官全票一致、κ=.920。禁从成功9条筛子集继续五臂，禁把 FAIL 解读成『链语义一般无因果作用』。权威路径=x1_replay_gate。",
    "M4/B17 后:§6 修复特异性主报改走 T−C(四指标全排零含 RRs p=.032)而非 T−N(RRs p=.073);B17 的'验证口径上不显著'风险消除,RRs 可安全进主表。",
-   "B15 PASS 后:contrib-3 升格版启用('grows with model capability — edit-specific and robust to per-case base-knowledge control');§4 加 B15 一句+分层彩蛋(燃料/引擎);图1 主板定 es_drop(G 节缓解:族内配对 CI+高端显著点高亮,RR 副板)。",
-   "B11/K2′ 后:Discussion 的 KC 段可用主导措辞(25.0% vs 3.2%,8×)+ confabulation 注脚(1/31);与 B15 燃料/引擎互证。",
-   "B16 后:contrib-2/§5 数字更新——'bridge-dominant (68%), flat recall a real minority (22%), never-silent 49/50(1 例分裂票)';taxonomy 表加 5 新 cell(含首批 Llama);R3 preempt 改写为'50 committed reversions across 7 cells/2 families'。【headline 裁决 2026-07-08 必1】contrib-2 主口径=50-池 68%(B16);17-池中性重跑 82.4% 仅作伴报一句(neutral-judge robustness,勿混池,遵 b16_widened_pool 并列不混池纪律);S1 旧 '~81%/~90% bridge' 一律 superseded。",
+   "B15 case-block 后:[CLOSED v1.88] 五个 matched checkpoints 上，B0-base-recall control 后 es_drop slope=.0837[.0158,.1510]，相比 matched baseline .1005[.0335,.1684] 约衰减 16.7% 但仍排零。只写『不被二值 B0 base-answer recall 完全解释的 fixed-checkpoint size association』，不写 scaling law/capability causality/知识混淆已穷尽。",
+   "B11/K2′ 后:Discussion 的 KC 段可用主导措辞(25.0% vs 3.2%,8×)+ confabulation 注脚(1/31)。可与 B15-B0 合成为『基座知识是重要条件，但二值覆盖不能完全解释尺度关联』；不用『燃料/引擎』作因果分解。",
+   "[HOLD until P0] B16 的 '50 committed reversions'/68-22-8-2 与 17-池 82.4% 暂停写入；先对全部101 candidate chain instance 做 answer-only OLD/NEW/NEITHER 重门控，再重算分母、路线比例与κ。原 in-pop 且仍 OLD 可复用路线票；新救回 OLD 的原 excluded 行须补跑路线判官。",
    "V1 后:§3 metric 段加 CLR 极性验证注脚(判官验 37 链:paper 口径假阳≈6%,主为否定式;M1/RQ3 用途免疫)。",
    "B7 后:logit-lens 全文统一 n=23、峰值层改 decoder 58(hs59)、'100% intact(n=23)'同句、降级为安装 sanity(B23 无窗版)。",
    "B26 后:§6 部署门用全量 n(1319/500);报点估 Δ(GSM8K +0.000/MATH −0.010,均<±0.02)+ 90%CI,措辞='deployment-caliber suppression leaves general-task accuracy within ±0.02 (point est.), CIs bound but not TOST-certified(paired per-item deferred)';acc_off 0.868/0.618 证旧 worstcase=harness 病(§7/附录一句)。**不写 certified equivalent**。",
@@ -950,7 +1887,7 @@
   }
  },
  "rq2_taxonomy": {
-  "_status": "DONE —— 3-判官面板(workflow wbhgnlufw[14B+32B] + wuq9wq97k[7B],各链×3 判官读 RAW cot、strict precedence Reflective-override>Bridge>Recall>Associative、必引 verbatim span)→ src/chain_classify aggregate(多数决/3-way precedence)+ pool。LaTeX 表 results/a3/table_rq2.tex。",
+  "_status": "P0 COMPLETE. Answer-only membership audit over 101 frozen chain items and the one-row neutral route rescue are closed; the authoritative post-hoc corrected taxonomy has n=41. Historical n=19/17/50 route percentages remain preserved only as superseded audit records.",
   "editor": "ROME",
   "dataset": "CounterFact",
   "decode": "greedy",
@@ -966,6 +1903,305 @@
    "Reflective-override",
    "Associative"
   ],
+  "p0_membership_reaudit": {
+   "_status": "COMPLETE. Membership technical audit PASS for all 101 items; the sole rescued excluded row received three fresh neutral route votes and the corrected taxonomy is closed.",
+   "source": {
+    "sample": {
+     "path": "results/p0_membership_sample.jsonl",
+     "sha256": "13ebe1db80b871ad8d465bac0a9f4bc657e6d209bc1e3b13194e97ffdbbd0dee"
+    },
+    "prompts": {
+     "path": "results/p0_membership_prompts.jsonl",
+     "sha256": "af308481fbbf3a3bd4ecbc322730d7422db3b83cb4057591b03744ede0a44b93"
+    },
+    "judge_files_actual": {
+     "J1": {
+      "path": "results/p0_judgeJUDGE_1.jsonl",
+      "sha256": "a39d7e675d70e8913b531970f7549a9b725944803917bb6de6fa2e4f3dc69acb"
+     },
+     "J2": {
+      "path": "results/p0_judgeJUDGE_2.jsonl",
+      "sha256": "e4f6a26b1bd73aefba22084911a652a1cae2a4fa3e4dcd7387cd6ac6de1ba6d8"
+     },
+     "J3": {
+      "path": "results/p0_judgeJUDGE_3.jsonl",
+      "sha256": "216869710864bbc5f1f202171173a5f0c099ed2871f1d0cee19fcaf41ed90eae"
+     }
+    },
+    "raw_audit": {
+     "path": "results/p0_membership_raw_audit.json",
+     "sha256": "fe721803b6799d56684db6a1c8001654eb27c23de8763989ba90461b7197833b"
+    },
+    "merged_verdicts": {
+     "path": "results/p0_membership_verdicts.jsonl",
+     "sha256": "2f6802501e4748e38e50b07e8ffd1a1ea1df426158db5b7d1169013c3e9e9981"
+    },
+    "aggregate": {
+     "path": "results/p0_membership_audit.json",
+     "sha256": "a5d32a19e1f71360fcc111eb5a52526484e831ad9c7eef5ef590d594bd5bab00"
+    }
+   },
+   "technical_audit": {
+    "status": "PASS",
+    "n_items": 101,
+    "judge_rows_each": 101,
+    "unique_item_ids_each": 101,
+    "exact_item_set_and_order": true,
+    "valid_committed_only": true,
+    "nonempty_reasons": true,
+    "missing_verdicts": [],
+    "insufficient": 0,
+    "format_pollution": false
+   },
+   "membership_votes": {
+    "per_judge_old_new_neither": {
+     "J1": [
+      39,
+      43,
+      19
+     ],
+     "J2": [
+      42,
+      43,
+      16
+     ],
+     "J3": [
+      41,
+      44,
+      16
+     ]
+    },
+    "unanimous_cases": 97,
+    "two_one_majority_cases": 4,
+    "split_1_1_1_cases": 0,
+    "unanimity_rate": 0.9603960396039604,
+    "raw_pairwise_agreement": {
+     "equal_pairs": 295,
+     "all_pairs": 303,
+     "rate": 0.9735973597359736
+    },
+    "membership_fleiss_kappa": 0.9577876845918083,
+    "majority_old_new_neither": [
+     41,
+     43,
+     17
+    ],
+    "unit_note": "The independent unit is 101 chain items; 303 votes are repeated ratings, not independent samples."
+   },
+   "membership_transition": {
+    "current_in_population": 50,
+    "reuse_existing_route_votes": 40,
+    "drops": 10,
+    "drop_item_ids": [
+     "a3|32b|cf_19889",
+     "a3|32b|cf_1235",
+     "a3|32b|cf_14660",
+     "a3|32b|cf_10410",
+     "b16|qwen1.5b-greedy|cf_7744",
+     "b16|llama8b-greedy|cf_3627",
+     "b16|llama8b-greedy|cf_15609",
+     "b16|qwen32b-F2B1|cf_140",
+     "b16|qwen32b-sample|cf_390",
+     "b16|llama70b-greedy|cf_9255"
+    ],
+    "current_excluded": 51,
+    "remain_excluded": 50,
+    "rescues_requiring_route_rejudge": 1,
+    "rescue_item_ids": [
+     "b16|qwen32b-sample|cf_15156"
+    ],
+    "membership_majority_old": 41
+   },
+   "per_pool_cell_transitions": [
+    [
+     "a3/7b",
+     5,
+     3,
+     3,
+     2,
+     0,
+     3,
+     0,
+     0,
+     2
+    ],
+    [
+     "a3/14b",
+     12,
+     4,
+     4,
+     8,
+     0,
+     4,
+     0,
+     0,
+     8
+    ],
+    [
+     "a3/32b",
+     16,
+     10,
+     6,
+     5,
+     5,
+     6,
+     4,
+     0,
+     6
+    ],
+    [
+     "b16/qwen1.5b-greedy",
+     5,
+     2,
+     1,
+     2,
+     2,
+     1,
+     1,
+     0,
+     3
+    ],
+    [
+     "b16/llama8b-greedy",
+     15,
+     7,
+     5,
+     6,
+     4,
+     5,
+     2,
+     0,
+     8
+    ],
+    [
+     "b16/qwen32b-F2B1",
+     18,
+     10,
+     9,
+     8,
+     1,
+     9,
+     1,
+     0,
+     8
+    ],
+    [
+     "b16/qwen32b-sample",
+     14,
+     6,
+     6,
+     6,
+     2,
+     5,
+     1,
+     1,
+     7
+    ],
+    [
+     "b16/llama70b-greedy",
+     16,
+     8,
+     7,
+     6,
+     3,
+     7,
+     1,
+     0,
+     8
+    ]
+   ],
+   "per_pool_cell_columns": [
+    "pool/cell",
+    "N",
+    "current_in",
+    "majority_old",
+    "majority_new",
+    "majority_neither",
+    "keep",
+    "drop",
+    "rescue",
+    "remain_excluded"
+   ],
+   "route_rescue": {
+    "item_id": "b16|qwen32b-sample|cf_15156",
+    "membership_votes": [
+     "neither",
+     "old",
+     "old"
+    ],
+    "prompt_path": "results/p0_route_rescue_prompts.jsonl",
+    "prompt_sha256": "02332cef8feeecf3458f59505e98633345b7483da4290d361eeab7a94fb3c638",
+    "protocol": "src/chain_classify.py:JUDGE_PROMPT_NEUTRAL; three new independent route judges; old Excluded-held votes are forbidden"
+   },
+   "decision": "Route rescue completed: cf_15156 received three fresh neutral Bridge votes. Report only the corrected n=41 taxonomy below as the P0 answer-only-gated route distribution.",
+   "claim_ceiling": "P0 changes only post-hoc diagnostic membership and route denominators. The official X1 9/18 FAIL, X1 stop rule, and no-GPU/no-case-filtering boundaries remain unchanged."
+  },
+  "p0_corrected_taxonomy": {
+   "status": "PASS",
+   "corrected_taxonomy_status": "COMPLETE",
+   "source": {
+    "path": "results/p0_corrected_taxonomy.json",
+    "sha256": "c11c6a0e5a3ecddff6e18aca4f19cfd91c57d4ff88a83012c211b2aef8543290",
+    "rescue_verdicts_sha256": "3c44933d35ded1e8a98431acb646a9cedc4ce847973792f0ce48ebbcb00e441f",
+    "reused_route_vote_lock": {
+     "status": "PASS",
+     "n_reused": 40,
+     "rule": "live three-vote sequence exactly equals the frozen membership-sample existing_route_votes",
+     "a3_neutral_sha256": "8cb06e96ebbdfd3e7c6e62bb71e4bc0c3e76a6c7ba3561a8f4891df8b2ee6208",
+     "b16_sha256": "b53eae02bc322af38a822c4430e2390664695c2c2d2bc7a267fc705bbe6a87fd"
+    }
+   },
+   "n": 41,
+   "dist": {
+    "Bridge": 27,
+    "Recall": 11,
+    "Reflective-override": 3,
+    "Associative": 0
+   },
+   "pct": {
+    "Bridge": 0.6585365853658537,
+    "Recall": 0.2682926829268293,
+    "Reflective-override": 0.07317073170731707,
+    "Associative": 0.0
+   },
+   "agreement": {
+    "unanimous_cases": 35,
+    "two_one_cases": 6,
+    "split_1_1_1_cases": 0,
+    "raw_pairwise_agreement": "111/123=.902439",
+    "fleiss_kappa": 0.8125952260030472
+   },
+   "rescue": {
+    "item_id": "b16|qwen32b-sample|cf_15156",
+    "fresh_route_votes": [
+     "Bridge",
+     "Bridge",
+     "Bridge"
+    ]
+   },
+   "instrument_hardening": {
+    "status": "CODE_FIXED; EXISTING NUMBERS UNCHANGED",
+    "default_prompt": "neutral",
+    "legacy_primed_prompt": "available only via explicit --prompt main for historical reproduction",
+    "split_rule": "any route panel without a two-vote majority requires adjudication/hard fail; no fixed precedence",
+    "current_result_impact": "none: corrected taxonomy has split_1_1_1_cases=0"
+   },
+   "interpretation": "After independent answer-only membership gating, Bridge remains the majority route (27/41), Recall is a substantial minority (11/41), Reflective-override is rare (3/41), and no Associative case remains. This is weaker and cleaner than the superseded 50-row 68/22/8/2% story: the apparent single Associative example disappears, while explicit Recall becomes larger.",
+   "claim_ceiling": "Final post-hoc taxonomy for the frozen 101-item candidate pool. It does not establish natural-chain causal mediation or alter X1."
+  },
+  "p0_downstream_crosswalk": {
+   "status": "PASS_WITH_BLOCKED_COMPONENT",
+   "source": {
+    "path": "results/p0_downstream_crosswalk.json",
+    "sha256": "f034a5f41368effd392a647ebcde7e17f194f3405316f0678a5399747776b4a4"
+   },
+   "x1": "OLD/NEW/NEITHER=13/0/5; official 9/18 FAIL unchanged",
+   "historical_necessity_19": "OLD/NEW/NEITHER=13/3/3; corrected OLD subset historical/raw CLR=13/13 and paper subject-scrubbed CLR=13/13; routes Bridge=10, Recall=2, Reflective-override=1, Associative=0",
+   "all_a3_candidates_33": "OLD/NEW/NEITHER=13/15/5; non-OLD historical/raw CLR=18/20 and paper subject-scrubbed CLR=18/20. The two instruments agree on this frozen subset, but CLR remains non-sufficient for OLD commitment.",
+   "wa_a2rev": "16 W-A rows; 15 overlap P0 a3/32b; overlap OLD/NEW/NEITHER=6/5/4",
+   "logitlens": "BLOCKED_MISSING_PER_ITEM_ARTIFACT: results/probe/logitlens_cf200_ROME_B3.jsonl is absent locally; case IDs are not guessed from aggregate n=23",
+   "claim_ceiling": "All membership-dependent numbers are post-hoc diagnostics over frozen artifacts."
+  },
   "_category_note": "Recall=直陈值无中介;Bridge=经命名中介推出(众数路径);Reflective-override=draft 'dismiss' 收紧(verbalize o_new→反思标记→同段 commit 旧);Associative=残差(implicit-leak/ramble)。draft 旧 3 分不成立:recall/bridge 1:1、dismiss 收紧、必加 Associative。",
   "per_scale": {
    "7B": {
@@ -1116,7 +2352,7 @@
    "verdict": "★最宽字符串口径下 traceless 回退 = 0/17:每一条 committed 回退的链都含 o_old 痕迹 → 『回退从不无声』的行为学底座在最宽口径下成立(本样本)。同时 CLR0_wide∩held=31/35=链不提 o_old 的 case 几乎全守住编辑(与 M1 链中介一致)。W-A A1 主总体=CLR0_wide 全体 n=35(claim=言语化是门控);traceless-回退检验按 prereg 声明本数据不可答(n=0<5)。"
   },
   "b16_widened_pool": {
-   "_status": "B16(终极review 池加宽;5 新 cell × 3 中性判官=205 calls,workflow wbho1h7a7;原始票 results/b16_verdicts.json)。来源:extract_reverted 于 F2-B1/F3-采样/8B/70B/1.5B;与原 neutral 17(7B/14B/32B greedy)并列报,不混池。",
+   "_status": "HISTORICAL/SUPERSEDED. This is the pre-P0 route-classifier 50-row denominator. The answer-only-gated authoritative distribution is rq2_taxonomy.p0_corrected_taxonomy (n=41); the sole rescue is complete.",
    "new_cells": {
     "qwen1.5b-greedy": {
      "chains": 5,
@@ -1183,44 +2419,65 @@
     "provenance_inpop": "50-池=原 17(7B/14B/32B greedy 中性,a3_neutral)+ 新 33(qwen32b-F2B1 10 / llama70b 8 / llama8b 7 / qwen32b-sample 6 / qwen1.5b 2,b16_verdicts);各 cell 名即 run/解码 provenance",
     "write_note": "写作报 68% headline 伴报『合并 50-池 in-pop κ=0.790、panel κ=0.875;与原 17-池 0.765 一致』;低端小 cell 报计数+P̄、勿单报其 κ。table_rq2.tex 已按此重生成(两池并列+κ 行)。"
    },
-   "verdict": "★B16 DONE:机理分母 17→**50 committed reversions**(7 cell/2 族/3 解码-剂量配置)——R3『20 case 撑四结果』拆掉。跨族复现:Llama 8B/70B 同为 Bridge-or-Recall 主导。修正后的路由图景:Bridge 68% 主导、Recall 22%(S1 的'去 prime 后 Recall 非零'在大池坐实=flat recall 是真实少数路由)、RO 8%(4/4 在高能力 cell:70B 3 + 32B 1=Reflective-override 只在高能力 cell 出现的观察,n 小只报计数)、**Associative 1/50(且该例 2-1 分裂票)= 'committed 回退几乎从不无声'在判官级+大池下成立**(与宽口径普查 0/17 互证)。"
+   "verdict": "SUPERSEDED AUDIT RECORD: the pre-P0 classifier yielded 50 rows and 34/11/4/1. It must not be called 50 committed reversions. After answer-only membership gating and the fresh rescue vote, the authoritative result is n=41 with 27/11/3/0; use p0_corrected_taxonomy."
   }
  },
  "emergence": {
-  "_note": "B-emergence:erosion 指标对 log10(参数量)pool 两族回归;slope CI 排零=涌现有统计支撑(非仅靠 2/6 per-cell 显著)。6 点小样、log-params 为能力代理(跨族 alignment 已论证)、不宣称 scaling law。OLS 解析 t-CI(df=n-2)+按点 bootstrap(n=10000,seed42)+逆方差 WLS+family 控制。src/emergence_regression.py 可复现。",
-  "_percase_replacement": "【6 点 OLS→per-case 承重统计的替换记录;数值以 emergence.percase(CLEAN,rows=1194)为准】6 点 OLS 的 p<0.002 来自 point-resample 同 6 cell 均值 → 换 per-CASE 回归(每行=edit-case×尺度,~log10(params)+chain_len,family drop-one FE + 两级 cluster bootstrap)。⚠首跑(rows=1196)受 glob 污染已作废(v1.56);clean 值见 percase:es_drop 0.109[0.036,0.175] p=.003 显著、rr 0.644 p=.052 擦边、clr raw 显著但经 cap3_netclr 判为 base 底噪伪影退役。",
+  "_note": "Scale-association analysis over six observed R1 checkpoints. The authoritative percase block resamples unique facts while retaining their available cross-checkpoint rows; a positive CI supports robustness across these facts conditional on the fixed checkpoints, not a model-population scaling law, discrete emergence threshold, or causal capability effect. The older six-point regressions below are descriptive/sensitivity context.",
+  "_percase_replacement": "v1.87 authoritative replacement: the six-cell long table is analyzed with unique-case block resampling that keeps every fact's available rows across the six fixed checkpoints together. The old family→row intervals remain sensitivity-only.",
   "percase": {
-   "_status": "CLEAN 6-cell(commit 后 glob 污染修复;显式 per-scale --glob:cf200/cf200c2/cf100,无混-tag 告警,rows=1194)。两级 cluster bootstrap(case nested in family,K=2)。取代 6 点 OLS 为承重 emergence 统计。★clean 后 es_drop 涌现【复活】显著(污染时被 cf200sup 抑制数据盖住)。",
+   "_status": "PASS_CASE_BLOCK(v1.87). results/percase_caseblock.json passed the six-world duplicate audit and unique-case block bootstrap. Main inference is fact-sampling uncertainty conditional on these six observed checkpoints; no model-population scaling-law or causal capability claim is licensed.",
+   "_statistical_freeze": {
+    "status": "CLOSED_PASS",
+    "artifact": "results/percase_caseblock.json",
+    "artifact_sha256": "32a35c7c4ff26819372a4287568ac9869c76496d4b6b91176c87187d7591d1a4",
+    "bootstrap_unit": "unique case_id; retain all available scale/family rows",
+    "duplicate_world_audit": "PASS; zero duplicate keys and zero deduplicated rows",
+    "old_numbers_role": "historical family-row sensitivity only",
+    "inference_scope": "fact-sampling uncertainty conditional on six fixed checkpoints; never a model-population scaling law",
+    "headline_worlds": [
+     "results/probe/r1qwen1_5b_ROME_cf200_r*.jsonl",
+     "results/pilot/r1qwen7b_ROME_cf200_r*of8.jsonl",
+     "results/probe/r1qwen14b_ROME_cf200_r*.jsonl",
+     "results/probe/r1qwen32b_ROME_cf200_r*.jsonl",
+     "results/probe/r1llama8b_ROME_cf200c2_r*.jsonl",
+     "results/probe/r1llama70b_ROME_cf100_r*.jsonl"
+    ]
+   },
    "clr": {
     "point": 0.9703,
     "kind": "logit",
     "ci95": [
-     0.5971,
-     1.3503
+     0.7792,
+     1.178
     ],
     "excludes_zero": true,
     "p_slope_le_0": 0.0,
     "n_rows": 1194,
-    "n_families": 2,
+    "n_case_blocks": 200,
     "n_boot_effective": 10000,
+    "bootstrap_unit": "unique case_id; retain all available scale/family rows",
+    "inference_scope": "fact-sampling uncertainty conditional on six fixed checkpoints",
     "_desc": "CLR@B3 ∈{0,1}（链内旧知识泄漏）",
     "statsmodels": {
      "available": false
     },
-    "_base_floor_caveat": "⚠Cap3 实测(emergence.cap3_netclr):raw CLR slope 强显著,但逐 case 减 base 底噪后 net_clr slope=0.049 [−0.024,0.122] p=.093 【含零不显著】 → CLR 涌现≈全由 base CLR 底噪(0.582→0.86 随 scale 升)共线解释,【非】编辑特异涌现。故 CLR 涌现【退役】、只作描述;capability-emergence 靠 es_drop(0.109 p=.003,编辑特异、非底噪)+ rr(p=.052 擦边)。clr_density(Cap1)显著但未扣 base、同受底噪嫌疑=suggestive。"
+    "_base_floor_caveat": "Cap3's primary base-subtracted net-CLR slope contains zero, so raw CLR cannot carry the capability framing. The case-block es_drop association is now authoritative only conditional on the six fixed checkpoints."
    },
    "es_drop": {
     "point": 0.1094,
     "kind": "ols",
     "ci95": [
-     0.0357,
-     0.1748
+     0.0417,
+     0.177
     ],
     "excludes_zero": true,
-    "p_slope_le_0": 0.003,
+    "p_slope_le_0": 0.0008,
     "n_rows": 1194,
-    "n_families": 2,
+    "n_case_blocks": 200,
     "n_boot_effective": 10000,
+    "bootstrap_unit": "unique case_id; retain all available scale/family rows",
+    "inference_scope": "fact-sampling uncertainty conditional on six fixed checkpoints",
     "_desc": "ES 降幅 ES@B0−ES@B3 ∈{−1,0,1}（连续，主结局；正=思考后丢编辑）",
     "statsmodels": {
      "available": false
@@ -1230,21 +2487,24 @@
     "point": 0.6444,
     "kind": "logit",
     "ci95": [
-     -0.1134,
-     1.3723
+     0.1985,
+     1.1427
     ],
-    "excludes_zero": false,
-    "p_slope_le_0": 0.0517,
+    "excludes_zero": true,
+    "p_slope_le_0": 0.0026,
     "n_rows": 689,
-    "n_families": 2,
+    "n_case_blocks": 189,
     "n_boot_effective": 10000,
+    "bootstrap_unit": "unique case_id; retain all available scale/family rows",
+    "inference_scope": "fact-sampling uncertainty conditional on six fixed checkpoints",
     "_desc": "b0ok-gated RR@B3 ∈{0,1}（仅 B0 命中编辑的 case）",
     "statsmodels": {
      "available": false
     }
    },
    "n_rows": 1194,
-   "n_families": 2,
+   "n_case_blocks": 200,
+   "n_fixed_checkpoints": 6,
    "cells_present": [
     "1.5B-Qwen",
     "7B-Qwen",
@@ -1296,14 +2556,16 @@
     "point": 0.0037,
     "kind": "ols",
     "ci95": [
-     0.0018,
-     0.0051
+     0.0025,
+     0.0049
     ],
     "excludes_zero": true,
-    "p_slope_le_0": 0.0001,
+    "p_slope_le_0": 0.0,
     "n_rows": 1194,
-    "n_families": 2,
+    "n_case_blocks": 200,
     "n_boot_effective": 10000,
+    "bootstrap_unit": "unique case_id; retain all available scale/family rows",
+    "inference_scope": "fact-sampling uncertainty conditional on six fixed checkpoints",
     "_desc": "Cap1: CLR 密度 = 链内 o_old 词边界出现次数/chain_len（连续；涌现=更高泄漏率还是只是链更长？控 chain_len 后仍正 slope=前者）",
     "statsmodels": {
      "available": false
@@ -1313,14 +2575,16 @@
     "point": 0.6444,
     "kind": "logit",
     "ci95": [
-     -0.1138,
-     1.3764
+     0.1914,
+     1.1457
     ],
-    "excludes_zero": false,
-    "p_slope_le_0": 0.052,
+    "excludes_zero": true,
+    "p_slope_le_0": 0.003,
     "n_rows": 689,
-    "n_families": 2,
+    "n_case_blocks": 189,
     "n_boot_effective": 10000,
+    "bootstrap_unit": "unique case_id; retain all available scale/family rows",
+    "inference_scope": "fact-sampling uncertainty conditional on six fixed checkpoints",
     "_desc": "Cap2: b0ok-gated CLR∧回退 ∈{0,1}（CLR 限定到真驱动回退的链，重测涌现 slope，剔除『编辑守住但顺带提旧』的 CLR）",
     "statsmodels": {
      "available": false
@@ -1330,25 +2594,82 @@
     "point": 1.1819,
     "kind": "logit",
     "ci95": [
-     0.8612,
-     1.5396
+     0.9189,
+     1.4803
     ],
     "excludes_zero": true,
     "p_slope_le_0": 0.0,
     "n_rows": 794,
-    "n_boot_effective": 10000
+    "n_case_blocks": 200,
+    "n_boot_effective": 10000,
+    "bootstrap_unit": "unique case_id; retain all available scale/family rows",
+    "inference_scope": "fact-sampling uncertainty conditional on six fixed checkpoints"
    },
    "within_Qwen_es_drop": {
     "point": 0.1194,
     "kind": "ols",
     "ci95": [
-     0.0415,
-     0.1983
+     0.0374,
+     0.1995
     ],
     "excludes_zero": true,
-    "p_slope_le_0": 0.0007,
+    "p_slope_le_0": 0.0017,
     "n_rows": 794,
-    "n_boot_effective": 10000
+    "n_case_blocks": 200,
+    "n_boot_effective": 10000,
+    "bootstrap_unit": "unique case_id; retain all available scale/family rows",
+    "inference_scope": "fact-sampling uncertainty conditional on six fixed checkpoints"
+   },
+   "fixed_checkpoint_pairs": {
+    "Qwen_32B_minus_14B": {
+     "n_pairs": 198,
+     "mean_high_minus_low": 0.0657,
+     "ci95": [
+      -0.0303,
+      0.1616
+     ],
+     "excludes_zero": false,
+     "bootstrap_unit": "paired unique case_id",
+     "interpretation": "same-family fixed-checkpoint contrast; does not independently establish a 14B-to-32B increase"
+    },
+    "Qwen_32B_minus_7B_math_confounded": {
+     "n_pairs": 198,
+     "mean_high_minus_low": 0.1263,
+     "ci95": [
+      0.0152,
+      0.2323
+     ],
+     "excludes_zero": true,
+     "bootstrap_unit": "paired unique case_id",
+     "interpretation": "secondary only because the 7B checkpoint has the Qwen2.5-Math parent confound"
+    }
+   },
+   "_family_row_sensitivity": {
+    "es_drop": {
+     "point": 0.1094,
+     "ci95": [
+      0.0359,
+      0.1748
+     ],
+     "excludes_zero": true
+    },
+    "rr": {
+     "point": 0.6444,
+     "ci95": [
+      -0.1127,
+      1.3688
+     ],
+     "excludes_zero": false
+    },
+    "clr_rev": {
+     "point": 0.6444,
+     "ci95": [
+      -0.1138,
+      1.3744
+     ],
+     "excludes_zero": false
+    },
+    "role": "sensitivity only; K=2 families cannot support model-population inference"
    },
    "_superseded_within_qwen_clr_polluted": {
     "slope": 0.365,
@@ -1575,33 +2896,50 @@
    }
   },
   "cap3_netclr": {
-   "_status": "Cap3(src/cap3_netclr.py,clean per-scale glob):net_clr=edited_CLR−base_CLR 逐 case 配对减 base 底噪,重估涌现 slope。net_clr 匹配 4 尺度(1.5B/8B/14B/32B;7B base 未入本次 glob、70B base 未跑),n=793。",
+   "_status": "PASS_CASE_BLOCK_WITH_NULL_PRIMARY(v1.87). Five matched checkpoints passed edited/base duplicate-world audits and unique-case block bootstrap. The primary base-subtracted net-CLR slope contains zero; CLR emergence remains non-load-bearing.",
+   "_statistical_freeze": {
+    "status": "CLOSED_PASS",
+    "artifact": "results/cap3_caseblock.json",
+    "artifact_sha256": "288cf5a14d1fb0521b1d8ec6b619f85a0e1606bbf59a52ecc76982c7a4b75991",
+    "main_bootstrap": "unique case_id block retaining all available fixed-checkpoint rows",
+    "old_numbers_role": "historical family-row sensitivity",
+    "matched_scope": "five observed BASE-B3 worlds; Qwen-7B is not added post hoc",
+    "duplicate_world_audits": "PASS for edited and base; zero duplicate keys"
+   },
    "net_clr": {
-    "point": 0.0494,
+    "point": 0.0522,
     "ci95": [
-     -0.024,
-     0.1216
+     -0.0075,
+     0.1111
     ],
     "excludes_zero": false,
-    "p_slope_le_0": 0.0928,
-    "n": 793
+    "p_slope_le_0": 0.0422,
+    "n_rows": 993,
+    "n_case_blocks": 200,
+    "bootstrap_unit": "unique case_id; retain all available scale/family rows",
+    "inference_scope": "fact-sampling uncertainty conditional on five matched fixed checkpoints",
+    "p_note": "p_slope_le_0 is a one-sided bootstrap tail fraction; the two-sided 95% CI contains zero"
    },
    "clr_raw_matched": {
-    "point": 1.1283,
+    "point": 0.9356,
     "ci95": [
-     0.8246,
-     1.4682
+     0.7429,
+     1.1432
     ],
-    "excludes_zero": true
+    "excludes_zero": true,
+    "n_rows": 993,
+    "n_case_blocks": 200
    },
    "clr_on_baseCLR0": {
-    "point": 0.654,
+    "point": 1.0054,
     "ci95": [
-     -0.285,
-     1.7613
+     0.3875,
+     2.0104
     ],
-    "excludes_zero": false,
-    "n": 178
+    "excludes_zero": true,
+    "n_rows": 197,
+    "n_case_blocks": 96,
+    "role": "exploratory selected subgroup only; scale-dependent baseCLR0 selection cannot rescue the null primary net_clr endpoint"
    },
    "per_scale": {
     "Llama-8.0B": {
@@ -1609,6 +2947,12 @@
      "edited_clr": 0.34,
      "base_clr": 0.825,
      "net_clr": -0.485
+    },
+    "Llama-70.0B": {
+     "n": 200,
+     "edited_clr": 0.495,
+     "base_clr": 0.905,
+     "net_clr": -0.41
     },
     "Qwen-1.5B": {
      "n": 196,
@@ -1629,9 +2973,37 @@
      "net_clr": -0.289
     }
    },
-   "verdict": "★Cap3 定论:raw CLR slope 1.128[0.825,1.468]强显著 → net(减 base)0.049[−0.024,0.122] p=.093【含零】。逐尺度 net_clr≈平(−0.37/−0.49/−0.39/−0.29)=编辑 CLR 恒定低于 base ~0.38、gap 不随能力扩。→ CLR 涌现是 base 底噪伪影,【退役】为描述;base_clr==0 子集 slope 0.654 亦含零(n=178)。capability-emergence 由 es_drop(0.109 p=.003,编辑特异)接棒,不受影响。",
-   "_gap": "已闭:6 尺度全配对(full_6scale)。",
+   "_family_row_sensitivity": {
+    "net_clr": {
+     "point": 0.0522,
+     "ci95": [
+      -0.0081,
+      0.1506
+     ],
+     "excludes_zero": false
+    },
+    "clr_raw_matched": {
+     "point": 0.9356,
+     "ci95": [
+      0.59,
+      1.3054
+     ],
+     "excludes_zero": true
+    },
+    "clr_on_baseCLR0": {
+     "point": 1.0054,
+     "ci95": [
+      0.1098,
+      2.7009
+     ],
+     "excludes_zero": true
+    },
+    "role": "sensitivity only"
+   },
+   "verdict": "Primary result: after subtracting same-fact unedited-base B3 CLR, the positive net-CLR slope is uncertain (0.0522[-0.0075,0.1111]). Raw CLR therefore cannot carry the capability claim. The baseCLR0 positive subgroup is exploratory and does not override the primary endpoint.",
+   "_gap": "The authoritative primary uses the five prespecified matched worlds above. full_6scale is retained only as a historical family-row sensitivity that post hoc includes Qwen-7B.",
    "full_6scale": {
+    "_role": "HISTORICAL_SENSITIVITY_ONLY; not the v1.87 primary estimand",
     "per_scale": {
      "1.5B": -0.372,
      "7B": -0.42,
@@ -1669,43 +3041,118 @@
    }
   },
   "b15_base_recall_control": {
-   "_status": "B15(终极review 证据侧最高优先=capability 第二支柱升格闸门;src/b15_regress.py,5 尺度 matched n=993,7B base 分片未进 glob 不影响)。",
-   "baseline_matched": {
-    "slope": 0.1007,
-    "ci": [
-     0.0304,
-     0.1675
-    ],
-    "p": 0.0041
+   "_status": "PASS_B0_CASE_BLOCK(v1.88). Five matched checkpoints passed edited/base duplicate-world audits. Controlling binary unedited-base B0 answer-old recall attenuates but does not eliminate the positive es_drop size association. This rejects full explanation by that measured proxy, not all residual confounding or a causal capability claim.",
+   "_statistical_freeze": {
+    "status": "CLOSED_PASS",
+    "artifact": "results/b15_caseblock.json",
+    "artifact_sha256": "3a663c447031a14b2f0f58d1f7eb8b09892d8c20543e92ce688da98b657c8d0f",
+    "base_budget": "B0",
+    "base_recall_definition": "unedited base answer contains o_old at B0; subject-scrubbed metrics.hit",
+    "model_scope": "five matched fixed checkpoints; Qwen-7B remains excluded by the frozen scope",
+    "duplicate_world_audits": "PASS for edited and base; zero duplicate keys",
+    "validator_status": "PASS"
    },
-   "controlled": {
-    "slope": 0.0992,
-    "ci": [
-     0.0283,
-     0.1674
-    ],
-    "p": 0.0041,
-    "covs": "chain_len+base_ans_old"
-   },
-   "stratified": {
-    "base_known_n696": {
-     "slope": 0.1268,
+   "b0_primary": {
+    "base_budget": "B0",
+    "n_matched": 994,
+    "n_case_blocks": 200,
+    "bootstrap_unit": "unique case_id; retain all available scale/family rows",
+    "baseline_matched": {
+     "slope": 0.1005,
      "ci": [
-      0.0378,
-      0.2093
+      0.0335,
+      0.1684
+     ],
+     "p_slope_le_0": 0.0021
+    },
+    "controlled": {
+     "slope": 0.0837,
+     "ci": [
+      0.0158,
+      0.151
+     ],
+     "p_slope_le_0": 0.0079,
+     "covs": "chain_len+unedited_base_B0_ans_old",
+     "attenuation_from_matched_baseline": 0.0168,
+     "relative_attenuation": 0.1672
+    },
+    "stratified": {
+     "base_known": {
+      "n_rows": 693,
+      "n_case_blocks": 183,
+      "slope": 0.1103,
+      "ci": [
+       0.0272,
+       0.195
+      ],
+      "excl0": true
+     },
+     "base_unknown": {
+      "n_rows": 301,
+      "n_case_blocks": 127,
+      "slope": 0.0331,
+      "ci": [
+       -0.0755,
+       0.1464
+      ],
+      "excl0": false
+     }
+    },
+    "family_row_sensitivity_controlled": {
+     "slope": 0.0837,
+     "ci": [
+      0.013,
+      0.1493
      ],
      "excl0": true
-    },
-    "base_unknown_n297": {
-     "slope": 0.0432,
-     "ci": [
-      -0.1577,
-      0.1677
-     ],
-     "excl0": false
     }
    },
-   "verdict": "★B15 PASS(升格闸门过):控 per-case base_ans_old 后 es_drop 涌现 slope 几乎不变(.1007→.0992,p=.0041)→ capability-emergent erosion【非】知识覆盖伪影,contrib-3 用升格版(G 节预写);图1 主板=es_drop。分层机理彩蛋:涌现集中于 base 认识 o_old 的 case(.127 排零)、不认识的无信号(.043 含零)=知识是燃料、能力是引擎——与重推机理自洽(无处可推则无侵蚀),不是混淆而是机制一致性。"
+   "b3_sensitivity_only": {
+    "base_budget": "B3",
+    "n_matched": 993,
+    "n_case_blocks": 200,
+    "bootstrap_unit": "unique case_id; retain all available scale/family rows",
+    "baseline_matched": {
+     "slope": 0.1007,
+     "ci": [
+      0.0338,
+      0.1685
+     ],
+     "p_slope_le_0": 0.002
+    },
+    "controlled": {
+     "slope": 0.0992,
+     "ci": [
+      0.0304,
+      0.1684
+     ],
+     "p_slope_le_0": 0.0023,
+     "covs": "chain_len+unedited_base_B3_ans_old"
+    },
+    "stratified": {
+     "base_known": {
+      "n_rows": 696,
+      "n_case_blocks": 185,
+      "slope": 0.1268,
+      "ci": [
+       0.0446,
+       0.2083
+      ],
+      "excl0": true
+     },
+     "base_unknown": {
+      "n_rows": 297,
+      "n_case_blocks": 126,
+      "slope": 0.0432,
+      "ci": [
+       -0.0794,
+       0.1682
+      ],
+      "excl0": false
+     }
+    }
+   },
+   "verdict": "B15-B0 PASS with a bounded interpretation: after adding the measured binary B0 knowledge-coverage proxy, the slope point estimate falls from .1005 to .0837 (16.7% relative attenuation) but remains positive with a case-block CI above zero. This is not an identified fraction explained, a scaling law, a causal capability effect, or proof that knowledge coverage is irrelevant."
   }
  },
  "metric_validation": {
@@ -1751,7 +3198,20 @@
     "negation_only": 1
    },
    "paper_caliber_note": "★关键口径:4 个 subject-restatement 假阳来自 extract_reverted 的 clr_in_cot(未去主体);paper 的 CLR(metrics.score)先过 _without_subject 再判 → 这类假阳在 paper 口径下基本不存在。paper 口径估计:n≈33,genuine 28,真极性假阳(否定式/引用)= 2 → **假阳率 ≈6%(Wilson ~[1.7%,20%])**。",
-   "verdict": "★V1 DONE:CLR 阳性判定 ~94% 为真肯定性回忆(paper 口径);极性假阳(如 'not French')≈6%,= 描述性 CLR 水平值含 ~6% 通胀、非'开箱即中'级缺陷;M1/RQ3 的 CLR 用途(分层/构造性下降)对此不敏感(评审已判免疫)。写作时 CLR 水平值配此验证注脚即可。副产品:再证 _without_subject 清洗的必要性。"
+    "verdict": "★V1 DONE:CLR 阳性判定 ~94% 为真肯定性回忆(paper 口径);极性假阳(如 'not French')≈6%,= 描述性 CLR 水平值含 ~6% 通胀、非'开箱即中'级缺陷;M1/RQ3 的 CLR 用途(分层/构造性下降)对此不敏感(评审已判免疫)。写作时 CLR 水平值配此验证注脚即可。副产品:再证 _without_subject 清洗的必要性。"
+  },
+  "loc_target_leakage_boundary": {
+   "status": "MEASUREMENT_BOUNDARY",
+   "code": "src/metrics.py: locality success is only not hit(locality_answer,o_new)",
+   "valid_name": "target-value non-leakage rate",
+   "invalid_overclaim": "It does not test whether the neighbor answer remains correct or unchanged; refusal, unrelated error, or gibberish can also score 1.",
+   "claim_ceiling": "Existing Loc numbers may support low direct o_new leakage to neighbor prompts, not general locality preservation or absence of collateral damage."
+  },
+  "flip_analysis_last_mention_fix": {
+   "status": "CODE_FIXED_NO_HEADLINE_RECOMPUTE_REQUIRED",
+   "change": "flip_analysis.last now compares last_mention(o_new) and last_mention(o_old), rather than inferring the last stance from first-mention order",
+   "affected_outputs": "the standalone last-stance diagnostic only; ES, RR, RRs, CLR, ESf(first stance), and Flip(both present) are unchanged",
+   "tests": "old-new-old, new-old-new, single-value, and no-hit cases pass in src/test_metrics.py"
   }
  },
  "multihop": {
@@ -1871,7 +3331,7 @@
   }
  },
  "necessity": {
-  "_status": "E-NECESSITY (depth-plan §第三轮 #2):自然回退的 in-chain re-derivation 观察性必要性,RQ2 判官链(results/a3/labels_*.jsonl),未重跑/未干预。src/necessity_check.py → results/necessity.json。",
+  "_status": "P0 CROSSWALK COMPLETE. The historical 19-row table is preserved as a superseded route-classifier denominator; only 13/19 are independently answer-only majority OLD.",
   "reversions": {
    "n": 19,
    "rederiv_route": 19,
@@ -1912,7 +3372,41 @@
     "held_n": 6
    }
   },
-  "verdict": "★必要性方向(观察性):19/19 自然 committed 回退都经可观察链内重推路由(Bridge 17/RO 2),traceless(Associative)=0 → 回退从不无声=in-chain re-derivation 在每个被判回退里都可观察到(链级干预证充分性的观察性补充)。o_old 逐字现于链 17/19。充分性边界(诚实):held n=14 全部 clr_in_cot=True → o_old 现于链对回退【不充分】,答案取决于链是否 commit 到 o_old(呼应 Bridge/Reflective-override vs held)。诚实 caveat:观察性非随机、n 小(19/14)、clr_in_cot 是判官启发式 prefeature、held 群亦判官采样(选在 o_old 显著上→'不充分'是提示性,'回退无 traceless'是更干净的主张)。不报 P(回退|clr) 裸对比(population 选择偏倚)。"
+  "verdict": "HISTORICAL/SUPERSEDED: the old 19/19 statement used a route-classifier population that did not independently establish final OLD commitment. The P0-corrected OLD subset is 13/19; all 13 contain CLR and all 13 have a visible route, but this remains observational and cannot establish necessity because non-OLD candidates also contain CLR in 18/20 cases.",
+  "p0_corrected_crosswalk": {
+   "source": {
+    "path": "results/p0_downstream_crosswalk.json",
+    "sha256": "f034a5f41368effd392a647ebcde7e17f194f3405316f0678a5399747776b4a4"
+   },
+   "historical_19_membership": {
+    "old": 13,
+    "new": 3,
+    "neither": 3
+   },
+   "corrected_old_subset": {
+    "n": 13,
+    "clr_in_cot": "13/13",
+    "paper_clr_subject_scrubbed": "13/13",
+    "routes": {
+     "Bridge": 10,
+     "Recall": 2,
+     "Reflective-override": 1,
+     "Associative": 0
+    }
+   },
+   "all_a3_candidates": {
+    "n": 33,
+    "old_new_neither": [
+     13,
+     15,
+     5
+    ],
+    "non_old_clr_in_cot": "18/20",
+    "non_old_paper_clr_subject_scrubbed": "18/20",
+    "subject_scrub_changed_n": 0
+   },
+   "interpretation": "Within answer-only committed OLD cases, visible chain routing is universal in this small observational sample. Historical/raw CLR and the independently recomputed paper subject-scrubbed CLR happen to agree on all 33 A3 candidates. However, CLR is nearly universal outside OLD commitment too, so mentioning the old value is not sufficient and the crosswalk does not close natural-generation mediation or necessity."
+  }
  },
  "f2_zerothink_deconfound": {
   "_status": "F2(depth-plan §五):去 ZeroThink 空块混淆——B0(空<think></think>)/B0P(LessThink 固定假思考=非空但零推理内容)/B1(256-token 真链),同 32B ROME×CF 200 case,greedy,tag cf200f2。src/think_budget.py B0P 臂 + experiments/probe32b_f2.yaml(commit ff8cbc0)。",
@@ -2020,61 +3514,110 @@
   "_honest_wrinkle": "B0P ES(0.715)>B0 ES(0.625):ZeroThink 空块比极简 canned think 略欠编辑保持——不威胁去混淆(两者 RR 都≈0),反说明 ZeroThink 锚点【保守】(未人为夸大编辑守住)。"
  },
  "f3_sampling_robustness": {
-  "_status": "F3(depth-plan §五):温度采样鲁棒性——32B ROME×CF tag cf200samp,temp=0.6 × seed{0,1,2}(采样臂 n=600=200×3),greedy 同 run 对照(n=200)。堵 draft §3.3『声称做了 0.6×3 sampling arm 却零上报』。experiments/probe32b_sample.yaml;errors=16(~2.7%)。",
-  "sampling": {
-   "B0": {
-    "ES": 0.588,
-    "ESf": 0.7,
-    "RR": 0.071,
-    "RRs": 0.033,
-    "CLR": 0.0,
-    "Flip": 0.15,
-    "Loc": 0.968,
-    "n": 600
+  "_status": "CONFIRM_WITH_ONE_MISSING_CASE; POST_HOC_SEED_PAIRED_REANALYSIS(v1.87). Under temp=.6 and fixed seeds {0,1,2}, same-seed B0/B3 pairing and case-block bootstrap show positive erosion. This is a robustness confirmation, not a formally preregistered confirmatory gate or a seed-population claim.",
+  "_statistical_freeze": {
+   "status": "CLOSED_PASS_WITH_MISSING_PAIRS",
+   "artifact": "results/f3_sampling_recalc.json",
+   "artifact_sha256": "0f0b779f86c6b4a86a8d8bbeb60409ac84a370ff58a3e69a6f5add14ea5f5833",
+   "unit": "pair B0 and B3 within (case_id,seed), gate RR on the same-seed B0, average seeds within case, bootstrap unique case_id",
+   "coverage": "199/200 complete cases; 597/600 pairs",
+   "missing_pairs": [
+    "cf_10436|seed0|B3",
+    "cf_10436|seed1|B3",
+    "cf_10436|seed2|B3"
+   ],
+   "upstream_errors": "16 OOM rows retained in provenance; the other 15 affected case IDs still have complete efficacy endpoints"
+  },
+  "sampling_primary_complete_cases": {
+   "n_cases": 199,
+   "n_seed_pairs": 597,
+   "ES_B0": {
+    "point": 0.586265,
+    "ci95": [
+     0.529313,
+     0.643216
+    ]
    },
-   "B3": {
-    "ES": 0.469,
-    "ESf": 0.621,
-    "RR": 0.264,
-    "RRs": 0.093,
-    "CLR": 0.523,
-    "Flip": 0.229,
-    "Loc": 0.968,
-    "n": 597
+   "ES_B3": {
+    "point": 0.469012,
+    "ci95": [
+     0.413735,
+     0.524288
+    ]
    },
-   "es_drop_B0toB3": [
-    0.09,
-    [
-     0.01,
-     0.171
+   "ES_drop": {
+    "point": 0.117253,
+    "ci95": [
+     0.067002,
+     0.169179
+    ]
+   },
+   "RR_B3_average_case_conditional": {
+    "point": 0.30518,
+    "ci95": [
+     0.242117,
+     0.371622
     ],
-    "CI>0 显著"
-   ],
-   "rr_ci_B3": [
-    0.264,
-    [
-     0.195,
-     0.336
+    "n_cases": 148,
+    "n_b0ok_seed_pairs": 350,
+    "estimand": "each case is weighted equally after averaging only its B0-successful seeds; not the pooled 87/350 trajectory rate"
+   },
+   "RRs_B3_average_case_conditional": {
+    "point": 0.094595,
+    "ci95": [
+     0.056306,
+     0.136261
     ],
-    "★写作口径=case 聚类 CI(n_case=199,重采样单位=case);行级伪复制版 [0.216,0.312] 已弃(点估同 0.264)。落于 gap-review 预期 ~[0.19,0.34];RR 点估 0.264>0.20 稳,下界 0.195 略低 0.20 但 CI 排零。"
-   ],
-   "clr_ci_B3": [
-    0.523,
-    [
-     0.462,
-     0.583
-    ],
-    "★写作口径=case 聚类 CI(n_case=199);行级伪复制版 [0.482,0.563] 已弃(点估同 0.523)。CLR 强显著(下界 0.462≫0)。"
-   ],
-   "es_ci_B3_cluster": [
-    0.469,
-    [
-     0.414,
-     0.523
-    ],
-    "边际 ES 聚类 CI(n_case=199);B0 ES 聚类 0.588[0.530,0.645](n_case=200)。"
-   ],
-   "_ci_必2_fix": "★硬伤1/必2 DONE(2026-07-08,用户回传聚类重算):score_bootstrap 按 row 重采样→采样臂同 case 3 seed 链被当独立=伪复制,与 draft:114 'resampling n facts' 承诺互证为假。修=metrics.score_bootstrap_clustered(重采样单位=case 整块;b0ok 门仍 eff0[0])+ score_pilot --cluster + 单测。**结果(聚类 vs 行级,点估全同、CI 如预期加宽)**:B3 RR 0.264 行[0.216,0.312]→聚类[0.195,0.336];B3 CLR 0.523 行[0.482,0.563]→聚类[0.462,0.583];B3 边际 ES 0.469 聚类[0.414,0.523]。**es_drop 0.090[0.010,0.171] 不受影响**(drop_bootstrap 本就 case 级 rows[0],用户跑同确认✅CI>0 显著)。→ 写作全用聚类口径,draft:114 声明与释出代码(score_pilot --cluster)一致化;行级 CI 作废、勿再引。命令(可复现):`python src/score_pilot.py --config experiments/probe32b_sample.yaml --editor ROME --decode sample --cluster --boot 10000`。"
+    "n_cases": 148,
+    "n_b0ok_seed_pairs": 350
+   },
+   "CLR_B0": {
+    "point": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ]
+   },
+   "CLR_B3": {
+    "point": 0.522613,
+    "ci95": [
+     0.463987,
+     0.58124
+    ]
+   },
+   "bootstrap_unit": "unique case_id",
+   "case_value": "mean over same-seed B0/B3 pairs"
+  },
+  "sampling_sensitivities": {
+   "per_seed_descriptive": {
+    "seed0": {
+     "ES_drop": 0.090452,
+     "RR_B3": 0.243243,
+     "CLR_B3": 0.527638
+    },
+    "seed1": {
+     "ES_drop": 0.170854,
+     "RR_B3": 0.294118,
+     "CLR_B3": 0.552764
+    },
+    "seed2": {
+     "ES_drop": 0.090452,
+     "RR_B3": 0.208333,
+     "CLR_B3": 0.487437
+    },
+    "role": "descriptive only; no per-seed intervals"
+   },
+   "trajectory_weighted_RR_posthoc": {
+    "point": 0.248571,
+    "count": "87/350",
+    "role": "post-hoc weighting sensitivity derived from artifact case_summaries; primary remains equal-case conditional RR"
+   },
+   "legacy_first_row": {
+    "ES_drop": 0.090452,
+    "RR_B3": 0.264264,
+    "RRs_B3": 0.093093,
+    "role": "superseded file-order sensitivity only"
+   }
   },
   "greedy_control": {
    "B0": {
@@ -2108,8 +3651,8 @@
     ]
    ]
   },
-  "verdict": "★F3 CONFIRM(erosion 采样鲁棒):ES 降幅 采样 0.090[0.010,0.171] ≈ greedy 0.110[0.035,0.185],均显著、同量级 → 回退【不是】单条贪心脆性(中层近平局微扰即翻的质疑被否)。RR@B3 采样 0.264>greedy 0.208(采样更频=多样链更常重推 o_old,合机理);strict RRs 采样 0.093≈greedy 0.112;CLR@B3 采样 0.523≈greedy 0.485。go/no-go RR≥0.20 采样(0.264)/greedy(0.208)均过。→ 堵『声称做了没报』,头牌在采样下稳。",
-  "_note": "greedy 对照(ES 降幅 0.110/RR 0.208)复现 headline(0.106/0.193),内部一致=本 run 协议无漂移。"
+  "verdict": "CONFIRM within the fixed three-seed design: sampling ES-drop=.1173[.0670,.1692] is positive and close to greedy .110[.035,.185], so erosion is not a single greedy-trajectory artifact. Do not claim sampling is significantly worse than greedy, that .305 is a pooled trajectory rate, or that the result generalizes to a seed population.",
+  "_note": "The greedy control (ES drop .110/RR .208) reproduces the headline scale. The same-seed correction strengthens ES-drop relative to the superseded first-row .090 and changes the conditional RR estimand from .264 to equal-case .305; both must be labeled precisely."
  },
  "memit_replication": {
   "_status": "B22(终极review 全表最大单项,堵 R2 单编辑器):MEMIT×CF 14B(memit14b.yaml,层 [7,8,9],n=200,errors=0,greedy)。32B 首跑 OOM(见 _diagnosis);14B 定案(review 明载 14B 也够用)。32B 重试 INFEASIBLE(mom2 OOM,见 _32b_final);B22=MEMIT-14B 定案。",
@@ -2297,7 +3840,7 @@
    },
    "note": "edited 略低 base(部分压制,介于 ROME-14B 强压制与 MEMIT 保留之间)= 跨族第三点,压制是编辑器/配置连续量而非二元;跨族比较有 capability/base-recall 混淆,正式结论只在 within-model 的 A3 配对 Δz 上下。"
   },
-  "_ladder_status": "四级扩展梯数据全齐(sampling/MEMIT-14B/ROME-14B/Llama-8B)+ 32B 主两态在平台;待:32B jsonl 回传→A1/A2/A3 case 级统计(7/14 裁决)。"
+  "_ladder_status": "EXPLORATORY/FROZEN, not a current submission blocker. The aggregate four-level extension counts are preserved, but their extension raw shards are not local and the unclustered counts are not confirmatory. The load-bearing 32B main two-state shards and analysis are local; latest plan drops new W-A iteration. Do not promote these extension counts without a future case-level reanalysis."
  },
  "wa_main": {
   "_status": "W-A 32B 主分析(src/wa_main_analyze.py 修 fork 版 A2/G4 取数 bug;results/wa_main_analysis.json)。",
@@ -2353,7 +3896,7 @@
   "base_unknown": {
    "RR": "1/31=0.032"
   },
-  "verdict": "★KC 'why' 站稳(带诚实注脚):回退 8× 集中于 base 认识 o_old 的 case(25.0% vs 3.2%)=knowledge-conflict 是主导机制;base-无知层 1/31 的孤例=残余 confabulation 成分,注脚如实报。与 B15 分层(涌现集中 base_known)同构 —— 知识是燃料、能力是引擎,两处互证。"
+  "verdict": "★KC 'why' 站稳(带诚实注脚):回退 8× 集中于 base 认识 o_old 的 case(25.0% vs 3.2%)，支持 knowledge-conflict 是重要条件；base-无知层 1/31 的孤例表明仍有残余 confabulation。B15-B0 控制使尺度 slope 约衰减 16.7% 但仍排零，因此最强合法解释是『基座知识是重要条件，二值覆盖不能完全解释 fixed-checkpoint size association』；不作燃料/引擎因果分解。"
  },
  "rq2_logitlens": {
   "_authoritative_record": {
@@ -2362,7 +3905,13 @@
    "edit_intact_at_cloze": "23/23=100%",
    "gap_top_median": 11.51,
    "peak_layer": "hs 索引中位=59 → decoder 层 58(约定 hs[k]=decoder k−1;draft 旧引 56 需改)",
-   "caveats": "无对照/无 CI/近恒真设计(ROME 优化目标即此 logit)→ 按 B23 降级措辞:'编辑安装 sanity',abstract 不承重;'100% intact' 同句必附 n=23。"
+    "caveats": "无对照/无 CI/近恒真设计(ROME 优化目标即此 logit)→ 按 B23 降级措辞:'编辑安装 sanity',abstract 不承重;'100% intact' 同句必附 n=23。"
+   },
+   "p0_membership_crosswalk": {
+    "status": "BLOCKED_MISSING_PER_ITEM_ARTIFACT",
+    "expected_path": "results/probe/logitlens_cf200_ROME_B3.jsonl",
+    "expected_n": 23,
+    "reason": "Only the aggregate n=23 record and figure are present locally. Without the raw per-item JSONL, membership overlap and item-level selection bias cannot be audited; case IDs are not guessed."
+   }
   }
- }
 }

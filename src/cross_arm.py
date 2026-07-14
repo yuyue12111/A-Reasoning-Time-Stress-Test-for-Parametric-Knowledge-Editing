@@ -17,43 +17,137 @@ import metrics
 METRICS = ["ES", "RR", "RRs", "CLR"]
 
 
-def per_case(cfg, editor, budget, decode="greedy"):
+def _load_efficacy_worlds(paths, cases, decode="greedy", seed=None):
+    """Load unique efficacy generation worlds with strict duplicate provenance.
+
+    A scientific world is keyed by case/budget/probe plus the generation trajectory
+    (decode, seed, temperature).  The trajectory fields are required here because
+    different sampling seeds are legitimate independent generations, not duplicate
+    shards.  Repeated copies of the same complete world are accepted only when the
+    entire parsed JSON object is equal; any field drift is a hard failure that names
+    both source locations.
+    """
+    seen = {}
+    for path in paths:
+        with open(path) as fh:
+            for line_no, line in enumerate(fh, 1):
+                raw_line = line.rstrip("\r\n")
+                if not raw_line.strip():
+                    continue
+                d = json.loads(line)
+                if d.get("_meta") or d.get("error") or d.get("probe") != "efficacy":
+                    continue
+                row_decode = d.get("decode", "greedy")
+                if row_decode != decode or d.get("case_id") not in cases:
+                    continue
+                if seed is not None and d.get("seed") != seed:
+                    continue
+                trajectory = (row_decode, d.get("seed"), d.get("temperature"))
+                world_key = (d["case_id"], d.get("budget"), d.get("probe"), *trajectory)
+                source = {"path": path, "line": line_no}
+                prior = seen.get(world_key)
+                if prior is not None:
+                    if d != prior["row"]:
+                        sentinel = object()
+                        fields = sorted(set(prior["row"]) | set(d))
+                        changed = [field for field in fields
+                                   if prior["row"].get(field, sentinel) != d.get(field, sentinel)]
+                        first = prior["sources"][0]
+                        raise ValueError(
+                            "conflicting duplicate world "
+                            f"(case_id={d['case_id']}, budget={d.get('budget')}, "
+                            f"decode={row_decode}, seed={d.get('seed')}, "
+                            f"temperature={d.get('temperature')}): "
+                            f"differing_fields={changed}; first={first['path']}:{first['line']}; "
+                            f"duplicate={path}:{line_no}")
+                    equivalence = ("byte_identical" if raw_line == prior["raw_line"]
+                                   else "normalized_json_equal")
+                    prior["sources"].append({**source, "equivalence_to_first": equivalence})
+                    prior[f"{equivalence}_duplicates"] += 1
+                    continue
+                seen[world_key] = {
+                    "row": d,
+                    "raw_line": raw_line,
+                    "trajectory": trajectory,
+                    "sources": [{**source, "equivalence_to_first": "first"}],
+                    "byte_identical_duplicates": 0,
+                    "normalized_json_equal_duplicates": 0,
+                }
+
+    duplicates = []
+    for world_key, entry in sorted(seen.items(), key=lambda kv: repr(kv[0])):
+        if len(entry["sources"]) <= 1:
+            continue
+        cid, budget, probe, row_decode, row_seed, temperature = world_key
+        duplicates.append({
+            "case_id": cid,
+            "budget": budget,
+            "probe": probe,
+            "decode": row_decode,
+            "seed": row_seed,
+            "temperature": temperature,
+            "copies_total": len(entry["sources"]),
+            "byte_identical_duplicates": entry["byte_identical_duplicates"],
+            "normalized_json_equal_duplicates": entry["normalized_json_equal_duplicates"],
+            "sources": entry["sources"],
+        })
+    audit = {
+        "status": "PASS",
+        "world_key": ["case_id", "budget", "probe", "decode", "seed", "temperature"],
+        "n_unique_worlds": len(seen),
+        "n_duplicate_keys": len(duplicates),
+        "n_duplicate_rows_deduplicated": sum(item["copies_total"] - 1 for item in duplicates),
+        "duplicate_keys": duplicates,
+    }
+    return list(seen.values()), audit
+
+
+def per_case(cfg, editor, budget, decode="greedy", seed=None, return_audit=False):
     """{case_id: {ES,RR,RRs,CLR}} on efficacy/greedy。**口径严格同 metrics.score**:
     _without_subject 挖主体复述(去污)+ RR/RRs 仅在 b0ok(B0 编辑成功)case 上有值(否则 None,不入分母);
-    ES/CLR 在全 case 上。→ 边际数与 score_pilot 一致、跨臂配对差在 paper 口径。"""
+    ES/CLR 在全 case 上。→ 边际数与 score_pilot 一致、跨臂配对差在 paper 口径。
+
+    同一完整 generation world 的等价分片副本会去重并进入 audit；冲突副本 hard fail。
+    sampling 必须用 seed 明确选择一条合法轨迹；不再把多 seed 静默压成一个 case。"""
     ds = cfg["dataset"]
     pat = os.path.join(cfg["out_dir"], f"{cfg['model_tag']}_{editor}_{ds['tag']}_r*.jsonl")
     cases = {c["case_id"]: c for c in (json.loads(l) for l in open(ds.get("fallback_path", ds["path"])))}
     aliases = json.load(open("data/aliases.json"))
-    by = {}                                          # cid -> budget -> efficacy 行
-    for sh in sorted(glob.glob(pat)):
-        for line in open(sh):
-            line = line.strip()
-            if not line:
-                continue
-            d = json.loads(line)
-            if d.get("_meta") or d.get("error") or d.get("probe") != "efficacy":
-                continue
-            if d.get("decode", "greedy") != decode or d["case_id"] not in cases:
-                continue
-            by.setdefault(d["case_id"], {})[d.get("budget")] = d
+    entries, audit = _load_efficacy_worlds(
+        sorted(glob.glob(pat)), cases, decode=decode, seed=seed)
+    by_trajectory = {}                               # cid -> trajectory -> budget -> (row, source)
+    for entry in entries:
+        d = entry["row"]
+        by_trajectory.setdefault(d["case_id"], {}).setdefault(entry["trajectory"], {})[
+            d.get("budget")] = (d, entry["sources"][0])
     out = {}
-    for cid, buds in by.items():
-        if budget not in buds:
+    for cid, trajectories in by_trajectory.items():
+        target = [(trajectory, buds) for trajectory, buds in trajectories.items()
+                  if budget in buds]
+        if not target:
             continue
+        if len(target) > 1:
+            locs = [f"{buds[budget][1]['path']}:{buds[budget][1]['line']}"
+                    for _trajectory, buds in target]
+            raise ValueError(
+                f"multiple independent trajectories for case_id={cid}, budget={budget}, "
+                f"decode={decode}; select one with seed=...; sources={locs}")
+        _trajectory, buds = target[0]
         c = cases[cid]
         s, o_old, o_new = c.get("s") or "", c["o_old"], c["o_new"]
         clean = lambda t: metrics._without_subject(t or "", s)        # 去主体复述(同 metrics.score line140)
-        ans, cot = clean(buds[budget].get("answer")), clean(buds[budget].get("cot"))
+        target_row = buds[budget][0]
+        ans, cot = clean(target_row.get("answer")), clean(target_row.get("cot"))
         ho, hn = bool(metrics.hit(ans, o_old, aliases)), bool(metrics.hit(ans, o_new, aliases))
         rec = {"ES": int(hn and not ho), "CLR": int(bool(metrics.hit(cot, o_old, aliases)))}
-        b0 = buds.get("B0")                                          # b0ok 门(B0 答新且不含旧;scope=think 下 B0 跨臂同)
+        b0_entry = buds.get("B0")                                   # 同一 decode/seed/temp 轨迹的 B0 门
+        b0 = b0_entry[0] if b0_entry else None
         b0ok = bool(b0) and metrics.hit(clean(b0.get("answer")), o_new, aliases) \
             and not metrics.hit(clean(b0.get("answer")), o_old, aliases)
         rec["RR"] = int(ho) if b0ok else None                        # RR/RRs 仅 b0ok case 有值(同 metrics rr_n 门)
         rec["RRs"] = int(ho and not hn) if b0ok else None
         out[cid] = rec
-    return out
+    return (out, audit) if return_audit else out
 
 
 def marginal(A):
@@ -85,13 +179,17 @@ def main():
     ap.add_argument("--editor", default="ROME")
     ap.add_argument("--budget", default="B3")
     ap.add_argument("--decode", default="greedy")
+    ap.add_argument("--seed", type=int, default=None,
+                    help="sampling decode 时选择单一 seed；避免把多条合法轨迹当重复或静默覆盖")
     ap.add_argument("--out", default=None, help="可选:汇总 json 落盘")
     args = ap.parse_args()
 
-    arms = {}
+    arms = {}; input_audits = {}
     for spec in args.arm:
         label, _, path = spec.partition("=")
-        arms[label] = per_case(yaml.safe_load(open(path)), args.editor, args.budget, args.decode)
+        arms[label], input_audits[label] = per_case(
+            yaml.safe_load(open(path)), args.editor, args.budget, args.decode,
+            seed=args.seed, return_audit=True)
     print(f"# 跨臂配对差 @ {args.budget} {args.decode}  臂={list(arms)}  各 n={{ {', '.join(f'{k}:{len(v)}' for k,v in arms.items())} }}")
     print(f"\n# 各臂边际速率:")
     print(f"{'arm':<6}" + "".join(f"{m:>9}" for m in METRICS))
@@ -104,7 +202,9 @@ def main():
                  ("D", "N", "★方向臂(压 o_new;符号错=近致命)"), ("P", "N", "placebo floor(链扰动,期望≈0)"),
                  ("C", "N", "强竞争者 floor(同 relation 强错答;M4,期望≈0=非通用)"),
                  ("T", "C", "★o_old 超强竞争者 margin(M4 最强特异性;T−C 排零=o_old 特异)")]
-    summ = {"arms_n": {k: len(v) for k, v in arms.items()}, "marginal": {k: marginal(v) for k, v in arms.items()}, "contrasts": {}}
+    summ = {"arms_n": {k: len(v) for k, v in arms.items()},
+            "input_duplicate_audit": input_audits,
+            "marginal": {k: marginal(v) for k, v in arms.items()}, "contrasts": {}}
     print(f"\n# 配对对照(armA − armB,均差 [95%CI] p):")
     for a, b, desc in contrasts:
         if a in arms and b in arms:

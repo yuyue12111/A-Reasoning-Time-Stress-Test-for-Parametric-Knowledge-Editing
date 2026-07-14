@@ -1,0 +1,26 @@
+# X2/N-fresh（条件臂）：仅当既有 memit14b N 的 _meta 无法证明 git/dtype/BOS/配置 parity 时运行。
+# 科学配置与 experiments/memit14b.yaml 相同；独立 tag 防止覆盖权威旧 N。
+model_tag: r1qwen14b
+seed: 42
+out_dir: results/probe
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-14B
+  stats_dir: ./data/stats_r1qwen14b
+  v_loss_layer: 47
+
+dataset:
+  tag: cf200memit_freshn
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 200
+
+budgets: [B0, B3]
+sampling:
+  enabled: false
+probes: [efficacy, locality]
+
+editors:
+  MEMIT:
+    hparams: source/EasyEdit/hparams/MEMIT/qwen2.5-7b.yaml
+    layers: [7, 8, 9]

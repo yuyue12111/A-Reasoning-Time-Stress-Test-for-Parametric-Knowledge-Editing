@@ -52,6 +52,9 @@ def _gwb(model, tok, q, b, do_sample=False, temperature=0.6, seed=None, suppress
     _SUP_SEEN.append({"q": q, "budget": b, "suppress": suppress})
     if _RAISE_GEN_ON["sub"] and _RAISE_GEN_ON["sub"] in q:
         raise RuntimeError("gen-boom")
+    # 真 think_budget 在 scope=think 的 B0 不进入 processor；其它预算的链生成会调用。
+    if suppress and b != "B0" and hasattr(suppress.get("processor"), "calls"):
+        suppress["processor"].calls += 3
     tag = f"s{seed}" if do_sample else "greedy"
     return (f"cot[{b}|{tag}]", f"ans[{b}|{tag}]", "full")
 _tb.generate_with_budget = _gwb
@@ -71,7 +74,10 @@ for _pname in ("easyedit_qwen2_loader", "easyedit_mom2_dataset"):
 # suppress stub(edit_loop.run 内惰性 from suppress import ...;mock 的 tok="TOK" 无法真建 token ids)
 _sup = types.ModuleType("suppress")
 _sup.build_old_token_ids = lambda tok, tgt, aliases: [1, 2]
-_sup.make_processor = lambda ids, penalty: f"PROC(p={penalty})"
+class _FakeProcessor:
+    def __init__(self, penalty):
+        self.penalty, self.calls = penalty, 0
+_sup.make_processor = lambda ids, penalty: _FakeProcessor(penalty)
 sys.modules["suppress"] = _sup
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -172,6 +178,24 @@ def test_provenance_header_written_once_and_resume_no_dup():
     assert sum(r.get("_meta") is True for r in raw2) == 1, "续跑不应重复写溯源头"
 
 
+def test_new_format_resume_rejects_config_or_code_drift_before_append():
+    _reset()
+    fd, path = tempfile.mkstemp(suffix=".jsonl"); os.close(fd); os.remove(path)
+    meta = {"config_sha256": "cfgA", "code_sha256": {"src/edit_loop.py": "codeA"},
+            "dataset": {"tag": "t"}, "run": {"tag_suffix": "_smoke"}}
+    edit_loop.run(_cases(1), "ROME", "x", ["B0"], path, rank=0, world=1, meta=meta)
+    before = open(path).read()
+    try:
+        edit_loop.run(_cases(1), "ROME", "x", ["B0"], path, rank=0, world=1,
+                      meta={**meta, "config_sha256": "cfgB"})
+    except RuntimeError as e:
+        assert "resume signature mismatch" in str(e)
+    else:
+        raise AssertionError("changed config hash must refuse append")
+    after = open(path).read(); os.remove(path)
+    assert before == after, "拒绝恢复时不得写入任何字节"
+
+
 def test_suppress_apply_to_default_efficacy_only():
     # 默认(无 apply_to):suppress 只到 efficacy 探针,其余(para/locality/open)必须 None——历史行为锁定
     _reset()
@@ -201,12 +225,50 @@ def test_suppress_apply_to_hop_g1():
         "apply_to:[hop] 下 efficacy 不应收到 suppress"
 
 
+def test_suppress_trace_records_target_ids_and_activation():
+    _reset()
+    cases = _cases(1)
+    rows, _ = _run(cases=cases, budgets=["B0", "B3"],
+                   suppress_cfg={"penalty": 8, "scope": "think",
+                                 "apply_to": ["efficacy", "para0", "para1"]})
+    traced = [r for r in rows if r.get("suppress_trace")]
+    assert traced, "suppression run 每行应有可审计 trace"
+    assert all(r["suppress_trace"]["target"] == cases[0]["o_old"] for r in traced)
+    assert all(r["suppress_trace"]["token_ids"] == [1, 2] for r in traced)
+    by = {(r["budget"], r["probe"]): r["suppress_trace"] for r in traced}
+    assert by[("B0", "efficacy")]["selected"] is True
+    assert by[("B0", "efficacy")]["active"] is False
+    assert by[("B0", "efficacy")]["processor_calls"] == 0
+    assert by[("B3", "efficacy")]["active"] is True
+    assert by[("B3", "para0")]["active"] is True
+    assert by[("B3", "para0")]["processor_calls"] == 3
+    assert by[("B3", "locality")]["selected"] is False
+    assert by[("B3", "locality")]["active"] is False
+    assert by[("B3", "open")]["active"] is False
+
+
+def test_opt_in_diagnostics_are_recorded_without_changing_default():
+    _reset()
+    original = edit_loop.weight_delta_summary
+    edit_loop.weight_delta_summary = lambda model, weights, chunk: {
+        "n_weights": 1, "aggregate": {"delta_l2": 2.0, "relative_l2": 0.1}}
+    try:
+        rows, _ = _run(cases=_cases(1), budgets=["B0"], probe_sel=["efficacy"],
+                       diagnostics_cfg={"weight_delta": True, "chunk_elems": 7})
+    finally:
+        edit_loop.weight_delta_summary = original
+    assert len(rows) == 1 and rows[0]["diagnostics"]["weight_delta"]["n_weights"] == 1
+
+
 TESTS = [test_sharding_partitions_by_index, test_subject_and_s_field_passed,
          test_open_probe_uses_s, test_restore_called_every_case, test_resume_skips_done,
          test_generation_error_still_restores_and_continues,
          test_edit_error_skips_restore_and_continues,
          test_provenance_header_written_once_and_resume_no_dup,
-         test_suppress_apply_to_default_efficacy_only, test_suppress_apply_to_hop_g1]
+         test_new_format_resume_rejects_config_or_code_drift_before_append,
+         test_suppress_apply_to_default_efficacy_only, test_suppress_apply_to_hop_g1,
+         test_suppress_trace_records_target_ids_and_activation,
+         test_opt_in_diagnostics_are_recorded_without_changing_default]
 
 
 def _main():

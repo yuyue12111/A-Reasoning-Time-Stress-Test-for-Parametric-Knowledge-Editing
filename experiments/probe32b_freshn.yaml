@@ -1,0 +1,27 @@
+# X3/N-fresh-mp2：v1.76 容量救援后与 T/C 同协议必跑，不再是条件臂。
+# 独立 tag 防覆盖既有 headline N；旧单卡 N 仅保留 Day-0/故障审计。
+model_tag: r1qwen32b
+seed: 42
+out_dir: results/probe
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+  stats_dir: ./data/stats_r1qwen32b
+  v_loss_layer: 63
+  model_parallel: true
+
+dataset:
+  tag: cf200para_freshn_mp2
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 200
+
+budgets: [B0, B3]
+sampling:
+  enabled: false
+probes: [efficacy, paraphrase]
+
+editors:
+  ROME:
+    hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+    layers: [12]

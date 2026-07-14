@@ -1,0 +1,32 @@
+# X2/T · MEMIT-14B 链级 o_old 抑制复制（prereg-x2-x3.md）。
+# 与 memit14b.yaml 的 N 臂仅差 suppress；同 case/order、编辑层、mom2、dtype/BOS 环境。
+model_tag: r1qwen14b
+seed: 42
+out_dir: results/probe
+
+hparams_overrides:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-14B
+  stats_dir: ./data/stats_r1qwen14b
+  v_loss_layer: 47
+
+dataset:
+  tag: cf200memit_sup
+  path: data/counterfact.prefiltered.jsonl
+  fallback_path: data/counterfact.jsonl
+  n: 200
+
+budgets: [B0, B3]
+sampling:
+  enabled: false
+probes: [efficacy, locality]
+
+suppress:
+  penalty: 8
+  scope: think
+  source: o_old
+  apply_to: [efficacy]
+
+editors:
+  MEMIT:
+    hparams: source/EasyEdit/hparams/MEMIT/qwen2.5-7b.yaml
+    layers: [7, 8, 9]

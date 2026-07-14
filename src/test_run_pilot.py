@@ -66,8 +66,54 @@ def test_resolve_device_explicit_overrides_rank():
     assert R["overrides"]["device"] == 7, "显式 device 应压过 rank"
 
 
+def test_resolve_limit_and_tag_suffix_isolate_smoke():
+    dp = _jsonl(CASES)
+    cfg = {"model_tag": "m", "seed": 42, "out_dir": "o", "hparams_overrides": {},
+           "dataset": {"tag": "tiny", "path": dp, "n": 3},
+           "budgets": ["B0"], "editors": {"ROME": {"hparams": "h"}}}
+    R = rp.resolve(cfg, "ROME", 0, 8, limit=2, tag_suffix="_smoke")
+    os.remove(dp)
+    assert len(R["cases"]) == 2 and R["effective_n"] == 2
+    assert R["requested_n"] == 3 and R["dataset_tag"] == "tiny_smoke"
+    assert "_tiny_smoke_r0of8.jsonl" in R["out"]
+
+
+def test_explicit_case_ids_preserve_literal_order_and_validate():
+    dp = _jsonl(CASES)
+    cfg = {"model_tag": "m", "seed": 42, "out_dir": "o", "hparams_overrides": {},
+           "dataset": {"tag": "frozen", "path": dp,
+                       "case_ids": ["cf_7", "cf_1", "cf_9"]},
+           "budgets": ["B0"], "diagnostics": {"weight_delta": True},
+           "editors": {"ROME": {"hparams": "h"}}}
+    R = rp.resolve(cfg, "ROME", 0, 1)
+    assert [c["case_id"] for c in R["cases"]] == ["cf_7", "cf_1", "cf_9"]
+    assert R["diagnostics_cfg"] == {"weight_delta": True}
+    bad = {**cfg, "dataset": {**cfg["dataset"], "case_ids": ["cf_7", "missing"]}}
+    try:
+        rp.resolve(bad, "ROME", 0, 1)
+    except ValueError as exc:
+        assert "missing" in str(exc)
+    else:
+        raise AssertionError("missing explicit case id must fail")
+    os.remove(dp)
+
+
+def test_sha256_file_stable_and_content_sensitive():
+    fd, p = tempfile.mkstemp(); os.close(fd)
+    with open(p, "wb") as f:
+        f.write(b"alpha")
+    a = rp.sha256_file(p); b = rp.sha256_file(p)
+    with open(p, "wb") as f:
+        f.write(b"beta")
+    c = rp.sha256_file(p); os.remove(p)
+    assert a == b and a != c and len(a) == 64
+
+
 TESTS = [test_load_cases_deterministic_and_n, test_shard_partition,
-         test_resolve_overrides_and_paths, test_resolve_device_explicit_overrides_rank]
+         test_resolve_overrides_and_paths, test_resolve_device_explicit_overrides_rank,
+         test_resolve_limit_and_tag_suffix_isolate_smoke,
+         test_explicit_case_ids_preserve_literal_order_and_validate,
+         test_sha256_file_stable_and_content_sensitive]
 
 
 def _main():

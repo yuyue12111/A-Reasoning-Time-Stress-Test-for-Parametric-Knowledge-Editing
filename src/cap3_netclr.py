@@ -51,14 +51,20 @@ metrics = pe.metrics
 # ------------------------------------------------------------------------------
 # base per-case CLR 加载(base_probe 写的 *_BASE_* 分片,probe="base")
 # ------------------------------------------------------------------------------
-def load_base_clr(base_paths, cases, aliases, tag_override=None, late="B3"):
+def load_base_clr(base_paths, cases, aliases, tag_override=None, late="B3",
+                  decode="greedy", seed=None, return_provenance=False):
     """读 base_probe 的 *_BASE_* 分片 → {(params_b, family, case_id): {base_clr, base_ans_old}}。
 
     base 记录 probe='base'(src/base_probe.py),逐 case 有 cot/answer;取 late(默认 B3)预算的
     链 o_old(=base CLR 底噪)与答 o_old(=base recall,做协变量)。完全复用 metrics.hit/_without_subject
-    (与 edited 侧、与 base_probe 聚合口径一致)。scale/family 由 *_BASE_* 文件名的 model_tag 决定。"""
+    (与 edited 侧、与 base_probe 聚合口径一致)。scale/family 由 *_BASE_* 文件名的 model_tag 决定。
+
+    默认返回接口保持不变；return_provenance=True 时返回 (map, provenance)。同一
+    (params_b,family,case_id,budget,probe,decode,seed) 的等价 JSON 副本去重，任意字段
+    冲突 hard FAIL 并报双方 path:line。decode 缺失规范化为 greedy，seed/temperature
+    缺失规范化为 null；不同 seed 是独立 trajectory，未显式选 seed 时不得静默折叠。"""
     cmap = {c["case_id"]: c for c in cases}
-    m = {}
+    seen = {}
     skipped = []
     for path in base_paths:
         meta = pe.infer_tag_meta(pe._tag_from_path(path), tag_override)
@@ -67,7 +73,8 @@ def load_base_clr(base_paths, cases, aliases, tag_override=None, late="B3"):
             continue
         pb, fam = meta
         with open(path) as fh:
-            for line in fh:
+            for line_no, line in enumerate(fh, 1):
+                raw_line = line.rstrip("\r\n")
                 try:
                     r = json.loads(line)
                 except Exception:
@@ -79,15 +86,103 @@ def load_base_clr(base_paths, cases, aliases, tag_override=None, late="B3"):
                 cid = r.get("case_id")
                 if cid not in cmap:
                     continue
-                c = cmap[cid]
-                subj = c.get("s") or ""
-                clean = lambda t: metrics._without_subject(t, subj)
-                base_clr = 1 if metrics.hit(clean(r.get("cot", "")), c["o_old"], aliases) else 0
-                base_ans_old = 1 if metrics.hit(clean(r.get("answer", "")), c["o_old"], aliases) else 0
-                m[(float(pb), fam, cid)] = {"base_clr": base_clr, "base_ans_old": base_ans_old}
+                row_decode = r.get("decode", "greedy")
+                row_seed = r.get("seed")
+                if row_decode != decode or (seed is not None and row_seed != seed):
+                    continue
+                normalized = dict(r)
+                normalized["decode"] = row_decode
+                normalized["seed"] = row_seed
+                normalized["temperature"] = r.get("temperature")
+                world_key = (float(pb), fam, cid, late, "base", row_decode, row_seed)
+                source = {"path": path, "line": line_no}
+                prior = seen.get(world_key)
+                if prior is not None:
+                    if normalized != prior["normalized_row"]:
+                        sentinel = object()
+                        fields = sorted(set(prior["normalized_row"]) | set(normalized))
+                        changed = [field for field in fields
+                                   if prior["normalized_row"].get(field, sentinel)
+                                   != normalized.get(field, sentinel)]
+                        first = prior["sources"][0]
+                        raise ValueError(
+                            "conflicting duplicate base world "
+                            f"(scale={pb}, family={fam}, case_id={cid}, budget={late}, "
+                            f"probe=base, decode={row_decode}, seed={row_seed}): "
+                            f"differing_fields={changed}; first={first['path']}:{first['line']}; "
+                            f"duplicate={path}:{line_no}")
+                    equivalence = ("byte_identical" if raw_line == prior["raw_line"]
+                                   else "normalized_json_equal")
+                    prior["sources"].append({**source, "equivalence_to_first": equivalence})
+                    prior[f"{equivalence}_duplicates"] += 1
+                    continue
+                seen[world_key] = {
+                    "row": r,
+                    "normalized_row": normalized,
+                    "raw_line": raw_line,
+                    "sources": [{**source, "equivalence_to_first": "first"}],
+                    "byte_identical_duplicates": 0,
+                    "normalized_json_equal_duplicates": 0,
+                }
     if skipped:
         print(f"  [skip base] {len(skipped)} 个推不出 scale/family 的 base 分片已忽略："
               f"{', '.join(skipped[:6])}{' …' if len(skipped) > 6 else ''}", file=sys.stderr)
+
+    by_case = {}
+    for world_key, entry in seen.items():
+        pb, fam, cid, _budget, _probe, row_decode, row_seed = world_key
+        by_case.setdefault((pb, fam, cid), []).append((row_decode, row_seed, entry))
+    m = {}
+    for case_key, trajectories in by_case.items():
+        if len(trajectories) > 1:
+            sources = [f"{entry['sources'][0]['path']}:{entry['sources'][0]['line']}"
+                       for _decode, _seed, entry in trajectories]
+            raise ValueError(
+                "multiple independent base trajectories for "
+                f"scale={case_key[0]}, family={case_key[1]}, case_id={case_key[2]}, "
+                f"budget={late}, decode={decode}; select seed explicitly; sources={sources}")
+        _row_decode, _row_seed, entry = trajectories[0]
+        r = entry["row"]
+        c = cmap[case_key[2]]
+        subj = c.get("s") or ""
+        clean = lambda t: metrics._without_subject(t, subj)
+        base_clr = 1 if metrics.hit(clean(r.get("cot", "")), c["o_old"], aliases) else 0
+        base_ans_old = 1 if metrics.hit(clean(r.get("answer", "")), c["o_old"], aliases) else 0
+        m[case_key] = {"base_clr": base_clr, "base_ans_old": base_ans_old}
+
+    duplicate_keys = []
+    for world_key, entry in sorted(seen.items(), key=lambda kv: repr(kv[0])):
+        if len(entry["sources"]) == 1:
+            continue
+        pb, fam, cid, budget, probe, row_decode, row_seed = world_key
+        duplicate_keys.append({
+            "key": {"params_b": pb, "family": fam, "case_id": cid,
+                    "budget": budget, "probe": probe, "decode": row_decode,
+                    "seed": row_seed},
+            "copies_total": len(entry["sources"]),
+            "duplicate_rows_deduplicated": len(entry["sources"]) - 1,
+            "byte_identical_duplicates": entry["byte_identical_duplicates"],
+            "normalized_json_equal_duplicates": entry["normalized_json_equal_duplicates"],
+            "sources": entry["sources"],
+        })
+    provenance = {
+        "duplicate_world_audit": {
+            "status": "PASS",
+            "world_key": ["params_b", "family", "case_id", "budget", "probe",
+                          "decode", "seed"],
+            "selected": {"budget": late, "probe": "base", "decode": decode,
+                         "seed": seed},
+            "comparison": ("full normalized JSON row; missing decode->greedy and missing "
+                           "seed/temperature->null; raw-line equality recorded separately"),
+            "n_unique_worlds": len(seen),
+            "n_duplicate_keys": len(duplicate_keys),
+            "n_duplicate_rows_deduplicated": sum(
+                item["duplicate_rows_deduplicated"] for item in duplicate_keys),
+            "duplicate_keys": duplicate_keys,
+        }
+    }
+    if return_provenance:
+        return m, provenance
     return m
 
 
@@ -111,18 +206,24 @@ def augment_with_net_clr(rows, base_map):
 
 
 # ------------------------------------------------------------------------------
-# 分析(全复用 pe.cluster_bootstrap_ci：两级 family→case bootstrap + family fixed-effect)
+# 分析：主 CI 用 unique-case block；旧 family→row bootstrap 只作 sensitivity。
 # ------------------------------------------------------------------------------
 def analyze_cap3(rows, B=10000, seed=42, control_chain=True):
     out = {}
+    sensitivity = {}
+    primary_scope = "fact-sampling uncertainty conditional on five matched fixed checkpoints"
     sub = [r for r in rows if r.get("net_clr") is not None]       # base-matched
     sub0 = [r for r in rows if r.get("base_clr") == 0]            # base 未泄漏子集
 
     # ① 主结局:net_clr slope(连续 ∈{−1,0,1};减 base 底噪后的涌现)
-    res = pe.cluster_bootstrap_ci(sub, "net_clr", binary=False, control_chain=control_chain, B=B, seed=seed)
+    res = pe.case_block_bootstrap_ci(
+        sub, "net_clr", binary=False, control_chain=control_chain, B=B, seed=seed)
+    sensitivity["net_clr"] = pe.cluster_bootstrap_ci(
+        sub, "net_clr", binary=False, control_chain=control_chain, B=B, seed=seed)
     if res is None:
         out["net_clr"] = {"_error": "no net_clr rows(base 未匹配?检查 --base-glob 与 model_tag)"}
     else:
+        res["inference_scope"] = primary_scope
         res["_desc"] = ("net_clr = edited_CLR − base_CLR ∈{−1,0,1}(逐 case 配对减 base 底噪);"
                         "slope 仍排零且正 → CLR 涌现扣 base 后存活;含零 → raw CLR 涌现大半是 base 共线")
         res["_n"] = len(sub)
@@ -130,17 +231,25 @@ def analyze_cap3(rows, B=10000, seed=42, control_chain=True):
         out["net_clr"] = res
 
     # ② 分层控制:仅 base_clr==0 的 case 上重估 edited CLR slope
-    res0 = pe.cluster_bootstrap_ci(sub0, "clr", binary=True, control_chain=control_chain, B=B, seed=seed + 1)
+    res0 = pe.case_block_bootstrap_ci(
+        sub0, "clr", binary=True, control_chain=control_chain, B=B, seed=seed + 1)
+    sensitivity["clr_on_baseCLR0"] = pe.cluster_bootstrap_ci(
+        sub0, "clr", binary=True, control_chain=control_chain, B=B, seed=seed + 1)
     if res0 is None:
         out["clr_on_baseCLR0"] = {"_error": "no base_clr==0 rows"}
     else:
+        res0["inference_scope"] = primary_scope
         res0["_desc"] = "edited CLR slope,仅在 base 未泄漏(base_clr==0)的 case;仍排零=编辑 CLR 涌现非 base 先验"
         res0["_n"] = len(sub0)
         out["clr_on_baseCLR0"] = res0
 
     # ③ 对照:同 base-matched 子集上的 raw edited CLR slope(与 net_clr 同分母,供比对)
-    resr = pe.cluster_bootstrap_ci(sub, "clr", binary=True, control_chain=control_chain, B=B, seed=seed + 2)
+    resr = pe.case_block_bootstrap_ci(
+        sub, "clr", binary=True, control_chain=control_chain, B=B, seed=seed + 2)
+    sensitivity["clr_raw_matched"] = pe.cluster_bootstrap_ci(
+        sub, "clr", binary=True, control_chain=control_chain, B=B, seed=seed + 2)
     if resr is not None:
+        resr["inference_scope"] = primary_scope
         resr["_desc"] = "raw edited CLR slope(仅 base-matched case,与 net_clr 同分母,供直接比对基线)"
         resr["_n"] = len(sub)
         out["clr_raw_matched"] = resr
@@ -159,6 +268,10 @@ def analyze_cap3(rows, B=10000, seed=42, control_chain=True):
                        "base_clr": round(c["base_clr"] / c["n"], 3), "net_clr": round(c["net"] / c["n"], 3)}
         for (f, pb), c in sorted(cells.items(), key=lambda kv: (kv[0][0], kv[0][1]))
     }
+    out["_family_row_sensitivity"] = sensitivity
+    out["_inference_scope"] = (
+        "primary intervals resample unique case_id blocks and retain every available fixed-checkpoint "
+        "row for that fact; uncertainty is conditional on the five matched observed checkpoints")
     return out
 
 
@@ -284,11 +397,14 @@ def main():
     aliases = json.load(open(args.aliases))
     tag_override = json.load(open(args.map)) if args.map else None
 
-    rows, tags = pe.load_percase_rows(ed_paths, cases, aliases, decode=args.decode,
-                                      base=args.base, late=args.late, tag_override=tag_override)
+    rows, tags, edited_provenance = pe.load_percase_rows(
+        ed_paths, cases, aliases, decode=args.decode, base=args.base,
+        late=args.late, tag_override=tag_override, return_provenance=True)
     if not rows:
         raise SystemExit("edited 侧无可配对逐 case 行(见 percase_emergence 的提示;--glob 指向 6 尺度 ROME×CF 分片)。")
-    base_map = load_base_clr(base_paths, cases, aliases, tag_override=tag_override, late=args.late)
+    base_map, base_provenance = load_base_clr(
+        base_paths, cases, aliases, tag_override=tag_override, late=args.late,
+        decode=args.decode, return_provenance=True)
     matched = augment_with_net_clr(rows, base_map)
     print(f"edited rows={len(rows)}  base per-case={len(base_map)}  net_clr matched={matched} "
           f"({matched / len(rows) * 100:.0f}%)  尺度={sorted(set((r['params_b'], r['family']) for r in rows))}")
@@ -300,6 +416,10 @@ def main():
     out["_meta"] = {"edited_shards": [os.path.basename(p) for p in ed_paths],
                     "base_shards": [os.path.basename(p) for p in base_paths],
                     "n_edited_rows": len(rows), "n_net_clr_matched": matched, "tags": tags}
+    out["_provenance"] = {"edited": edited_provenance, "base": base_provenance,
+                          "edited_paths": ed_paths, "base_paths": base_paths,
+                          "edited_files": [pe.file_record(path) for path in ed_paths],
+                          "base_files": [pe.file_record(path) for path in base_paths]}
     out["verdict"] = _verdict(out)
 
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)

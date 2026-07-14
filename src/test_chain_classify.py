@@ -13,6 +13,18 @@ def _v(primary, **kw):
     d.update(kw); return d
 
 
+def test_default_prompt_is_neutral_and_main_is_opt_in():
+    row = {"case_id": "p1", "s": "Subject", "o_old": "Paris", "o_new": "Rome",
+           "cot": "Some reasoning", "answer": "Paris"}
+    prompt = cc.build_prompt(row)
+    assert cc.DEFAULT_JUDGE_PROMPT == "neutral"
+    assert "STILL INSTALLED" not in prompt
+    assert "ROUTING AROUND an intact edit" not in prompt
+    assert "Do NOT assume anything about whether the edit is intact" in prompt
+    historical = cc.build_prompt(row, cc.JUDGE_PROMPT_TEMPLATE)
+    assert "STILL INSTALLED" in historical, "污染版仅允许显式 opt-in 作历史复现"
+
+
 def test_gate_artifact_and_shortcode():
     # short_code:o_old="US"(2 字) → Excluded-artifact
     row = {"case_id": "s1", "s": "X", "o_old": "US", "o_new": "Canada", "cot": "it's US", "answer": "US"}
@@ -58,15 +70,33 @@ def test_aggregate_majority_and_held():
     assert h["primary"] == "Excluded-held" and h["in_population"] is False
 
 
-def test_aggregate_three_way_precedence():
+def test_aggregate_three_way_requires_adjudication():
     pf = {"overlap_subject": False}
-    # 全不同 {Recall,Bridge,Associative} → precedence 取最高 = Bridge
-    r = cc.aggregate_votes("c3", [_v("Recall"), _v("Bridge"), _v("Associative")], pf)
-    assert r["primary"] == "Bridge" and r["split"] is True
-    # 含 Reflective-override 的 3-way → Reflective-override 胜
-    r2 = cc.aggregate_votes("c4", [_v("Reflective-override", contests_edit_reason="factual"),
-                                   _v("Recall"), _v("Bridge")], pf)
-    assert r2["primary"] == "Reflective-override" and r2["contests_edit_reason"] == "factual"
+    vote_sets = [
+        [_v("Recall"), _v("Bridge"), _v("Associative")],
+        [_v("Reflective-override", contests_edit_reason="factual"), _v("Recall"), _v("Bridge")],
+    ]
+    for i, votes in enumerate(vote_sets):
+        try:
+            cc.aggregate_votes(f"c_split_{i}", votes, pf)
+        except cc.RouteAdjudicationRequired as exc:
+            assert exc.case_id == f"c_split_{i}"
+            assert len(exc.labels) == 3 and len(set(exc.labels)) == 3
+            assert "adjudication required" in str(exc)
+        else:
+            raise AssertionError("1-1-1 route split 必须 hard-fail，不能按固定优先级裁决")
+
+
+def test_single_held_dissent_without_route_majority_requires_adjudication():
+    pf = {"overlap_subject": False}
+    votes = [_v("Recall"), _v("Bridge"),
+             _v("Excluded-held", in_population=False, commits_new=True)]
+    try:
+        cc.aggregate_votes("c_no_majority", votes, pf)
+    except cc.RouteAdjudicationRequired as exc:
+        assert exc.labels == ["Recall", "Bridge"]
+    else:
+        raise AssertionError("两张不同 route 票 + 一张 held 异议没有 route 多数，必须重裁")
 
 
 def test_associative_subtype_and_contests():

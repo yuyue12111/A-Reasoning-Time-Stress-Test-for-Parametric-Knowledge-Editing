@@ -10,23 +10,22 @@
 不是 6 次独立的「能力抽样」——重采样 cell-mean 把 cell 内部的真实样本量（n≈200/case）
 当成了 0，并假装 6 个曲线点彼此独立。重采样的「单位」错了。
 
-本文件把承重统计量换成 **逐 case 的混合/聚类回归**：
+本文件把承重统计量换成 **逐 case 的固定-checkpoint回归**：
   - 分析单位 = 单条 edit-case ×尺度（每个 case 在每个尺度上一行），不是 6 个 cell-mean。
   - family（Qwen / Llama）作为 **分组/随机效应**。
   - log10(参数量) 的斜率作点估，控制 chain_len（B3 链 token 长度）协变量。
-  - CI 来自 **分层（cluster）bootstrap**：**先重采样 family，再在 family 内重采样 case**。
-    这正是对「你重采样了 6 个点」的精确反驳——重采样的单位变成「嵌套在 family 内的 case」，
-    而不是 6 个 cell-mean；family 数（2）有限这一事实被如实地编码进 bootstrap 的方差里
-    （只有 2 个 cluster → CI 必然变宽 → 不再 anti-conservative）。
+  - **主 CI（plan v1.69）**来自 case-block bootstrap：抽 unique ``case_id``，每次保留该事实
+    在全部可用尺度/族上的整组行。它量化的是“conditional on these six fixed checkpoints”的
+    事实抽样不确定性，绝不冒充模型总体/架构总体的不确定性。
+  - 旧的 family→row 两级 bootstrap 保留为 sensitivity，不再承重。它会拆散同一事实跨尺度的
+    重复观测，而且 K=2 family 不能支持对模型总体的外推。
 
   → 旧的 6 点 OLS 降级为 **描述性图**（plots.fig1 的曲线），不再承担显著性断言。
     本文件的 percase_emergence.json 才是论文 §3/§4 引用的承重涌现统计量。
 
-口径诚实：只有 2 个 family cluster，两级 bootstrap 在 family 层是「重采样 2 个里的 2 个」，
-方差吃紧、CI 偏宽——这是 **诚实** 而非缺陷：我们不假装有比实际更多的独立 family。
-我们额外报告 within-Qwen-only 的逐 case 斜率（4 个尺度、case 内重采样），给「就算只看一条族内
-单调曲线，斜率也排零」的稳健性证据；results.json 旧的 within-Qwen CLR=0.2611 是 cell-mean 口径
-且 ci=null，这里给它配上逐 case 的 CI。
+口径诚实：case-block CI 只对测试事实的抽样负责；参数量只在 6 个固定模型点上变化，所以任何
+“capability”解释都必须保持 supporting association。另报 Qwen 32B−14B 的同事实配对差（主描述）
+和 32B−7B（带 Math-base 混淆的次描述），以及旧 family→row sensitivity。
 
 ================================================================================
 期望的逐 case jsonl schema（镜像 src/edit_loop.py 写出 + src/score_pilot.py / src/metrics.py 消费）
@@ -71,6 +70,7 @@ o_old/o_new/s/别名 查表与判分**逐字复用 src/metrics.py**（import met
 """
 import argparse
 import glob as globlib
+import hashlib
 import json
 import os
 import re
@@ -93,7 +93,7 @@ except Exception:
 # ------------------------------------------------------------------------------
 # scale -> (params_b, family) 映射：默认从文件名里的 model_tag 推断
 # ------------------------------------------------------------------------------
-# 已知 6 个点（与 paper/results.json capability.families 对齐）：
+# 已知 6 个点（与 paperwriting/results.json capability.families 对齐）：
 #   Qwen: 1.5/7/14/32B    Llama: 8/70B
 _TAG_PARAMS = {
     "r1qwen1.5b": (1.5, "Qwen"), "r1qwen7b": (7.0, "Qwen"),
@@ -144,6 +144,15 @@ def _tag_from_path(path):
     return os.path.basename(path)
 
 
+def file_record(path):
+    """Release-grade immutable input record for a local/shared-disk artifact."""
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return {"path": path, "sha256": h.hexdigest(), "bytes": os.path.getsize(path)}
+
+
 # ------------------------------------------------------------------------------
 # 逐 case 长表构建（镜像 metrics 口径）
 # ------------------------------------------------------------------------------
@@ -154,7 +163,8 @@ def _wb_count_tokens(text):
 
 
 def load_percase_rows(paths, cases, aliases, decode="greedy", base="B0", late="B3",
-                      tag_override=None, chainlen_field=None, tok_count=None):
+                      tag_override=None, chainlen_field=None, tok_count=None,
+                      return_provenance=False):
     """读所有分片 → 逐 (case × scale) 一行。完全复用 metrics.hit / _without_subject。
 
     返回 list[dict]，每行字段：
@@ -166,10 +176,17 @@ def load_percase_rows(paths, cases, aliases, decode="greedy", base="B0", late="B
     scale/family 由该分片文件名的 model_tag 决定（同一分片内所有 case 同尺度）。
     tok_count: 可选 callable(text)->int，给了则 chain_len 用真 tokenizer 词数（Cap1；平台侧有 tokenizer）；
                否则沿用 --chainlen-field 字段或空白分词近似。
+    return_provenance=True 时额外返回 duplicate-world 审计：同一
+      (params_b, family, case_id, budget) 只允许原文相同或 JSON 解析后整行等价；
+      任何字段差异立即 ValueError，等价副本去重并记录全部 path:line 来源。
     """
     cmap = {c["case_id"]: c for c in cases}
     # (params_b, family, case_id) -> {budget: {"answer":..,"cot":..,"chain_field":..}}
     bucket = {}
+    # (params_b, family, case_id, budget) -> first full JSON row + every equivalent source.
+    # Compare the whole parsed row, not a hand-picked subset: provenance/runtime fields drifting under
+    # the same scientific world are also a hard failure instead of another last-write-wins channel.
+    seen_worlds = {}
     seen_tags = {}
     skipped = []
     for path in paths:
@@ -185,7 +202,8 @@ def load_percase_rows(paths, cases, aliases, decode="greedy", base="B0", late="B
         ds_tag = m_tag.group(1) if m_tag else os.path.basename(path)
         seen_tags.setdefault((params_b, family), set()).add(ds_tag)
         with open(path) as fh:
-            for line in fh:
+            for line_no, line in enumerate(fh, 1):
+                raw_line = line.rstrip("\r\n")
                 try:
                     r = json.loads(line)
                 except Exception:
@@ -198,10 +216,38 @@ def load_percase_rows(paths, cases, aliases, decode="greedy", base="B0", late="B
                 if cid not in cmap:
                     continue
                 key = (params_b, family, cid)
+                budget = r["budget"]
+                world_key = (float(params_b), family, cid, budget)
+                source = {"path": path, "line": line_no}
+                prior = seen_worlds.get(world_key)
+                if prior is not None:
+                    if r != prior["row"]:
+                        sentinel = object()
+                        fields = sorted(set(prior["row"]) | set(r))
+                        changed = [field for field in fields
+                                   if prior["row"].get(field, sentinel) != r.get(field, sentinel)]
+                        first = prior["sources"][0]
+                        raise ValueError(
+                            "conflicting duplicate world "
+                            f"(scale={params_b}, family={family}, case_id={cid}, budget={budget}): "
+                            f"differing_fields={changed}; first={first['path']}:{first['line']}; "
+                            f"duplicate={path}:{line_no}")
+                    equivalence = ("byte_identical" if raw_line == prior["raw_line"]
+                                   else "normalized_json_equal")
+                    prior["sources"].append({**source, "equivalence_to_first": equivalence})
+                    prior[f"{equivalence}_duplicates"] += 1
+                    continue
+                seen_worlds[world_key] = {
+                    "row": r,
+                    "raw_line": raw_line,
+                    "sources": [{**source, "equivalence_to_first": "first"}],
+                    "byte_identical_duplicates": 0,
+                    "normalized_json_equal_duplicates": 0,
+                }
                 slot = bucket.setdefault(key, {})
                 cf = r.get(chainlen_field) if chainlen_field else None
-                slot[r["budget"]] = {"answer": r.get("answer", ""), "cot": r.get("cot", ""),
-                                     "chain_field": cf}
+                slot[budget] = {"answer": r.get("answer", ""), "cot": r.get("cot", ""),
+                                "chain_field": cf}
 
     rows = []
     for (params_b, family, cid), buds in bucket.items():
@@ -250,15 +296,45 @@ def load_percase_rows(paths, cases, aliases, decode="greedy", base="B0", late="B
     if skipped:
         print(f"  [skip] {len(skipped)} 个推不出 scale/family 的分片已忽略（非容量 per-case？）："
               f"{', '.join(skipped[:8])}{' …' if len(skipped) > 8 else ''}", file=sys.stderr)
-    # ⚠混 tag 告警：同一尺度吃进 >1 个 dataset-tag → last-write-wins 会用字典序最后者覆盖，
-    # 静默污染该 cell（曾用 *_ROME_cf*.jsonl 把 cf200sup 抑制实验覆盖掉 32B 的 cf200 → rr 虚低）。
+    # ⚠混 tag 告警：同一尺度吃进 >1 个 dataset-tag 仍可能把不同 cohort 混成一个 cell。
+    # 同一 world 的冲突现在会在上面直接 FAIL，等价副本去重；但互不重叠的混 cohort 仍需告警。
     mixed = {f"{p}B-{f}": sorted(tags) for (p, f), tags in seen_tags.items() if len(tags) > 1}
     if mixed:
-        print(f"  ⚠⚠ 混 tag 告警：以下尺度吃进多个 dataset-tag（last-write-wins 会静默覆盖，数值不可信）：",
+        print(f"  ⚠⚠ 混 tag 告警：以下尺度吃进多个 dataset-tag（可能混 cohort；"
+              "冲突重复 world 已由一致性门单独阻断）：",
               file=sys.stderr)
         for k, ts in mixed.items():
             print(f"       {k}: {ts}  → 用显式 per-scale --glob 或 --map 只留 headline tag", file=sys.stderr)
-    return rows, {f"{p}B_{f}": ("|".join(sorted(tags))) for (p, f), tags in seen_tags.items()}
+    tags_out = {f"{p}B_{f}": ("|".join(sorted(tags))) for (p, f), tags in seen_tags.items()}
+    duplicate_keys = []
+    for (params_b, family, cid, budget), entry in sorted(seen_worlds.items()):
+        if len(entry["sources"]) == 1:
+            continue
+        duplicate_keys.append({
+            "key": {"params_b": params_b, "family": family,
+                    "case_id": cid, "budget": budget},
+            "copies_total": len(entry["sources"]),
+            "duplicate_rows_deduplicated": len(entry["sources"]) - 1,
+            "byte_identical_duplicates": entry["byte_identical_duplicates"],
+            "normalized_json_equal_duplicates": entry["normalized_json_equal_duplicates"],
+            "sources": entry["sources"],
+        })
+    provenance = {
+        "duplicate_world_audit": {
+            "status": "PASS",
+            "key_fields": ["params_b", "family", "case_id", "budget"],
+            "comparison": "full parsed JSON row; raw-line equality recorded separately",
+            "policy": ("conflicting duplicate worlds fail; byte-identical or normalized-JSON-equal "
+                       "worlds are deduplicated"),
+            "n_duplicate_keys": len(duplicate_keys),
+            "n_duplicate_rows_deduplicated": sum(
+                item["duplicate_rows_deduplicated"] for item in duplicate_keys),
+            "duplicate_keys": duplicate_keys,
+        }
+    }
+    if return_provenance:
+        return rows, tags_out, provenance
+    return rows, tags_out
 
 
 # ------------------------------------------------------------------------------
@@ -404,6 +480,111 @@ def cluster_bootstrap_ci(rows, outcome, binary, control_chain=True,
     }
 
 
+def _case_block_map(rows, outcome):
+    """Return non-missing rows grouped by fact id, preserving every scale/family row per fact."""
+    by_case = {}
+    for row in rows:
+        if row.get(outcome) is not None:
+            by_case.setdefault(row["case_id"], []).append(row)
+    return by_case
+
+
+def case_block_bootstrap_ci(rows, outcome, binary, control_chain=True,
+                            B=10000, seed=42, ci=0.95):
+    """Primary v1.69 bootstrap: resample unique facts and keep all their checkpoint rows.
+
+    The six model checkpoints are fixed.  This interval therefore quantifies uncertainty over
+    CounterFact facts conditional on those checkpoints; it is not a model-population or family-
+    population interval.  Repeated appearances of the same ``case_id`` at different scales/families
+    always enter or leave a replicate together.
+    """
+    built = _design(rows, outcome, control_chain)
+    if built is None:
+        return None
+    X0, y0, _, _ = built
+    point, kind = _fit_slope(X0, y0, binary)
+    by_case = _case_block_map(rows, outcome)
+    case_ids = sorted(by_case)
+    if not case_ids:
+        return None
+    rng = np.random.default_rng(seed)
+    slopes = []
+    m = len(case_ids)
+    for _ in range(B):
+        draw = rng.integers(0, m, m)
+        resampled = []
+        for idx in draw:
+            resampled.extend(by_case[case_ids[idx]])
+        bt = _design(resampled, outcome, control_chain)
+        if bt is None:
+            continue
+        Xb, yb, _, _ = bt
+        if np.unique(Xb[:, 1]).size < 2:
+            continue
+        slope, _ = _fit_slope(Xb, yb, binary)
+        if np.isfinite(slope):
+            slopes.append(slope)
+    slopes = np.sort(np.asarray(slopes, float))
+    lo_q, hi_q = (1 - ci) / 2 * 100, (1 + ci) / 2 * 100
+    lo, hi = ((float(np.percentile(slopes, lo_q)), float(np.percentile(slopes, hi_q)))
+              if slopes.size else (float("nan"), float("nan")))
+    return {
+        "point": round(float(point), 4), "kind": kind,
+        "ci95": [round(lo, 4), round(hi, 4)],
+        "excludes_zero": bool(slopes.size and (lo > 0 or hi < 0)),
+        "p_slope_le_0": round(float((slopes <= 0).mean()), 4) if slopes.size else float("nan"),
+        "n_rows": sum(len(v) for v in by_case.values()),
+        "n_case_blocks": len(case_ids),
+        "n_boot_effective": int(slopes.size),
+        "bootstrap_unit": "unique case_id; retain all available scale/family rows",
+        "inference_scope": "fact-sampling uncertainty conditional on six fixed checkpoints",
+    }
+
+
+def within_family_case_block_ci(rows, family, outcome, binary, control_chain=True,
+                                B=10000, seed=43, ci=0.95):
+    """Within-family slope with the same cross-scale case-block resampling discipline."""
+    sub = [row for row in rows if row["family"] == family]
+    if len({row["log_params"] for row in sub if row.get(outcome) is not None}) < 2:
+        return None
+    return case_block_bootstrap_ci(
+        sub, outcome, binary, control_chain=control_chain, B=B, seed=seed, ci=ci)
+
+
+def paired_checkpoint_diff(rows, family, high_params, low_params, outcome="es_drop",
+                           B=10000, seed=42, ci=0.95):
+    """Same-fact paired difference high-minus-low for two fixed checkpoints."""
+    high = {row["case_id"]: row[outcome] for row in rows
+            if row["family"] == family and row["params_b"] == float(high_params)
+            and row.get(outcome) is not None}
+    low = {row["case_id"]: row[outcome] for row in rows
+           if row["family"] == family and row["params_b"] == float(low_params)
+           and row.get(outcome) is not None}
+    ids = sorted(set(high) & set(low))
+    if not ids:
+        return {"n_pairs": 0}
+    diffs = np.asarray([float(high[cid]) - float(low[cid]) for cid in ids], float)
+    point = float(diffs.mean())
+    rng = np.random.default_rng(seed)
+    m = len(ids)
+    boots = np.sort(np.asarray([
+        float(diffs[rng.integers(0, m, m)].mean()) for _ in range(B)
+    ]))
+    lo_q, hi_q = (1 - ci) / 2 * 100, (1 + ci) / 2 * 100
+    lo, hi = np.percentile(boots, [lo_q, hi_q])
+    return {
+        "family": family,
+        "high_params_b": float(high_params),
+        "low_params_b": float(low_params),
+        "outcome": outcome,
+        "n_pairs": len(ids),
+        "mean_high_minus_low": round(point, 4),
+        "ci95": [round(float(lo), 4), round(float(hi), 4)],
+        "excludes_zero": bool(lo > 0 or hi < 0),
+        "bootstrap_unit": "paired unique case_id",
+    }
+
+
 def within_family_ci(rows, family, outcome, binary, control_chain=True,
                      B=10000, seed=43, ci=0.95):
     """族内（如 within-Qwen）逐 case 斜率 + case 重采样 CI（单 cluster → 普通 case bootstrap）。
@@ -496,21 +677,33 @@ _OUTCOMES = [
 
 def analyze(rows, B=10000, seed=42, control_chain=True):
     out = {}
+    sensitivity = {}
     for outcome, binary, desc in _OUTCOMES:
-        res = cluster_bootstrap_ci(rows, outcome, binary, control_chain, B=B, seed=seed)
+        res = case_block_bootstrap_ci(rows, outcome, binary, control_chain, B=B, seed=seed)
         if res is None:
             out[outcome] = {"_desc": desc, "_error": "no rows for outcome"}
             continue
         res["_desc"] = desc
         res["statsmodels"] = statsmodels_corroboration(rows, outcome, binary, control_chain)
         out[outcome] = res
-    # within-Qwen-only CLR（给 results.json 的 0.2611/ci:null 配 CI）
-    out["within_Qwen_clr"] = within_family_ci(rows, "Qwen", "clr", binary=True,
-                                              control_chain=control_chain, B=B, seed=seed + 1) \
+        sensitivity[outcome] = cluster_bootstrap_ci(
+            rows, outcome, binary, control_chain, B=B, seed=seed)
+    out["_family_row_sensitivity"] = sensitivity
+    # within-Qwen-only：同一事实跨尺度整块重采样
+    out["within_Qwen_clr"] = within_family_case_block_ci(
+        rows, "Qwen", "clr", binary=True,
+        control_chain=control_chain, B=B, seed=seed + 1) \
         or {"_error": "Qwen family absent or single-scale"}
-    out["within_Qwen_es_drop"] = within_family_ci(rows, "Qwen", "es_drop", binary=False,
-                                                  control_chain=control_chain, B=B, seed=seed + 2) \
+    out["within_Qwen_es_drop"] = within_family_case_block_ci(
+        rows, "Qwen", "es_drop", binary=False,
+        control_chain=control_chain, B=B, seed=seed + 2) \
         or {"_error": "Qwen family absent or single-scale"}
+    out["fixed_checkpoint_pairs"] = {
+        "Qwen_32B_minus_14B": paired_checkpoint_diff(
+            rows, "Qwen", 32, 14, B=B, seed=seed + 3),
+        "Qwen_32B_minus_7B_math_confounded": paired_checkpoint_diff(
+            rows, "Qwen", 32, 7, B=B, seed=seed + 4),
+    }
     return out
 
 
@@ -570,10 +763,10 @@ def main():
         tok_count = lambda s: len(_tk(s or "", add_special_tokens=False)["input_ids"])
         print(f"  [Cap1] chain_len 用真 tokenizer: {args.tokenizer}")
 
-    rows, tags = load_percase_rows(paths, cases, aliases, decode=args.decode,
-                                   base=args.base, late=args.late,
-                                   tag_override=tag_override,
-                                   chainlen_field=args.chainlen_field, tok_count=tok_count)
+    rows, tags, load_provenance = load_percase_rows(
+        paths, cases, aliases, decode=args.decode, base=args.base, late=args.late,
+        tag_override=tag_override, chainlen_field=args.chainlen_field,
+        tok_count=tok_count, return_provenance=True)
     if not rows:
         raise SystemExit(
             "没有可配对的逐 case 行（需同 case 同时有 base 与 late 的 efficacy 行）。\n"
@@ -593,14 +786,17 @@ def main():
     control = not args.no_chain_control
     res = analyze(rows, B=args.boot, seed=args.seed, control_chain=control)
     out = {
-        "_note": ("PER-CASE 承重涌现统计量（取代 6 点 bootstrap）。逐 case ×尺度长表，结局=ES 降幅/"
+        "_note": ("CASE-BLOCK 主统计（plan v1.69）。逐 case ×尺度长表，结局=ES 降幅/"
                   "b0ok-gated RR/CLR（口径逐字复用 src/metrics.py），预测=log10(参数量)+chain_len，"
-                  "family 作分组；CI 来自两级 cluster bootstrap（先重采样 family、再 family 内重采样 case）"
-                  "——精确反驳『重采样了 6 个 cell-mean』。6 点 OLS（src/emergence_regression.py）降级为描述性图。"),
+                  "family 固定效应；bootstrap 抽 unique case_id 并保留该事实跨全部可用尺度/族的行。"
+                  "CI 仅表示 conditional on six fixed checkpoints 的事实抽样不确定性。旧 family→row"
+                  "两级 bootstrap 只存 _family_row_sensitivity。"),
         "_config": {"glob": args.glob, "decode": args.decode, "base": args.base, "late": args.late,
                     "control_chain_len": control, "n_boot": args.boot, "seed": args.seed,
                     "statsmodels_available": _HAS_SM, "n_rows_total": len(rows),
                     "scales_detected": tags},
+        "_provenance": {**load_provenance,
+                         "input_files": [file_record(path) for path in paths]},
         "cells_descriptive": _summary_table(rows),
         **{k: v for k, v in res.items()},
     }
@@ -610,7 +806,7 @@ def main():
     # 人读摘要
     print(f"# per-case emergence —— rows={len(rows)} families={sorted(set(r['family'] for r in rows))} "
           f"scales={out['_config']['scales_detected']}  chain_len_controlled={control}  sm={_HAS_SM}")
-    print(f"{'outcome':<14}{'model':>8}{'slope':>10}{'95% CI(cluster-boot)':>26}{'p(≤0)':>9}{'排零':>6}  n_rows/fam")
+    print(f"{'outcome':<14}{'model':>8}{'slope':>10}{'95% CI(case-block)':>26}{'p(≤0)':>9}{'排零':>6}  n_rows/cases")
     for outcome, binary, _desc in _OUTCOMES:
         a = res.get(outcome, {})
         if "ci95" not in a:
@@ -618,7 +814,7 @@ def main():
             continue
         print(f"{outcome:<14}{a['kind']:>8}{a['point']:>10.4f}{str(a['ci95']):>26}"
               f"{a['p_slope_le_0']:>9.4f}{('YES' if a['excludes_zero'] else 'no'):>6}  "
-              f"{a['n_rows']}/{a['n_families']}")
+              f"{a['n_rows']}/{a['n_case_blocks']}")
         sm_c = a.get("statsmodels", {})
         if sm_c.get("ci95"):
             print(f"               ↳ statsmodels {sm_c['method']}: slope={sm_c['slope']} "
@@ -629,13 +825,12 @@ def main():
               f"排零={wq['excludes_zero']}  (旧 results.json=0.2611, ci:null → 这里补 CI)")
     print(f"\n# → {args.out}")
     _excl = {o: bool(res.get(o, {}).get("excludes_zero")) for o, _b, _d in _OUTCOMES}
-    print("# 解读：重采样单位=case nested in family（非 6 个 cell-mean）→ 直接堵『制造显著性』。")
-    print(f"#   各结局 cluster-boot CI 排零：{_excl}")
+    print("# 解读：重采样单位=unique case_id block；同一事实跨尺度/族的行同进同出。")
+    print(f"#   各结局 case-block CI 排零：{_excl}")
     if any(_excl.values()):
         print("#   → 至少一指标斜率显著为正 = 涌现有承重统计支撑。")
     else:
-        print("#   → 点估计为正但 CI 均含零（K=2 family 下 between-family 方差估不准）= 斜率在 family 层面"
-              "不显著 → capability 作【描述性单调趋势】报、不宣称显著斜率（与 MECH-led 机理/修复头牌正交，不动头牌）。")
+        print("#   → 点估计为正但事实抽样 CI 均含零：仅保留双高端 cell 的描述性 size-associated pattern。")
 
 
 if __name__ == "__main__":
