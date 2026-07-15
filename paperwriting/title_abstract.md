@@ -7,6 +7,24 @@
 > 纪律：本文件每个数字下表有 JSON path 对账；改数先改 `results.json` 永不反向。
 > 禁语自查已过：无 invalid / capability-emergent / scaling-law 宣称 / 无 hedge 的 halves / mediation 类词。
 
+## OpenReview 填报冻结记录（abstract registration，硬线 7/21）
+
+- **Title**：冻结版逐字（见下节）。之后 PDF 标题必须与表单逐字一致（AI 辅助评审可机器比对）。
+- **TL;DR（250 字符限）**，两版均合规、用户任选：
+  - **推荐（Fable，228 字符，与 title 互补不重复——bidding 时评审并排看到 title+TL;DR，重复=浪费槽位；本版补 title 没有的 aha：pass-yet-overturn + still-detectable）**：
+    *An edit can pass direct-answer validation yet be overturned when the model reasons—while the edit itself remains detectable. Our thinking-budget stress test quantifies these reversions; a think-span-only suppression lowers them.*
+  - 备选（Codex，177 字符，身份直陈版）：
+    *Direct-answer success can miss reasoning-time failures of parametric knowledge edits; our stress test exposes these reversions and identifies a chain-local causal control point.*
+- **Abstract**：冻结 v5 纯文本逐字粘贴（已 diff 核验 = 冻结版）；粘后 Preview 核 `κ`、`−`(U+2212)、CI 方括号渲染。
+- **Primary Topic（终裁，Codex 依官方 track scope 亲核 + Fable 同意）**：`PEAI: AI Evaluation, Auditing & Red Teaming`。不选 `PEAI: AI Alignment & Oversight`（会引来 oversight/governance 评审池）。
+- **Secondary Topics（终裁：四项，第五留空；secondary 是双刃剑不为填满而填）**：
+  ① ML: Machine Unlearning, Data Deletion & Model Editing ② ML: Reasoning & Test-Time Compute
+  ③ NLP: Interpretability, Analysis & Evaluation (incl. Factuality & Hallucination) ④ PEAI: Safety, Robustness & Trustworthiness。
+  不选 XAI（把火力引向我们主动降级的机理轴）；`NLP: (Large) Language Models` 仅作自愿第五项。
+- **Reciprocal Reviewer**（7/21 后锁死）：先核 Haoyu Wang 是否满足 ≥2 一作/≥5 合著 archival 门槛并本人确认可承担 ≤6 篇；"no author qualifies" 是带 desk-reject 后果的声明，逐人核过才可选。
+- 其余：作者列表=最终顺序（注册后通常锁死，勿留缺）、全员 profile 补齐（姓名/单位/单位邮箱/DBLP）、Country 按单位所在地、PDF/checklist/supplement 留空（7/28、7/31 分批传）、禁外部匿名仓库链接、License CC BY 4.0 默认。
+- **提交后**：submission number + 确认截图记入行政台账（本文件追加一行即可）。
+
 ## Title（冻结，2026-07-14 用户拍板，Codex 提案 + Fable 复核同意）
 
 > **Direct-Answer Edit Success Is Not Enough: A Reasoning-Time Stress Test for Parametric Knowledge Editing**
