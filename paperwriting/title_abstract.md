@@ -17,27 +17,36 @@ Trade-off 自觉：标题只覆盖 C1，C2/C3 隐身 = under-promise/over-delive
 "Thinking Undoes Editing" 降级为项目代号 + §1 开篇钩子（Codex 二审后弱化版，"routes around it" 超证据已弃）：
 *"Does thinking undo editing? The edited association remains detectable at a cloze probe — yet native reasoning can reverse the final answer."*
 
-## Abstract v2（唯一版本，~240 词；2026-07-14 按 Codex 二审四项 REVISE 重写，待复审）
+## Abstract v3（唯一版本；2026-07-14 按 Codex 三审 REVISE-ONCE 修订，待终审冻结）
 
-> Parametric knowledge edits are validated with direct answers, yet deployed reasoning models may
-> reason before they answer. We stress-test edits with a controlled thinking budget: the same ROME
-> edit on CounterFact is scored at zero thinking and after a natural chain of thought, across six
-> fixed checkpoints from two DeepSeek-R1-distill families. Direct-answer-validated edits erode once
-> thinking unfolds: on R1-Distill-Qwen-32B, paired edit success drops by 0.106 [0.030, 0.182],
-> mirrored at 0.107 [0.032, 0.182] on Llama-70B; the old answer displaces the new one outright in
-> 9.2% of zero-thinking successes and resurfaces in the final answer in 19.3% overall (strict
-> scorer: Cohen's κ=0.836 vs. a neutral three-judge majority). The erosion is edit-specific (no
-> detectable drift in the unedited base), content-dependent (a canned non-reasoning thought does
-> not reproduce it), and persists across three fixed sampling seeds. Reverted answers coexist with
-> a still-detectable cloze edit in all 23 cases examined; a three-judge census of 41 committed
-> reversions (33 unique facts, κ=0.813) finds visible in-chain routes—Bridge 66%, Recall 27%.
-> Suppressing first-token variants of the old answer only inside the thinking span—answer logits
-> untouched—removes the thinking tax (+0.106 → −0.035) and lowers reversion from 19.3% to 8.5%,
-> beating an inert placebo and a largely-inactive same-relation competitor with signed, dose-graded
-> effects. The strict endpoint improves only against the competitor control; edit-success gains
-> replicate at 14B and transfer to MEMIT, where strict transfer remains inconclusive.
-> Direct-answer edit success is not enough: edit evaluation needs a reasoning-time stress test, and
-> the failure it reveals admits a chain-local causal control point.
+> Parametric knowledge edits are validated with direct answers; deployed reasoning models may
+> reason before answering. We stress-test edits under a controlled thinking budget: the same ROME
+> edit on CounterFact is scored at zero thinking and after a natural chain, across six fixed
+> checkpoints of two DeepSeek-R1-distill families. Erosion concentrates at each family's largest
+> checkpoint: paired edit success drops 0.106 [0.030, 0.182] (Qwen-32B) and 0.107 [0.032, 0.182]
+> (Llama-70B); the old answer displaces the new one outright in 9.2% of zero-thinking successes and
+> resurfaces in the final answer in 19.3% of them (strict scorer: Cohen's κ=0.836 vs. a neutral
+> three-judge majority). On Qwen-32B, erosion is edit-specific (no detectable unedited-base drift),
+> content-dependent (a canned thought fails to reproduce it), and stable across three fixed
+> sampling seeds. Reverted answers coexist with a still-detectable cloze edit (23/23 examined); a
+> three-judge census of 41 committed reversions (33 unique facts, κ=0.813) finds visible in-chain
+> routes, predominantly Bridge and Recall. A signed, dose-graded suppression of the old answer's
+> first tokens—think-span only, answer logits untouched—removes the thinking tax (paired
+> edit-success gain 0.138 [0.082, 0.194]) and lowers loose reversion to 8.5% (paired −0.102
+> [−0.170, −0.042]), beating an inert placebo and a same-relation competitor with near-null
+> answer-level effects; the strict endpoint improves against both controls, though not detectably
+> against no suppression. Edit-success gains replicate at 14B and transfer to MEMIT; strict
+> transfer remains inconclusive. Direct-answer edit success is not enough: edit evaluation needs a
+> reasoning-time stress test, and the failure it reveals admits a chain-local causal control point.
+
+### v2→v3 修订记录（Codex 三审 REVISE-ONCE，全部采纳 + 两处 Fable 变体待 Codex 终审）
+1. **事实错误修正（三审唯一硬错，已核实）**："strict improves **only** against the competitor control" 删除——T−P strict `−.057 [−.114,−.010] p=.029` 同样显著（`contrasts_B3_mean_ci_p.T_minus_P.RRs`）；改为 "improves against both controls, though not detectably against no suppression"（T−N p=.073）。
+2. **估计量纪律**：删 marginal 箭头 +0.106→−0.035；修复句全部换配对量——thinking tax removal = T−N ES `+.138 [.082,.194]`、loose 修复 = T−N RR `−.102 [−.170,−.042]`。marginal 箭头移主文（与配对量并列呈现）。
+3. **分母修正**："19.3% overall" → "in 19.3% of them"（23/119，条件于 zero-thinking successes，防全样本误读）。
+4. **范围收紧**：泛化句改 "Erosion concentrates at each family's largest checkpoint"（六格仅两高端排零）；控制句加 "On Qwen-32B" 前缀（F1/F2/F3 均为 32B 证据）。
+5. **competitor 锚点换正**：abstract 的 largely-inactive（X2/X3 跨协议活跃度数据）→ "with near-null answer-level effects"（主 ROME-32B 电池自身证据：C−N RRs `−.0093 [−.0467,.028] p=.83` + `_C_arm_M4`）；X2/X3 的 T=109/C=18 只在 §5 相应协议处使用。
+6. **待 Codex 终审的两处 Fable 变体**：(a) "Erosion concentrates at…" 替代其 "At the largest tested checkpoint…erode"（等价范围、更顺）；(b) 保留 "thinking tax" 标签但括号内改配对增益（其建议句删掉了该标签）。
+7. 词数 247（目标 235–240）：已砍 Bridge/Recall 百分比与 "anywhere"；再压需牺牲 (a) "(23/23 examined)" (b) 三判官归属细节 (c) route 名称之一——留 Codex/用户选。
 
 ### v1→v2 修订记录（Codex 二审裁决 + Fable 复核，全部纯文字零新数字）
 1. "flips 9.2–19.3% back" → 拆开语义：strict=「displaces outright」(11/119)、loose=「resurfaces in the final answer」(23/119, overall 表明包含关系)——语义各自贴口径，叙事保留。
@@ -63,10 +72,11 @@ Trade-off 自觉：标题只覆盖 C1，C2/C3 隐身 = under-promise/over-delive
 | persists across three fixed sampling seeds | `f3_sampling_robustness.sampling_primary_complete_cases.ES_drop=.117[.067,.169]` |
 | coexist with still-detectable cloze edit, 23 cases（无对照 sanity 措辞） | `rq2_logitlens`（n=23，installation sanity） |
 | 41 / 33 facts / κ=.813 / Bridge 66% Recall 27% | `rq2_taxonomy.p0_corrected_taxonomy`（.6585/.2683） |
-| removes the thinking tax +0.106→−0.035 | `rq3.baseline.ES_drop`→`rq3.suppress.ES_drop`；配对承重 T−N ES `+.1378 [.0816,.1939] p≈0` |
-| lowers reversion 19.3%→8.5%（loose） | `rq3.baseline.RR`→`rq3.suppress.RR`；配对承重 T−N RR `−.1017 [−.1695,−.0424] p=.001` |
-| strict improves **only** against competitor control | T−C RRs `−.0566 [−.1132,−.0094] p=.0324`；T−N RRs `−.0508 [−.1017,0.000] p=.073` 未排零→**禁止 0.092→0.042 箭头** |
-| largely-inactive same-relation competitor | `x2/x3 audit.b3_different_probe_rows_vs_N`（T=109 vs C=18；X3 215 vs 24） |
+| removes the thinking tax（paired gain 0.138 [0.082,0.194]） | `cross_arm_paired_ci.T_minus_N.ES`；marginal 箭头 +0.106→−0.035 只进主文并与配对量并列 |
+| lowers loose reversion to 8.5%（paired −0.102 [−0.170,−0.042]） | `cross_arm_paired_ci.T_minus_N.RR p=.001`；8.5%=`rq3.suppress.RR` |
+| strict improves against **both** controls, not detectably vs. no suppression | T−P RRs `−.057 [−.114,−.010] p=.029` + T−C RRs `−.0566 [−.1132,−.0094] p=.0324`；T−N RRs p=.073→**禁 only-vs-competitor、禁 0.092→0.042 箭头** |
+| competitor with near-null answer-level effects | `cross_arm_paired_ci.C_minus_N`（RRs −.0093 [−.0467,.028] p=.83）+ `sup_battery._C_arm_M4`；X2/X3 的 T=109/C=18 活跃度数据仅限 §5 对应协议使用 |
+| Erosion concentrates at each family's largest checkpoint / On Qwen-32B 前缀 | 六格仅 2 格排零（`capability.families.*.es_drop_sig`）；F1/F2/F3 全为 32B 证据 |
 | replicate at 14B / MEMIT strict inconclusive | `rq3.s10_14b_fix_replication.TminusN_paired_ci`（14B 无 C 臂，T−N）/ `x2...contrasts_B3.T_minus_C`（ES +.100 显著；RRs −.0268 [−.0804,.0268] 含零） |
 
 ## 刻意不进 abstract 的项（防问）
