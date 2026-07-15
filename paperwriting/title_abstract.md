@@ -1,4 +1,8 @@
-# title_abstract.md · W1 工作文件（2026-07-14 起草；**title 已冻结**，abstract 为唯一版本）
+# title_abstract.md · W1 工作文件（2026-07-14；**title 与 abstract 均已冻结**）
+
+> **冻结状态**：Title 冻结（Codex 四轮审计 PASS）；Abstract v5 冻结（Codex 五轮审计，五审 REVISE-MINOR 两项修毕后 Codex 同意冻结 + Fable 独立核验同意）。
+> **格式合规（Codex 五审亲核）**：AAAI-27 Submission Instructions 无 250 词上限；OpenReview schema abstract `maxLength=5000` characters；冻结版 263 词 / 1,871 字符。
+> 此后任何改动 = 解冻事件，须记录理由并重新过审。
 
 > 纪律：本文件每个数字下表有 JSON path 对账；改数先改 `results.json` 永不反向。
 > 禁语自查已过：无 invalid / capability-emergent / scaling-law 宣称 / 无 hedge 的 halves / mediation 类词。
@@ -17,7 +21,7 @@ Trade-off 自觉：标题只覆盖 C1，C2/C3 隐身 = under-promise/over-delive
 "Thinking Undoes Editing" 降级为项目代号 + §1 开篇钩子（Codex 二审后弱化版，"routes around it" 超证据已弃）：
 *"Does thinking undo editing? The edited association remains detectable at a cloze probe — yet native reasoning can reverse the final answer."*
 
-## Abstract v4（唯一版本；2026-07-14 按 Codex 四审四阻断项 + 叙事铰链修订，待冻结确认）
+## Abstract v5 —— **FROZEN 2026-07-14**（唯一版本）
 
 > Parametric knowledge edits are validated with direct answers; deployed reasoning models may
 > reason before answering. We stress-test edits under a controlled thinking budget: the same ROME
@@ -28,10 +32,11 @@ Trade-off 自觉：标题只覆盖 C1，C2/C3 隐身 = under-promise/over-delive
 > resurfaces in the final answer in 19.3% of them (strict scorer: Cohen's κ=0.836 vs. a neutral
 > three-judge majority); erosion is edit-specific (no detectable unedited-base drift),
 > content-dependent (a canned thought fails to reproduce it), and persists across three fixed
-> sampling seeds. Reverted answers coexist with a still-detectable cloze edit (23/23 examined), and
-> every one of 41 judged committed reversions (33 unique facts) shows a visible in-chain route,
-> pointing to a chain-routing vulnerability rather than simple erasure. A signed, dose-graded
-> suppression of the old answer's first tokens (think-span only; answer logits untouched) then
+> sampling seeds. At Qwen-32B, reverted answers coexist with a still-detectable cloze edit (23/23
+> examined). Separately, neutral three-judge majority labels identify a visible in-chain route in
+> all 41 committed reversions (33 unique facts), motivating a chain-routing hypothesis. We next
+> test for a chain-local control point: a signed, dose-graded suppression of the old answer's first
+> tokens (think-span only; answer logits untouched)
 > offsets the observed thinking tax (paired edit-success gain 0.138 [0.082, 0.194]) and lowers
 > loose reversion to 8.5% (paired −0.102 [−0.170, −0.042]), beating a placebo and a same-relation
 > competitor with near-null answer-level effects; the strict endpoint improves against both
@@ -39,6 +44,11 @@ Trade-off 自觉：标题只覆盖 C1，C2/C3 隐身 = under-promise/over-delive
 > transfer to MEMIT; strict transfer remains inconclusive. Direct-answer edit success is not
 > enough: edit evaluation needs a reasoning-time stress test, and the failure it reveals admits a
 > chain-local causal control point.
+
+### v4→v5 修订记录（Codex 五审 REVISE-MINOR 两项，修毕即冻结；Fable 独立核验均成立）
+1. **"every one … shows" → "neutral three-judge majority labels identify … in all 41"**：41 条中 35 全票、6 条 2–1（其一为 Recall/Associative/Recall），且 neutral prompt 允许 Associative=no traceable route——成立的是"多数票标签均为可见路线"，不是"每条客观无争议地 shows"（v1.85① 台账：unanimous=35、2–1=6、split=0）。
+2. **"rather than simple erasure" 拆缝**：23/23 cloze（Qwen-32B、无对照 installation sanity，真源禁 abstract 承重）与 41 条 taxonomy 的逐 case crosswalk 缺 raw artifact（`BLOCKED_MISSING_PER_ITEM_ARTIFACT`）——原句暗示同 case 合取"编辑完好+可见路线⇒排除 erasure"。改为三段结构：coexist（At Qwen-32B）→ **Separately** + census → "motivating a chain-routing hypothesis" → "**We next test** for a chain-local control point:"——观察性假说与因果检验显式分层，叙事反而更强（诊断→检验）。
+3. 词数裁决：257→263 词合规（AAAI-27 无词数上限、OpenReview 5,000 字符；本版 1,871 字符），"(33 unique facts)" 保留。
 
 ### v3→v4 修订记录（Codex 四审，四阻断项全采纳；其中两项是 Fable v3 压词时自己引入的回归）
 1. **范围钉死**：9.2%/19.3% 是 Qwen-32B 的 11/119、23/119——句子重排为 "(Llama-70B). On Qwen-32B, the old answer…"，且与 F1/F2/F3 控制句合并在同一个 On-Qwen-32B 辖域下（顺带省词）。
@@ -84,7 +94,8 @@ Trade-off 自觉：标题只覆盖 C1，C2/C3 隐身 = under-promise/over-delive
 | 41 / 33 facts / κ=.813 / Bridge 66% Recall 27% | `rq2_taxonomy.p0_corrected_taxonomy`（.6585/.2683） |
 | **offsets** the observed thinking tax（paired gain 0.138 [0.082,0.194]） | `cross_arm_paired_ci.T_minus_N.ES`；**禁 removes**（增益 CI 下界 .082 < 观测税 .106，无残余税等价检验）；marginal 箭头 +0.106→−0.035 只进主文并与配对量并列 |
 | a placebo（禁 inert 前缀） | `contrasts_B3_mean_ci_p.P_minus_N` 全含零 = null-compatible ≠ 认证 inert |
-| every one of 41 shows a visible in-chain route / "pointing to a chain-routing vulnerability" | `p0_corrected_taxonomy`：41=Bridge 27+Recall 11+RO 3+Assoc 0（全部可分类路由）；"pointing to"=溯因措辞，禁升 "re-derivation causes"（X1 9/18 FAIL） |
+| majority labels identify a visible in-chain route in all 41 / "motivating a chain-routing hypothesis" | `p0_corrected_taxonomy`：41=Bridge 27+Recall 11+RO 3+Assoc 0，unanimous 35、2–1 6；**多数票口径**，禁 "every one shows"；"motivating a hypothesis"=溯因，禁升 "re-derivation causes"（X1 9/18 FAIL） |
+| coexist 句与 census 句必须 "Separately" 分层 | 23-cloze↔41-taxonomy 逐 case crosswalk `BLOCKED_MISSING_PER_ITEM_ARTIFACT`（rq2_logitlens 附注）——禁同 case 合取表述"编辑完好+可见路线⇒排除 erasure" |
 | lowers loose reversion to 8.5%（paired −0.102 [−0.170,−0.042]） | `cross_arm_paired_ci.T_minus_N.RR p=.001`；8.5%=`rq3.suppress.RR` |
 | strict improves against **both** controls, not detectably vs. no suppression | T−P RRs `−.057 [−.114,−.010] p=.029` + T−C RRs `−.0566 [−.1132,−.0094] p=.0324`；T−N RRs p=.073→**禁 only-vs-competitor、禁 0.092→0.042 箭头** |
 | competitor with near-null answer-level effects | `cross_arm_paired_ci.C_minus_N`（RRs −.0093 [−.0467,.028] p=.83）+ `sup_battery._C_arm_M4`；X2/X3 的 T=109/C=18 活跃度数据仅限 §5 对应协议使用 |
