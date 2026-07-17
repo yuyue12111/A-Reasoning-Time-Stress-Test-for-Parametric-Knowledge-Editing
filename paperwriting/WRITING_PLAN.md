@@ -59,7 +59,9 @@
 
 ## 3. 禁语清单（对账时全文扫描，零命中才准冻结）
 
-`invalid certificate` / `capability-emergent`（headline）/ `scaling law` / `fuel`、`vanishes`（B15 分层无 interaction 检验）/ `re-derivation causes` / `semantic mediation`、`mediates`、`necessity`（近似词用 near-necessity）/ `semantic paraphrase robustness` / `equivalence certified`、`TOST-certified` / `prevents`、`blocks`、`robust to bypass` / 不带夹层限定的 `halves reversion` / `first to discover` / `preregistered` 用于任何无结果前冻结证据的分析。
+`invalid certificate` / `capability-emergent`（headline）/ `scaling law` / `fuel`、`vanishes`（B15 分层无 interaction 检验）/ `re-derivation causes` / `semantic mediation`、`mediates`、`necessity`（近似词用 near-necessity）/ `semantic paraphrase robustness` / `equivalence certified`、`TOST-certified` / `prevents`、`blocks`、`robust to bypass` / 不带夹层限定的 `halves reversion` / `first to discover` / `preregistered` 用于任何无结果前冻结证据的分析 / **`edit intact`、`not erased`、`非擦除已证`**（cloze 可探 ≠ intact ≠ 排除功能性擦除；合法上限=*edited association remains detectable at a cloze probe*）/ **`guaranteed upper bound` 形容 loose RR**（recall=.96、FN=1 alias gap→非数学上界；夹层措辞用 conservative/permissive 口径）。
+
+另（Kimi 交锋传导，2026-07-14）：F1 的 `effect_above_control=.214` **禁作正式 contrast**（编辑态 b0ok-门 loose RR 与未编辑基座全样本 drift 的事件定义/分母不同、无 interaction CI）——主文只并列报告两个量，不做差值宣称。
 
 ## 4. 日历（硬线：abstract 7/21、全文 7/28、supp+code 7/31，UTC-12；内部冻结 7/18 / 7/25）
 

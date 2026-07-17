@@ -10,11 +10,10 @@
 ## OpenReview 填报冻结记录（abstract registration，硬线 7/21）
 
 - **Title**：冻结版逐字（见下节）。之后 PDF 标题必须与表单逐字一致（AI 辅助评审可机器比对）。
-- **TL;DR（250 字符限）**，两版均合规、用户任选：
-  - **推荐（Fable，228 字符，与 title 互补不重复——bidding 时评审并排看到 title+TL;DR，重复=浪费槽位；本版补 title 没有的 aha：pass-yet-overturn + still-detectable）**：
-    *An edit can pass direct-answer validation yet be overturned when the model reasons—while the edit itself remains detectable. Our thinking-budget stress test quantifies these reversions; a think-span-only suppression lowers them.*
-  - 备选（Codex，177 字符，身份直陈版）：
-    *Direct-answer success can miss reasoning-time failures of parametric knowledge edits; our stress test exposes these reversions and identifies a chain-local causal control point.*
+- **TL;DR（250 字符限）——最终版（2026-07-14 封版，Kimi 认输条#2 采 Codex 纠正）**：
+    *An edit can pass direct-answer validation yet be overturned when the model reasons—while its edited association remains detectable at a cloze probe. Our stress test quantifies these reversions; think-span-only suppression lowers them.*（234 字符）
+  - 纠正记录：原推荐版 "the edit itself remains detectable" 宽于证据上限（cloze 可探 ≠ 整个编辑 intact ≠ 排除功能性擦除，且 ROME 优化目标正是该 logit）——换 "its edited association remains detectable at a cloze probe" 逐字对齐；"thinking-budget" 由并排显示的 title 语义补全，不复述。三方确认后此为最后一个字节级动作，**锁不再开**。
+  - 已作废旧版存档：Fable 228 字符版（detectable 措辞超限）；Codex 177 字符身份直陈版（丢 pass-yet-overturn beat）。
 - **Abstract**：冻结 v5 纯文本逐字粘贴（已 diff 核验 = 冻结版）；粘后 Preview 核 `κ`、`−`(U+2212)、CI 方括号渲染。
 - **Primary Topic（终裁，Codex 依官方 track scope 亲核 + Fable 同意）**：`PEAI: AI Evaluation, Auditing & Red Teaming`。不选 `PEAI: AI Alignment & Oversight`（会引来 oversight/governance 评审池）。
 - **Secondary Topics（终裁：四项，第五留空；secondary 是双刃剑不为填满而填）**：
@@ -134,7 +133,7 @@ Trade-off 自觉：标题只覆盖 C1，C2/C3 隐身 = under-promise/over-delive
 - 评分：清晰 8 / 惊讶 7 / 可信 9 / 记忆 7 / 顶会味 7。
 - **解冻事件顺手采纳清单**（Kimi 三项 optional；单独不值得解冻，冻结期禁改）：
   1. S5 尾加 "(…; an installation sanity check)"（+4 词，preempt vacuity 攻击）；
-  2. S4 loose 显式标注 "(loose upper bound; strict scorer: …)"；
+  2. ~~S4 loose 显式标注 "(loose upper bound; …)"~~ **作废（Kimi 自撤，2026-07-14）**：`vs_RR_loose_decontam` recall=.96、FN=1（judge-true 回退被 loose 漏检=alias gap）→ loose **不是数学上界**，标注反引入新过度宣称；"resurfaces in the final answer" 原样最稳；
   3. S7 消歧 "…a placebo and a same-relation competitor, both near-null at the answer level;"。
 - **两个校准分歧的终裁**：
   1. S5 去留（Kimi 主删）：**保留**。Kimi 记忆测试(G)自证"编辑仍完好"是应记住句的核心成分，删 S5 = 塌回"长推理掉点+补丁"故事；字面已三重弱化+分层。保险转为主文义务：§4 以 installation sanity check 身份+全 caveat 呈现 cloze 检查（WRITING_PLAN 已令）。
