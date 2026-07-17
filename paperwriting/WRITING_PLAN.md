@@ -37,7 +37,7 @@
 - M1：baseline-risk enrichment（CLR1 层 `−.289 p=.0002` vs CLR0 `+.014 p=.72`，CLR0 有 N_RR=0 地板，`rq3.clr_split_M1`）——写 near-necessity，不写 mediation
 - W-B：概念方向压链（CLR `−.078` 排零）不修答案（RR/ES 含零，`wb_representation_repair.confirm_arms`）= "减少概念表达不充分"的诚实反例
 - T/D/P/C 五臂：**唯一真因果**，识别的是 chain-local old-token control point（`rq3.sup_battery`）
-- **X1 一句正文披露**：预注册 replay 载具门 9/18 FAIL、未救门（`x1_replay_gate.gate`）；完整 gate 表进 supplementary
+- **X1 正文披露（Kimi 终审加严）**：预注册 replay 载具门 9/18 FAIL、未救门（`x1_replay_gate.gate`）；披露必须站在机理章 routing-hypothesis 讨论的**紧邻位置**，作为"是否直接测过链作为自然载具"这一可预测追问的正面回答——不得藏 §7 limitations 尾部；完整 gate 表进 supplementary。cloze 检查在 §4 必须以 "installation sanity check" 身份 + 全 caveat（无对照/近恒真/条件于回退样本/crosswalk BLOCKED）呈现
 - 合法机理句式：*failure coexists with an installed cloze edit; native chains frequently expose Bridge/Recall routes; an old-token-specific intervention in the chain causally changes the untouched answer.*
 - 禁写：re-derivation **causes** the failure / 41/41 证明重推导 / content-driven mechanism 已闭合 / semantic mediation / commitment layer located
 

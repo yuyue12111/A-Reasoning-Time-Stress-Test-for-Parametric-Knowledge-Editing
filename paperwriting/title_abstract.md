@@ -127,3 +127,18 @@ Trade-off 自觉：标题只覆盖 C1，C2/C3 隐身 = under-promise/over-delive
 - **locality/genbench**：Loc 只是 target non-leakage、TOST 未认证——abstract 写了就要 hedge，不写最干净。
 - **per-case slope**：supporting outcome，正文供货，abstract 不承载。
 - **尺寸关联 hedge 句**（v2 起删除）："size association is supporting evidence, not a scaling law" 整句退场——abstract 不做任何尺寸关联 claim，无 claim 即无需 hedge；scope 由 "six fixed checkpoints from two families" 描述性携带（Codex 二审同意，Fable 采纳）。
+
+## Kimi 独立终审（2026-07-14，第三方，先独立重算后读修订史）
+
+- **裁决：Title FREEZE / Abstract FREEZE，零 blocking**。逐句 claim ledger 与 Codex/Fable 结论独立收敛（含两 κ 归属、near-null 换锚、T−P/T−C/T−N 分层、跨样本 Separately 纪律）。三方全体一致，冻结成立。
+- 评分：清晰 8 / 惊讶 7 / 可信 9 / 记忆 7 / 顶会味 7。
+- **解冻事件顺手采纳清单**（Kimi 三项 optional；单独不值得解冻，冻结期禁改）：
+  1. S5 尾加 "(…; an installation sanity check)"（+4 词，preempt vacuity 攻击）；
+  2. S4 loose 显式标注 "(loose upper bound; strict scorer: …)"；
+  3. S7 消歧 "…a placebo and a same-relation competitor, both near-null at the answer level;"。
+- **两个校准分歧的终裁**：
+  1. S5 去留（Kimi 主删）：**保留**。Kimi 记忆测试(G)自证"编辑仍完好"是应记住句的核心成分，删 S5 = 塌回"长推理掉点+补丁"故事；字面已三重弱化+分层。保险转为主文义务：§4 以 installation sanity check 身份+全 caveat 呈现 cloze 检查（WRITING_PLAN 已令）。
+  2. X1 FAIL 显眼度（Kimi 加严）：**采纳**。披露位置从"正文一句"升级为"机理章 routing-hypothesis 讨论紧邻位置，作为『你直接测过链作为自然载具吗』的正面回答"（WRITING_PLAN 已令）。
+- **W3 hostile-review 靶标（Kimi 供出的拒稿一句话，全文须逐分句预置回答）**：
+  "A real but narrow evaluation gap on CounterFact/ROME; the mechanism is observational, the preregistered mediation test failed, and the fix is a decoding-time lexical patch whose strict endpoint is null against the natural baseline."
+- 记忆落差修正令：chain-local causal control point（最硬 novelty）读者记忆排第三——§1 贡献列表与 §7 结论句上提该 beat（零新数字）。
