@@ -1,0 +1,39 @@
+{
+  "candidate_version": "v8.1",
+  "candidate_file_sha256": "0c85a03e9cd288b45d6f23502caf17b74e84c28dee0f3a2e62f9202ec4b81e5f",
+  "g3_substance": "PASS",
+  "g4_hostile_read": "PASS_WITH_RECORDED_MINOR_SCOPE_OVERREAD",
+  "independent_reviews": {
+    "science": {
+      "reviewer": "v81_final_science",
+      "status": "PASS",
+      "final_sha_rechecked": true
+    },
+    "statistics": {
+      "reviewer": "v81_estimand plus v81_final_science",
+      "status": "PASS",
+      "final_sha_rechecked": true,
+      "resolution": "The paired −0.102 estimate moved to D5; the abstract now reports only the two arm-wise resurfacing levels."
+    },
+    "causal_scope": {
+      "reviewer": "v81_final_science",
+      "status": "PASS",
+      "final_sha_rechecked": true,
+      "resolution": "S5 separates cloze and route evidence; S6 scopes the manipulation to Qwen-32B; S7 reports signed/dose calibration and near-null answer-level controls."
+    },
+    "control_endpoints": {
+      "reviewer": "v81_control_claim",
+      "status": "PASS",
+      "final_sha_rechecked": true,
+      "resolution": "P−N and C−N ES/RR/RRs point estimates are within 1.52 percentage points of zero and all CIs include zero; answer-level remains mandatory because C−N CLR is nonzero."
+    },
+    "story": {
+      "reviewer": "v81_final_story",
+      "status": "PASS",
+      "final_sha_rechecked": true
+    }
+  },
+  "surviving_minor_risk": "Blind readers may read chain-local causal control point as broad mechanism identification. The abstract says hypothesis, scopes the intervention to Qwen-32B, and uses the frozen existential admits claim; the manuscript must disclose X1 9/18 FAIL adjacent to the routing hypothesis and keep the intervention framed as a bounded causal probe.",
+  "natural_mediation_claimed": false,
+  "universal_or_deployment_fix_claimed": false
+}

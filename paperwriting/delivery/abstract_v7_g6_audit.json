@@ -1,0 +1,83 @@
+{
+  "allocation": {
+    "v5": 4,
+    "v6": 4,
+    "v7": 4
+  },
+  "clarity_scores": {
+    "v5": [
+      4,
+      4,
+      3,
+      4
+    ],
+    "v6": [
+      4,
+      4,
+      4,
+      4
+    ],
+    "v7": [
+      4,
+      4,
+      4,
+      4
+    ]
+  },
+  "decision": "NOT_PASSED_CLEAR_WIN_NOT_ESTABLISHED",
+  "failures": [],
+  "raw_record_sha256": "181453101a363f3d4aa1bf1fde2636f99253244a2454137cd1ff4e33c1ff22db",
+  "scorer_totals": {
+    "scorer_1": {
+      "v5": [
+        3,
+        4,
+        0,
+        4,
+        1
+      ],
+      "v6": [
+        2,
+        4,
+        0,
+        4,
+        1
+      ],
+      "v7": [
+        1,
+        4,
+        0,
+        4,
+        0
+      ]
+    },
+    "scorer_2": {
+      "v5": [
+        3,
+        4,
+        0,
+        4,
+        1
+      ],
+      "v6": [
+        2,
+        4,
+        0,
+        4,
+        1
+      ],
+      "v7": [
+        1,
+        4,
+        1,
+        4,
+        0
+      ]
+    }
+  },
+  "status": "PASS",
+  "v7_valid_bounded_cloze_hits": {
+    "scorer_1": 0,
+    "scorer_2": 0
+  }
+}

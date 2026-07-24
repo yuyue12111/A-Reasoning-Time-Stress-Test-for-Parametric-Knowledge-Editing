@@ -1,0 +1,40 @@
+{
+  "status": "PASS_NO_OBSERVED_REGRESSION_NOT_EQUIVALENCE",
+  "protocol": "paperwriting/delivery/abstract_v8_g62_protocol.json",
+  "raw": "paperwriting/delivery/abstract_v8_g62_raw.json",
+  "candidate_version": "v8.1",
+  "candidate_file_sha256": "0c85a03e9cd288b45d6f23502caf17b74e84c28dee0f3a2e62f9202ec4b81e5f",
+  "v8.1": {
+    "n": 4,
+    "clarity_scores": [4, 4, 4, 5],
+    "clarity_median": 4.0,
+    "clarity_le_2": 0,
+    "memorability_scores": [4, 4, 5, 5],
+    "memorability_median": 4.5,
+    "bid_scores": [4, 4, 5, 5],
+    "bid_median": 4.5,
+    "major_overreads": 0
+  },
+  "v6": {
+    "n": 4,
+    "clarity_scores": [4, 4, 4, 4],
+    "clarity_median": 4.0,
+    "clarity_le_2": 0,
+    "memorability_scores": [5, 5, 4, 4],
+    "memorability_median": 4.5,
+    "bid_scores": [4, 4, 4, 4],
+    "bid_median": 4.0,
+    "major_overreads": 0
+  },
+  "preregistered_rule_checks": {
+    "median_v8_1_clarity_ge_v6": true,
+    "v8_1_clarity_le_2_count_le_v6": true,
+    "v8_1_major_overreads_le_v6": true,
+    "no_repeated_new_v8_1_parsing_failure_absent_from_v6": true
+  },
+  "parsing_note": "Three v8.1 readers named natural chain; all four v6 readers named the same phrase, so this is not a new v8.1 parsing failure. Signed, dose-graded intervention was a singleton.",
+  "overread_note": "All eight readers marked only a minor causal-scope overread. This shared issue is not a v8.1 regression and remains a manuscript scoping obligation.",
+  "interpretation_limit": "This is a regression guard, not a test of equivalence, non-inferiority, or elegance. Elegance remains a user-only judgment.",
+  "user_elegance_judgment": "APPROVED_FOR_INTERNAL_FREEZE_BY_USER_REQUEST",
+  "external_sync": "BLOCKED_UNTIL_G5_DEBTS_CLOSE"
+}

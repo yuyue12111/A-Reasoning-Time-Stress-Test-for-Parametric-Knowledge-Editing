@@ -1,0 +1,64 @@
+{
+  "adoption_gate": "BLOCKED_PENDING_MAIN_TEXT_DEBTS_D1_D7_AND_R1",
+  "all_digit_bearing_tokens": [
+    "0.106",
+    "32B",
+    "0.107",
+    "70B",
+    "32B",
+    "9.2%",
+    "19.3%",
+    "32B",
+    "19.3%",
+    "8.5%",
+    "−0.102",
+    "14B"
+  ],
+  "banned_phrase_hits": [],
+  "candidate": {
+    "file_sha256": "6a39175ec4b40976f0c680e3dea3c1796fe01d2455be2c731da0806a02431a71",
+    "normalized_text_sha256": "761d565073ba1cfc3ed7ffa20e00e7b2bb03b6b8700d239f1d3f3377c0dcec69",
+    "path": "paperwriting/delivery/abstract_v7_candidate.txt",
+    "sentence_count": 9,
+    "sentence_word_counts": [
+      30,
+      19,
+      19,
+      21,
+      22,
+      10,
+      24,
+      28,
+      24
+    ],
+    "word_count_whitespace": 197
+  },
+  "effect_number_count": 7,
+  "effect_number_definition": "result-quantity occurrences only; model identifiers and design counts excluded",
+  "effect_number_occurrences": [
+    "0.106",
+    "0.107",
+    "9.2%",
+    "19.3%",
+    "19.3%",
+    "8.5%",
+    "−0.102"
+  ],
+  "evidence_checks": {
+    "B1.Llama70.drop=0.107": true,
+    "B1.Qwen32.drop=0.106": true,
+    "B2.loose=19.3%": true,
+    "B2.strict=9.2%": true,
+    "B3.armwise_T=8.5%": true,
+    "B3.complete_case_paired=-0.102": true,
+    "control.base_drift_ci_contains_zero": true
+  },
+  "failures": [],
+  "frozen_title_exact": true,
+  "frozen_tldr_exact": true,
+  "frozen_v5_normalized_sha256_exact": true,
+  "missing_locked_phrases": [],
+  "missing_scope_or_estimand_fragments": [],
+  "numeric_set_subset_of_v5_union_v6": true,
+  "status": "PASS"
+}

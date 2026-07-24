@@ -2152,6 +2152,8 @@
     }
    },
    "n": 41,
+   "n_unique_facts": 33,
+   "_derivation": "n_unique_facts counts distinct items[].case_id values across the 41 member rows in results/p0_corrected_taxonomy.json; repeated case IDs across pool/cell occurrences count once (sha256=c11c6a0e5a3ecddff6e18aca4f19cfd91c57d4ff88a83012c211b2aef8543290).",
    "dist": {
     "Bridge": 27,
     "Recall": 11,

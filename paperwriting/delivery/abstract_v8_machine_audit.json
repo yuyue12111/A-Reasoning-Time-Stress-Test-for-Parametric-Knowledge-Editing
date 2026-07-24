@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "candidate": {
+    "version": "v8.1",
+    "path": "paperwriting/delivery/abstract_v8_candidate.txt",
+    "file_sha256": "0c85a03e9cd288b45d6f23502caf17b74e84c28dee0f3a2e62f9202ec4b81e5f",
+    "normalized_text_sha256": "1f9a2b7ed38109b2550142acda48d6f6bd950a2a1ef928c35fbe99077c00ad01",
+    "word_count_whitespace": 188,
+    "sentence_count": 8,
+    "sentence_word_counts": [17, 22, 19, 30, 30, 21, 25, 24]
+  },
+  "G1_numeric": "PASS",
+  "G2_language_and_form": "PASS",
+  "G3_substance": "PASS",
+  "G4_hostile_read": "PASS_WITH_RECORDED_MINOR_SCOPE_OVERREAD",
+  "G5": {
+    "disposition_table": "PASS",
+    "manuscript_debts": "OPEN",
+    "adoption_gate": "BLOCKED"
+  },
+  "G6_2": {
+    "corpus_form": "PASS",
+    "llm_guard": "PASS_NO_OBSERVED_REGRESSION_NOT_EQUIVALENCE",
+    "user_elegance_judgment": "APPROVED_FOR_INTERNAL_FREEZE_BY_USER_REQUEST"
+  },
+  "result_number_occurrences": ["0.106", "0.107", "19.3%", "9.2%", "19.3%", "8.5%"],
+  "result_numeric_sentence_ids": [3, 4, 7],
+  "unexpected_numeric_tokens": [],
+  "missing_required_phrases": [],
+  "banned_phrase_hits": [],
+  "ledger_language_hits": [],
+  "local_frozen_field_checks": {"title": true, "tldr": true, "v5": true, "v8.1_embedded": true},
+  "semantic_audit_checks": {"candidate_hash": true, "science": true, "statistics": true, "causal_scope": true},
+  "g62_audit_checks": {"candidate_hash": true, "guard_pass": true, "user_authority_recorded": true},
+  "failures": []
+}

@@ -1,0 +1,64 @@
+{
+  "authorized_transformations_only": true,
+  "banned_phrase_hits": [],
+  "baseline": {
+    "sentence_count": 9,
+    "normalized_text_sha256": "80b2208d42f5dc6c33378e8ead282b7f9f5316e0d7b0053cbef3cb9405add223",
+    "source": "paperwriting/title_abstract.md::Abstract v5",
+    "word_count_whitespace": 263
+  },
+  "candidate": {
+    "file_sha256": "743ce122bda82bacae6257423c30081a4f8398ea92fc877d727939de9cbf4bc4",
+    "normalized_text_sha256": "274def5d885722dcff313fb197f62480daa78fbd0750764325e4974276d52700",
+    "path": "paperwriting/delivery/abstract_v6_candidate.txt",
+    "sentence_count": 9,
+    "word_count_whitespace": 272
+  },
+  "changed_sentences": [5, 6, 7],
+  "failures": [],
+  "m03": {
+    "derived_unique_case_ids": 33,
+    "results_json_n_unique_facts": 33,
+    "source_rows": 41,
+    "source_sha256": "c11c6a0e5a3ecddff6e18aca4f19cfd91c57d4ff88a83012c211b2aef8543290",
+    "source_unique_item_ids": 41
+  },
+  "numeric_token_counts": {
+    "0.030": 1,
+    "0.032": 1,
+    "0.082": 1,
+    "0.106": 1,
+    "0.107": 1,
+    "0.138": 1,
+    "0.182": 2,
+    "0.194": 1,
+    "0.836": 1,
+    "14B": 1,
+    "19.3%": 1,
+    "23/23": 1,
+    "32B": 3,
+    "33": 1,
+    "41": 1,
+    "70B": 1,
+    "8.5%": 1,
+    "9.2%": 1,
+    "−0.042": 1,
+    "−0.102": 1,
+    "−0.170": 1
+  },
+  "numeric_token_sequence_equal": true,
+  "status": "PASS",
+  "unchanged_sentences_byte_equal": [1, 2, 3, 4, 8, 9],
+  "wording_preconditions": {
+    "cloze_sanity_n": 23,
+    "near_null_answer_level_ci_contains_zero": {
+      "C_minus_N.ES": true,
+      "C_minus_N.RR": true,
+      "C_minus_N.RRs": true,
+      "P_minus_N.ES": true,
+      "P_minus_N.RR": true,
+      "P_minus_N.RRs": true
+    },
+    "strict_validation_kappa": 0.836
+  }
+}

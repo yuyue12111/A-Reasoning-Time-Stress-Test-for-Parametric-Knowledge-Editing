@@ -1,0 +1,68 @@
+{
+  "banned_phrase_hits": [],
+  "candidate": {
+    "file_sha256": "daab7b77177945cf316450f0cd58ec1c4747c3cf66e5e6dee9e778f76a1664ac",
+    "normalized_text_sha256": "0b70c13ef6c2c46f840c46a599c3bbab1fc59eb088b1f33be89e58cf0f40622f",
+    "path": "paperwriting/delivery/abstract_v7_1_candidate.txt",
+    "sentence_count": 9,
+    "sentence_word_counts": [
+      15,
+      24,
+      19,
+      21,
+      22,
+      23,
+      24,
+      28,
+      24
+    ],
+    "word_count_whitespace": 200
+  },
+  "effect_number_count": 7,
+  "effect_number_occurrences": [
+    "0.106",
+    "0.107",
+    "9.2%",
+    "19.3%",
+    "19.3%",
+    "8.5%",
+    "−0.102"
+  ],
+  "evidence_checks": {
+    "B1.Llama70.drop=0.107": true,
+    "B1.Qwen32.drop=0.106": true,
+    "B2.loose=19.3%": true,
+    "B2.strict=9.2%": true,
+    "B3.armwise_T=8.5%": true,
+    "B3.complete_case_paired=-0.102": true,
+    "control.base_drift_ci_contains_zero": true
+  },
+  "external_openreview_state": "NOT_VERIFIED_EXTERNAL",
+  "failures": [],
+  "g5_adoption_gate": "BLOCKED_PENDING_MAIN_TEXT_DEBTS_D1_D7_AND_R1",
+  "g6_status": "NOT_RUN_FOR_V7_1__FRESH_BLIND_PANEL_REQUIRED",
+  "local_frozen_field_checks": {
+    "title": true,
+    "tldr": true,
+    "v5": true
+  },
+  "missing_locked_phrases": [],
+  "numeric_set_subset_of_v5_v6_v7": true,
+  "source_map_checks": {
+    "S1_hash": true,
+    "S2_hash": true,
+    "S3_hash": true,
+    "S4_hash": true,
+    "S5_hash": true,
+    "S6_hash": true,
+    "S7_hash": true,
+    "S8_hash": true,
+    "S9_hash": true,
+    "candidate_file_hash": true,
+    "candidate_normalized_hash": true,
+    "sentence_count": true,
+    "v6_source_hash": true,
+    "v7_source_hash": true
+  },
+  "status": "PASS"
+}

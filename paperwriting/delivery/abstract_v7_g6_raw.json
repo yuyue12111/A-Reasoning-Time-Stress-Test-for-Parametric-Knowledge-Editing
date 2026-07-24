@@ -1,0 +1,206 @@
+{
+  "protocol": {
+    "reader_prompt_template": "Read the supplied abstract exactly once, then do not reread. Without any target rubric: (1) retell its scientific mental model in <=30 English words from memory; (2) state the main implication retained; (3) name any overclaim invited; (4) rate one-pass clarity 1-5.",
+    "allocation": "four fresh readers per version; each reader saw one version only",
+    "limitations": [
+      "LLM compliance with the one-pass/no-reread instruction is not directly observable.",
+      "Reader allocation was balanced but not randomized through a recorded randomization device.",
+      "The operational atom rubric is a sensitivity analysis, not a user-pre-specified aggregation rule.",
+      "The prompt requested retelling and main implication separately, which can shift the stress-test conclusion into the latter field; retelling-only A5 counts therefore do not carry the decision.",
+      "Retellings are verbatim; main_implication and overclaim fields omit response labels and may be lightly normalized for JSON. Conversation-side transcripts are not claimed as repository raw logs."
+    ],
+    "version_sources": {
+      "v5": {
+        "path": "paperwriting/title_abstract.md::Abstract v5",
+        "normalized_text_sha256": "80b2208d42f5dc6c33378e8ead282b7f9f5316e0d7b0053cbef3cb9405add223"
+      },
+      "v6": {
+        "path": "paperwriting/delivery/abstract_v6_candidate.txt",
+        "file_sha256": "743ce122bda82bacae6257423c30081a4f8398ea92fc877d727939de9cbf4bc4",
+        "normalized_text_sha256": "274def5d885722dcff313fb197f62480daa78fbd0750764325e4974276d52700"
+      },
+      "v7": {
+        "path": "paperwriting/delivery/abstract_v7_candidate.txt",
+        "file_sha256": "6a39175ec4b40976f0c680e3dea3c1796fe01d2455be2c731da0806a02431a71",
+        "normalized_text_sha256": "761d565073ba1cfc3ed7ffa20e00e7b2bb03b6b8700d239f1d3f3377c0dcec69"
+      }
+    }
+  },
+  "readers": [
+    {
+      "reader_id": "V7-R1",
+      "version": "v7",
+      "retelling": "Reasoning chains can reactivate old knowledge and erode parameter edits; suppressing old-answer tokens during thought partially restores edited behavior, exposing a chain-local causal control point.",
+      "retelling_word_count": 25,
+      "main_implication": "Direct-answer success is insufficient; knowledge edits need reasoning-budget stress tests.",
+      "overclaim": "Calling token suppression a general causal control point may overstate mechanistic and cross-method evidence, especially with strict transfer inconclusive.",
+      "clarity": 4
+    },
+    {
+      "reader_id": "V7-R2",
+      "version": "v7",
+      "retelling": "Reasoning chains can undo successful knowledge edits while leaving edited facts detectable; suppressing old-answer tokens during thought partly restores robustness across models and editing methods.",
+      "retelling_word_count": 25,
+      "main_implication": "Direct-answer success is insufficient; edits should be stress-tested under reasoning, where chain-local intervention can mitigate reversion.",
+      "overclaim": "Causal control point and broad transfer exceed evidence centered on selected reversions, Qwen-32B, loose outcomes, and inconclusive strict transfer.",
+      "clarity": 4
+    },
+    {
+      "reader_id": "V7-R3",
+      "version": "v7",
+      "retelling": "A knowledge edit that survives direct recall can be undone during reasoning when the old fact re-enters the chain; suppressing it inside thought partly restores robustness.",
+      "retelling_word_count": 26,
+      "main_implication": "Knowledge-edit evaluations should include reasoning-time stress tests; direct-answer accuracy can conceal chain-mediated failures.",
+      "overclaim": "Causal control point may overgeneralize from predominantly Qwen-specific, partial intervention evidence; strict cross-model transfer remains inconclusive.",
+      "clarity": 4
+    },
+    {
+      "reader_id": "V7-R4",
+      "version": "v7",
+      "retelling": "Across two R1-distill families, ROME edits weaken during natural reasoning despite cloze retention; chain-local old-answer suppression causally recovers success, with partial replication across scale and MEMIT.",
+      "retelling_word_count": 26,
+      "main_implication": "Knowledge-edit evaluation must include reasoning-time stress tests.",
+      "overclaim": "A general chain-local causal control point exceeds evidence dominated by one model, loose reversion, and inconclusive strict transfer.",
+      "clarity": 4
+    },
+    {
+      "reader_id": "V5-R1",
+      "version": "v5",
+      "retelling": "Direct-answer success overstates edit robustness: reasoning erodes ROME edits, while suppressing old-answer tokens during thought recovers performance, suggesting chain-local routing causes reversions.",
+      "retelling_word_count": 22,
+      "main_implication": "Knowledge-edit evaluation needs reasoning-time stress tests; observed failures may be mitigated within the reasoning chain.",
+      "overclaim": "Chain-local causal control point sounds broader than the evidence because strict improvement versus no suppression is inconclusive and the strongest mechanistic evidence is Qwen-32B-specific.",
+      "clarity": 4
+    },
+    {
+      "reader_id": "V5-R2",
+      "version": "v5",
+      "retelling": "Knowledge edits that succeed in direct answers can unravel during reasoning; suppressing the old answer within the thought chain partially restores edited behavior.",
+      "retelling_word_count": 23,
+      "main_implication": "Knowledge-edit evaluation must include reasoning-time stress tests, with chain-local interventions offering a promising repair direction.",
+      "overclaim": "Causal control point is strong given limited tasks/models and inconclusive strict improvement versus no suppression.",
+      "clarity": 4
+    },
+    {
+      "reader_id": "V5-R3",
+      "version": "v5",
+      "retelling": "Edits that work in direct answers can erode after reasoning; chain-local suppression restores much performance, so evaluations must stress-test inference-time thinking.",
+      "retelling_word_count": 21,
+      "main_implication": "Direct-answer success is insufficient; reasoning can undo edits, while intervention within the reasoning chain can mitigate the failure.",
+      "overclaim": "Causal control point sounds broader than warranted because the suppressor is oracle-like, strict improvement over no suppression is inconclusive, and generalization is limited.",
+      "clarity": 3
+    },
+    {
+      "reader_id": "V5-R4",
+      "version": "v5",
+      "retelling": "Reasoning erodes ROME edits in large R1-distilled models; old answers resurface via chain routing, while think-span token suppression partially restores edit success without changing answer logits.",
+      "retelling_word_count": 26,
+      "main_implication": "Direct-answer evaluation overstates edit robustness; reasoning-time stress tests are necessary, and chain-local intervention may mitigate failures.",
+      "overclaim": "Causal control point sounds stronger than warranted because routing labels are observational and the strict endpoint did not significantly beat no suppression.",
+      "clarity": 4
+    },
+    {
+      "reader_id": "V6-R1",
+      "version": "v6",
+      "retelling": "Edited facts survive direct probes, but reasoning revives old answers; thought-only token suppression mitigates erosion, so edit evaluation must include reasoning-budget stress tests.",
+      "retelling_word_count": 23,
+      "main_implication": "The main implication was retained.",
+      "overclaim": "Causal control point is somewhat strong because strict improvement versus no suppression is not significant and strict transfer is inconclusive.",
+      "clarity": 4
+    },
+    {
+      "reader_id": "V6-R2",
+      "version": "v6",
+      "retelling": "Reasoning can undo apparently successful knowledge edits by routing back to old answers; suppressing old-answer tokens during thought partly restores edits without directly changing answer logits.",
+      "retelling_word_count": 26,
+      "main_implication": "Edit evaluation should include reasoning-time stress tests, not only direct-answer checks.",
+      "overclaim": "Causal control point feels slightly strong because strict improvement versus no suppression and broad transfer are inconclusive.",
+      "clarity": 4
+    },
+    {
+      "reader_id": "V6-R3",
+      "version": "v6",
+      "retelling": "Reasoning can route around an installed fact edit, reviving the old answer; suppressing old-answer tokens only during the chain recovers much of the lost success.",
+      "retelling_word_count": 25,
+      "main_implication": "Knowledge edits need reasoning-budget stress tests; the reasoning chain may offer an actionable control point.",
+      "overclaim": "Causality and generality remain limited; strict improvement versus no suppression and strict transfer are inconclusive.",
+      "clarity": 4
+    },
+    {
+      "reader_id": "V6-R4",
+      "version": "v6",
+      "retelling": "Knowledge edits that work in direct answers can erode during reasoning; suppressing old-answer tokens only within the thought chain partially restores edited behavior, suggesting chain-local interference.",
+      "retelling_word_count": 26,
+      "main_implication": "Edit evaluation should include reasoning-time stress tests; failures may be mitigated through interventions confined to the reasoning chain.",
+      "overclaim": "Causal control point feels stronger than the evidence because the strict endpoint was not detectably better than no suppression and broader transfer remained inconclusive.",
+      "clarity": 4
+    }
+  ],
+  "operational_scorers": {
+    "rubric": {
+      "A1": "explicit direct-answer or zero-thinking success",
+      "A2": "reasoning-time failure",
+      "A3": "edited association specifically cloze-probe detectable without intactness overread",
+      "A4": "chain-local intervention or causal-control-point content",
+      "A5": "evaluation needs a reasoning-time stress test",
+      "I": "intact/not-erased/in-weights overread",
+      "M": "natural routing or mediation treated as established"
+    },
+    "scorer_1": {
+      "v7": {
+        "V7-R1": {"atoms": [0, 1, 0, 1, 0], "flags": ["I", "M"]},
+        "V7-R2": {"atoms": [0, 1, 0, 1, 0], "flags": []},
+        "V7-R3": {"atoms": [1, 1, 0, 1, 0], "flags": ["I", "M"]},
+        "V7-R4": {"atoms": [0, 1, 0, 1, 0], "flags": ["I"]},
+        "totals": [1, 4, 0, 4, 0]
+      },
+      "v5": {
+        "V5-R1": {"atoms": [1, 1, 0, 1, 0], "flags": ["M"]},
+        "V5-R2": {"atoms": [1, 1, 0, 1, 0], "flags": []},
+        "V5-R3": {"atoms": [1, 1, 0, 1, 1], "flags": []},
+        "V5-R4": {"atoms": [0, 1, 0, 1, 0], "flags": ["M"]},
+        "totals": [3, 4, 0, 4, 1]
+      },
+      "v6": {
+        "V6-R1": {"atoms": [1, 1, 0, 1, 1], "flags": ["I", "M"]},
+        "V6-R2": {"atoms": [0, 1, 0, 1, 0], "flags": ["M"]},
+        "V6-R3": {"atoms": [0, 1, 0, 1, 0], "flags": ["M"]},
+        "V6-R4": {"atoms": [1, 1, 0, 1, 0], "flags": ["M"]},
+        "totals": [2, 4, 0, 4, 1]
+      }
+    },
+    "scorer_2": {
+      "v7": {
+        "V7-R1": {"atoms": [0, 1, 0, 1, 0], "flags": ["I", "M"]},
+        "V7-R2": {"atoms": [0, 1, 0, 1, 0], "flags": ["M"]},
+        "V7-R3": {"atoms": [1, 1, 0, 1, 0], "flags": ["M"]},
+        "V7-R4": {"atoms": [0, 1, 1, 1, 0], "flags": ["I"]},
+        "totals": [1, 4, 1, 4, 0]
+      },
+      "v5": {
+        "V5-R1": {"atoms": [1, 1, 0, 1, 0], "flags": ["M"]},
+        "V5-R2": {"atoms": [1, 1, 0, 1, 0], "flags": []},
+        "V5-R3": {"atoms": [1, 1, 0, 1, 1], "flags": []},
+        "V5-R4": {"atoms": [0, 1, 0, 1, 0], "flags": ["M"]},
+        "totals": [3, 4, 0, 4, 1]
+      },
+      "v6": {
+        "V6-R1": {"atoms": [1, 1, 0, 1, 1], "flags": ["I", "M"]},
+        "V6-R2": {"atoms": [0, 1, 0, 1, 0], "flags": ["M"]},
+        "V6-R3": {"atoms": [0, 1, 0, 1, 0], "flags": ["M"]},
+        "V6-R4": {"atoms": [1, 1, 0, 1, 0], "flags": []},
+        "totals": [2, 4, 0, 4, 1]
+      }
+    }
+  },
+  "decision": {
+    "status": "NOT_PASSED_CLEAR_WIN_NOT_ESTABLISHED",
+    "basis": [
+      "Balanced clarity: v7 4/4/4/4; v5 4/4/3/4; v6 4/4/4/4.",
+      "Literal v7 A3 is scorer-sensitive (0/4 versus 1/4); the conservative A3-without-intactness-overread composite is 0/4.",
+      "All four v7 main-implication fields retain A5, so prompt-sensitive retelling-only A5 totals are not used for the decision.",
+      "Operational atom sensitivity does not show v7 clearly beating both baselines.",
+      "This supports fallback under the user's unclear-win rule; it does not prove v7 is worse."
+    ]
+  }
+}

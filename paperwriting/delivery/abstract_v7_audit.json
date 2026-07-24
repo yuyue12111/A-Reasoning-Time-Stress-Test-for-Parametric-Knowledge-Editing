@@ -1,0 +1,106 @@
+{
+  "status": "G1_G2_MACHINE_PASS__G3_G4_JUDGMENT_PASS_FOR_CANDIDACY__G5_BLOCKED__G6_NOT_PASSED__DO_NOT_ADOPT",
+  "record_type": "manually_compiled_decision_audit_with_machine_check_references",
+  "machine_check_source": "python3 src/check_abstract_v7.py",
+  "candidate": {
+    "path": "paperwriting/delivery/abstract_v7_candidate.txt",
+    "file_sha256": "6a39175ec4b40976f0c680e3dea3c1796fe01d2455be2c731da0806a02431a71",
+    "normalized_text_sha256": "761d565073ba1cfc3ed7ffa20e00e7b2bb03b6b8700d239f1d3f3377c0dcec69",
+    "word_count_whitespace": 197,
+    "sentence_count": 9,
+    "sentence_word_counts": [30, 19, 19, 21, 22, 10, 24, 28, 24],
+    "effect_number_definition": "result-quantity occurrences only; model identifiers and design counts excluded",
+    "effect_number_occurrences": [
+      "0.106",
+      "0.107",
+      "9.2%",
+      "19.3%",
+      "19.3%",
+      "8.5%",
+      "−0.102"
+    ]
+  },
+  "gates": {
+    "G1_numeric_ledger": {
+      "status": "PASS",
+      "evidence_checks": {
+        "capability.families.R1-Distill-Qwen.params_b[3]=32_and_es_drop[3]=0.106": true,
+        "capability.families.R1-Distill-Llama.params_b[1]=70_and_es_drop[1]=0.107": true,
+        "rq3.sup_battery.marginal_B3.N.RRs=0.092": true,
+        "rq3.sup_battery.marginal_B3.N.RR=0.193": true,
+        "rq3.sup_battery.marginal_B3.T.RR=0.085": true,
+        "rq3.sup_battery.cross_arm_paired_ci.T_minus_N.RR[0]=-0.1017": true,
+        "base_probe.f1_edit_specificity.paired_ci.ci95_contains_zero": true
+      },
+      "numeric_set_subset_of_v5_union_v6": true
+    },
+    "G2_banned_language": {
+      "status": "PASS",
+      "hits": [],
+      "locked_phrases_missing": [],
+      "frozen_title_exact": true,
+      "frozen_tldr_exact": true,
+      "frozen_v5_normalized_sha256_exact": true
+    },
+    "G3_non_substantive": {
+      "status": "PASS_AS_SUBSET_NOT_EQUALITY",
+      "qualitatively_different": false,
+      "basis": "Same research identity and headline claim vector; v7's predicate set is a documented subset of v5/v6, its number set only shrinks, and no retained predicate is broadened or strengthened. Exact claim-set equality is not asserted because evidential credentials move to the main text."
+    },
+    "G4_hostile_read": {
+      "status": "PASS_FOR_CANDIDATE_ONLY",
+      "deferred_risks": [
+        "Omitted uncertainty and controls can look hidden until D1-D7 are visible in the manuscript.",
+        "Cloze detectability must not be read as an intact edit or non-erasure result.",
+        "Observed routes motivate a hypothesis; they do not identify natural mediation.",
+        "The ROME strict T-minus-N endpoint is not detectable and must remain visible in the main text."
+      ]
+    },
+    "G5_disposition_and_debts": {
+      "status": "PASS_DISPOSITION_TABLE__ADOPTION_BLOCKED_OPEN_DEBTS",
+      "open_debts": ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "R1"],
+      "reason": "All rows have the required rationale/absence/destination triple, but no final W2 manuscript sections exist yet, so adoption remains blocked."
+    },
+    "G6_mental_model": {
+      "status": "NOT_PASSED_CLEAR_WIN_NOT_ESTABLISHED",
+      "raw_record": "paperwriting/delivery/abstract_v7_g6_raw.json",
+      "protocol": "Balanced single-version, rubric-hidden retelling (four readers per version); separate scorers then applied an operational five-atom sensitivity rubric to retellings only. LLM compliance with the one-pass instruction is not directly enforceable. The prompt requested retelling and main implication separately, which can shift A5 into the latter field.",
+      "readers": {
+        "v7": {
+          "n": 4,
+          "clarity_scores": [4, 4, 4, 4],
+          "fully_faithful_retellings_under_strict_rubric": 0
+        },
+        "v5": {
+          "n": 4,
+          "clarity_scores": [4, 4, 3, 4],
+          "fully_faithful_retellings_under_strict_rubric": 0
+        },
+        "v6": {
+          "n": 4,
+          "clarity_scores": [4, 4, 4, 4],
+          "fully_faithful_retellings_under_strict_rubric": 0
+        }
+      },
+      "scorer_1_operational_atom_totals": {
+        "v7_n4": [1, 4, 0, 4, 0],
+        "v5_n4": [3, 4, 0, 4, 1],
+        "v6_n4": [2, 4, 0, 4, 1]
+      },
+      "scorer_2_operational_atom_totals": {
+        "v7_n4": [1, 4, 1, 4, 0],
+        "v5_n4": [3, 4, 0, 4, 1],
+        "v6_n4": [2, 4, 0, 4, 1]
+      },
+      "scoring_caveat": "No exact atom aggregation was user-pre-specified. Atom 4 scores chain-local intervention/control-point content; observational-versus-interventional conflation is a separate calibration warning. Literal v7 atom-3 is scorer-sensitive (0/4 versus 1/4); scorer 2's lone hit used 'cloze retention' and simultaneously triggered an intactness-overread flag, yielding 0/4 under the conservative A3-without-I composite. Atom totals are sensitivity diagnostics, not a confirmatory statistic. Because the prompt separately requested the main implication, retelling-only A5 counts are not decision-bearing; all four v7 implication fields retain A5.",
+      "interpretation": "V7 did not clearly exceed both baselines: balanced one-pass clarity ties v6, literal bounded-cloze retention is scorer-sensitive, and the conservative no-overread bounded-cloze composite is 0/4. This is failure to establish the required clear win, not evidence that v7 is intrinsically worse.",
+      "excluded_developmental_tests": [
+        "A rubric-primed pilot was excluded because showing the atoms before retelling created a ceiling effect.",
+        "A five-reader comparative test favored an earlier 194-word v7 variant 5/5, but it is not adoption evidence for the final 197-word candidate and does not establish the final candidate's bounded-model retention."
+      ]
+    }
+  },
+  "adoption_decision": "DO_NOT_REPLACE_FROZEN_V5_OR_SYNC_OPENREVIEW",
+  "fallback_chain": ["v6_candidate", "frozen_v5"],
+  "reproducible_command": "python3 src/check_abstract_v7.py"
+}

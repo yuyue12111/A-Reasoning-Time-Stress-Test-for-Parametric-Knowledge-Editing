@@ -1,0 +1,20 @@
+{
+  "status": "PREREGISTERED_FOR_FINAL_BYTES_BEFORE_FINAL_READERS",
+  "purpose": "Regression guard only; the LLM panel does not decide elegance or prove non-inferiority.",
+  "versions": {
+    "v6":{"path":"paperwriting/delivery/abstract_v6_candidate.txt","file_sha256":"743ce122bda82bacae6257423c30081a4f8398ea92fc877d727939de9cbf4bc4"},
+    "v8.1":{"path":"paperwriting/delivery/abstract_v8_candidate.txt","file_sha256":"0c85a03e9cd288b45d6f23502caf17b74e84c28dee0f3a2e62f9202ec4b81e5f"}
+  },
+  "discarded_pre_final_pilot":"All responses to superseded v8 drafts, including SHAs 50d236b2, 8222e96b, ee0c338e, 4567041a, 3a9ef852, and 093d4bc8, plus developmental micro-edits, are excluded as final-v8.1 evidence.",
+  "allocation":"Four fresh single-version readers for final v8.1; compare them with the already-blind four-reader v6 anchor in abstract_v8_g62_raw.json. No v8.1 reader sees another abstract, project context, title, TL;DR, target rubric, or comparison prompt.",
+  "prompt":"Read the abstract once. Without rereading or comparing it to anything else: (1) retell its core scientific finding and implication in no more than 30 English words; (2) rate clarity 1–5; (3) rate memorability 1–5; (4) rate willingness to bid as a reviewer 1–5; (5) quote or name the first confusing phrase, or 'none'; (6) state any scientific overclaim invited and label it none, minor, or major.",
+  "no_observed_regression_rule": [
+    "median(v8.1 clarity) >= median(v6 clarity)",
+    "count(v8.1 clarity <= 2) <= count(v6 clarity <= 2)",
+    "count(v8.1 major overread) <= count(v6 major overread)",
+    "fewer than two v8.1 readers independently report the same new parsing failure absent from v6"
+  ],
+  "reporting":"Report raw counts and medians only; do not call the result statistical equivalence or non-inferiority.",
+  "elegance_decider":"USER_ONLY",
+  "user_decision":"APPROVE_INTERNAL_FREEZE; EXTERNAL_SYNC_REMAINS_G5_GATED"
+}

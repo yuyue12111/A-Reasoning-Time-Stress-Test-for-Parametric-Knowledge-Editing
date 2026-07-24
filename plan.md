@@ -5,7 +5,12 @@
 - **硬截止**（gap-review E1 多源亲核,2026-07-08 更新;OpenReview 上再终核一次）: abstract **2026-07-21**、全文 **2026-07-28**、supplementary+code **2026-07-31**（均 UTC-12）。**内部冻结不动**=abstract 7/18 / 全文 7/25（各留 3 天缓冲）。**checklist 随全文 7/28 单独上传且明文计入录取决策**。（旧记 7/20/7/27 偏早 1 天=更保守,不影响内部线；AGENTS/CLAUDE 入口已按 v1.88 同步。）
 - **页数约束**: 正文 **7 页** + 至多 **2 页仅参考文献**（共 9);正文**无 appendix 位**→ 所有"下附录"项去向=supplementary(评审不强制读)。**评审机制(gap-review E2 修正)**: Phase-1 每篇 **3 名人类审稿人 + 一份 AI 生成辅助评审**、**审全文**、SPC/AC 决定去留;**无 Phase-1 rebuttal**(唯一 rebuttal 窗 10/19–25 只给进 Phase-2 者);"abstract 与全文实质变更可径直拒"条款存在 → **全文数字一致性(B1/B14/[pending] 清零)是 Phase-1 生死件**,非仅门面。图1/引言仍最重(人类注意力)但不再唯一。
 - **数字写入铁律(v1.69)**:任何数字、显著性或认证措辞必须先有 `paper/results.json` 的明确 JSON path；X 系列新结果须按「raw jsonl/分析产物 → results.json 数据块 + `_pending_draft_edits` → draft」单向写入。`_verdict`、plan 变更日志和旧 review 不是数据源；无 per-item 落账不得写 paired/McNemar 认证。
-- **版本**: v1.89 (2026-07-14)。当前执行：**最终科学复审完成（三方审计 + GPT-5.6 复核，仲裁裁决已定），全面进入写作冲刺**。唯一有效写作计划 = `paperwriting/WRITING_PLAN.md`（本版执行层，含身份/贡献/禁语/日历/定稿判据）。**投稿前科学队列=零**：不跑 B15 interaction、不烧 X-A 池、不加 seed/数据集/编辑器。官方 X1 `9/18 FAIL` 永远不变且须正文一句披露。
+- **版本**: v1.90 (2026-07-22)。当前执行：**Abstract v8.1 内部终版冻结，全面进入正文写作与债务落地**。唯一有效写作计划 = `paperwriting/WRITING_PLAN.md`。**投稿前科学队列=零**：不跑 B15 interaction、不烧 X-A 池、不加 seed/数据集/编辑器。官方 X1 `9/18 FAIL` 永远不变且须正文紧邻 routing hypothesis 披露。
+- **v1.90 变更 (2026-07-22)**: **story-first Abstract v8.1 定稿，摘要锁关闭，正文债务成为唯一解锁条件。**
+  ① **内部终稿**：188 词/8 句/6 个结果数字，SHA256=`0c85a03e9cd288b45d6f23502caf17b74e84c28dee0f3a2e62f9202ec4b81e5f`；正向写作弧线=认证缺口→同编辑双条件→旧答案回归→cloze/route 分离假说→链内因果控制→评测原则。
+  ② **审计**：G1/G2/G3 PASS，G4 仅记录 causal-scope 轻度超读风险；最终盲读 v8.1 clarity=`[4,4,4,5]`、无 major overread，未观察到相对 v6 的可读性回归。`paired −0.102` 移出摘要，避免与边际 `19.3%→8.5%` 混算；完整 paired 估计留 D5。
+  ③ **冻结边界**：正文完成前不再因风格/词数/新增 abstract-only review 改摘要。仅当正文债务无法安放、摘要与正文实质冲突或投稿政策要求时才解冻，并重跑受影响门。
+  ④ **外部同步仍受 G5 阻断**：OpenReview 当前保留 v5；D1–D8/R1 必须在 §3–§5 成文并冻结后，才一次性替换为 v8.1。Title/TL;DR 不动。
 - **v1.89 变更 (2026-07-14)**: **最终仲裁裁决落库——身份重构 + 写作冲刺 + 投稿后 S 轨，直到 accept 的总路线。**
   ① **裁决来源**：三份独立审计（Review A/B + 本方 provisional）的 evidence-backed adjudication（六路核验 workflow，全部数字/代码/draft/novelty 引用逐一对账）+ GPT-5.6 对仲裁的复核。复核采纳项：主 claim 用 *insufficient certificate*（禁 *invalid*）；RQ2 叙事降到合法句式（禁 "re-derivation causes"/"41/41 证明重推导"）；RR slope 与 F3 RR 降为 supporting/注明 estimand；**B15 interaction 检验取消**（子群点估已见，只能算 post-hoc follow-up，投稿前不跑）；**X-A 烧池移出投稿窗**（7/29 后独立研究轨启动，正文不列未运行设计为贡献）；commit **不能追溯证明 preregistration**——禁止历史回填，只做诚实 snapshot + provenance manifest 分层（真·结果前冻结证据=SHA-in-artifact/服务器时间戳 vs 事后记录）。
   ② **最大单一瘸腿（终裁）**：RQ2 自然语义中介未识别——降级 framing 处理（claim ceiling 已冻结），非补实验；被日历而非科学堵死（X1 事后分解：committed-OLD∧安装成功下 replay 8/9，仅作内部判断，禁作证据报告）。

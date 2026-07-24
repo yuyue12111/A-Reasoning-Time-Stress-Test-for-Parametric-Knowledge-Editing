@@ -1,0 +1,87 @@
+{
+  "candidate": {
+    "path": "paperwriting/delivery/abstract_v7_1_candidate.txt",
+    "file_sha256": "daab7b77177945cf316450f0cd58ec1c4747c3cf66e5e6dee9e778f76a1664ac",
+    "normalized_text_sha256": "0b70c13ef6c2c46f840c46a599c3bbab1fc59eb088b1f33be89e58cf0f40622f"
+  },
+  "source_versions": {
+    "v6": {
+      "path": "paperwriting/delivery/abstract_v6_candidate.txt",
+      "file_sha256": "743ce122bda82bacae6257423c30081a4f8398ea92fc877d727939de9cbf4bc4",
+      "status_in_current_repo": "candidate_not_frozen"
+    },
+    "v7": {
+      "path": "paperwriting/delivery/abstract_v7_candidate.txt",
+      "file_sha256": "6a39175ec4b40976f0c680e3dea3c1796fe01d2455be2c731da0806a02431a71",
+      "status": "rejected_blueprint"
+    }
+  },
+  "sentences": [
+    {
+      "candidate_sentence_id": "S1",
+      "candidate_text_sha256": "143a26c7db3cfa4f819bc9d4b2a6eaa276a6a6fb294b4b51fc4edad3385a0ea4",
+      "sources": [{"version": "v6", "sentence_id": "S1", "text_sha256": "143a26c7db3cfa4f819bc9d4b2a6eaa276a6a6fb294b4b51fc4edad3385a0ea4"}],
+      "transform": "exact",
+      "semantic_role": "restore the population-level CONTEXT opening"
+    },
+    {
+      "candidate_sentence_id": "S2",
+      "candidate_text_sha256": "c4c6ca60905209110a4b19859f1819545a4064c2145c64fc760f0a860f4b31c5",
+      "sources": [{"version": "v6", "sentence_id": "S2", "text_sha256": "4e179d55230e45c3699e560e2348e71be2c00ce465441ea8846f047e5516d391"}],
+      "transform": "compress",
+      "semantic_role": "retain same-edit, zero-versus-chain, CounterFact, six-checkpoint, two-family design within the sentence-length ceiling"
+    },
+    {
+      "candidate_sentence_id": "S3",
+      "candidate_text_sha256": "83a1ff7dbb851369c99873987425b8e5b8fbc4f1bb7d5ca791ecb48affa5ac0a",
+      "sources": [{"version": "v7", "sentence_id": "S3", "text_sha256": "83a1ff7dbb851369c99873987425b8e5b8fbc4f1bb7d5ca791ecb48affa5ac0a"}],
+      "transform": "exact",
+      "semantic_role": "phenomenon beat"
+    },
+    {
+      "candidate_sentence_id": "S4",
+      "candidate_text_sha256": "743fee764b15c40c0461c49e081524420fad7516593d11f367266876f1fe251c",
+      "sources": [{"version": "v7", "sentence_id": "S4", "text_sha256": "743fee764b15c40c0461c49e081524420fad7516593d11f367266876f1fe251c"}],
+      "transform": "exact",
+      "semantic_role": "strict/permissive severity beat with Qwen-32B denominator"
+    },
+    {
+      "candidate_sentence_id": "S5",
+      "candidate_text_sha256": "b8246ac9062c6e02e6f5d7234091bd3bf5abd72045d10d60745fe92da4276d68",
+      "sources": [{"version": "v7", "sentence_id": "S5", "text_sha256": "b8246ac9062c6e02e6f5d7234091bd3bf5abd72045d10d60745fe92da4276d68"}],
+      "transform": "exact",
+      "semantic_role": "Qwen-32B controls and fixed-seed boundary"
+    },
+    {
+      "candidate_sentence_id": "S6",
+      "candidate_text_sha256": "bdd324b1021da06dfc7365053f00928d43088aba47787b71ca42139d62c20b05",
+      "sources": [
+        {"version": "v7", "sentence_id": "S1", "text_sha256": "94a914763444b6290bbe001c1e171cb977bbbbaea8211aabbe2aed14a0f07446"},
+        {"version": "v7", "sentence_id": "S6", "text_sha256": "cd6484f56d3dfe75070e6cf3137bf28f03075441609a0fb7ae92c4b9ed63387e"}
+      ],
+      "transform": "merge_move_rescope",
+      "semantic_role": "move bounded cloze detectability out of the opening, add examined-Qwen scope, and preserve the separate observational routing hypothesis"
+    },
+    {
+      "candidate_sentence_id": "S7",
+      "candidate_text_sha256": "f1c9291f6fa3bc2a740e3a214b8c6aea769f01ba2c3ed445c3e931911732be83",
+      "sources": [{"version": "v7", "sentence_id": "S7", "text_sha256": "f1c9291f6fa3bc2a740e3a214b8c6aea769f01ba2c3ed445c3e931911732be83"}],
+      "transform": "exact",
+      "semantic_role": "chain-local intervention design"
+    },
+    {
+      "candidate_sentence_id": "S8",
+      "candidate_text_sha256": "8d9273eb34f77385ea51618a7d9f35a98095d15c779977f519d17dd2fe86b1af",
+      "sources": [{"version": "v7", "sentence_id": "S8", "text_sha256": "06df27ad3d4efc10aeca174a26eaf3e3b5d3e5634654e8cb2c94444e5e0ca49e"}],
+      "transform": "punctuation_estimand_separation",
+      "semantic_role": "separate the edit-success tax claim from marginal and complete-case paired loose-reversion quantities"
+    },
+    {
+      "candidate_sentence_id": "S9",
+      "candidate_text_sha256": "8ce56d26f5a96893a74e723f2adf3eb3eeb3b1405141d57775527fe948ada6a4",
+      "sources": [{"version": "v7", "sentence_id": "S9", "text_sha256": "8ce56d26f5a96893a74e723f2adf3eb3eeb3b1405141d57775527fe948ada6a4"}],
+      "transform": "exact",
+      "semantic_role": "shared title callback and bounded implication"
+    }
+  ]
+}

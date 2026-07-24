@@ -1,0 +1,96 @@
+{
+  "protocol": "paperwriting/delivery/abstract_v8_g62_protocol.json",
+  "candidate_version": "v8.1",
+  "candidate_file_sha256": "0c85a03e9cd288b45d6f23502caf17b74e84c28dee0f3a2e62f9202ec4b81e5f",
+  "allocation": "four fresh final-v8.1 single-version readers compared with the unchanged four-reader blind v6 anchor",
+  "responses": [
+    {
+      "reader": "locked_a",
+      "condition": "v8.1",
+      "retelling": "ROME edits can fail after reasoning as old knowledge resurfaces; chain-token suppression partly restores control, motivating reasoning-time evaluation and chain-local intervention.",
+      "clarity": 4,
+      "memorability": 4,
+      "bid": 4,
+      "first_confusion": "natural chain",
+      "overclaim_label": "minor",
+      "overclaim": "the chain-local causal control-point implication may generalize beyond the single tested Qwen-32B intervention"
+    },
+    {
+      "reader": "locked_b",
+      "condition": "v8.1",
+      "retelling": "Reasoning can undo successful factual edits by routing old answers through the chain; chain-local token suppression partly restores edited answers, implying direct-answer tests are insufficient.",
+      "clarity": 4,
+      "memorability": 4,
+      "bid": 4,
+      "first_confusion": "after a natural chain",
+      "overclaim_label": "minor",
+      "overclaim": "the general chain-local causal-control conclusion is supported experimentally only on Qwen-32B"
+    },
+    {
+      "reader": "locked_c",
+      "condition": "v8.1",
+      "retelling": "Reasoning can overturn successful knowledge edits by routing toward old answers; chain-only suppression partially rescues them, implying edit evaluations must include reasoning-time stress tests.",
+      "clarity": 4,
+      "memorability": 5,
+      "bid": 5,
+      "first_confusion": "after a natural chain",
+      "overclaim_label": "minor",
+      "overclaim": "the conclusion may generalize beyond ROME, CounterFact, and the Qwen-32B intervention evidence"
+    },
+    {
+      "reader": "locked_d",
+      "condition": "v8.1",
+      "retelling": "Reasoning can undo successful knowledge edits by resurfacing old answers; targeted chain-time suppression partly restores control, motivating reasoning stress tests and a chain-routing mechanism.",
+      "clarity": 5,
+      "memorability": 5,
+      "bid": 5,
+      "first_confusion": "signed, dose-graded intervention",
+      "overclaim_label": "minor",
+      "overclaim": "the chain-local causal control-point implication may invite broader generalization beyond the single Qwen-32B intervention setting"
+    },
+    {
+      "reader": "blind_epsilon",
+      "condition": "v6",
+      "retelling": "Longer reasoning can undo successful ROME edits in large distilled models; suppressing old-answer tokens during thinking partly restores them, motivating reasoning-aware evaluation and chain-local intervention.",
+      "clarity": 4,
+      "memorability": 5,
+      "bid": 4,
+      "first_confusion": "after a natural chain",
+      "overclaim_label": "minor",
+      "overclaim": "admits a chain-local causal control point sounds broader than the demonstrated model and method scope"
+    },
+    {
+      "reader": "blind_zeta",
+      "condition": "v6",
+      "retelling": "Longer reasoning can undo successful knowledge edits by reviving old answers; suppressing old-answer tokens within the reasoning chain partly restores edits, demanding reasoning-aware evaluation.",
+      "clarity": 4,
+      "memorability": 5,
+      "bid": 4,
+      "first_confusion": "after a natural chain",
+      "overclaim_label": "minor",
+      "overclaim": "the closing claim may imply broader causal generality than the tested models, edits, and endpoints establish"
+    },
+    {
+      "reader": "blind_eta",
+      "condition": "v6",
+      "retelling": "Knowledge edits weaken after reasoning; suppressing old-answer tokens during the chain restores success, implying direct-answer tests miss reasoning-time failures that chain-local intervention can mitigate.",
+      "clarity": 4,
+      "memorability": 4,
+      "bid": 4,
+      "first_confusion": "after a natural chain",
+      "overclaim_label": "minor",
+      "overclaim": "admits a chain-local causal control point invites broader causal and generality claims than the tested models, edits, and targeted suppression establish"
+    },
+    {
+      "reader": "blind_theta",
+      "condition": "v6",
+      "retelling": "Reasoning erodes otherwise successful knowledge edits; suppressing old-answer tokens during thought partly restores them, implying edit evaluation must test reasoning-time robustness.",
+      "clarity": 4,
+      "memorability": 4,
+      "bid": 4,
+      "first_confusion": "natural chain",
+      "overclaim_label": "minor",
+      "overclaim": "the intervention supports controllability, but causal control point may imply a uniquely identified natural mechanism"
+    }
+  ]
+}

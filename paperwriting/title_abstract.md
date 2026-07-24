@@ -1,8 +1,8 @@
-# title_abstract.md · W1 工作文件（2026-07-14；**title 与 abstract 均已冻结**）
+# title_abstract.md · W1 工作文件（**title 与 abstract v8.1 均已冻结**）
 
-> **冻结状态**：Title 冻结（Codex 四轮审计 PASS）；Abstract v5 冻结（Codex 五轮审计，五审 REVISE-MINOR 两项修毕后 Codex 同意冻结 + Fable 独立核验同意）。
-> **格式合规（Codex 五审亲核）**：AAAI-27 Submission Instructions 无 250 词上限；OpenReview schema abstract `maxLength=5000` characters；冻结版 263 词 / 1,871 字符。
-> 此后任何改动 = 解冻事件，须记录理由并重新过审。
+> **冻结状态**：Title 冻结；Abstract v8.1 内部终版冻结（188 词，SHA256 `0c85a03e…`）。OpenReview 当前仍是 v5；须等 D1–D8/R1 正文债务落地后一次性同步。
+> **格式合规**：AAAI-27 Submission Instructions 无 250 词上限；OpenReview schema abstract `maxLength=5000` characters。
+> 正文冻结前不再修改摘要；若正文债务暴露实质不一致，才按解冻流程重开审计。
 
 > 纪律：本文件每个数字下表有 JSON path 对账；改数先改 `results.json` 永不反向。
 > 禁语自查已过：无 invalid / capability-emergent / scaling-law 宣称 / 无 hedge 的 halves / mediation 类词。
@@ -14,7 +14,7 @@
     *An edit can pass direct-answer validation yet be overturned when the model reasons—while its edited association remains detectable at a cloze probe. Our stress test quantifies these reversions; think-span-only suppression lowers them.*（234 字符）
   - 纠正记录：原推荐版 "the edit itself remains detectable" 宽于证据上限（cloze 可探 ≠ 整个编辑 intact ≠ 排除功能性擦除，且 ROME 优化目标正是该 logit）——换 "its edited association remains detectable at a cloze probe" 逐字对齐；"thinking-budget" 由并排显示的 title 语义补全，不复述。三方确认后此为最后一个字节级动作，**锁不再开**。
   - 已作废旧版存档：Fable 228 字符版（detectable 措辞超限）；Codex 177 字符身份直陈版（丢 pass-yet-overturn beat）。
-- **Abstract**：冻结 v5 纯文本逐字粘贴（已 diff 核验 = 冻结版）；粘后 Preview 核 `κ`、`−`(U+2212)、CI 方括号渲染。
+- **Abstract**：OpenReview 当前为 v5；内部终版为下文 v8.1。D1–D8/R1 在 §3–§5 落地并冻结前不得同步；届时只作一次表单替换与 byte-diff 核验。
 - **Primary Topic（终裁，Codex 依官方 track scope 亲核 + Fable 同意）**：`PEAI: AI Evaluation, Auditing & Red Teaming`。不选 `PEAI: AI Alignment & Oversight`（会引来 oversight/governance 评审池）。
 - **Secondary Topics（终裁：四项，第五留空；secondary 是双刃剑不为填满而填）**：
   ① ML: Machine Unlearning, Data Deletion & Model Editing ② ML: Reasoning & Test-Time Compute
@@ -38,7 +38,28 @@ Trade-off 自觉：标题只覆盖 C1，C2/C3 隐身 = under-promise/over-delive
 "Thinking Undoes Editing" 降级为项目代号 + §1 开篇钩子（Codex 二审后弱化版，"routes around it" 超证据已弃）：
 *"Does thinking undo editing? The edited association remains detectable at a cloze probe — yet native reasoning can reverse the final answer."*
 
-## Abstract v5 —— **FROZEN 2026-07-14**（唯一版本）
+## Abstract v8.1 —— **INTERNAL FINAL / FROZEN**
+
+> An edit can pass direct-answer validation yet lose control of the final answer when the model
+> reasons. We evaluate each ROME edit on CounterFact twice—at zero thinking and after a natural
+> chain—across six fixed checkpoints from two DeepSeek-R1-distill families. At the largest tested
+> checkpoint in each family, edit success drops by 0.106 on Qwen-32B and 0.107 on Llama-70B. Among
+> zero-thinking successes on Qwen-32B, old answers resurface in 19.3% of reasoned final answers and
+> displace new answers outright in 9.2%, while the unedited base shows no detectable old-answer
+> drift. Yet in the Qwen-32B reversions we examined, the edited association remains detectable at
+> a cloze probe; separately, route analysis finds visible in-chain paths to old answers, motivating
+> a chain-routing hypothesis. We next test for a chain-local control point by suppressing
+> old-answer first tokens only during Qwen-32B reasoning, leaving answer logits untouched. The
+> signed, dose-graded intervention offsets the edit-success loss and lowers the resurfacing rate
+> from 19.3% to 8.5%; placebo and same-relation controls have near-null answer-level effects.
+> Direct-answer edit success is not enough: edit evaluation needs a reasoning-time stress test,
+> and the failure it reveals admits a chain-local causal control point.
+
+- Final file: `paperwriting/delivery/abstract_v8_candidate.txt`; SHA256 `0c85a03e9cd288b45d6f23502caf17b74e84c28dee0f3a2e62f9202ec4b81e5f`.
+- 门状态：G1–G4 PASS；G6.2 无观察到的可读性回归；G5 的处置表 PASS、正文债务仍 OPEN，因此只冻结文本、不改外部表单。
+- v8→v8.1：删除 `marginal/loose` 摘要术语和会制造边际/配对算术疑问的 `−0.102`；拆开干预设计与因果校准；删除冗余 `paired`（S2 的 `each ... twice` 已建立配对设计）；恢复 `edit evaluation` 辖域。
+
+## Abstract v5 —— **OPENREVIEW CURRENT BASELINE / INTERNALLY SUPERSEDED**
 
 > Parametric knowledge edits are validated with direct answers; deployed reasoning models may
 > reason before answering. We stress-test edits under a controlled thinking budget: the same ROME
@@ -108,14 +129,14 @@ Trade-off 自觉：标题只覆盖 C1，C2/C3 隐身 = under-promise/over-delive
 | canned thought 不复现 | `f2_zerothink_deconfound.arms`（B0P RR .040 vs B1 .208） |
 | persists across three fixed sampling seeds | `f3_sampling_robustness.sampling_primary_complete_cases.ES_drop=.117[.067,.169]` |
 | coexist with still-detectable cloze edit, 23 cases（无对照 sanity 措辞） | `rq2_logitlens`（n=23，installation sanity） |
-| 41 / 33 facts / κ=.813 / Bridge 66% Recall 27% | `rq2_taxonomy.p0_corrected_taxonomy`（.6585/.2683） |
-| **offsets** the observed thinking tax（paired gain 0.138 [0.082,0.194]） | `cross_arm_paired_ci.T_minus_N.ES`；**禁 removes**（增益 CI 下界 .082 < 观测税 .106，无残余税等价检验）；marginal 箭头 +0.106→−0.035 只进主文并与配对量并列 |
-| a placebo（禁 inert 前缀） | `contrasts_B3_mean_ci_p.P_minus_N` 全含零 = null-compatible ≠ 认证 inert |
+| 41 / 33 facts / κ=.813 / Bridge 66% Recall 27% | `rq2_taxonomy.p0_corrected_taxonomy.n=41` / `.n_unique_facts=33` / `.agreement.fleiss_kappa` / `.pct.Bridge` / `.pct.Recall` |
+| **offsets** the observed thinking tax（paired gain 0.138 [0.082,0.194]） | `rq3.sup_battery.cross_arm_paired_ci.T_minus_N.ES`；**禁 removes**（增益 CI 下界 .082 < 观测税 .106，无残余税等价检验）；marginal 箭头 +0.106→−0.035 只进主文并与配对量并列 |
+| a placebo（禁 inert 前缀） | `rq3.sup_battery.contrasts_B3_mean_ci_p.P_minus_N` 全含零 = null-compatible ≠ 认证 inert |
 | majority labels identify a visible in-chain route in all 41 / "motivating a chain-routing hypothesis" | `p0_corrected_taxonomy`：41=Bridge 27+Recall 11+RO 3+Assoc 0，unanimous 35、2–1 6；**多数票口径**，禁 "every one shows"；"motivating a hypothesis"=溯因，禁升 "re-derivation causes"（X1 9/18 FAIL） |
 | coexist 句与 census 句必须 "Separately" 分层 | 23-cloze↔41-taxonomy 逐 case crosswalk `BLOCKED_MISSING_PER_ITEM_ARTIFACT`（rq2_logitlens 附注）——禁同 case 合取表述"编辑完好+可见路线⇒排除 erasure" |
-| lowers loose reversion to 8.5%（paired −0.102 [−0.170,−0.042]） | `cross_arm_paired_ci.T_minus_N.RR p=.001`；8.5%=`rq3.suppress.RR` |
+| lowers loose reversion to 8.5%（paired −0.102 [−0.170,−0.042]） | `rq3.sup_battery.cross_arm_paired_ci.T_minus_N.RR p=.001`；8.5%=`rq3.suppress.RR` |
 | strict improves against **both** controls, not detectably vs. no suppression | T−P RRs `−.057 [−.114,−.010] p=.029` + T−C RRs `−.0566 [−.1132,−.0094] p=.0324`；T−N RRs p=.073→**禁 only-vs-competitor、禁 0.092→0.042 箭头** |
-| competitor with near-null answer-level effects | `cross_arm_paired_ci.C_minus_N`（RRs −.0093 [−.0467,.028] p=.83）+ `sup_battery._C_arm_M4`；X2/X3 的 T=109/C=18 活跃度数据仅限 §5 对应协议使用 |
+| competitor with near-null answer-level effects | `rq3.sup_battery.cross_arm_paired_ci.C_minus_N`（RRs −.0093 [−.0467,.028] p=.83）+ `rq3.sup_battery._C_arm_M4`；X2/X3 的 T=109/C=18 活跃度数据仅限 §5 对应协议使用 |
 | Erosion concentrates at each family's largest checkpoint / On Qwen-32B 前缀 | 六格仅 2 格排零（`capability.families.*.es_drop_sig`）；F1/F2/F3 全为 32B 证据 |
 | replicate at 14B / MEMIT strict inconclusive | `rq3.s10_14b_fix_replication.TminusN_paired_ci`（14B 无 C 臂，T−N）/ `x2...contrasts_B3.T_minus_C`（ES +.100 显著；RRs −.0268 [−.0804,.0268] 含零） |
 

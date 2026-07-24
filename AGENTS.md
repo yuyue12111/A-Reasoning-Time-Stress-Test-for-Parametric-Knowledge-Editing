@@ -4,7 +4,7 @@
 
 AAAI-27 投稿项目，代号「越想越退」(Thinking Undoes Editing)：量化参数知识编辑（ROME/MEMIT/AlphaEdit）在 R1 式推理模型上随思考预算增加而被推翻的现象 + 机理 + training-free 修补。
 
-**读单（按序）：`plan.md` 头部 v1.x 变更日志（当前 **v1.89**，本项目唯一权威计划）→ `paperwriting/WRITING_PLAN.md`（唯一有效写作计划）→ `paperwriting/results.json`（数字真源）→ `analysis/11–16_*.md` 与对应 prereg（X/P0/CPU closeout 最新证据）→ `RUNBOOK.md`（仅在确有 GPU 任务时）。** `sumandplan1.md` §5/§6 与 `phase-1.md` 是 6 月历史快照，不得覆盖 plan 头部或复活已停止队列。与 plan 冲突的一切行为都需要先升 plan 版本并写变更记录，再执行。
+**读单（按序）：`plan.md` 头部 v1.x 变更日志（当前 **v1.90**，本项目唯一权威计划）→ `paperwriting/WRITING_PLAN.md`（唯一有效写作计划）→ `paperwriting/results.json`（数字真源）→ `analysis/11–16_*.md` 与对应 prereg（X/P0/CPU closeout 最新证据）→ `RUNBOOK.md`（仅在确有 GPU 任务时）。** `sumandplan1.md` §5/§6 与 `phase-1.md` 是 6 月历史快照，不得覆盖 plan 头部或复活已停止队列。与 plan 冲突的一切行为都需要先升 plan 版本并写变更记录，再执行。
 
 ## 硬约束（不可违反）
 
@@ -32,13 +32,13 @@ data/     清洗数据(大文件 gitignore,     results/ 实验 jsonl（gitignor
 - [x] P0 membership/route/crosswalk 完成：corrected taxonomy n=41，Bridge/Recall/RO/Associative=27/11/3/0；logit-lens per-item crosswalk 仅因缺 raw 文件阻塞。
 - [x] Percase/B15-B0/Cap3/F3/X2/X3 CPU closeout 全部闭合；最终 audit PASS，B15-B0 两侧 duplicate audit 和 budget provenance 均 PASS。
 - [x] GPU 和服务器 CPU 科学队列清空；P0 logit-lens 只是缺 raw dependency 的非承重 optional block。
-- [x] 最终科学 review + 三方仲裁 + GPT-5.6 复核完成（v1.89 落库）。
+- [x] 最终科学 review + 三方仲裁 + GPT-5.6 复核完成（v1.89）；Abstract v8.1 内部终版冻结（v1.90）。
 - [ ] **唯一当前任务 = 写作冲刺**，按 `paperwriting/WRITING_PLAN.md` 执行。
 
-## 立即任务队列 —— **以 `plan.md v1.89` + `paperwriting/WRITING_PLAN.md` 为准**
+## 立即任务队列 —— **以 `plan.md v1.90` + `paperwriting/WRITING_PLAN.md` 为准**
 
 1. **投稿前科学队列=零**（不跑 B15 interaction、不烧 X-A 池、不加任何新数字）。
-2. W1（→7/18）：LaTeX 主文件 + 唯一 abstract（insufficient-certificate 身份）+ Fig.1 认证缺口图 + claim hierarchy。
+2. Abstract v8.1 已内部冻结；下一步只做正文/图表，并逐项关闭 D1–D8/R1。正文冻结前不得再做 abstract-only 风格迭代。
 3. W2（7/19–23）主文四节 → W3（7/24–25）机器对账 + 禁语扫描 + hostile review → 7/28 提交 → R 段 supplementary/provenance manifest。
 4. 旧 `paperwriting/draft.md` 是**违规数字的历史底稿**（≥15 处与真源不一致，X1 零披露）：只作素材参考，一切数字从 `paperwriting/results.json` 正向取。
 

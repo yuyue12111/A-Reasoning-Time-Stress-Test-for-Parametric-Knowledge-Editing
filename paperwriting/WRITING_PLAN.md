@@ -1,4 +1,4 @@
-# WRITING_PLAN.md · 最终写作作战计划（plan v1.89 的执行层）
+# WRITING_PLAN.md · 最终写作作战计划（plan v1.90 的执行层）
 
 > 状态：**唯一有效的写作计划**（2026-07-14 仲裁定稿，整合三方审计 + GPT-5.6 复核裁决）。
 > 数字唯一真源 = `paperwriting/results.json`（原 `paper/` 已更名，5 个 src 脚本路径已同步修复）。
@@ -68,7 +68,7 @@
 | 段 | 日期 | 内容 | 完成判据 |
 |---|---|---|---|
 | D0 | 7/14–15 | ① 诚实 snapshot commit（见 §5）② LaTeX 主文件建立（AAAI 模板+骨架+bib 起步）③ Fig.1 面板顺序调整 | 主文件可编译 |
-| W1 | –7/18 | ① 唯一 abstract（从冻结块正向写，n=41 taxonomy、RRs/RR 夹层、insufficient-certificate 主 claim）② 三贡献 claim hierarchy 定稿 ③ Fig.1 定稿 ④ §1 引言 | abstract 内部冻结 |
+| W1 | –7/18 | ① 唯一 abstract v8.1 已按 story-first 形式内部冻结；删出的 uncertainty/measurement/strict/transfer 证据全部由 D1–D8/R1 强制落正文 ② 三贡献 claim hierarchy 定稿 ③ Fig.1 定稿 ④ §1 引言 | abstract 内部冻结；外部同步等 G5 |
 | W2 | 7/19–23 | 主文四节顺序：§3 evaluation gap → §4 causal diagnosis → §5 bounded guard → §2 related work（SCR=2503.05212、ReCoE=Hua et al. 2401.17585 分拆；新增 Thinking-to-Recall 2603.09906 / LightEdit 2604.19089 / DeCK 2405.11613 / CRANE 2606.09033 / Inverse-Scaling 2507.14417 / belief-depth 2510.17941；维持 controlled-conjunction 定位）→ §6/§7 | 全文初稿 |
 | W3 | 7/24–25 | **只做对账与 hostile review**：① 机器对账（写 checker：全文数字 ↔ results.json path 逐一校验）② 禁语扫描 ③ 判官式全文攻击 ④ abstract↔全文同源核对 | 全文内部冻结 7/25 |
 | 缓冲 | 7/26–27 | 只修不加；任何新数字不进 | — |
