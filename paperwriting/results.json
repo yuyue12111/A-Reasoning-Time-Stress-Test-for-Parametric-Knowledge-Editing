@@ -25,6 +25,7 @@
  },
  "capability": {
   "_schema": "families[name] = {params_b, es_b0, es_b3, es_drop, es_drop_ci, es_drop_sig, rr, rr_ci, clr, clr_ci};新点直接 append 进对应族的每个数组(须 results.json 真实数,[pending] 的点先别加);plots.fig1 每族一条线。flat 旧式(顶层直接放数组)仍兼容=单族 Qwen。",
+  "ci_level": 0.95,
   "_bos_note": "口径:R1-Distill-Qwen/Llama tokenizer 均 add_bos_token=False。旧 Qwen 7/14/32B 实际无 BOS 跑出(鲁棒、趋势干净);Llama 缺 BOS 退化故必补 BOS。BOS A/B(1.5B,n=40,同 40 case):ON vs OFF 的 ES@B0 0.525/0.550、ES@B3 0.550/0.575、ES降幅 −0.025/−0.025(同)、CLR 0.275/0.225、RR 0.048/0.045 —— 差异 ≤1–2 case、CI 大幅重叠 → BOS 对 Qwen 无材料级影响,旧 Qwen 点有效、跨族对比不被 BOS 混淆。论文 §3 注此 robustness。",
   "families": {
    "R1-Distill-Qwen": {
@@ -136,6 +137,10 @@
     "params_b": [
      8,
      70
+    ],
+    "headline_n": [
+     200,
+     187
     ],
     "es_b0": [
      0.625,
@@ -793,6 +798,8 @@
      "C": 0
     },
     "b0_byte_identity": {
+     "n_cases": 200,
+     "n_probe_types_per_case": 2,
      "T_vs_N": {
       "compared_probe_rows": 400,
       "different": 0,
@@ -3158,7 +3165,9 @@
   }
  },
  "metric_validation": {
-  "_status": "W2/E-SEMJUDGE:中性 3-判官(commit OLD/NEW/NEITHER,prompt 无 edit-intact 断言)验证去污规则回退非子串伪影(src/sj_validate.py,workflow wxl3p6hr7)。n=87(120 样本中 33 条判官 rate-limited 跳过,多为 rule_rr=0→补只增 TN/抬一致,故 κ 是下界);判官=Claude 同族(共享偏置 caveat)。样本按 rule_rr 分层故 judge 回退率 0.31 非总体 RR。",
+  "_status": "W2/E-SEMJUDGE:中性 3-判官(commit OLD/NEW/NEITHER,prompt 无 edit-intact 断言)验证去污规则回退非子串伪影(src/sj_validate.py,workflow wxl3p6hr7)。n=87/120,另 33 条因判官 rate limit 缺失;缺失行虽偏 rule_rr=0,但 judge 标签未知,故 κ 只作 available-case 估计、不是有保证的下界。判官=Claude 同族(共享偏置 caveat)。样本按 rule_rr 分层,judge 回退率 0.31 非总体 RR。",
+  "n_attempted": 120,
+  "n_rate_limited": 33,
   "n": 87,
   "vs_RRs_strict_decontam": {
    "cohen_kappa": 0.836,
@@ -3184,7 +3193,7 @@
     "TN": 32
    }
   },
-  "verdict": "★严口径 **RRs(去污,我们报的下界)与语义判官 Cohen κ=0.836 / 一致 0.93 / 精度 0.92** = 近乎一致 → 回退非子串伪影,W2 测量端立。loose RR 精度 0.48 = 按设计的上界(『守住+顺带提旧』),判官证实 loose 高估(FP 28)→ 真回退落在 RRs(下界)与 RR(上界)之间正是论文口径。RRs 侧 FP/FN 各小(2/4)。",
+  "verdict": "★available-case 验证:去污 strict RRs 与三判官多数票 Cohen κ=0.836 / agreement=0.931 / precision=0.92 / recall=0.85;permissive RR precision=0.48 / recall=0.96。两者是 conservative/permissive operational endpoints,均有 FP/FN,不构成潜在语义回退率的数学上下界。缺失与同判官模型族 caveat 必须随首次报告披露。",
   "v1_clr_polarity": {
    "_status": "B8/V1(终极review:CLR scorer 从未验极性,metrics.hit 无否定检查;workflow wtu31tkws,37 unique case × ≥2 判官,取自 5 个 reverted_* 池;⚠采样单位=unique case_id,同 case 跨 cell 的票被并池(cf_140/cf_13079 等),重复者全 genuine 不改结论;池为回退链(held 链未采,scope 注)。",
    "raw": {
@@ -3532,7 +3541,9 @@
   },
   "sampling_primary_complete_cases": {
    "n_cases": 199,
+   "n_cases_attempted": 200,
    "n_seed_pairs": 597,
+   "n_seed_pairs_attempted": 600,
    "ES_B0": {
     "point": 0.586265,
     "ci95": [
