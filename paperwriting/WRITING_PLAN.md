@@ -1,4 +1,4 @@
-# WRITING_PLAN.md · 最终写作作战计划（plan v1.91 的执行层）
+# WRITING_PLAN.md · 最终写作作战计划（plan v1.92 的执行层）
 
 > 状态：**唯一有效的写作计划**（2026-07-14 仲裁定稿，整合三方审计 + GPT-5.6 复核裁决）。
 > 数字唯一真源 = `paperwriting/results.json`（原 `paper/` 已更名，5 个 src 脚本路径已同步修复）。
@@ -32,7 +32,7 @@ Fig.1 按语料形态走 **PRIMARY_RESULT**（7/14；method-pipeline 仅 2/14）
 **主 claim（英文措辞冻结，与 title 同步为 "not enough" 措辞）**：
 > Direct-answer edit success is **not enough** to certify knowledge edits for reasoning-model
 > deployment. We provide a controlled reasoning-time stress test, show the failure it reveals, and
-> demonstrate that this failure admits a **chain-localized causal control point**.
+> demonstrate that this failure admits a **chain-local causal control point**.
 
 - 用 *not enough / insufficient*，禁用 *invalid*（很多部署确是直接回答；prior work 已批评 teacher-forcing 评测；我们证明的是"遗漏一类重要 failure mode"）；标题与散文均避免名词化 *certificate/certified* 以免暗示形式化认证体系（动词 certify 可用）。
 - 独有性卖点不是"评测有效性"四个字（SCR/ReCoE/CRANE/Inverse-Scaling 都在附近），而是**六元合取**：
@@ -52,15 +52,15 @@ Fig.1 按语料形态走 **PRIMARY_RESULT**（7/14；method-pipeline 仅 2/14）
 证据阶梯**分层报告**（诚实分层本身是 Alignment track 的审计味卖点）：
 - logit-lens：installation sanity（n=23，重施编辑后裸 cloze 首 token pairwise gap，无对照）
 - P0 taxonomy：观察性 route census——n=41 实例 / **33 个独立事实**、Bridge 27/Recall 11/RO 3/Assoc 0、κ=.813（`rq2_taxonomy.p0_corrected_taxonomy`）；CLR 无判别力（OLD 13/13 但非 OLD 18/20 也有 CLR，`p0_downstream_crosswalk`）
-- M1：baseline-risk enrichment（CLR1 层 `−.289 p=.0002` vs CLR0 `+.014 p=.72`，CLR0 有 N_RR=0 地板，`rq3.clr_split_M1`）——写 near-necessity，不写 mediation
-- W-B：概念方向压链（CLR `−.078` 排零）不修答案（RR/ES 含零，`wb_representation_repair.confirm_arms`）= "减少概念表达不充分"的诚实反例
+- M1：baseline-CLR stratified enrichment（CLR1 层 `−.289 p=.0002` vs CLR0 `+.014 p=.72`，CLR0 有 N_RR=0 地板，且无跨层 interaction，`rq3.clr_split_M1`）——只写样本内富集，不写 near-necessity/effect modification/mediation
+- W-B：先报 prospectively specified 主对比 S−Pshuf RR null；再报 CLR `−.078` 排零、同对比 ES null、S−N ES `+.092` 排零；显著的 S−Pshuf LocAcc 只称“预设 harm metric 上的 secondary contrast”，不得冒充预指定 B2 对照（`wb_representation_repair.confirm_arms`）——合法结论仅为测得的旧对象表达下降未产生可检出的 confirmatory RR repair；`B1_S_minus_Pshuf` 的 B1 是端点标签，正文不得误写成思考预算
 - T/D/P/C 五臂：**唯一真因果**，识别的是 chain-local old-token control point（`rq3.sup_battery`）
-- **X1 正文披露（Kimi 终审加严）**：预注册 replay 载具门 9/18 FAIL、未救门（`x1_replay_gate.gate`）；披露必须站在机理章 routing-hypothesis 讨论的**紧邻位置**，作为"是否直接测过链作为自然载具"这一可预测追问的正面回答——不得藏 §7 limitations 尾部；完整 gate 表进 supplementary。cloze 检查在 §4 必须以 "installation sanity check" 身份 + 全 caveat（无对照/近恒真/条件于回退样本/crosswalk BLOCKED）呈现
+- **X1 正文披露（Kimi 终审加严）**：prospectively specified replay 载具门 9/18 FAIL、未救门（`x1_replay_gate.gate`）；披露必须站在机理章 routing-hypothesis 讨论的**紧邻位置**，作为"是否直接测过 fixed replay 载具稳定性"这一可预测追问的正面回答——不得藏 §7 limitations 尾部；完整 gate 表进 supplementary。cloze 检查在 §4 必须以 "installation sanity check" 身份 + 全 caveat（无对照/近恒真/条件于回退样本/crosswalk BLOCKED）呈现
 - 合法机理句式：*failure coexists with an installed cloze edit; native chains frequently expose Bridge/Recall routes; an old-token-specific intervention in the chain causally changes the untouched answer.*
 - 禁写：re-derivation **causes** the failure / 41/41 证明重推导 / content-driven mechanism 已闭合 / semantic mediation / commitment layer located
 
 ### C3 · Bounded mitigation transfer（第三贡献）
-- ROME-32B：T−C 四端点排零（ES `+.1212` RR `−.0943` RRs `−.0566 p=.032`，`rq3.sup_battery.cross_arm_paired_ci`）；T−N 严口径 `p=.073` 如实报；回退 headline 用 RRs/RR 夹层句式（loose 判官精度仅 0.48，`metric_validation`）
+- ROME-32B：T−C 四端点排零（ES `+.1212` RR `−.0943` RRs `−.0566 p=.032`，`rq3.sup_battery.cross_arm_paired_ci`）；T−N 严口径 `p=.073` 如实报；回退 headline 将 strict/permissive 写成 nested operational endpoints，不写潜在真值的数学夹层或 bound；判官认证只作 available-case 估计并把 missingness sensitivity 放 supplementary（loose 判官精度仅 0.48，`metric_validation`）
 - ROME-14B 复制：**T−N**（14B 无 C 臂，`rq3.s10_14b_fix_replication.TminusN_paired_ci`）
 - MEMIT-14B X2：ES `+.100[.040,.160]` 正、**strict RRs null 并报**（`rq3.x2_memit14b_repair_replication.contrasts_B3.T_minus_C`）；现象行必须带 fresh-N 括注（es_drop `.060[−.020,.140]` ns，`_baseline_discrepancy`）
 - X3：**active lexical paraphrase transfer**（T−C strict PS `+.055[.020,.0925]`），禁写 semantic paraphrase robustness；内容审计 30/40、11/20、κ=.444 如实报
@@ -77,7 +77,7 @@ Fig.1 按语料形态走 **PRIMARY_RESULT**（7/14；method-pipeline 仅 2/14）
 
 ## 3. 禁语清单（对账时全文扫描，零命中才准冻结）
 
-`invalid certificate` / `capability-emergent`（headline）/ `scaling law` / `fuel`、`vanishes`（B15 分层无 interaction 检验）/ `re-derivation causes` / `semantic mediation`、`mediates`、`necessity`（近似词用 near-necessity）/ `semantic paraphrase robustness` / `equivalence certified`、`TOST-certified` / `prevents`、`blocks`、`robust to bypass` / 不带夹层限定的 `halves reversion` / `first to discover` / `preregistered` 用于任何无结果前冻结证据的分析 / **`edit intact`、`not erased`、`非擦除已证`**（cloze 可探 ≠ intact ≠ 排除功能性擦除；合法上限=*edited association remains detectable at a cloze probe*）/ **`guaranteed upper bound` 形容 loose RR**（recall=.96、FN=1 alias gap→非数学上界；夹层措辞用 conservative/permissive 口径）。
+`invalid certificate` / `capability-emergent`（headline）/ `scaling law` / `fuel`、`vanishes`（B15 分层无 interaction 检验）/ `re-derivation causes` / `semantic mediation`、`mediates`、`necessity`（M1 本轮连 near-necessity 也不用，只写 sample-stratified enrichment）/ `semantic paraphrase robustness` / `equivalence certified`、`TOST-certified` / `prevents`、`blocks`、`robust to bypass` / 不带夹层限定的 `halves reversion` / `first to discover` / `preregistered` 用于任何无结果前冻结证据的分析 / **`edit intact`、`not erased`、`非擦除已证`**（cloze 可探 ≠ intact ≠ 排除功能性擦除；合法上限=*edited association remains detectable at a cloze probe*）/ **`guaranteed upper bound` 形容 loose RR**（recall=.96、FN=1 alias gap→非数学上界；夹层措辞用 conservative/permissive 口径）。
 
 另（Kimi 交锋传导，2026-07-14）：F1 的 `effect_above_control=.214` **禁作正式 contrast**（编辑态 b0ok-门 loose RR 与未编辑基座全样本 drift 的事件定义/分母不同、无 interaction CI）——主文只并列报告两个量，不做差值宣称。
 
@@ -117,7 +117,7 @@ Fig.1 按语料形态走 **PRIMARY_RESULT**（7/14；method-pipeline 仅 2/14）
 
 ## 8. 定稿判据（7/25 冻结时逐项打勾）
 
-① checker 通过：全文每个数字有 results.json path；② 禁语清单零命中；③ X1 FAIL / X2 strict null / X3 content audit / W-B null / G5 FAIL 全部可见；④ X2/X3 结果已写入（含 "repair not yet tested with MEMIT" 类过期句清零）；⑤ abstract 与全文数字逐一同源；⑥ taxonomy 全文统一 n=41/33 facts/κ=.813；⑦ Fig.1 第一视觉=认证缺口；⑧ related work 引用归属正确；⑨ provenance manifest 与上传 prereg 集合一致；⑩ 正文无未运行实验的结果性陈述。
+① checker 通过：全文每个数字有 results.json path；② 禁语清单零命中；③ X1 FAIL 可见且已防火墙（三句式+撤回句+controls-not-through-replay），并且 X2 strict null / X3 content audit / W-B null / G5 FAIL 全部可见；④ X2/X3 结果已写入（含 "repair not yet tested with MEMIT" 类过期句清零）；⑤ abstract 与全文数字逐一同源；⑥ taxonomy 全文统一 n=41/33 facts/κ=.813；⑦ Fig.1 第一视觉=认证缺口；⑧ related work 引用归属正确；⑨ provenance manifest 与上传 prereg 集合一致；⑩ 正文无未运行实验的结果性陈述。
 
 ## 9. 预期与止损
 

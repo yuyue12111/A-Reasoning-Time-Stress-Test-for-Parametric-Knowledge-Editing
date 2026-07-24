@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """Fail-closed checks for the W2 manuscript surface.
 
-The checker treats every numeric occurrence in Section 3 as an occurrence-level
-claim.  Each occurrence must have an inline ``% RJ:`` JSON record containing a
-unique claim id, an RFC 6901 pointer to a numeric scalar in results.json, and an
-enumerated formatter.  Other, not-yet-authored sections reject numeric tokens
-until their own ledgers land.  Banned and stale language is checked across the
-whole visible manuscript.  The frozen abstract is byte-authenticated after
-reversing the single LaTeX escape ``\\% -> %`` and cross-checked against body
-ledger displays, with one explicit Section 5 debt for the frozen 8.5% value.
+The checker treats every numeric occurrence in authored Sections 3 and 4 as an
+occurrence-level claim.  Each occurrence must have an inline ``% RJ:`` JSON
+record containing a unique claim id, an RFC 6901 pointer into results.json, and
+an enumerated formatter.  Targets are numeric scalars except for a narrow set
+of exact frozen string records whose approved token positions are enumerated
+below.  Other, not-yet-authored sections reject numeric tokens until their own
+ledgers land.  Banned and stale language is checked across the whole visible
+manuscript.  The frozen abstract is byte-authenticated after reversing the
+single LaTeX escape ``\\% -> %`` and cross-checked against the combined body
+ledger, with one explicit Section 5 debt for the frozen 8.5% value.
 """
 
 from __future__ import annotations
@@ -36,9 +38,24 @@ FROZEN_TITLE = (
 FROZEN_ABSTRACT_SHA256 = (
     "0c85a03e9cd288b45d6f23502caf17b74e84c28dee0f3a2e62f9202ec4b81e5f"
 )
-APPROVED_LEDGER_BINDINGS_SHA256 = (
-    "e9b4288b8ea70fc5d1989b429f840464889c0400cb03835701141f8ab7399f20"
+APPROVED_PREAMBLE_SHA256 = (
+    "6d9e90c1d65f8dc77a054e9c01aa69bf42c6663cb535e8a1a31830bdcd041c88"
 )
+APPROVED_REFS_SHA256 = (
+    "f9543d25ecd407f6d5526f4b4e3be54a987a46a6f76342b1ee2403f33f0d1ee4"
+)
+APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
+    "Section 3": "750ed864a221ab24cc1a4ebfa63ef9ff24fe3fe0a3c065a48a774d3682f219c1",
+    "Section 4": "52da82179b7a674602f165a31ad0a3d08989fee3841e83e1a6688d8487eb17ec",
+}
+APPROVED_SECTION_VISIBLE_SHA256 = {
+    "Section 3": "0e3dfac2d95d0624adcd1887bff393c6dd3935be751374d7037117ffe37cbc24",
+    "Section 4": "498a33ae92608a855314db5ee5d3561c5d7d8c08e0c6bf01d13c491787012322",
+}
+APPROVED_SECTION_SOURCE_SHA256 = {
+    "Section 3": "402838f80803169620e0fbbfce59f9e6446a0a0e0b28892f1de356607ba7ca3e",
+    "Section 4": "7a7b541ce46d792158795f0b4e817ba64dcef31fb4da8a7150458013572dec38",
+}
 
 # Abstract v8.1 is frozen before Section 5 is authored.  Every other abstract
 # number must already have a same-display body RJ binding.  This one reviewed
@@ -62,13 +79,89 @@ APPROVED_EXACT_POINTERS = frozenset(
         "/rq2_taxonomy/p0_corrected_taxonomy/n",
         "/rq2_taxonomy/p0_corrected_taxonomy/n_unique_facts",
         "/rq2_taxonomy/p0_corrected_taxonomy/agreement/fleiss_kappa",
+        "/rq2_logitlens/_authoritative_record/n",
+        "/rq2_logitlens/_authoritative_record/edit_intact_at_cloze",
+        "/rq2_taxonomy/p0_membership_reaudit/technical_audit/n_items",
+        "/rq2_taxonomy/p0_membership_reaudit/membership_votes/majority_old_new_neither/0",
+        "/rq2_taxonomy/p0_membership_reaudit/membership_votes/majority_old_new_neither/1",
+        "/rq2_taxonomy/p0_membership_reaudit/membership_votes/majority_old_new_neither/2",
+        "/rq2_taxonomy/p0_membership_reaudit/membership_votes/membership_fleiss_kappa",
+        "/rq2_taxonomy/p0_corrected_taxonomy/dist/Bridge",
+        "/rq2_taxonomy/p0_corrected_taxonomy/dist/Recall",
+        "/rq2_taxonomy/p0_corrected_taxonomy/dist/Reflective-override",
+        "/rq2_taxonomy/p0_corrected_taxonomy/dist/Associative",
+        "/rq2_taxonomy/p0_corrected_taxonomy/agreement/unanimous_cases",
+        "/rq2_taxonomy/p0_corrected_taxonomy/agreement/two_one_cases",
+        "/rq2_taxonomy/p0_corrected_taxonomy/agreement/split_1_1_1_cases",
+        "/rq2_taxonomy/p0_corrected_taxonomy/agreement/raw_pairwise_agreement",
+        "/rq2_taxonomy/p0_downstream_crosswalk/historical_necessity_19",
+        "/rq2_taxonomy/p0_downstream_crosswalk/all_a3_candidates_33",
+        "/x1_replay_gate/gate/success",
+        "/x1_replay_gate/gate/n",
+        "/x1_replay_gate/gate/required",
+        "/x1_replay_gate/gate/b0_strict",
+        "/x1_replay_gate/gate/judge_old_majority",
+        "/x1_replay_gate/judge_agreement/fleiss_kappa",
+        "/x1_replay_gate/p0_source_membership_crosswalk/n",
+        "/x1_replay_gate/p0_source_membership_crosswalk/old_new_neither/0",
+        "/x1_replay_gate/by_source/f2_b1_greedy/n",
+        "/x1_replay_gate/by_source/f2_b1_greedy/b0_strict",
         "/rq3/n",
         "/rq3/sup_battery/n/N",
+        "/rq3/sup_battery/n/T",
         "/rq3/sup_battery/marginal_B3/N/RRs",
         "/rq3/sup_battery/marginal_B3/N/RR",
         "/rq3/sup_battery/marginal_B3/T/RR",
+        "/rq3/sup_battery/marginal_B3/T/ES",
+        "/rq3/clr_split_M1/CLR1_baseline/n",
+        "/rq3/clr_split_M1/CLR1_baseline/T_minus_N_RR",
+        "/rq3/clr_split_M1/CLR1_baseline/ci/0",
+        "/rq3/clr_split_M1/CLR1_baseline/ci/1",
+        "/rq3/clr_split_M1/CLR1_baseline/p",
+        "/rq3/clr_split_M1/CLR0_baseline/n",
+        "/rq3/clr_split_M1/CLR0_baseline/T_minus_N_RR",
+        "/rq3/clr_split_M1/CLR0_baseline/ci/0",
+        "/rq3/clr_split_M1/CLR0_baseline/ci/1",
+        "/rq3/clr_split_M1/CLR0_baseline/p",
+        "/rq3/clr_split_M1/CLR0_baseline/N_RR",
+        "/wb_representation_repair/confirm_arms/B1_S_minus_Pshuf/RR",
+        "/wb_representation_repair/confirm_arms/B1_S_minus_Pshuf/ES",
+        "/wb_representation_repair/confirm_arms/B1_S_minus_Pshuf/CLR",
+        "/wb_representation_repair/confirm_arms/S_minus_N/RR",
+        "/wb_representation_repair/confirm_arms/S_minus_N/ES",
+        "/wb_representation_repair/confirm_arms/B2_LocAcc/S_minus_Pshuf",
     }
 )
+
+# A few frozen result blocks predate the scalar-ledger schema.  Only the listed
+# numeric token positions from these exact strings are admissible.  This keeps
+# the exception auditable and prevents a generic string/note escape hatch.
+APPROVED_STRING_TOKEN_POINTERS = {
+    "/rq2_logitlens/_authoritative_record/edit_intact_at_cloze": frozenset({0, 1}),
+    "/rq2_taxonomy/p0_corrected_taxonomy/agreement/raw_pairwise_agreement": frozenset(
+        {0, 1}
+    ),
+    "/rq2_taxonomy/p0_downstream_crosswalk/historical_necessity_19": frozenset(
+        {5, 6}
+    ),
+    "/rq2_taxonomy/p0_downstream_crosswalk/all_a3_candidates_33": frozenset(
+        {5, 6}
+    ),
+    "/wb_representation_repair/confirm_arms/B1_S_minus_Pshuf/RR": frozenset(
+        {0, 1, 2}
+    ),
+    "/wb_representation_repair/confirm_arms/B1_S_minus_Pshuf/ES": frozenset(
+        {0, 1, 2}
+    ),
+    "/wb_representation_repair/confirm_arms/B1_S_minus_Pshuf/CLR": frozenset(
+        {0, 1, 2}
+    ),
+    "/wb_representation_repair/confirm_arms/S_minus_N/RR": frozenset({0, 1, 2}),
+    "/wb_representation_repair/confirm_arms/S_minus_N/ES": frozenset({0, 1, 2}),
+    "/wb_representation_repair/confirm_arms/B2_LocAcc/S_minus_Pshuf": frozenset(
+        {0, 1, 2}
+    ),
+}
 
 # Prefixes are intentionally narrower than top-level result blocks and always
 # end at an object/array boundary.  Historical prose and broad subtree lookup
@@ -119,6 +212,110 @@ REQUIRED_SECTION_ORDER = (
     "Conclusion",
 )
 
+AUDITED_SECTION_SPECS = (
+    {
+        "label": "Section 3",
+        "title": "The Reasoning-Time Evaluation Gap",
+        "end_title": "Causal Diagnosis",
+    },
+    {
+        "label": "Section 4",
+        "title": "Causal Diagnosis",
+        "end_title": "A Chain-Local Causal Control Point",
+    },
+)
+AUDITED_SECTION_TITLES = frozenset(
+    specification["title"] for specification in AUDITED_SECTION_SPECS
+)
+
+# The checker does not attempt to interpret arbitrary TeX.  This allowlist is
+# the reviewed command surface of the single-source manuscript; adding a new
+# command or environment requires an explicit checker review in the same
+# change.  In particular, generated text/numbers, external text input, and
+# non-rendering side-effect commands fail closed.
+ALLOWED_TEX_COMMANDS = frozenset(
+    {
+        "Pr",
+        "UrlFont",
+        "affiliations",
+        "author",
+        "begin",
+        "bibliography",
+        "bottomrule",
+        "caption",
+        "centering",
+        "citep",
+        "citet",
+        "columnwidth",
+        "def",
+        "documentclass",
+        "end",
+        "fbox",
+        "footnote",
+        "frenchspacing",
+        "kappa",
+        "label",
+        "land",
+        "maketitle",
+        "mathrm",
+        "midrule",
+        "neg",
+        "parbox",
+        "pdfinfo",
+        "ref",
+        "rm",
+        "section",
+        "setcounter",
+        "small",
+        "subsection",
+        "textbf",
+        "textit",
+        "textsc",
+        "textwidth",
+        "title",
+        "toprule",
+        "urlstyle",
+        "usepackage",
+    }
+)
+ALLOWED_TEX_ENVIRONMENTS = frozenset(
+    {"abstract", "document", "figure*", "table", "table*", "tabular"}
+)
+ALLOWED_TEX_CONTROL_SYMBOLS = frozenset({"%", "&", "(", ")", ",", "\\"})
+BODY_ALLOWED_TEX_COMMANDS = frozenset(
+    {
+        "Pr",
+        "begin",
+        "bibliography",
+        "bottomrule",
+        "caption",
+        "centering",
+        "citep",
+        "citet",
+        "columnwidth",
+        "end",
+        "fbox",
+        "footnote",
+        "kappa",
+        "label",
+        "land",
+        "maketitle",
+        "mathrm",
+        "midrule",
+        "neg",
+        "parbox",
+        "ref",
+        "section",
+        "small",
+        "subsection",
+        "textbf",
+        "textit",
+        "textsc",
+        "textwidth",
+        "toprule",
+    }
+)
+
 M04_TARGET = (
     "We report all six fixed-checkpoint cells. The cellwise, unadjusted 95% "
     "paired case-bootstrap intervals exclude zero only at the largest tested "
@@ -154,14 +351,27 @@ BANNED_PATTERNS = {
     "not-erased overclaim": r"\bnot erased\b",
     "guaranteed-upper-bound overclaim": r"\bguaranteed upper bound\b",
     "ordered-trend overclaim": r"\bmonotonic\w*\b",
+    "chain-localized variant": r"\bchain-localized\b",
+    "chain-only variant": r"\bchain-only\b",
     "forbidden F1 pseudo-contrast": r"(?<!\d)\.214(?!\d)",
     "latent-rate bracket": r"\btrue reversion\b.{0,60}\bbetween\b",
 }
 
 STALE_CONTEXT_PATTERNS = {
     "superseded route pool": r"\b(?:n\s*=\s*50|50 committed reversions)\b",
+    "superseded route pool words": r"\bfifty committed reversions\b",
+    "superseded fifty count": r"\bfifty\b",
     "superseded route distribution": r"\b68\s*%",
+    "superseded route distribution words": r"\bsixty[- ]eight percent\b",
+    "superseded sixty-eight count": r"\bsixty[- ]eight\b",
+    "superseded route count tuple": r"\b34\s*/\s*11\s*/\s*4\s*/\s*1\b",
+    "superseded route percentage tuple": r"\b68\s*/\s*22\s*/\s*8\s*/\s*2\b",
     "superseded route kappa": r"(?:kappa|κ)\s*=\s*0?\.790\b",
+    "superseded full-panel kappa": r"(?:kappa|κ)\s*=\s*0?\.875\b",
+    "superseded logit-lens feature": (
+        r"\b(?:logit|cloze|gap|layer).{0,80}"
+        r"(?:17\.803|11\.548|11\.569|-?0?\.246|-?0?\.351)\b"
+    ),
     "stale bare .545": r"(?<![\d.A-Za-z_])0?\.545(?![\dA-Za-z_])",
     "stale bare .765": r"(?<![\d.A-Za-z_])0?\.765(?![\dA-Za-z_])",
     "mis-scoped reversion": r"\b19\.3\s*%\s+overall\b",
@@ -246,18 +456,59 @@ def extract_section(text: str, start_title: str, end_title: str) -> str:
     )
 
 
+def replace_citation_with_visible_notes(match: re.Match[str]) -> str:
+    """Keep rendered natbib notes while dropping the generated citation/key."""
+
+    notes = re.findall(r"\[([^\[\]]*)\]", match.group("notes") or "")
+    return " " + " ".join(notes) + " "
+
+
+def strip_nonrendered_command_arguments(text: str) -> str:
+    """Remove source-only command arguments before visible-text assertions."""
+
+    text = re.sub(
+        r"\\(?:cite|citep|citet|citealp|citeauthor|citeyear)"
+        r"(?P<notes>(?:\[[^\[\]]*\]){0,2})\{[^{}]*\}",
+        replace_citation_with_visible_notes,
+        text,
+    )
+    text = re.sub(
+        r"\\(?:ref|pageref|label|bibliography)\s*\{[^{}]*\}",
+        " ",
+        text,
+    )
+    text = re.sub(r"\\(?:begin|end)\s*\{[^{}]*\}", " ", text)
+    # Optional short headings/captions are not printed in the manuscript body.
+    text = re.sub(
+        r"\\(?:section|subsection|caption)\*?(?:\[[^\[\]]*\])?",
+        "",
+        text,
+    )
+    return text
+
+
 def normalize_visible(text: str) -> str:
     text = strip_tex_comments(text)
+    text = strip_nonrendered_command_arguments(text)
     text = (
         text.replace(r"\%", "%")
         .replace(r"\&", "&")
         .replace(r"\-", "")
         .replace(r"\kappa", "kappa")
+        .replace(r"\Pr", "Pr")
+        .replace(r"\land", " AND ")
+        .replace(r"\neg", " NOT ")
+        .replace(r"\,", " ")
+        .replace(r"\\", " ")
+        .replace("~", " ")
     )
     # Preserve arguments while removing TeX command names and grouping braces.
     # This makes prose scans see through constructions such as
     # ``scal\textbf{ing}`` instead of treating source spelling as rendered text.
-    text = re.sub(r"\\[A-Za-z@]+\*?", "", text)
+    # TeX ignores delimiter whitespace after a control word, so consume it as
+    # well: ``scal\textbf {ing}`` and ``scal\relax ing`` must not create a
+    # false word boundary.
+    text = re.sub(r"\\[A-Za-z@]+\*?[ \t\r\n]*", "", text)
     text = re.sub(r"\\.", "", text)
     text = text.replace("{", "").replace("}", "")
     text = re.sub(r"\s+", " ", text)
@@ -312,7 +563,31 @@ def drop_leading_zero(value: str) -> str:
     return value
 
 
-def format_result(value: Any, rule: str) -> str:
+def format_result(value: Any, rule: str, pointer: str | None = None) -> str:
+    token_match = re.fullmatch(r"token:(\d+)", rule)
+    if token_match:
+        if pointer is None:
+            raise ValueError("token formatter requires its exact pointer")
+        token_index = int(token_match.group(1))
+        allowed_indices = APPROVED_STRING_TOKEN_POINTERS.get(pointer)
+        if allowed_indices is None or token_index not in allowed_indices:
+            raise ValueError(
+                f"token position {token_index} is not approved for {pointer}"
+            )
+        if not isinstance(value, str):
+            raise TypeError(
+                f"token formatter requires a frozen string, got {type(value).__name__}"
+            )
+        tokens = [
+            match.group(0).replace("\N{MINUS SIGN}", "-")
+            for match in NUMERIC_RE.finditer(value)
+        ]
+        if token_index >= len(tokens):
+            raise ValueError(
+                f"token position {token_index} is absent from frozen string"
+            )
+        return tokens[token_index]
+
     number = decimal_value(value)
     if rule == "integer":
         integral = number.to_integral_value()
@@ -320,7 +595,7 @@ def format_result(value: Any, rule: str) -> str:
             raise ValueError(f"integer formatter received {number}")
         return str(integral)
 
-    match = re.fullmatch(r"(fixed|percent):(\d+)", rule)
+    match = re.fullmatch(r"(fixed|percent|signed):(\d+)", rule)
     if not match:
         raise ValueError(f"unknown formatter {rule!r}")
     kind, places_text = match.groups()
@@ -330,17 +605,26 @@ def format_result(value: Any, rule: str) -> str:
     if kind == "percent":
         number *= Decimal(100)
     quantum = Decimal(1).scaleb(-places)
-    rendered = format(number.quantize(quantum, rounding=ROUND_HALF_UP), f".{places}f")
+    quantized = number.quantize(quantum, rounding=ROUND_HALF_UP)
+    if kind == "signed":
+        rendered = format(quantized, f"+.{places}f")
+    else:
+        rendered = format(quantized, f".{places}f")
     return drop_leading_zero(rendered)
 
 
 def pointer_is_approved(pointer: str) -> bool:
+    # Exact exceptions are reviewed before generic underscore/historical
+    # rejection; this is needed for the authoritative logit-lens record and
+    # two frozen crosswalk strings without opening their surrounding subtrees.
+    if pointer in APPROVED_EXACT_POINTERS:
+        return True
     lowered_parts = [part.lower() for part in pointer.split("/")]
     if any(part.startswith("_") for part in pointer.split("/") if part):
         return False
     if any(fragment in part for fragment in UNSAFE_POINTER_PARTS for part in lowered_parts):
         return False
-    return pointer in APPROVED_EXACT_POINTERS or any(
+    return any(
         pointer.startswith(prefix) for prefix in APPROVED_POINTER_PREFIXES
     )
 
@@ -349,13 +633,15 @@ def mask_nonclaim_numbers(code: str) -> str:
     """Remove identifiers and dimensions that are not manuscript claims."""
 
     # Citation and reference keys can contain years or model ids but do not
-    # render as authored numeric claims.
+    # render as authored numeric claims.  Natbib optional notes do render and
+    # therefore remain visible to the numeric scanner.
     code = re.sub(
-        r"\\(?:cite|citep|citet|citealp|citeauthor|citeyear|ref|pageref|label)"
-        r"(?:\[[^\]]*\])?\{[^{}]*\}",
-        " ",
+        r"\\(?:cite|citep|citet|citealp|citeauthor|citeyear)"
+        r"(?P<notes>(?:\[[^\[\]]*\]){0,2})\{[^{}]*\}",
+        replace_citation_with_visible_notes,
         code,
     )
+    code = re.sub(r"\\(?:ref|pageref|label)\s*\{[^{}]*\}", " ", code)
     # Fixed budget and full model identifiers are names.  A standalone
     # parameter count (e.g., the Parameters column's ``7B``) remains a claim:
     # remove only its unit so the numeric scanner sees it.
@@ -367,17 +653,34 @@ def mask_nonclaim_numbers(code: str) -> str:
         r"\1",
         code,
     )
-    # Pure layout dimensions are source mechanics, not rendered claims.
+    # Pure layout dimensions are source mechanics only inside the reviewed
+    # width/position arguments of ``\parbox``.  A generic TeX group such as
+    # ``{.546pt}`` can be visible prose and must not receive this exemption.
+    def mask_parbox_dimensions(match: re.Match[str]) -> str:
+        invocation = match.group(0)
+        invocation = re.sub(
+            r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:in|pt|pc|mm|cm|em|ex)\b",
+            "LAYOUT_DIM",
+            invocation,
+        )
+        return re.sub(
+            r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)\s*"
+            r"\\(?:textwidth|linewidth|columnwidth)\b",
+            "LAYOUT_DIM",
+            invocation,
+        )
+
     code = re.sub(
-        r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)"
-        r"(?:in|pt|pc|mm|cm|em|ex)\b",
-        " ",
+        r"\\parbox(?:\[[^\[\]]*\]){0,3}\{[^{}]*\}",
+        mask_parbox_dimensions,
         code,
     )
+    # A dimension-looking token outside that command surface is visible prose.
+    # Remove only its alphabetic suffix so the numeric claim is scanned.
     code = re.sub(
-        r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)\s*"
-        r"\\(?:textwidth|linewidth|columnwidth)\b",
-        " ",
+        r"(?<![A-Za-z0-9])([-+]?(?:\d+(?:\.\d*)?|\.\d+))"
+        r"(?:in|pt|pc|mm|cm|em|ex)\b",
+        r"\1",
         code,
     )
     return code
@@ -419,6 +722,20 @@ def check_template_and_frozen_surfaces(
     errors: list[str],
 ) -> None:
     visible_source = strip_tex_comments(main_text)
+    document_marker = r"\begin{document}"
+    if main_text.count(document_marker) != 1:
+        errors.append(r"\begin{document} must occur exactly once")
+        preamble = ""
+        body_source = visible_source
+    else:
+        preamble, body = main_text.split(document_marker, 1)
+        body_source = strip_tex_comments(body)
+        preamble_sha256 = sha256_bytes(preamble.encode("utf-8"))
+        if preamble_sha256 != APPROVED_PREAMBLE_SHA256:
+            errors.append(
+                "manuscript preamble differs from the reviewed snapshot "
+                f"(actual SHA256 {preamble_sha256})"
+            )
 
     titles = re.findall(r"\\title\{([^{}]+)\}", visible_source)
     if titles != [FROZEN_TITLE]:
@@ -438,7 +755,11 @@ def check_template_and_frozen_surfaces(
         errors.append("section numbering depth must be 2")
     if r"\nocopyright" in visible_source:
         errors.append(r"\nocopyright is forbidden")
-    if re.search(r"\\(?:input|include)\s*\{", visible_source):
+    if re.search(
+        r"\\(?:input|include|InputIfFileExists|verbatiminput|VerbatimInput|"
+        r"lstinputlisting|import|subimport|includepdf)\b",
+        visible_source,
+    ):
         errors.append("main.tex must remain a single source file without input/include")
 
     # Conditional compilation, invisible boxes, comment environments, and
@@ -455,16 +776,62 @@ def check_template_and_frozen_surfaces(
             r"\\(?:def|gdef|edef|xdef|let|newcommand|renewcommand|"
             r"providecommand|DeclareRobustCommand)\b"
         ),
+        "non-rendering side effect": (
+            r"\\(?:typeout|message|write|openout|openin|read|special)\b"
+        ),
     }
     for label, pattern in unsafe_constructs.items():
         if re.search(pattern, construct_surface):
             errors.append(f"forbidden manuscript construct ({label})")
+
+    commands = set(re.findall(r"\\([A-Za-z@]+)\*?", visible_source))
+    unknown_commands = sorted(commands - ALLOWED_TEX_COMMANDS)
+    if unknown_commands:
+        errors.append(f"unreviewed TeX command(s): {unknown_commands!r}")
+    body_commands = set(re.findall(r"\\([A-Za-z@]+)\*?", body_source))
+    unknown_body_commands = sorted(body_commands - BODY_ALLOWED_TEX_COMMANDS)
+    if unknown_body_commands:
+        errors.append(
+            f"preamble-only/unreviewed body TeX command(s): {unknown_body_commands!r}"
+        )
+    if body_source.count(r"\small") != 1:
+        errors.append(r"\small must occur exactly once in the reviewed table")
+
+    environments = set(
+        re.findall(r"\\(?:begin|end)\s*\{([^{}]+)\}", visible_source)
+    )
+    unknown_environments = sorted(environments - ALLOWED_TEX_ENVIRONMENTS)
+    if unknown_environments:
+        errors.append(f"unreviewed TeX environment(s): {unknown_environments!r}")
+
+    control_symbols = set(
+        re.findall(r"\\([^A-Za-z@\s])", visible_source)
+    )
+    unknown_control_symbols = sorted(
+        control_symbols - ALLOWED_TEX_CONTROL_SYMBOLS
+    )
+    if unknown_control_symbols or re.search(r"(?<!\\)\\[ \t]", visible_source):
+        errors.append(
+            "unreviewed TeX control symbol(s): "
+            f"{unknown_control_symbols!r}"
+        )
+    if "^^" in visible_source:
+        errors.append("TeX ^^ character notation is forbidden")
+
+    expected_pdfinfo = "\\pdfinfo{\n/TemplateVersion (2027.1)\n}"
+    if (
+        visible_source.count(r"\pdfinfo") != 1
+        or visible_source.count(expected_pdfinfo) != 1
+    ):
+        errors.append("PDF metadata block differs from the reviewed template block")
 
     section_titles = re.findall(r"\\section\{([^{}]+)\}", visible_source)
     if tuple(section_titles) != REQUIRED_SECTION_ORDER:
         errors.append(f"unexpected numbered-section order: {section_titles!r}")
     if visible_source.count(r"\section*{Ethical Statement}") != 1:
         errors.append("unnumbered Ethical Statement is missing")
+    if re.findall(r"\\bibliography\{([^{}]+)\}", visible_source) != ["refs"]:
+        errors.append(r"bibliography command must occur exactly once as \bibliography{refs}")
 
     if visible_source.count(r"\begin{abstract}") != 1 or visible_source.count(
         r"\end{abstract}"
@@ -494,12 +861,26 @@ def check_template_and_frozen_surfaces(
         if not copied.exists() or copied.read_bytes() != original.read_bytes():
             errors.append(f"{filename} is missing or differs from AuthorKit27")
 
+    refs_path = main_path.parent / "refs.bib"
+    if not refs_path.exists():
+        errors.append("refs.bib is missing or differs from the reviewed bibliography")
+    else:
+        refs_sha256 = sha256_bytes(refs_path.read_bytes())
+        if refs_sha256 != APPROVED_REFS_SHA256:
+            errors.append(
+                "refs.bib is missing or differs from the reviewed bibliography "
+                f"(actual SHA256 {refs_sha256})"
+            )
+
 
 def check_rj_ledger(
-    section_text: str, results: Any, errors: list[str]
+    section_text: str,
+    results: Any,
+    errors: list[str],
+    section_label: str,
+    global_claim_ids: set[str],
 ) -> list[dict[str, Any]]:
     ledger: list[dict[str, Any]] = []
-    claim_ids: set[str] = set()
 
     for line_number, line in enumerate(section_text.splitlines(), start=1):
         code, comment = split_tex_comment(line)
@@ -509,17 +890,19 @@ def check_rj_ledger(
             try:
                 payload = json.loads(payload_text)
             except json.JSONDecodeError as exc:
-                errors.append(f"Section 3 line {line_number}: malformed RJ JSON: {exc}")
+                errors.append(
+                    f"{section_label} line {line_number}: malformed RJ JSON: {exc}"
+                )
                 continue
             entries = payload if isinstance(payload, list) else [payload]
             if not entries:
-                errors.append(f"Section 3 line {line_number}: empty RJ payload")
+                errors.append(f"{section_label} line {line_number}: empty RJ payload")
 
         source_numbers = numeric_occurrences(code)
         ledger_numbers: list[str] = []
 
         for entry_index, entry in enumerate(entries):
-            prefix = f"Section 3 line {line_number}, RJ entry {entry_index + 1}"
+            prefix = f"{section_label} line {line_number}, RJ entry {entry_index + 1}"
             if not isinstance(entry, dict):
                 errors.append(f"{prefix}: entry must be an object")
                 continue
@@ -538,16 +921,16 @@ def check_rj_ledger(
                 continue
             if not re.fullmatch(r"[A-Za-z][A-Za-z0-9-]*", claim):
                 errors.append(f"{prefix}: invalid claim id {claim!r}")
-            elif claim in claim_ids:
+            elif claim in global_claim_ids:
                 errors.append(f"{prefix}: duplicate claim id {claim!r}")
             else:
-                claim_ids.add(claim)
+                global_claim_ids.add(claim)
             if not pointer_is_approved(pointer):
                 errors.append(f"{prefix}: pointer is outside approved current-result paths: {pointer}")
                 continue
             try:
                 value = resolve_pointer(results, pointer)
-                rendered = format_result(value, rule)
+                rendered = format_result(value, rule, pointer)
             except (KeyError, IndexError, TypeError, ValueError) as exc:
                 errors.append(f"{prefix}: {exc}")
                 continue
@@ -562,24 +945,34 @@ def check_rj_ledger(
                     "display": display,
                     "pointer": pointer,
                     "format": rule,
+                    "section": section_label,
                     "source_line": line_number,
+                    "source_code_sha256": sha256_bytes(
+                        normalize_visible(code).encode("utf-8")
+                    ),
                 }
             )
 
         if source_numbers != ledger_numbers:
             errors.append(
-                f"Section 3 line {line_number}: numeric occurrences {source_numbers!r} "
+                f"{section_label} line {line_number}: numeric occurrences {source_numbers!r} "
                 f"do not match RJ occurrences {ledger_numbers!r}"
             )
 
     if not ledger:
-        errors.append("Section 3 contains no RJ ledger entries")
+        errors.append(f"{section_label} contains no RJ ledger entries")
     return ledger
 
 
 def ledger_bindings_sha256(ledger: list[dict[str, Any]]) -> str:
     bindings = [
-        [entry["claim"], entry["pointer"], entry["format"]]
+        [
+            entry["claim"],
+            entry["display"],
+            entry["pointer"],
+            entry["format"],
+            entry["source_code_sha256"],
+        ]
         for entry in ledger
     ]
     encoded = json.dumps(
@@ -590,8 +983,36 @@ def ledger_bindings_sha256(ledger: list[dict[str, Any]]) -> str:
     return sha256_bytes(encoded)
 
 
+def section_visible_sha256(section_text: str) -> str:
+    return sha256_bytes(normalize_visible(section_text).encode("utf-8"))
+
+
+def section_source_sha256(section_text: str) -> str:
+    """Hash reviewed TeX structure while excluding RJ/comment-only metadata."""
+
+    semantic_lines: list[str] = []
+    for raw_line in section_text.splitlines():
+        code, comment = split_tex_comment(raw_line)
+        # A comment-only line has no TeX paragraph semantics.  Preserve genuine
+        # blank lines, because inserting one starts a new rendered paragraph.
+        if comment is not None and not code.strip():
+            continue
+        semantic_lines.append(code.rstrip())
+    source = "\n".join(semantic_lines)
+    paragraphs = [
+        re.sub(r"\s+", " ", paragraph).strip()
+        for paragraph in re.split(r"\n[ \t]*\n+", source)
+        if paragraph.strip()
+    ]
+    source = "<PAR>".join(paragraphs)
+    return sha256_bytes(source.encode("utf-8"))
+
+
 def check_global_claim_language(main_text: str, errors: list[str]) -> None:
     visible = normalize_visible(main_text)
+    # TeX ``--``/``---`` and Unicode dash variants render as punctuation that
+    # must not split banned phrases such as ``scaling-law`` or ``lower-bound``.
+    visible = re.sub(r"-{2,3}|[\u2010-\u2015\u2212]", "-", visible)
     lowered = visible.lower()
     for label, pattern in BANNED_PATTERNS.items():
         if re.search(pattern, lowered, flags=re.IGNORECASE | re.DOTALL):
@@ -600,8 +1021,16 @@ def check_global_claim_language(main_text: str, errors: list[str]) -> None:
         if re.search(pattern, visible, flags=re.IGNORECASE):
             errors.append(f"stale manuscript claim ({label})")
 
+    approved_lower_bound_sentence = (
+        "missingness is concentrated among rule-negative rows but does not make "
+        "the available-case kappa a lower bound; missingness sensitivity is "
+        "deferred to the supplement."
+    )
     for sentence in re.split(r"(?<=[.!?])\s+", lowered):
-        if re.search(r"\blower bound\b", sentence) and "does not make" not in sentence:
+        if (
+            re.search(r"\blower[ -]bound\b", sentence)
+            and sentence != approved_lower_bound_sentence
+        ):
             errors.append("lower-bound language is not explicitly negated in its sentence")
 
 
@@ -665,6 +1094,207 @@ def check_section3_requirements(section_text: str, errors: list[str]) -> None:
         )
 
 
+def check_section4_requirements(
+    section_text: str,
+    ledger: list[dict[str, Any]],
+    results: Any,
+    errors: list[str],
+) -> None:
+    visible_source = strip_tex_comments(section_text)
+    visible = normalize_visible(section_text)
+
+    expected_subsections = (
+        "Installation Sanity: The Edited Association Remains Cloze-Detectable",
+        "Visible In-Chain Routes",
+        "The Chain-Routing Hypothesis and a Failed Replay Vehicle",
+        "The Length-Only Account",
+        "CLR-Stratified Enrichment and a Dose-Limited Boundary Test",
+    )
+    actual_subsections = tuple(
+        re.findall(r"\\subsection\{([^{}]+)\}", visible_source)
+    )
+    if actual_subsections != expected_subsections:
+        errors.append(
+            "Section 4 subsection order/titles differ from the reviewed ceiling: "
+            f"{actual_subsections!r}"
+        )
+    if re.search(r"\\subsection\*", visible_source):
+        errors.append("Section 4 contains an unreviewed starred subsection")
+
+    required_strings = (
+        "This section assembles the diagnosis that motivates the primary intervention",
+        "This is only an installation sanity check",
+        "no control or confidence interval",
+        "close to tautological",
+        "conditional on the selected reversion sample",
+        "cannot audit its overlap and membership composition",
+        "reproduce the case-level tally",
+        "supplement records this missing expected artifact",
+        "drawn from six checkpoints across both backbone lineages",
+        "greedy, short-budget, and sampled generations represented",
+        "lexical candidacy is not equivalent to OLD membership by judge majority",
+        "we do not transport that estimate to this pooled census",
+        "outcome-conditioned failure surface",
+        "non-sufficient for OLD commitment",
+        "one external judge-model family",
+        "prospectively specified attempt",
+        "vehicle-validity gate is permanently Fail",
+        "the stop rule prevented the planned semantic-control arms from running",
+        "we withdraw the planned natural-chain mediation claim",
+        "non-rescuing post-hoc audit",
+        "do not identify a single mechanism",
+        "neither confirmed nor refuted",
+        "its controls do not route through replay",
+        "do not form a length-matched contrast",
+        "suppression may alter realized chain length",
+        "we infer neither saturation nor an ordered trend",
+        "an equal-length content-free filler remains untested",
+        "content-independent computational-buffer account",
+        "arm-paired stratum totals, not RR denominators",
+        "without an interaction test",
+        "the prospectively specified primary RR contrast was compatible with zero",
+        "ES remained null-compatible",
+        "a secondary concept-versus-shuffle contrast on the prespecified LocAcc harm metric",
+        "did not yield detectable confirmatory RR repair",
+        "Neither observation identifies natural-chain mediation",
+        "the test behind our chain-local causal control point",
+    )
+    for target in required_strings:
+        if target not in visible:
+            errors.append(f"Section 4 required target string missing: {target!r}")
+
+    # The two nonnumeric states are tied directly to results.json rather than
+    # weakening the numeric RJ schema.
+    expected_states = {
+        "/rq2_logitlens/p0_membership_crosswalk/status": (
+            "BLOCKED_MISSING_PER_ITEM_ARTIFACT",
+            "logit-lens per-item crosswalk",
+        ),
+        "/x1_replay_gate/gate/status": ("FAIL", "X1 replay gate"),
+    }
+    for pointer, (expected, label) in expected_states.items():
+        try:
+            observed = resolve_pointer(results, pointer)
+        except (KeyError, IndexError, TypeError, ValueError) as exc:
+            errors.append(f"Section 4 {label} state cannot be resolved: {exc}")
+            continue
+        if observed != expected:
+            errors.append(
+                f"Section 4 {label} state is {observed!r}, expected {expected!r}"
+            )
+
+    # Official failure, component decomposition, and post-hoc diagnosis must
+    # stay in that order; the independent Section 5 firewall follows them.
+    ordered_targets = (
+        "9/18",
+        "14/18",
+        "12/18",
+        "non-rescuing post-hoc audit",
+        "13/18",
+        "1/5",
+        "neither confirmed nor refuted",
+        "its controls do not route through replay",
+    )
+    offsets = [visible.find(target) for target in ordered_targets]
+    if any(offset < 0 for offset in offsets) or offsets != sorted(offsets):
+        errors.append(
+            "Section 4 X1 disclosure order must be FAIL -> decomposition -> "
+            "non-rescuing diagnosis -> terminal ruling -> replay-independent controls"
+        )
+
+    # High-risk length claims must retain their reviewed source identities.
+    required_bindings = {
+        (".631", "/rq3/sup_battery/marginal_B3/T/ES", "fixed:3"),
+        (".595", "/capability/families/R1-Distill-Qwen/es_b0/3", "fixed:3"),
+        (".208", "/f2_zerothink_deconfound/arms/B1/RR", "fixed:3"),
+        (".193", "/capability/families/R1-Distill-Qwen/rr/3", "fixed:3"),
+        (".040", "/f2_zerothink_deconfound/arms/B0P/RR", "fixed:3"),
+    }
+    actual_bindings = {
+        (entry["display"], entry["pointer"], entry["format"])
+        for entry in ledger
+    }
+    missing_bindings = sorted(required_bindings - actual_bindings)
+    if missing_bindings:
+        errors.append(f"Section 4 required M06 bindings missing: {missing_bindings!r}")
+
+    # Panel identity, not merely numeric equality, determines each kappa.
+    kappa_specs = {
+        "/rq2_taxonomy/p0_corrected_taxonomy/agreement/fleiss_kappa": (
+            ".813",
+            "route-panel",
+        ),
+        "/rq2_taxonomy/p0_membership_reaudit/membership_votes/membership_fleiss_kappa": (
+            ".958",
+            "answer-only membership gate",
+        ),
+        "/x1_replay_gate/judge_agreement/fleiss_kappa": (
+            ".9195",
+            "replay answer judges",
+        ),
+    }
+    section_lines = section_text.splitlines()
+    for pointer, (display, context) in kappa_specs.items():
+        entries = [entry for entry in ledger if entry["pointer"] == pointer]
+        if len(entries) != 1 or entries[0]["display"] != display:
+            errors.append(
+                f"Section 4 kappa identity mismatch for {pointer}: "
+                f"{[(entry['display'], entry['source_line']) for entry in entries]!r}"
+            )
+            continue
+        line_number = entries[0]["source_line"]
+        line_visible = normalize_visible(section_lines[line_number - 1])
+        if context not in line_visible:
+            errors.append(
+                f"Section 4 kappa {display} lacks its {context!r} context"
+            )
+
+    check_authoritative_cloze_ratio(results, errors)
+
+    if re.search(
+        r"(?:fig2|table)[-_]?(?:logitlens|rq2)",
+        visible_source,
+        flags=re.IGNORECASE,
+    ):
+        errors.append("Section 4 references a superseded diagnostic asset")
+    if r"\includegraphics" in visible_source:
+        errors.append(
+            "Section 4 external diagnostic assets require a separate reviewed landing"
+        )
+
+
+def check_authoritative_cloze_ratio(
+    results: Any,
+    errors: list[str],
+) -> None:
+    """Require the frozen cloze record to encode exactly n/n = 100%."""
+
+    try:
+        ratio = resolve_pointer(
+            results, "/rq2_logitlens/_authoritative_record/edit_intact_at_cloze"
+        )
+        n_value = resolve_pointer(
+            results, "/rq2_logitlens/_authoritative_record/n"
+        )
+        ratio_match = (
+            re.fullmatch(r"(\d+)/(\d+)=([0-9.]+)%", ratio)
+            if isinstance(ratio, str)
+            else None
+        )
+        valid = False
+        if ratio_match and isinstance(n_value, int) and not isinstance(n_value, bool):
+            numerator = int(ratio_match.group(1))
+            denominator = int(ratio_match.group(2))
+            percent = Decimal(ratio_match.group(3))
+            valid = numerator == denominator == n_value and percent == Decimal(100)
+        if not valid:
+            errors.append(
+                "Section 4 authoritative cloze ratio must equal n/n=100%"
+            )
+    except (InvalidOperation, KeyError, IndexError, TypeError, ValueError) as exc:
+        errors.append(f"Section 4 authoritative cloze ratio cannot be checked: {exc}")
+
+
 def check_unaudited_section_numbers(main_text: str, errors: list[str]) -> None:
     """Reject numbers in sections whose occurrence-level ledgers have not landed."""
 
@@ -683,9 +1313,8 @@ def check_unaudited_section_numbers(main_text: str, errors: list[str]) -> None:
         regions.append((title, start_marker, end_marker))
     regions.append(("Ethical Statement", ethical_marker, bibliography_marker))
 
-    audited_title = "The Reasoning-Time Evaluation Gap"
     for title, start_marker, end_marker in regions:
-        if title == audited_title:
+        if title in AUDITED_SECTION_TITLES:
             continue
         try:
             region = extract_between_markers(
@@ -702,6 +1331,45 @@ def check_unaudited_section_numbers(main_text: str, errors: list[str]) -> None:
             errors.append(
                 f"unaudited section {title!r} contains numeric tokens {numbers!r}; "
                 "add that section's occurrence-level RJ audit before prose numbers"
+            )
+
+
+def check_unsectioned_body_numbers(main_text: str, errors: list[str]) -> None:
+    """Reject authored numbers in document-body gaps outside the abstract/sections."""
+
+    regions = (
+        (
+            "pre-abstract front matter",
+            r"\begin{document}",
+            r"\begin{abstract}",
+        ),
+        (
+            "post-abstract front matter",
+            r"\end{abstract}",
+            r"\section{Introduction}",
+        ),
+        (
+            "post-bibliography tail",
+            r"\bibliography{refs}",
+            r"\end{document}",
+        ),
+    )
+    for label, start_marker, end_marker in regions:
+        try:
+            region = extract_between_markers(
+                main_text,
+                start_marker,
+                end_marker,
+                f"unpartitioned document-body region {label}",
+            )
+        except ValueError as exc:
+            errors.append(str(exc))
+            continue
+        numbers = numeric_occurrences(strip_tex_comments(region))
+        if numbers:
+            errors.append(
+                f"unpartitioned document-body region {label!r} contains "
+                f"numeric tokens {numbers!r}"
             )
 
 
@@ -750,7 +1418,9 @@ def check_abstract_body_bindings(
     for display, specification in PENDING_ABSTRACT_BODY_BINDINGS.items():
         try:
             value = resolve_pointer(results, specification["pointer"])
-            rendered = format_result(value, specification["format"])
+            rendered = format_result(
+                value, specification["format"], specification["pointer"]
+            )
         except (KeyError, IndexError, TypeError, ValueError) as exc:
             errors.append(f"abstract binding debt {display!r}: {exc}")
             continue
@@ -790,6 +1460,12 @@ def main() -> int:
     if not args.main.is_file():
         print(f"FAIL: missing manuscript source: {args.main}", file=sys.stderr)
         return 1
+    if args.results.resolve() != DEFAULT_RESULTS.resolve():
+        print(
+            "FAIL: numeric source must be the canonical paperwriting/results.json",
+            file=sys.stderr,
+        )
+        return 1
     if not args.results.is_file():
         print(f"FAIL: missing numeric source: {args.results}", file=sys.stderr)
         return 1
@@ -807,27 +1483,61 @@ def main() -> int:
     check_template_and_frozen_surfaces(main_text, args.main, errors)
     check_global_claim_language(main_text, errors)
     check_unaudited_section_numbers(main_text, errors)
-    try:
-        section_text = extract_section(
-            main_text,
-            "The Reasoning-Time Evaluation Gap",
-            "Causal Diagnosis",
-        )
-    except ValueError as exc:
-        errors.append(str(exc))
-        section_text = ""
-
-    ledger: list[dict[str, Any]] = []
-    if section_text:
-        ledger = check_rj_ledger(section_text, results, errors)
-        check_section3_requirements(section_text, errors)
-        check_abstract_body_bindings(main_text, ledger, results, errors)
-        bindings_sha256 = ledger_bindings_sha256(ledger)
-        if bindings_sha256 != APPROVED_LEDGER_BINDINGS_SHA256:
-            errors.append(
-                "Section 3 RJ claim/path/format bindings differ from the "
-                f"reviewed W2-1 ledger (actual SHA256 {bindings_sha256})"
+    check_unsectioned_body_numbers(main_text, errors)
+    combined_ledger: list[dict[str, Any]] = []
+    section_counts: dict[str, int] = {}
+    global_claim_ids: set[str] = set()
+    for specification in AUDITED_SECTION_SPECS:
+        section_label = specification["label"]
+        try:
+            section_text = extract_section(
+                main_text,
+                specification["title"],
+                specification["end_title"],
             )
+        except ValueError as exc:
+            errors.append(str(exc))
+            continue
+
+        section_ledger = check_rj_ledger(
+            section_text,
+            results,
+            errors,
+            section_label,
+            global_claim_ids,
+        )
+        if section_label == "Section 3":
+            check_section3_requirements(section_text, errors)
+        elif section_label == "Section 4":
+            check_section4_requirements(
+                section_text, section_ledger, results, errors
+            )
+
+        bindings_sha256 = ledger_bindings_sha256(section_ledger)
+        expected_sha256 = APPROVED_SECTION_LEDGER_BINDINGS_SHA256[section_label]
+        if bindings_sha256 != expected_sha256:
+            errors.append(
+                f"{section_label} RJ claim/path/format bindings differ from the "
+                f"reviewed ledger (actual SHA256 {bindings_sha256})"
+            )
+        visible_sha256 = section_visible_sha256(section_text)
+        expected_visible_sha256 = APPROVED_SECTION_VISIBLE_SHA256[section_label]
+        if visible_sha256 != expected_visible_sha256:
+            errors.append(
+                f"{section_label} visible semantic surface differs from the "
+                f"reviewed snapshot (actual SHA256 {visible_sha256})"
+            )
+        source_sha256 = section_source_sha256(section_text)
+        expected_source_sha256 = APPROVED_SECTION_SOURCE_SHA256[section_label]
+        if source_sha256 != expected_source_sha256:
+            errors.append(
+                f"{section_label} TeX source structure differs from the "
+                f"reviewed snapshot (actual SHA256 {source_sha256})"
+            )
+        combined_ledger.extend(section_ledger)
+        section_counts[section_label] = len(section_ledger)
+
+    check_abstract_body_bindings(main_text, combined_ledger, results, errors)
 
     if errors:
         print(f"FAIL: {len(errors)} manuscript check(s) failed", file=sys.stderr)
@@ -838,14 +1548,16 @@ def main() -> int:
     if args.ledger_out:
         args.ledger_out.parent.mkdir(parents=True, exist_ok=True)
         args.ledger_out.write_text(
-            json.dumps(ledger, indent=2, ensure_ascii=False) + "\n",
+            json.dumps(combined_ledger, indent=2, ensure_ascii=False) + "\n",
             encoding="utf-8",
         )
 
     print(
         "PASS: frozen title/abstract, adjacent template copies, full-manuscript "
-        "language gates, unaudited-section numeric gates, Section 3 RJ ledger "
-        f"({len(ledger)} occurrences), claim targets, and exact abstract-binding debt"
+        "language gates, unaudited-section numeric gates, "
+        f"Section 3 RJ ledger ({section_counts.get('Section 3', 0)} occurrences), "
+        f"Section 4 RJ ledger ({section_counts.get('Section 4', 0)} occurrences), "
+        "claim targets, and exact abstract-binding debt"
     )
     return 0
 
