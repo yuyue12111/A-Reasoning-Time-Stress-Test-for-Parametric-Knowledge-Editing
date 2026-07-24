@@ -4,8 +4,11 @@
 The checker treats every numeric occurrence in Section 3 as an occurrence-level
 claim.  Each occurrence must have an inline ``% RJ:`` JSON record containing a
 unique claim id, an RFC 6901 pointer to a numeric scalar in results.json, and an
-enumerated formatter.  The frozen abstract is checked as one byte-authenticated
-surface after reversing the single LaTeX escape ``\\% -> %``.
+enumerated formatter.  Other, not-yet-authored sections reject numeric tokens
+until their own ledgers land.  Banned and stale language is checked across the
+whole visible manuscript.  The frozen abstract is byte-authenticated after
+reversing the single LaTeX escape ``\\% -> %`` and cross-checked against body
+ledger displays, with one explicit Section 5 debt for the frozen 8.5% value.
 """
 
 from __future__ import annotations
@@ -34,8 +37,20 @@ FROZEN_ABSTRACT_SHA256 = (
     "0c85a03e9cd288b45d6f23502caf17b74e84c28dee0f3a2e62f9202ec4b81e5f"
 )
 APPROVED_LEDGER_BINDINGS_SHA256 = (
-    "fb6dec2a8d21f4a456cba5c63e92229ddb4194ea77e949b006d218ed0a58dc1b"
+    "e9b4288b8ea70fc5d1989b429f840464889c0400cb03835701141f8ab7399f20"
 )
+
+# Abstract v8.1 is frozen before Section 5 is authored.  Every other abstract
+# number must already have a same-display body RJ binding.  This one reviewed
+# debt validates against results.json now and must be removed as soon as the
+# Section 5 19.3% -> 8.5% sentence receives its own RJ entries.
+PENDING_ABSTRACT_BODY_BINDINGS = {
+    "8.5": {
+        "pointer": "/rq3/sup_battery/marginal_B3/T/RR",
+        "format": "percent:1",
+        "section": "A Chain-Local Causal Control Point",
+    }
+}
 
 # Exact scalar paths must not accidentally approve a same-prefix sibling.
 APPROVED_EXACT_POINTERS = frozenset(
@@ -50,6 +65,8 @@ APPROVED_EXACT_POINTERS = frozenset(
         "/rq3/n",
         "/rq3/sup_battery/n/N",
         "/rq3/sup_battery/marginal_B3/N/RRs",
+        "/rq3/sup_battery/marginal_B3/N/RR",
+        "/rq3/sup_battery/marginal_B3/T/RR",
     }
 )
 
@@ -105,14 +122,16 @@ REQUIRED_SECTION_ORDER = (
 M04_TARGET = (
     "We report all six fixed-checkpoint cells. The cellwise, unadjusted 95% "
     "paired case-bootstrap intervals exclude zero only at the largest tested "
-    "checkpoint in each family. These cells delimit the headline scope; we do "
-    "not infer an ordered trend across checkpoints."
+    "checkpoint in each family. These cells delimit the headline scope---a "
+    "scope statement, not a post-hoc selection---and we do not infer an "
+    "ordered trend across checkpoints."
 )
 
 M12_TARGET = (
-    "Both lineages share an R1 teacher and distillation recipe, so the "
-    "comparison neither establishes equality across lineages nor excludes "
-    "recipe-specificity."
+    "The similarity across the two tested backbone lineages disfavors a "
+    "single-lineage idiosyncrasy, though not recipe-specificity: both share "
+    "an R1 teacher and distillation recipe, and the comparison does not "
+    "establish equality across lineages."
 )
 
 BANNED_PATTERNS = {
@@ -142,7 +161,9 @@ BANNED_PATTERNS = {
 STALE_CONTEXT_PATTERNS = {
     "superseded route pool": r"\b(?:n\s*=\s*50|50 committed reversions)\b",
     "superseded route distribution": r"\b68\s*%",
-    "superseded route kappa": r"(?:\\kappa|κ)\s*=\s*0?\.790\b",
+    "superseded route kappa": r"(?:kappa|κ)\s*=\s*0?\.790\b",
+    "stale bare .545": r"(?<![\d.A-Za-z_])0?\.545(?![\dA-Za-z_])",
+    "stale bare .765": r"(?<![\d.A-Za-z_])0?\.765(?![\dA-Za-z_])",
     "mis-scoped reversion": r"\b19\.3\s*%\s+overall\b",
 }
 
@@ -168,14 +189,19 @@ def split_tex_comment(line: str) -> tuple[str, str | None]:
 
 
 def strip_tex_comments(text: str) -> str:
-    return "\n".join(split_tex_comment(line)[0] for line in text.splitlines())
+    # An unescaped TeX ``%`` consumes the physical newline as well as the rest
+    # of its line.  Preserve newlines only on uncommented lines so that
+    # ``scal% comment\ning`` normalizes to the rendered word ``scaling``.
+    return "".join(
+        split_tex_comment(line)[0]
+        for line in text.splitlines(keepends=True)
+    )
 
 
-def extract_section(text: str, start_title: str, end_title: str) -> str:
-    start_marker = rf"\section{{{start_title}}}"
-    end_marker = rf"\section{{{end_title}}}"
-
-    offsets: dict[str, list[int]] = {start_marker: [], end_marker: []}
+def uncommented_marker_offsets(
+    text: str, markers: tuple[str, ...]
+) -> dict[str, list[int]]:
+    offsets: dict[str, list[int]] = {marker: [] for marker in markers}
     cursor = 0
     for line in text.splitlines(keepends=True):
         code, _ = split_tex_comment(line)
@@ -188,22 +214,46 @@ def extract_section(text: str, start_title: str, end_title: str) -> str:
                 offsets[marker].append(cursor + index)
                 search_from = index + len(marker)
         cursor += len(line)
+    return offsets
+
+
+def extract_between_markers(
+    text: str,
+    start_marker: str,
+    end_marker: str,
+    label: str,
+) -> str:
+    offsets = uncommented_marker_offsets(text, (start_marker, end_marker))
 
     if len(offsets[start_marker]) != 1 or len(offsets[end_marker]) != 1:
         raise ValueError(
-            f"section boundaries must be unique and uncommented for {start_title!r}: "
+            f"boundaries must be unique and uncommented for {label!r}: "
             f"start={len(offsets[start_marker])}, end={len(offsets[end_marker])}"
         )
     start = offsets[start_marker][0]
     end = offsets[end_marker][0]
     if end <= start:
-        raise ValueError(f"cannot isolate section {start_title!r}")
+        raise ValueError(f"cannot isolate {label!r}")
     return text[start:end]
+
+
+def extract_section(text: str, start_title: str, end_title: str) -> str:
+    return extract_between_markers(
+        text,
+        rf"\section{{{start_title}}}",
+        rf"\section{{{end_title}}}",
+        f"section {start_title}",
+    )
 
 
 def normalize_visible(text: str) -> str:
     text = strip_tex_comments(text)
-    text = text.replace(r"\%", "%").replace(r"\&", "&").replace(r"\-", "")
+    text = (
+        text.replace(r"\%", "%")
+        .replace(r"\&", "&")
+        .replace(r"\-", "")
+        .replace(r"\kappa", "kappa")
+    )
     # Preserve arguments while removing TeX command names and grouping braces.
     # This makes prose scans see through constructions such as
     # ``scal\textbf{ing}`` instead of treating source spelling as rendered text.
@@ -319,7 +369,7 @@ def mask_nonclaim_numbers(code: str) -> str:
     )
     # Pure layout dimensions are source mechanics, not rendered claims.
     code = re.sub(
-        r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)\s*"
+        r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)"
         r"(?:in|pt|pc|mm|cm|em|ex)\b",
         " ",
         code,
@@ -363,7 +413,11 @@ def remove_balanced_command(text: str, command: str) -> str:
         cursor = index
 
 
-def check_template_and_frozen_surfaces(main_text: str, errors: list[str]) -> None:
+def check_template_and_frozen_surfaces(
+    main_text: str,
+    main_path: Path,
+    errors: list[str],
+) -> None:
     visible_source = strip_tex_comments(main_text)
 
     titles = re.findall(r"\\title\{([^{}]+)\}", visible_source)
@@ -435,7 +489,7 @@ def check_template_and_frozen_surfaces(main_text: str, errors: list[str]) -> Non
         errors.append("frozen abstract source SHA256 changed")
 
     for filename in ("aaai2027.sty", "aaai2027.bst"):
-        copied = DEFAULT_MAIN.parent / filename
+        copied = main_path.parent / filename
         original = TEMPLATE_DIR / filename
         if not copied.exists() or copied.read_bytes() != original.read_bytes():
             errors.append(f"{filename} is missing or differs from AuthorKit27")
@@ -536,10 +590,9 @@ def ledger_bindings_sha256(ledger: list[dict[str, Any]]) -> str:
     return sha256_bytes(encoded)
 
 
-def check_claim_language(section_text: str, errors: list[str]) -> None:
-    visible = normalize_visible(section_text)
+def check_global_claim_language(main_text: str, errors: list[str]) -> None:
+    visible = normalize_visible(main_text)
     lowered = visible.lower()
-
     for label, pattern in BANNED_PATTERNS.items():
         if re.search(pattern, lowered, flags=re.IGNORECASE | re.DOTALL):
             errors.append(f"banned language ({label})")
@@ -547,12 +600,13 @@ def check_claim_language(section_text: str, errors: list[str]) -> None:
         if re.search(pattern, visible, flags=re.IGNORECASE):
             errors.append(f"stale manuscript claim ({label})")
 
-    lower_bound_matches = list(re.finditer(r"\blower bound\b", lowered))
-    for match in lower_bound_matches:
-        window = lowered[max(0, match.start() - 100) : match.end()]
-        if "does not make" not in window:
-            errors.append("lower-bound language is not explicitly negated")
+    for sentence in re.split(r"(?<=[.!?])\s+", lowered):
+        if re.search(r"\blower bound\b", sentence) and "does not make" not in sentence:
+            errors.append("lower-bound language is not explicitly negated in its sentence")
 
+
+def check_section3_requirements(section_text: str, errors: list[str]) -> None:
+    visible = normalize_visible(section_text)
     required_strings = (
         M04_TARGET,
         M12_TARGET,
@@ -611,6 +665,112 @@ def check_claim_language(section_text: str, errors: list[str]) -> None:
         )
 
 
+def check_unaudited_section_numbers(main_text: str, errors: list[str]) -> None:
+    """Reject numbers in sections whose occurrence-level ledgers have not landed."""
+
+    numbered_markers = [
+        rf"\section{{{title}}}" for title in REQUIRED_SECTION_ORDER
+    ]
+    ethical_marker = r"\section*{Ethical Statement}"
+    bibliography_marker = r"\bibliography{refs}"
+    regions: list[tuple[str, str, str]] = []
+    for index, title in enumerate(REQUIRED_SECTION_ORDER):
+        start_marker = numbered_markers[index]
+        if index + 1 < len(numbered_markers):
+            end_marker = numbered_markers[index + 1]
+        else:
+            end_marker = ethical_marker
+        regions.append((title, start_marker, end_marker))
+    regions.append(("Ethical Statement", ethical_marker, bibliography_marker))
+
+    audited_title = "The Reasoning-Time Evaluation Gap"
+    for title, start_marker, end_marker in regions:
+        if title == audited_title:
+            continue
+        try:
+            region = extract_between_markers(
+                main_text,
+                start_marker,
+                end_marker,
+                f"unaudited section {title}",
+            )
+        except ValueError as exc:
+            errors.append(str(exc))
+            continue
+        numbers = numeric_occurrences(strip_tex_comments(region))
+        if numbers:
+            errors.append(
+                f"unaudited section {title!r} contains numeric tokens {numbers!r}; "
+                "add that section's occurrence-level RJ audit before prose numbers"
+            )
+
+
+def numeric_decimal(value: str) -> Decimal:
+    try:
+        return Decimal(value.replace("\N{MINUS SIGN}", "-"))
+    except InvalidOperation as exc:
+        raise ValueError(f"invalid numeric display {value!r}") from exc
+
+
+def check_abstract_body_bindings(
+    main_text: str,
+    ledger: list[dict[str, Any]],
+    results: Any,
+    errors: list[str],
+) -> None:
+    """Cross-check frozen abstract numbers against reviewed body RJ displays.
+
+    The exact missing-value set is a self-retiring debt: adding the Section 5
+    8.5% RJ binding without deleting the debt makes this check fail.
+    """
+
+    visible_source = strip_tex_comments(main_text)
+    abstract_match = re.search(
+        r"\\begin\{abstract\}\s*\n(.*?)\n\\end\{abstract\}",
+        visible_source,
+        flags=re.DOTALL,
+    )
+    if not abstract_match:
+        return
+
+    abstract_values = {
+        numeric_decimal(value)
+        for value in numeric_occurrences(abstract_match.group(1))
+    }
+    body_values = {
+        numeric_decimal(entry["display"])
+        for entry in ledger
+    }
+    missing_values = abstract_values - body_values
+    debt_values = {
+        numeric_decimal(display)
+        for display in PENDING_ABSTRACT_BODY_BINDINGS
+    }
+
+    for display, specification in PENDING_ABSTRACT_BODY_BINDINGS.items():
+        try:
+            value = resolve_pointer(results, specification["pointer"])
+            rendered = format_result(value, specification["format"])
+        except (KeyError, IndexError, TypeError, ValueError) as exc:
+            errors.append(f"abstract binding debt {display!r}: {exc}")
+            continue
+        if rendered != display:
+            errors.append(
+                f"abstract binding debt {display!r} != {rendered!r} from "
+                f"{specification['pointer']} via {specification['format']}"
+            )
+
+    if missing_values != debt_values:
+        rendered_missing = sorted(str(value) for value in missing_values)
+        rendered_debt = sorted(str(value) for value in debt_values)
+        errors.append(
+            "frozen-abstract numeric coverage differs from the exact "
+            f"self-retiring debt: missing={rendered_missing}, debt={rendered_debt}. "
+            "When Section 5 binds 8.5%, remove PENDING_ABSTRACT_BODY_BINDINGS "
+            "in the same commit."
+        )
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--main", type=Path, default=DEFAULT_MAIN)
@@ -644,7 +804,9 @@ def main() -> int:
         print(f"FAIL: cannot load results.json: {exc}", file=sys.stderr)
         return 1
 
-    check_template_and_frozen_surfaces(main_text, errors)
+    check_template_and_frozen_surfaces(main_text, args.main, errors)
+    check_global_claim_language(main_text, errors)
+    check_unaudited_section_numbers(main_text, errors)
     try:
         section_text = extract_section(
             main_text,
@@ -658,7 +820,8 @@ def main() -> int:
     ledger: list[dict[str, Any]] = []
     if section_text:
         ledger = check_rj_ledger(section_text, results, errors)
-        check_claim_language(section_text, errors)
+        check_section3_requirements(section_text, errors)
+        check_abstract_body_bindings(main_text, ledger, results, errors)
         bindings_sha256 = ledger_bindings_sha256(ledger)
         if bindings_sha256 != APPROVED_LEDGER_BINDINGS_SHA256:
             errors.append(
@@ -680,8 +843,9 @@ def main() -> int:
         )
 
     print(
-        "PASS: frozen title/abstract, template scaffold, Section 3 RJ ledger "
-        f"({len(ledger)} occurrences), claim targets, stale checks, and banned language"
+        "PASS: frozen title/abstract, adjacent template copies, full-manuscript "
+        "language gates, unaudited-section numeric gates, Section 3 RJ ledger "
+        f"({len(ledger)} occurrences), claim targets, and exact abstract-binding debt"
     )
     return 0
 
