@@ -5,6 +5,24 @@
 > 铁律：任何数字/显著性/认证措辞先有 results.json JSON path 再落笔（plan v1.65/v1.69）；
 > **投稿前科学队列 = 零**（不跑 B15 interaction、不烧 X-A 池、不加 seed/数据集/编辑器）。
 
+## 0-bis. 正文叙事逻辑（矿场产出蒸馏 + 摘要程序实证；W2 起草期主动使用，W3 用 transfer_checklist §2–§5 复查）
+
+> 来源：`prewrite/style_notes.md` / `prewrite/transfer_checklist.md`（14 篇同文体深读 + AAAI-25/26 AIA 全量 172 篇，
+> 全部 PROVISIONAL_UNCERTIFIED 描述性透镜）+ 本仓库摘要程序 v1–v8.1 的 24+ 盲读实证。
+> `prewrite/usage_protocol.md` 六禁令全程有效：透镜是修订层指引非模板，有意偏离+一句理由合法，冻结件无条件优先。
+
+七条叙事逻辑（每条注出处）：
+1. **先安装世界与旧假设，再谈自己**——首拍 CONTEXT/BACKGROUND（深读 12/14 摘要、14/14 引言）。§1 开场 = 编辑评测的现状与"直接回答成功⇒部署可靠"这个旧假设，不是我们的方法。
+2. **铰链早置**——引言在 ~30% 处显式转向（HINGE 位置中位 0.296，14/14 存在）："部署的推理模型会思考，而认证发生在零思考"这一转折必须在 §1 前三分之一落地。
+3. **先给结果的形状，再给细节**——RESULT_PREVIEW 14/14；§1 末的三拍预告（认证缺口/共存+假说/链内控制点），contribution list 可用（10/14）且 C2 首词 = 加粗的 "A chain-local causal control point."（M15 记忆锚令）。
+4. **每句单一职责，假说与检验显式分层**——摘要程序 G6 实证：读者会尊重文本标出的证据位阶（v8 面板 4/4 自发复述 claim ceiling）。正文沿用 "motivating a hypothesis → We next test" 的显式铰链语法。
+5. **数字只标承重节点，其余入表**——摘要程序的核心实证教训（clarity 被堆叠 estimand 从句钉死，删数字不减理解、只减疲劳）。正文散文承载模型与方向，CI/κ/分母/敏感性全部入 Table/脚注（M14/M16 配套）。
+6. **限制直说不致歉**——DIRECT tone 14/14（与 HEDGED 共存 12/14）；dedicated section 10/14 但分布式合法——X1 FAIL 按令分布在 §4 机理讨论紧邻位，不是集中忏悔。
+7. **结尾回扣重定义的问题**——末拍 IMPLICATION；全文最后一句含 verbatim 锚短语（M15 第 5 条）。
+
+本文的叙事骨相（Idea2Story 三问的定稿答案）：**主角**=编辑认证证书；**旧假设**=直接回答的编辑成功⇒部署可靠；**重定义**=编辑评测必须包含 reasoning-time stress test，且失效存在链内因果控制点。各节子模型：§3=证书在思考中失效（受控且编辑特异）；§4=失效非擦除、有可见路由（假说位阶）+ X1 诚实披露；§5=链内存在有符号、有剂量的控制点（干预位阶）；§6/§7=边界与含义。
+Fig.1 按语料形态走 **PRIMARY_RESULT**（7/14；method-pipeline 仅 2/14）= 认证缺口图，caption 自足（FULL 9/14 规格）。
+
 ## 0. 论文身份与主 claim（冻结）
 
 **身份**：reasoning-time evaluation / safety stress test（评测证书失效边界），不是"现象+机理+修复"三段论。
