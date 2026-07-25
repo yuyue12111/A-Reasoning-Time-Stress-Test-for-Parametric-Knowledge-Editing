@@ -46,15 +46,15 @@ APPROVED_REFS_SHA256 = (
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
     "Section 3": "750ed864a221ab24cc1a4ebfa63ef9ff24fe3fe0a3c065a48a774d3682f219c1",
-    "Section 4": "52da82179b7a674602f165a31ad0a3d08989fee3841e83e1a6688d8487eb17ec",
+    "Section 4": "db3e8a19d6e4fbf751d1879d71a15b232e17bf6baa88183bd7f55127d02147cb",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
     "Section 3": "0e3dfac2d95d0624adcd1887bff393c6dd3935be751374d7037117ffe37cbc24",
-    "Section 4": "498a33ae92608a855314db5ee5d3561c5d7d8c08e0c6bf01d13c491787012322",
+    "Section 4": "0515967094fdb02ef8d43aef56346e4416fb5a5ef26532ba5a9c3dd0e7ac1b4f",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
     "Section 3": "402838f80803169620e0fbbfce59f9e6446a0a0e0b28892f1de356607ba7ca3e",
-    "Section 4": "7a7b541ce46d792158795f0b4e817ba64dcef31fb4da8a7150458013572dec38",
+    "Section 4": "fcecd43de8e1825f514c31e5bc8b8994a55d5f8ef9e564ea42ef0f86e82389fb",
 }
 
 # Abstract v8.1 is frozen before Section 5 is authored.  Every other abstract
@@ -109,6 +109,9 @@ APPROVED_EXACT_POINTERS = frozenset(
         "/rq3/n",
         "/rq3/sup_battery/n/N",
         "/rq3/sup_battery/n/T",
+        "/rq3/sup_battery/cross_arm_paired_ci/T_minus_N/ES/0",
+        "/rq3/sup_battery/cross_arm_paired_ci/T_minus_N/ES/1/0",
+        "/rq3/sup_battery/cross_arm_paired_ci/T_minus_N/ES/1/1",
         "/rq3/sup_battery/marginal_B3/N/RRs",
         "/rq3/sup_battery/marginal_B3/N/RR",
         "/rq3/sup_battery/marginal_B3/T/RR",
@@ -136,31 +139,53 @@ APPROVED_EXACT_POINTERS = frozenset(
 # A few frozen result blocks predate the scalar-ledger schema.  Only the listed
 # numeric token positions from these exact strings are admissible.  This keeps
 # the exception auditable and prevents a generic string/note escape hatch.
+#
+# A bare position index is not a binding: rewording or reordering a frozen
+# record can leave position k occupied by a numerically identical but
+# semantically different quantity, which the display comparison cannot catch.
+# Each record is therefore pinned by the SHA256 of its exact UTF-8 bytes, so any
+# edit to the string retires its token approvals until they are re-reviewed.
 APPROVED_STRING_TOKEN_POINTERS = {
-    "/rq2_logitlens/_authoritative_record/edit_intact_at_cloze": frozenset({0, 1}),
-    "/rq2_taxonomy/p0_corrected_taxonomy/agreement/raw_pairwise_agreement": frozenset(
-        {0, 1}
-    ),
-    "/rq2_taxonomy/p0_downstream_crosswalk/historical_necessity_19": frozenset(
-        {5, 6}
-    ),
-    "/rq2_taxonomy/p0_downstream_crosswalk/all_a3_candidates_33": frozenset(
-        {5, 6}
-    ),
-    "/wb_representation_repair/confirm_arms/B1_S_minus_Pshuf/RR": frozenset(
-        {0, 1, 2}
-    ),
-    "/wb_representation_repair/confirm_arms/B1_S_minus_Pshuf/ES": frozenset(
-        {0, 1, 2}
-    ),
-    "/wb_representation_repair/confirm_arms/B1_S_minus_Pshuf/CLR": frozenset(
-        {0, 1, 2}
-    ),
-    "/wb_representation_repair/confirm_arms/S_minus_N/RR": frozenset({0, 1, 2}),
-    "/wb_representation_repair/confirm_arms/S_minus_N/ES": frozenset({0, 1, 2}),
-    "/wb_representation_repair/confirm_arms/B2_LocAcc/S_minus_Pshuf": frozenset(
-        {0, 1, 2}
-    ),
+    "/rq2_logitlens/_authoritative_record/edit_intact_at_cloze": {
+        "sha256": "f75857d4088da767b20c4c5d8709d73777783db84fa93435248c62f7d2ee21c7",
+        "tokens": frozenset({0, 1}),
+    },
+    "/rq2_taxonomy/p0_corrected_taxonomy/agreement/raw_pairwise_agreement": {
+        "sha256": "e160145137b6c31e2fed391b1deb204b0808fc99790dfdae357b488304969bba",
+        "tokens": frozenset({0, 1}),
+    },
+    "/rq2_taxonomy/p0_downstream_crosswalk/historical_necessity_19": {
+        "sha256": "6182ee93c608124d0e4bdc542adf4a490a88fabfaf55a74f5ee80733b05ec20c",
+        "tokens": frozenset({5, 6}),
+    },
+    "/rq2_taxonomy/p0_downstream_crosswalk/all_a3_candidates_33": {
+        "sha256": "d49c1109a97660e05e26862e525d0a653447b7dfcf2f7171fdef6899277af795",
+        "tokens": frozenset({5, 6}),
+    },
+    "/wb_representation_repair/confirm_arms/B1_S_minus_Pshuf/RR": {
+        "sha256": "eee259c1cf91ce13a0387e1e3ff0f0014799f6e2ce22a9d4420822cba977f909",
+        "tokens": frozenset({0, 1, 2}),
+    },
+    "/wb_representation_repair/confirm_arms/B1_S_minus_Pshuf/ES": {
+        "sha256": "ad9e7ad5ded2354bcec1d0a26081883b597805fdfec1d428137b944230938b1c",
+        "tokens": frozenset({0, 1, 2}),
+    },
+    "/wb_representation_repair/confirm_arms/B1_S_minus_Pshuf/CLR": {
+        "sha256": "cabd7ddc156c882ba84e255fb2e1829086110e93497437e330e4ef9c514f4ccc",
+        "tokens": frozenset({0, 1, 2}),
+    },
+    "/wb_representation_repair/confirm_arms/S_minus_N/RR": {
+        "sha256": "dd5b5beacbe8ca7e9fe455dbf25b56270cb174b5728505f3f50a66d8699ac042",
+        "tokens": frozenset({0, 1, 2}),
+    },
+    "/wb_representation_repair/confirm_arms/S_minus_N/ES": {
+        "sha256": "9cfacb9f2d9ae1738495fe6d97bafffc862f0bd0fadd1859d8fc7c7f7090fb95",
+        "tokens": frozenset({0, 1, 2}),
+    },
+    "/wb_representation_repair/confirm_arms/B2_LocAcc/S_minus_Pshuf": {
+        "sha256": "eab205e0feacbb6a6ba142ef2f507ba7f0c93693ada0ed4c58a3483fcb069211",
+        "tokens": frozenset({0, 1, 2}),
+    },
 }
 
 # Prefixes are intentionally narrower than top-level result blocks and always
@@ -274,6 +299,7 @@ ALLOWED_TEX_COMMANDS = frozenset(
         "textwidth",
         "title",
         "toprule",
+        "url",
         "urlstyle",
         "usepackage",
     }
@@ -313,6 +339,7 @@ BODY_ALLOWED_TEX_COMMANDS = frozenset(
         "textsc",
         "textwidth",
         "toprule",
+        "url",
     }
 )
 
@@ -353,6 +380,7 @@ BANNED_PATTERNS = {
     "ordered-trend overclaim": r"\bmonotonic\w*\b",
     "chain-localized variant": r"\bchain-localized\b",
     "chain-only variant": r"\bchain-only\b",
+    "chain-confined variant": r"\bchain-confined\b",
     "forbidden F1 pseudo-contrast": r"(?<!\d)\.214(?!\d)",
     "latent-rate bracket": r"\btrue reversion\b.{0,60}\bbetween\b",
 }
@@ -569,14 +597,21 @@ def format_result(value: Any, rule: str, pointer: str | None = None) -> str:
         if pointer is None:
             raise ValueError("token formatter requires its exact pointer")
         token_index = int(token_match.group(1))
-        allowed_indices = APPROVED_STRING_TOKEN_POINTERS.get(pointer)
-        if allowed_indices is None or token_index not in allowed_indices:
+        specification = APPROVED_STRING_TOKEN_POINTERS.get(pointer)
+        if specification is None or token_index not in specification["tokens"]:
             raise ValueError(
                 f"token position {token_index} is not approved for {pointer}"
             )
         if not isinstance(value, str):
             raise TypeError(
                 f"token formatter requires a frozen string, got {type(value).__name__}"
+            )
+        frozen_sha256 = sha256_bytes(value.encode("utf-8"))
+        if frozen_sha256 != specification["sha256"]:
+            raise ValueError(
+                f"frozen string at {pointer} differs from the reviewed record "
+                f"(actual SHA256 {frozen_sha256}); its token positions must be "
+                "re-reviewed before reuse"
             )
         tokens = [
             match.group(0).replace("\N{MINUS SIGN}", "-")
@@ -1129,7 +1164,9 @@ def check_section4_requirements(
         "conditional on the selected reversion sample",
         "cannot audit its overlap and membership composition",
         "reproduce the case-level tally",
-        "supplement records this missing expected artifact",
+        "supplement declares the missing expected artifact by name",
+        "results/probe/logitlens_cf200_ROME_B3.jsonl",
+        "place no quantitative weight on it downstream",
         "drawn from six checkpoints across both backbone lineages",
         "greedy, short-budget, and sampled generations represented",
         "lexical candidacy is not equivalent to OLD membership by judge majority",
@@ -1150,11 +1187,14 @@ def check_section4_requirements(
         "we infer neither saturation nor an ordered trend",
         "an equal-length content-free filler remains untested",
         "content-independent computational-buffer account",
+        "a within-case contrast between arms, not against",
+        "Realized chain lengths under suppression were not audited",
+        "constrains a length-only reading rather than eliminating it",
         "arm-paired stratum totals, not RR denominators",
         "without an interaction test",
-        "the prospectively specified primary RR contrast was compatible with zero",
+        "the pre-specified primary RR contrast was compatible with zero",
         "ES remained null-compatible",
-        "a secondary concept-versus-shuffle contrast on the prespecified LocAcc harm metric",
+        "a secondary concept-versus-shuffle contrast on the pre-specified LocAcc harm metric",
         "did not yield detectable confirmatory RR repair",
         "Neither observation identifies natural-chain mediation",
         "the test behind our chain-local causal control point",
@@ -1162,6 +1202,16 @@ def check_section4_requirements(
     for target in required_strings:
         if target not in visible:
             errors.append(f"Section 4 required target string missing: {target!r}")
+
+    # "Prospectively specified" is reserved for protocols frozen in a dated
+    # artifact before results existed; everything recorded afterwards is
+    # "pre-specified".  Section 4 grants the stronger label exactly once, at the
+    # X1 replay attempt, whose manifest carries a result-preceding SHA.
+    if visible.count("prospectively specified") != 1:
+        errors.append(
+            "Section 4 must grant 'prospectively specified' exactly once, to the "
+            f"X1 replay attempt (found {visible.count('prospectively specified')})"
+        )
 
     # The two nonnumeric states are tied directly to results.json rather than
     # weakening the numeric RJ schema.
@@ -1293,6 +1343,69 @@ def check_authoritative_cloze_ratio(
             )
     except (InvalidOperation, KeyError, IndexError, TypeError, ValueError) as exc:
         errors.append(f"Section 4 authoritative cloze ratio cannot be checked: {exc}")
+
+
+def check_marginal_denominator_identities(
+    results: Any,
+    errors: list[str],
+) -> None:
+    """Verify the Qwen-32B denominators that Sections 3 and 4 state in prose.
+
+    The Table 1 caption and the Section 4.4 footnote both report the Qwen-32B
+    \\(B_0\\) marginal level over 200 attempted rows while paired and treated
+    levels use smaller effective arm counts.  ``/rq3/n`` supplies that 200, so
+    two facts must hold for the prose to stay true.  First, the capability cell
+    and the battery's no-suppression arm have to be the same run: they are
+    separate result blocks, and only their agreement licenses reading a battery
+    count as the capability cell's denominator.  Second, the attempted count
+    must dominate every effective arm count and must divide the reported
+    \\(B_0\\) level into a whole number of successes.
+    """
+
+    try:
+        nominal = decimal_value(resolve_pointer(results, "/rq3/n"))
+        arm_counts = resolve_pointer(results, "/rq3/sup_battery/n")
+        es_b0 = decimal_value(
+            resolve_pointer(
+                results, "/capability/families/R1-Distill-Qwen/es_b0/3"
+            )
+        )
+        shared_endpoints = {
+            "ES_B3": "/capability/families/R1-Distill-Qwen/es_b3/3",
+            "ES_drop": "/capability/families/R1-Distill-Qwen/es_drop/3",
+            "RR": "/capability/families/R1-Distill-Qwen/rr/3",
+            "CLR": "/capability/families/R1-Distill-Qwen/clr/3",
+        }
+        for endpoint, capability_pointer in shared_endpoints.items():
+            battery_value = decimal_value(
+                resolve_pointer(results, f"/rq3/baseline/{endpoint}")
+            )
+            capability_value = decimal_value(
+                resolve_pointer(results, capability_pointer)
+            )
+            if battery_value != capability_value:
+                errors.append(
+                    "Qwen-32B capability cell and battery no-suppression arm "
+                    f"disagree on {endpoint} ({capability_value} vs "
+                    f"{battery_value}); the shared-denominator prose in "
+                    "Sections 3 and 4 no longer holds"
+                )
+        if not isinstance(arm_counts, dict) or not arm_counts:
+            raise TypeError("battery arm counts must be a non-empty object")
+        largest_effective = max(decimal_value(count) for count in arm_counts.values())
+        if nominal < largest_effective:
+            errors.append(
+                f"attempted row count {nominal} is below the largest effective "
+                f"arm count {largest_effective}"
+            )
+        successes = es_b0 * nominal
+        if successes != successes.to_integral_value():
+            errors.append(
+                f"Qwen-32B B_0 marginal level {es_b0} is not a whole count over "
+                f"{nominal} attempted rows (implies {successes} successes)"
+            )
+    except (InvalidOperation, KeyError, IndexError, TypeError, ValueError) as exc:
+        errors.append(f"Qwen-32B marginal denominators cannot be checked: {exc}")
 
 
 def check_unaudited_section_numbers(main_text: str, errors: list[str]) -> None:
@@ -1482,6 +1595,7 @@ def main() -> int:
 
     check_template_and_frozen_surfaces(main_text, args.main, errors)
     check_global_claim_language(main_text, errors)
+    check_marginal_denominator_identities(results, errors)
     check_unaudited_section_numbers(main_text, errors)
     check_unsectioned_body_numbers(main_text, errors)
     combined_ledger: list[dict[str, Any]] = []

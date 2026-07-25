@@ -179,5 +179,21 @@ GPT-2-XL 冒烟 `src/smoke_rome_gpt2.py`（之前被杀）降为可选：`cd sou
 - 打分结果 + go/no-go 结论写进 `analysis/`（新建 pilot 结果笔记）+ 更新 `plan.md`（版本 +0.1、写变更）。
 - `data/counterfact.prefiltered.jsonl`（pilot 实际用的 case 集）建议 commit，**钉死 pilot 集**便于复现。
 
+## 11. 正文审计门（W2 起；纯 CPU，无 GPU）
+
+每次改 `paperwriting/manuscript/main.tex` 或 `src/check_manuscript.py` 后**两条一起跑**（fail-closed）：
+
+```bash
+python3 src/check_manuscript.py
+```
+
+```bash
+uv run --no-project --with pytest pytest -q src/test_check_manuscript.py
+```
+
+- 本机无全局 pytest，故用 `uv run --no-project --with pytest` 起临时环境（不污染 editrev，也不写 requirements）。
+- §3/§4 有节级 ledger/visible/source 三重 SHA 快照：**改这两节任何字符都必须同步 `src/check_manuscript.py` 里的哈希常量**，这是设计不是坑（重算方式见 `check_manuscript.py` 的 `section_visible_sha256`/`section_source_sha256`/`ledger_bindings_sha256`）。
+- 编译门（收货线=4 页、无 Type 3 字体、无 overfull）需要 TeX：`pdflatex → bibtex → pdflatex → pdflatex`，在 `paperwriting/manuscript/` 下跑。**开发用的 Mac 上没有装任何 TeX 发行版**（`pdflatex`/`latexmk`/`tectonic` 均不存在），这一门只能在有 TeX 的机器上补跑。
+
 ---
 *手册随 harness 变化更新；与 plan 冲突时以 plan.md 为准（唯一权威计划）。*

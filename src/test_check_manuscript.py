@@ -51,7 +51,7 @@ def test_canonical_manuscript_passes(candidate_main: Path) -> None:
     completed = run_checker(candidate_main)
     assert completed.returncode == 0, completed.stdout + completed.stderr
     assert "Section 3 RJ ledger (127 occurrences)" in completed.stdout
-    assert "Section 4 RJ ledger (72 occurrences)" in completed.stdout
+    assert "Section 4 RJ ledger (75 occurrences)" in completed.stdout
 
 
 def test_frozen_abstract_mutation_is_rejected(candidate_main: Path) -> None:
@@ -511,8 +511,8 @@ def test_reviewed_forward_reference_cannot_be_redirected(
 ) -> None:
     mutate(
         candidate_main,
-        r"Section~\ref{sec:control} tests whether chain-confined",
-        r"Section~\ref{sec:gap} tests whether chain-confined",
+        r"Section~\ref{sec:control} tests whether think-span-confined",
+        r"Section~\ref{sec:gap} tests whether think-span-confined",
     )
     assert_rejected(
         candidate_main,
@@ -852,6 +852,153 @@ def test_authoritative_cloze_ratio_requires_n_over_n_at_100_percent(
     errors: list[str] = []
     namespace["check_authoritative_cloze_ratio"](results, errors)
     assert errors == ["Section 4 authoritative cloze ratio must equal n/n=100%"]
+
+
+def test_think_span_anchor_variant_is_rejected(candidate_main: Path) -> None:
+    mutate(
+        candidate_main,
+        "think-span-confined old-answer first-token suppression",
+        "chain-confined old-answer first-token suppression",
+    )
+    assert_rejected(candidate_main, "banned language (chain-confined variant)")
+
+
+def test_blocked_cloze_artifact_must_be_named(candidate_main: Path) -> None:
+    mutate(
+        candidate_main,
+        r"\url{results/probe/logitlens_cf200_ROME_B3.jsonl}",
+        "the expected raw file",
+    )
+    assert_rejected(
+        candidate_main,
+        "Section 4 required target string missing: "
+        "'results/probe/logitlens_cf200_ROME_B3.jsonl'",
+    )
+
+
+def test_cloze_downweighting_cannot_be_dropped(candidate_main: Path) -> None:
+    mutate(
+        candidate_main,
+        "  We therefore treat this observation as a sanity check and place no "
+        "quantitative weight on it downstream.",
+        "",
+    )
+    assert_rejected(
+        candidate_main,
+        "Section 4 required target string missing: "
+        "'place no quantitative weight on it downstream'",
+    )
+
+
+def test_forward_reference_effect_size_must_match_ledger(
+    candidate_main: Path,
+) -> None:
+    mutate(
+        candidate_main,
+        r"a paired \(+.138\,[.082,.194]\)",
+        r"a paired \(+.148\,[.082,.194]\)",
+    )
+    assert_rejected(
+        candidate_main,
+        "numeric occurrences ['+.148'",
+        "RJ occurrences ['+.138'",
+    )
+
+
+def test_forward_reference_baseline_disclaimer_is_required(
+    candidate_main: Path,
+) -> None:
+    mutate(
+        candidate_main,
+        "---a within-case contrast between arms, not against \\(B_0\\)",
+        "",
+    )
+    assert_rejected(
+        candidate_main,
+        "Section 4 required target string missing: "
+        "'a within-case contrast between arms, not against'",
+    )
+
+
+def test_prospective_label_cannot_be_granted_twice(candidate_main: Path) -> None:
+    mutate(
+        candidate_main,
+        "the pre-specified primary RR contrast",
+        "the prospectively specified primary RR contrast",
+    )
+    assert_rejected(
+        candidate_main,
+        "Section 4 must grant 'prospectively specified' exactly once",
+    )
+
+
+def test_frozen_string_token_binding_is_pinned_by_sha256() -> None:
+    namespace = runpy.run_path(str(CHECKER))
+    pointer = "/rq2_taxonomy/p0_downstream_crosswalk/historical_necessity_19"
+    results = json.loads(
+        (REPO_ROOT / "paperwriting" / "results.json").read_text(encoding="utf-8")
+    )
+    frozen = results["rq2_taxonomy"]["p0_downstream_crosswalk"][
+        "historical_necessity_19"
+    ]
+    assert namespace["format_result"](frozen, "token:5", pointer) == "13"
+
+    # A reworded record can leave every numeric token in place, so the display
+    # comparison alone cannot detect that position 5 now means something else.
+    reworded = frozen.replace(
+        "corrected OLD subset", "corrected OLD subset (recount pending)"
+    )
+    assert reworded != frozen
+    with pytest.raises(ValueError, match="differs from the reviewed record"):
+        namespace["format_result"](reworded, "token:5", pointer)
+
+
+def test_marginal_denominator_identities_pass_on_current_results() -> None:
+    namespace = runpy.run_path(str(CHECKER))
+    results = json.loads(
+        (REPO_ROOT / "paperwriting" / "results.json").read_text(encoding="utf-8")
+    )
+    errors: list[str] = []
+    namespace["check_marginal_denominator_identities"](results, errors)
+    assert errors == []
+
+
+@pytest.mark.parametrize(
+    ("path", "value", "diagnostic"),
+    [
+        (
+            ("rq3", "baseline", "RR"),
+            0.2,
+            "disagree on RR",
+        ),
+        (
+            ("rq3", "n"),
+            190,
+            "is below the largest effective arm count",
+        ),
+        (
+            ("capability", "families", "R1-Distill-Qwen", "es_b0", 3),
+            0.5951,
+            "is not a whole count over",
+        ),
+    ],
+)
+def test_marginal_denominator_identities_reject_drift(
+    path: tuple[object, ...],
+    value: object,
+    diagnostic: str,
+) -> None:
+    namespace = runpy.run_path(str(CHECKER))
+    results = json.loads(
+        (REPO_ROOT / "paperwriting" / "results.json").read_text(encoding="utf-8")
+    )
+    target = results
+    for key in path[:-1]:
+        target = target[key]
+    target[path[-1]] = value
+    errors: list[str] = []
+    namespace["check_marginal_denominator_identities"](results, errors)
+    assert any(diagnostic in error for error in errors), errors
 
 
 def test_noncanonical_results_path_is_rejected(
