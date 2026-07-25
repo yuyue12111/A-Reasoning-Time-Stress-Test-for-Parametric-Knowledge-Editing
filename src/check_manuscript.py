@@ -42,22 +42,37 @@ APPROVED_PREAMBLE_SHA256 = (
     "6d9e90c1d65f8dc77a054e9c01aa69bf42c6663cb535e8a1a31830bdcd041c88"
 )
 APPROVED_REFS_SHA256 = (
-    "f9543d25ecd407f6d5526f4b4e3be54a987a46a6f76342b1ee2403f33f0d1ee4"
+    "0303e2bb8c935d447bdd06b3909a51ced4631c1db46bbda34fa4d7eead0a36b6"
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
-    "Section 3": "750ed864a221ab24cc1a4ebfa63ef9ff24fe3fe0a3c065a48a774d3682f219c1",
-    "Section 4": "062eecf6cb5848f9d07a607775e155a46399548b75e880ad429eeea8139bfc6d",
-    "Section 5": "4e0871519fd282d5086f48c34eee9e00e39a5ac93ac00435d71ee77b02c41df7",
+    "Section 3": "2adc008c9ae9b9c3cda14478263ebeb09fe8c03c50ba6c0ae770cc6e3bef91ea",
+    "Section 4": "f3d506390a015c24e665adc11913abca49aa511f0e6d19ca696b1b9f8d1d58ae",
+    "Section 5": "4fbcc33acf773a80eb85da699cc1a137bd663199074c7b15b6c31dd9d13f1311",
+    "Section 1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "Section 6": "6a095d386ace80e2f1df65dbd552c206236079cc29c7290acc89f7535237af69",
+    "Section 7": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "Ethical Statement": "66582027431fb351d6b88922f6ee2ede96252981f015bbd4a319e721262e5104",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
-    "Section 3": "0e3dfac2d95d0624adcd1887bff393c6dd3935be751374d7037117ffe37cbc24",
-    "Section 4": "bce2a953e7511500696cddce745a0885c81ffbd11fa102b1d6502bf734a6600d",
-    "Section 5": "7f55bcedcb709f580044923f6b9a7f94685801e7bb3313f632d364bf6247167c",
+    "Section 3": "ba92878db22a9748be9f1aca345e3e053b28ffa8beb27b9e20a67a48b71f8bed",
+    "Section 4": "03db26fc2c961d1b6e4f97e86ab8104376a6ab127aef7020a6c0c82bd2f98c4f",
+    "Section 5": "8daad8f2badd4e0a62e6c91b6e1df5ffd480b116636088c200a507901f0ae623",
+    "Section 1": "e32c796afdb6fa66fb654629f0c4878d0aec17ef82c482e9765e5d31f7752222",
+    "Section 2": "292ba689d081074876b825ea00d5bb2199733ed2d86f7f66ab224e7979f49424",
+    "Section 6": "3363dfe896d5e4c246f9f142ece6949900b7501608b1b48e40446dd0b6848294",
+    "Section 7": "ff9e84c98835d3c0027129541fe0f2b28ba8238c7c1dfba089c58353c89a7944",
+    "Ethical Statement": "3e7a5adb3614b789ac6c993f174086d8953c144b58b5af3bfaa56283b22c744d",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
-    "Section 3": "402838f80803169620e0fbbfce59f9e6446a0a0e0b28892f1de356607ba7ca3e",
-    "Section 4": "d29230d7358cf39bd0d00afa61c9df247f1b645a45b6550ca03bca123dfd2b02",
-    "Section 5": "f0a9a298181a2e73de2343db260a09ec54ee0657baff842aa38978c3fdb57a71",
+    "Section 3": "a734d33684fa95d497d95562a7eac3a7d6e6d50f738050dcf37d8325769513cf",
+    "Section 4": "79ceab0d3fd96b2b4e9c4e4b78646fff929f50719b55b4928919084d4e049914",
+    "Section 5": "b5538826c4352a4f1433c5c0f14cc5197e9b46a0b6ce11c8e72c71595678d34e",
+    "Section 1": "39b527c367c15715becb12a1f346f460158e7cb1218022c24399bb114a9b8b3e",
+    "Section 2": "e34cb83df7c519fb190a2a7aa16511a6266e2f09d532111167ec535db7494ea6",
+    "Section 6": "3dee0899e4cff57c1fdcd704dc8bb759aa8dccfbe6322c0653c2e0bc9fdb983e",
+    "Section 7": "8088ceb48373f298c6b47fac9750f4f54e3327f715c655062a9bcab498e5b6d5",
+    "Ethical Statement": "0b7eeb13a12561028ee9f7c3b85f4d0ec2fb08376af7a0fb3127f1ae90f2f27d",
 }
 
 # Every frozen-abstract number now has a same-display body RJ binding: the
@@ -105,6 +120,7 @@ APPROVED_EXACT_POINTERS = frozenset(
         "/rq3/n",
         "/rq3/penalty",
         "/rq3/clr_split_M1/mediation_2x2/n_b0ok",
+        "/rq3/genbench/gate",
         "/rq3/sup_battery/marginal_B3/N/RRs",
         "/rq3/sup_battery/marginal_B3/N/RR",
         "/rq3/sup_battery/marginal_B3/T/RR",
@@ -184,6 +200,10 @@ APPROVED_STRING_TOKEN_POINTERS = {
         "sha256": "99454f96254a1e9c3bf0384cb913c20dd3bd3bbb9c698885319faaf8f144c2bf",
         "tokens": frozenset({0, 1}),
     },
+    "/rq3/genbench/gate": {
+        "sha256": "44ef820d96c32569572b6dfec04f66e9835ef57218294b27999ec625b943c81d",
+        "tokens": frozenset({0}),
+    },
     "/rq3/x3_rome32b_active_paraphrase/paraphrase_content_audit20"
     "/majority_counts/cases_with_both_paraphrases_audit_valid": {
         "sha256": "2d43821423611d1f85249174da18921f40d57ac4d9544cae192191a75925bcba",
@@ -229,6 +249,8 @@ APPROVED_POINTER_PREFIXES = (
     "/rq3/sup_battery/cross_arm_paired_ci/",
     "/rq3/sup_battery/contrasts_B3_mean_ci_p/",
     "/rq3/alpha_sweep/",
+    "/rq3/genbench_b26_tost/gsm8k/",
+    "/rq3/genbench_b26_tost/math500/",
     # Section 5 transfer slots.
     "/rq3/s10_14b_fix_replication/TminusN_paired_ci/",
     "/rq3/x2_memit14b_repair_replication/contrasts_B3/",
@@ -269,6 +291,21 @@ REQUIRED_SECTION_ORDER = (
 )
 
 AUDITED_SECTION_SPECS = (
+    # ``requires_ledger`` marks sections that must carry numeric claims.  The
+    # others are snapshotted too: with an empty ledger, any numeric token in
+    # them fails the per-line occurrence check, which is the zero-number rule.
+    {
+        "label": "Section 1",
+        "title": "Introduction",
+        "end_title": "Related Work",
+        "requires_ledger": False,
+    },
+    {
+        "label": "Section 2",
+        "title": "Related Work",
+        "end_title": "The Reasoning-Time Evaluation Gap",
+        "requires_ledger": False,
+    },
     {
         "label": "Section 3",
         "title": "The Reasoning-Time Evaluation Gap",
@@ -284,10 +321,40 @@ AUDITED_SECTION_SPECS = (
         "title": "A Chain-Local Causal Control Point",
         "end_title": r"Discussion \& Limitations",
     },
+    {
+        "label": "Section 6",
+        "title": r"Discussion \& Limitations",
+        "end_title": "Conclusion",
+    },
+    {
+        "label": "Section 7",
+        "title": "Conclusion",
+        "start_marker": r"\section{Conclusion}",
+        "end_marker": r"\section*{Ethical Statement}",
+        "requires_ledger": False,
+    },
+    {
+        "label": "Ethical Statement",
+        "title": "Ethical Statement",
+        "start_marker": r"\section*{Ethical Statement}",
+        "end_marker": r"\bibliography{refs}",
+    },
 )
 AUDITED_SECTION_TITLES = frozenset(
     specification["title"] for specification in AUDITED_SECTION_SPECS
 )
+
+
+def section_markers(specification: dict[str, Any]) -> tuple[str, str]:
+    if "start_marker" in specification:
+        start = specification["start_marker"]
+    else:
+        start = rf"\section{{{specification['title']}}}"
+    if "end_marker" in specification:
+        end = specification["end_marker"]
+    else:
+        end = rf"\section{{{specification['end_title']}}}"
+    return start, end
 
 # The checker does not attempt to interpret arbitrary TeX.  This allowlist is
 # the reviewed command surface of the single-source manuscript; adding a new
@@ -321,6 +388,7 @@ ALLOWED_TEX_COMMANDS = frozenset(
         "mathrm",
         "midrule",
         "neg",
+        "paragraph",
         "parbox",
         "pdfinfo",
         "ref",
@@ -365,6 +433,7 @@ BODY_ALLOWED_TEX_COMMANDS = frozenset(
         "mathrm",
         "midrule",
         "neg",
+        "paragraph",
         "parbox",
         "ref",
         "section",
@@ -427,6 +496,7 @@ BANNED_PATTERNS = {
 
 STALE_CONTEXT_PATTERNS = {
     "superseded route pool": r"\b(?:n\s*=\s*50|50 committed reversions)\b",
+    "superseded associative ratio": r"\b1\s*/\s*50\b",
     "superseded route pool words": r"\bfifty committed reversions\b",
     "superseded fifty count": r"\bfifty\b",
     "superseded route distribution": r"\b68\s*%",
@@ -956,6 +1026,7 @@ def check_rj_ledger(
     errors: list[str],
     section_label: str,
     global_claim_ids: set[str],
+    require_entries: bool = True,
 ) -> list[dict[str, Any]]:
     ledger: list[dict[str, Any]] = []
 
@@ -1036,7 +1107,7 @@ def check_rj_ledger(
                 f"do not match RJ occurrences {ledger_numbers!r}"
             )
 
-    if not ledger:
+    if require_entries and not ledger:
         errors.append(f"{section_label} contains no RJ ledger entries")
     return ledger
 
@@ -1201,14 +1272,14 @@ def check_section4_requirements(
     required_strings = (
         "This section assembles the diagnosis that motivates the primary intervention",
         "This is only an installation sanity check",
-        "no control or confidence interval",
+        "no control, no interval",
         "close to tautological",
         "conditional on the selected reversion sample",
-        "cannot audit its overlap and membership composition",
+        "audit sample overlap and membership composition",
         "reproduce the case-level tally",
-        "supplement declares the missing expected artifact by name",
+        "supplement names the missing per-item artifact",
         "results/probe/logitlens_cf200_ROME_B3.jsonl",
-        "place no quantitative weight on it downstream",
+        "we place no quantitative weight on this observation downstream",
         "drawn from six checkpoints across both backbone lineages",
         "greedy, short-budget, and sampled generations represented",
         "lexical candidacy is not equivalent to OLD membership by judge majority",
@@ -1361,6 +1432,61 @@ def check_section4_requirements(
         )
 
 
+def check_narrative_section_requirements(
+    section_label: str,
+    section_text: str,
+    errors: list[str],
+) -> None:
+    """Memory anchors and framing rules for the non-numeric sections."""
+
+    visible_source = strip_tex_comments(section_text)
+    visible = normalize_visible(section_text)
+
+    if section_label == "Section 1":
+        # The bolded contribution head is what reviewers copy into summaries.
+        if r"\textbf{A chain-local causal control point.}" not in visible_source:
+            errors.append(
+                "Section 1 must open contribution two with the bolded verbatim "
+                "head 'A chain-local causal control point.'"
+            )
+        if "Does thinking undo editing?" not in visible:
+            errors.append("Section 1 must keep the approved hook question")
+        if "chain-local causal control point" not in visible.split(". ")[-1]:
+            errors.append(
+                "Section 1 must close on the chain-local causal control point"
+            )
+    elif section_label == "Section 2":
+        if "Four properties are not addressed jointly" not in visible:
+            errors.append(
+                "Section 2 must state the four-property boundary, not a priority claim"
+            )
+        for citation, role in (
+            ("he2025scr", "SCR method paper"),
+            ("he2025benchmarking", "realistic-autoregressive benchmark"),
+            ("hua2024recoe", "ReCoE propagation"),
+        ):
+            if citation not in visible_source:
+                errors.append(f"Section 2 is missing the {role} citation")
+    elif section_label == "Section 7":
+        sentences = [s for s in re.split(r"(?<=[.!?])\s+", visible) if s.strip()]
+        if not sentences or "chain-local causal control point" not in sentences[-1]:
+            errors.append(
+                "the paper's final sentence must contain the verbatim anchor phrase"
+            )
+    elif section_label == "Ethical Statement":
+        required = (
+            "edited-query gated",
+            "updating no weights and applying no optimization toward concealment",
+            "\\(0\\) of \\(41\\)".replace("\\(", "").replace("\\)", ""),
+            "we do not claim that the absence of such a trace could serve as a monitor",
+        )
+        for target in required:
+            if target not in visible:
+                errors.append(
+                    f"Ethical Statement required target string missing: {target!r}"
+                )
+
+
 def check_section5_requirements(
     section_text: str,
     ledger: list[dict[str, Any]],
@@ -1419,7 +1545,7 @@ def check_section5_requirements(
         "every arm here is an intervened condition",
         "required in ordinary, uninterrupted generation",
         # R1 transfer ceilings.
-        "does not test a second editor",
+        "not a second editor",
         "transfers the intervention and not the gap",
         "not portability to unguarded queries",
         "a floor rather than an equivalence result",
@@ -1760,11 +1886,10 @@ def main() -> int:
     global_claim_ids: set[str] = set()
     for specification in AUDITED_SECTION_SPECS:
         section_label = specification["label"]
+        start_marker, end_marker = section_markers(specification)
         try:
-            section_text = extract_section(
-                main_text,
-                specification["title"],
-                specification["end_title"],
+            section_text = extract_between_markers(
+                main_text, start_marker, end_marker, section_label
             )
         except ValueError as exc:
             errors.append(str(exc))
@@ -1776,6 +1901,7 @@ def main() -> int:
             errors,
             section_label,
             global_claim_ids,
+            specification.get("requires_ledger", True),
         )
         if section_label == "Section 3":
             check_section3_requirements(section_text, errors)
@@ -1785,6 +1911,10 @@ def main() -> int:
             )
         elif section_label == "Section 5":
             check_section5_requirements(section_text, section_ledger, errors)
+        else:
+            check_narrative_section_requirements(
+                section_label, section_text, errors
+            )
 
         bindings_sha256 = ledger_bindings_sha256(section_ledger)
         expected_sha256 = APPROVED_SECTION_LEDGER_BINDINGS_SHA256[section_label]

@@ -4,7 +4,7 @@
 
 AAAI-27 投稿项目，代号「越想越退」(Thinking Undoes Editing)：量化参数知识编辑（ROME/MEMIT/AlphaEdit）在 R1 式推理模型上随思考预算增加而被推翻的现象 + 机理 + training-free 修补。
 
-**读单（按序）：`plan.md` 头部 v1.x 变更日志（当前 **v1.94**，本项目唯一权威计划）→ `paperwriting/WRITING_PLAN.md`（唯一有效写作计划）→ `paperwriting/results.json`（数字真源）→ `analysis/11–16_*.md` 与对应 prereg（X/P0/CPU closeout 最新证据）→ `RUNBOOK.md`（仅在确有 GPU 任务时）。** `sumandplan1.md` §5/§6 与 `phase-1.md` 是 6 月历史快照，不得覆盖 plan 头部或复活已停止队列。与 plan 冲突的一切行为都需要先升 plan 版本并写变更记录，再执行。
+**读单（按序）：`plan.md` 头部 v1.x 变更日志（当前 **v1.95**，本项目唯一权威计划）→ `paperwriting/WRITING_PLAN.md`（唯一有效写作计划）→ `paperwriting/results.json`（数字真源）→ `analysis/11–16_*.md` 与对应 prereg（X/P0/CPU closeout 最新证据）→ `RUNBOOK.md`（仅在确有 GPU 任务时）。** `sumandplan1.md` §5/§6 与 `phase-1.md` 是 6 月历史快照，不得覆盖 plan 头部或复活已停止队列。与 plan 冲突的一切行为都需要先升 plan 版本并写变更记录，再执行。
 
 ## 硬约束（不可违反）
 
@@ -35,11 +35,11 @@ data/     清洗数据(大文件 gitignore,     results/ 实验 jsonl（gitignor
 - [x] 最终科学 review + 三方仲裁 + GPT-5.6 复核完成（v1.89 落库）。
 - [ ] **唯一当前任务 = 写作冲刺**，按 `paperwriting/WRITING_PLAN.md` 执行。
 
-## 立即任务队列 —— **以 `plan.md v1.94` + `paperwriting/WRITING_PLAN.md` 为准**
+## 立即任务队列 —— **以 `plan.md v1.95` + `paperwriting/WRITING_PLAN.md` 为准**
 
 1. **投稿前科学队列=零**（不跑 B15 interaction、不烧 X-A 池、不加任何新数字）。
 2. **摘要锁已关闭（v1.90③）**：v8.1=内部终版（SHA 见 v1.90①），OpenReview 暂留 v5；**正文完成前不再动摘要**；D1–D8/R1 债务在 §3–§5 成文冻结后才一次性替换表单。Title/TL;DR 永久冻结。
-3. **当前唯一任务 = W2 正文**（协作环：Fable 计划 → Codex 第一性审计划并执行 → Fable 复审 → Codex 终裁修订）：LaTeX 主文件（AuthorKit27 模板）→ §3 evaluation gap → §4 causal diagnosis（含 X1 紧邻披露 + cloze sanity 全 caveat）→ §5 bounded guard → §2/§6/§7（**§3/§4/§5 已成文，余 §1/§2/§6/§7/Ethics**）；**债务台账 `paperwriting/delivery/abstract_v8_substance_ledger.json`（D1–D8/R1）+ 19 项 MAJOR（`delivery/fable_review_19majors_for_w2.md`）= 各节强制预置回答清单**；M16 checker 于 W2 期间建成。
+3. **当前唯一任务 = W2 正文**（协作环：Fable 计划 → Codex 第一性审计划并执行 → Fable 复审 → Codex 终裁修订）：LaTeX 主文件（AuthorKit27 模板）→ §3 evaluation gap → §4 causal diagnosis（含 X1 紧邻披露 + cloze sanity 全 caveat）→ §5 bounded guard → §2/§6/§7（**全七节 + Ethics 已成文；正文实测 7 页**）；**债务台账 `paperwriting/delivery/abstract_v8_substance_ledger.json`（D1–D8/R1）+ 19 项 MAJOR（`delivery/fable_review_19majors_for_w2.md`）= 各节强制预置回答清单**；M16 checker 于 W2 期间建成。
 4. 旧 `paperwriting/draft.md` 是**违规数字的历史底稿**（≥15 处与真源不一致，X1 零披露）：只作素材参考，一切数字从 `paperwriting/results.json` 正向取。
 
 ## 防雷清单（前人血泪，违反必翻车）

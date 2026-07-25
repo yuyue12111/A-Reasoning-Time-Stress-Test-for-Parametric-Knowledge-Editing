@@ -50,8 +50,8 @@ def assert_rejected(main_path: Path, *diagnostics: str) -> str:
 def test_canonical_manuscript_passes(candidate_main: Path) -> None:
     completed = run_checker(candidate_main)
     assert completed.returncode == 0, completed.stdout + completed.stderr
-    assert "Section 3 RJ ledger (127 occurrences)" in completed.stdout
-    assert "Section 4 RJ ledger (72 occurrences)" in completed.stdout
+    assert "Section 3 RJ ledger (110 occurrences)" in completed.stdout
+    assert "Section 4 RJ ledger (49 occurrences)" in completed.stdout
     assert "Section 5 RJ ledger (185 occurrences)" in completed.stdout
 
 
@@ -224,12 +224,15 @@ def test_full_manuscript_banned_language_gate(candidate_main: Path) -> None:
         r"\section*{Ethical Statement}",
     ],
 )
-def test_unaudited_sections_reject_numeric_tokens(
+def test_narrative_sections_reject_numeric_tokens(
     candidate_main: Path,
     marker: str,
 ) -> None:
     mutate(candidate_main, marker, marker + "\nThe unsupported value is .546.")
-    assert_rejected(candidate_main, "unaudited section", "numeric tokens ['.546']")
+    assert_rejected(
+        candidate_main,
+        "numeric occurrences ['.546'] do not match RJ occurrences []",
+    )
 
 
 @pytest.mark.parametrize(
@@ -488,13 +491,10 @@ def test_rendered_citation_notes_are_audited(
     assert_rejected(candidate_main, "numeric occurrences ['.546']")
 
 
-def test_citation_key_year_is_not_an_authored_number(
-    candidate_main: Path,
-) -> None:
-    marker = r"\section{Introduction}"
-    mutate(candidate_main, marker, marker + "\n\\citep{meng2022rome}")
-    completed = run_checker(candidate_main)
-    assert completed.returncode == 0, completed.stdout + completed.stderr
+def test_citation_key_year_is_not_an_authored_number() -> None:
+    namespace = runpy.run_path(str(CHECKER))
+    assert namespace["numeric_occurrences"](r"\citep{meng2022rome}") == []
+    assert namespace["numeric_occurrences"](r"\citep[p.~7]{meng2022rome}") == ["7"]
 
 
 def test_reviewed_citation_identity_cannot_be_swapped(
@@ -530,8 +530,8 @@ def test_reviewed_paragraph_boundary_cannot_change(
 ) -> None:
     mutate(
         candidate_main,
-        "selected reversion sample.  Without the raw per-item JSONL",
-        "selected reversion sample.\n\nWithout the raw per-item JSONL",
+        "conditional on the selected reversion sample.  The supplement names",
+        "conditional on the selected reversion sample.\n\nThe supplement names",
     )
     assert_rejected(
         candidate_main,
@@ -608,8 +608,7 @@ def test_grouped_prose_dimension_is_still_audited(
     )
     assert_rejected(
         candidate_main,
-        "unaudited section",
-        "numeric tokens ['.546']",
+        "numeric occurrences ['.546'] do not match RJ occurrences []",
     )
 
 
@@ -658,12 +657,6 @@ def test_reviewed_table_environment_shape_is_frozen(
         (
             "T (old-answer first-token suppression) versus N (no suppression)",
             "T (no suppression) versus N (old-answer first-token suppression)",
-        ),
-        (
-            "RR was \\(-.024\\,[-.098,+.049]\\), "
-            "CLR was \\(-.078\\,[-.148,-.008]\\)",
-            "CLR was \\(-.024\\,[-.098,+.049]\\), "
-            "RR was \\(-.078\\,[-.148,-.008]\\)",
         ),
         (
             "fresh-\\(B_0\\) strict direct-answer success held in \\(14/18\\) "
@@ -884,14 +877,13 @@ def test_blocked_cloze_artifact_must_be_named(candidate_main: Path) -> None:
 def test_cloze_downweighting_cannot_be_dropped(candidate_main: Path) -> None:
     mutate(
         candidate_main,
-        "  We therefore treat this observation as a sanity check and place no "
-        "quantitative weight on it downstream.",
+        "; absent it, we place no quantitative weight on this observation downstream",
         "",
     )
     assert_rejected(
         candidate_main,
         "Section 4 required target string missing: "
-        "'place no quantitative weight on it downstream'",
+        "'we place no quantitative weight on this observation downstream'",
     )
 
 

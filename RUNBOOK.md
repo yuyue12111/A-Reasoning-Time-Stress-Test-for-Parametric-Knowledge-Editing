@@ -193,7 +193,13 @@ uv run --no-project --with pytest pytest -q src/test_check_manuscript.py
 
 - 本机无全局 pytest，故用 `uv run --no-project --with pytest` 起临时环境（不污染 editrev，也不写 requirements）。
 - §3/§4 有节级 ledger/visible/source 三重 SHA 快照：**改这两节任何字符都必须同步 `src/check_manuscript.py` 里的哈希常量**，这是设计不是坑（重算方式见 `check_manuscript.py` 的 `section_visible_sha256`/`section_source_sha256`/`ledger_bindings_sha256`）。
-- 编译门（收货线=4 页、无 Type 3 字体、无 overfull）需要 TeX：`pdflatex → bibtex → pdflatex → pdflatex`，在 `paperwriting/manuscript/` 下跑。**开发用的 Mac 上没有装任何 TeX 发行版**（`pdflatex`/`latexmk`/`tectonic` 均不存在），这一门只能在有 TeX 的机器上补跑。
+- **编译门（收货线=正文 ≤7 页、无 Type 3 字体、无 overfull）**——本机已装 BasicTeX（`/usr/local/texlive/2026basic`，`pdflatex`/`bibtex` 在 `/Library/TeX/texbin`，**不在默认 PATH**）与 tectonic。四步编译：
+
+```bash
+export PATH="/Library/TeX/texbin:$PATH"; cd paperwriting/manuscript && pdflatex -interaction=nonstopmode main.tex && bibtex main && pdflatex -interaction=nonstopmode main.tex && pdflatex -interaction=nonstopmode main.tex
+```
+
+  验收三查：`grep -c Overfull main.log`（须 0）、`pdffonts main.pdf | grep -c "Type 3"`（须 0）、`pdftotext main.pdf - | grep -n References`（References 起始页须 ≤7）。缺宏包时用 `sudo tlmgr install <pkg>`（需密码，执行者跑不了）。旧注（历史）：编译门需要 TeX：`pdflatex → bibtex → pdflatex → pdflatex`，在 `paperwriting/manuscript/` 下跑。**开发用的 Mac 上没有装任何 TeX 发行版**（`pdflatex`/`latexmk`/`tectonic` 均不存在），这一门只能在有 TeX 的机器上补跑。
 
 ---
 *手册随 harness 变化更新；与 plan 冲突时以 plan.md 为准（唯一权威计划）。*
