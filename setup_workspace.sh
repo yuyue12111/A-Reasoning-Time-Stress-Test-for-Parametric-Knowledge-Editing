@@ -48,7 +48,8 @@ dl 2408.12456 ref_KELE_2408.12456.pdf
 dl 2506.17279 ref_Sleek_2506.17279.pdf
 dl 2601.09281 ref_STaR_2601.09281.pdf
 dl 2602.17692 ref_AgenticUnlearning_2602.17692.pdf
-dl 2602.17692 ref_AgenticUnlearning_2602.17692.pdf
+# W2-3/P11: cited verbatim in §4.3/§4.4; evidence ledger in paperwriting/related_work.md
+dl 2603.09906 ref_ThinkingToRecall_2603.09906.pdf
 
 echo "----"
 echo "workspace ready at: $ROOT"

@@ -46,28 +46,24 @@ APPROVED_REFS_SHA256 = (
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
     "Section 3": "750ed864a221ab24cc1a4ebfa63ef9ff24fe3fe0a3c065a48a774d3682f219c1",
-    "Section 4": "db3e8a19d6e4fbf751d1879d71a15b232e17bf6baa88183bd7f55127d02147cb",
+    "Section 4": "062eecf6cb5848f9d07a607775e155a46399548b75e880ad429eeea8139bfc6d",
+    "Section 5": "4e0871519fd282d5086f48c34eee9e00e39a5ac93ac00435d71ee77b02c41df7",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
     "Section 3": "0e3dfac2d95d0624adcd1887bff393c6dd3935be751374d7037117ffe37cbc24",
-    "Section 4": "0515967094fdb02ef8d43aef56346e4416fb5a5ef26532ba5a9c3dd0e7ac1b4f",
+    "Section 4": "bce2a953e7511500696cddce745a0885c81ffbd11fa102b1d6502bf734a6600d",
+    "Section 5": "7f55bcedcb709f580044923f6b9a7f94685801e7bb3313f632d364bf6247167c",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
     "Section 3": "402838f80803169620e0fbbfce59f9e6446a0a0e0b28892f1de356607ba7ca3e",
-    "Section 4": "fcecd43de8e1825f514c31e5bc8b8994a55d5f8ef9e564ea42ef0f86e82389fb",
+    "Section 4": "d29230d7358cf39bd0d00afa61c9df247f1b645a45b6550ca03bca123dfd2b02",
+    "Section 5": "f0a9a298181a2e73de2343db260a09ec54ee0657baff842aa38978c3fdb57a71",
 }
 
-# Abstract v8.1 is frozen before Section 5 is authored.  Every other abstract
-# number must already have a same-display body RJ binding.  This one reviewed
-# debt validates against results.json now and must be removed as soon as the
-# Section 5 19.3% -> 8.5% sentence receives its own RJ entries.
-PENDING_ABSTRACT_BODY_BINDINGS = {
-    "8.5": {
-        "pointer": "/rq3/sup_battery/marginal_B3/T/RR",
-        "format": "percent:1",
-        "section": "A Chain-Local Causal Control Point",
-    }
-}
+# Every frozen-abstract number now has a same-display body RJ binding: the
+# Section 5 arm-wise sentence retired the last debt when it bound 8.5% to the
+# treated arm.  Re-adding an entry here would re-open a covered value.
+PENDING_ABSTRACT_BODY_BINDINGS: dict[str, dict[str, str]] = {}
 
 # Exact scalar paths must not accidentally approve a same-prefix sibling.
 APPROVED_EXACT_POINTERS = frozenset(
@@ -107,11 +103,8 @@ APPROVED_EXACT_POINTERS = frozenset(
         "/x1_replay_gate/by_source/f2_b1_greedy/n",
         "/x1_replay_gate/by_source/f2_b1_greedy/b0_strict",
         "/rq3/n",
-        "/rq3/sup_battery/n/N",
-        "/rq3/sup_battery/n/T",
-        "/rq3/sup_battery/cross_arm_paired_ci/T_minus_N/ES/0",
-        "/rq3/sup_battery/cross_arm_paired_ci/T_minus_N/ES/1/0",
-        "/rq3/sup_battery/cross_arm_paired_ci/T_minus_N/ES/1/1",
+        "/rq3/penalty",
+        "/rq3/clr_split_M1/mediation_2x2/n_b0ok",
         "/rq3/sup_battery/marginal_B3/N/RRs",
         "/rq3/sup_battery/marginal_B3/N/RR",
         "/rq3/sup_battery/marginal_B3/T/RR",
@@ -186,6 +179,16 @@ APPROVED_STRING_TOKEN_POINTERS = {
         "sha256": "eab205e0feacbb6a6ba142ef2f507ba7f0c93693ada0ed4c58a3483fcb069211",
         "tokens": frozenset({0, 1, 2}),
     },
+    "/rq3/x3_rome32b_active_paraphrase/paraphrase_content_audit20"
+    "/majority_counts/audit_valid": {
+        "sha256": "99454f96254a1e9c3bf0384cb913c20dd3bd3bbb9c698885319faaf8f144c2bf",
+        "tokens": frozenset({0, 1}),
+    },
+    "/rq3/x3_rome32b_active_paraphrase/paraphrase_content_audit20"
+    "/majority_counts/cases_with_both_paraphrases_audit_valid": {
+        "sha256": "2d43821423611d1f85249174da18921f40d57ac4d9544cae192191a75925bcba",
+        "tokens": frozenset({0, 1}),
+    },
 }
 
 # Prefixes are intentionally narrower than top-level result blocks and always
@@ -218,9 +221,37 @@ APPROVED_POINTER_PREFIXES = (
     "/emergence/percase/cells_descriptive/Llama-70.0B/",
     "/emergence/percase/es_drop/",
     "/emergence/percase/rr/",
+    # Section 5 battery.  Each prefix ends at the object holding only current
+    # arms/contrasts; annotation keys inside them start with "_" and are
+    # rejected above, as are any "legacy"/"historical" siblings outside them.
+    "/rq3/sup_battery/n/",
+    "/rq3/sup_battery/marginal_B3/",
+    "/rq3/sup_battery/cross_arm_paired_ci/",
+    "/rq3/sup_battery/contrasts_B3_mean_ci_p/",
+    "/rq3/alpha_sweep/",
+    # Section 5 transfer slots.
+    "/rq3/s10_14b_fix_replication/TminusN_paired_ci/",
+    "/rq3/x2_memit14b_repair_replication/contrasts_B3/",
+    "/rq3/x2_memit14b_repair_replication/audit/b3_different_probe_rows_vs_N/",
+    "/rq3/x3_rome32b_active_paraphrase/primary_strict_PS_B3/",
+    "/rq3/x3_rome32b_active_paraphrase/audit/b3_different_probe_rows_vs_N/",
+    "/rq3/x3_rome32b_active_paraphrase/fixed_N_B0_gate_secondary_old_only/gate/",
+    "/rq3/x3_rome32b_active_paraphrase/paraphrase_content_audit20/agreement/",
+    "/rq3/x3_rome32b_active_paraphrase/paraphrase_content_audit20/majority_counts/",
 )
 
 UNSAFE_POINTER_PARTS = ("superseded", "historical", "legacy")
+
+# WRITING_PLAN §5 grants "prospectively specified" only where a dated artifact
+# (SHA-in-artifact, server timestamp, platform log) predates the results.  Each
+# approved manuscript site is listed with the artifact that earns it; anything
+# else must say "pre-specified".
+APPROVED_PROSPECTIVE_LABEL_SITES = frozenset(
+    {
+        # X1 replay: the 18-case manifest SHA was frozen before the gate ran.
+        "prospectively specified attempt",
+    }
+)
 
 NUMERIC_RE = re.compile(
     r"(?<![A-Za-z0-9])[-+\N{MINUS SIGN}]?"
@@ -247,6 +278,11 @@ AUDITED_SECTION_SPECS = (
         "label": "Section 4",
         "title": "Causal Diagnosis",
         "end_title": "A Chain-Local Causal Control Point",
+    },
+    {
+        "label": "Section 5",
+        "title": "A Chain-Local Causal Control Point",
+        "end_title": r"Discussion \& Limitations",
     },
 )
 AUDITED_SECTION_TITLES = frozenset(
@@ -374,6 +410,7 @@ BANNED_PATTERNS = {
     "unqualified halves-reversion claim": r"\bhalves reversion\b",
     "priority claim": r"\bfirst to discover\b",
     "unsupported preregistration wording": r"\bpreregistered\b",
+    "unhyphenated prespecified variant": r"\bprespecified\b",
     "edit-intact overclaim": r"\bedit intact\b",
     "not-erased overclaim": r"\bnot erased\b",
     "guaranteed-upper-bound overclaim": r"\bguaranteed upper bound\b",
@@ -381,7 +418,10 @@ BANNED_PATTERNS = {
     "chain-localized variant": r"\bchain-localized\b",
     "chain-only variant": r"\bchain-only\b",
     "chain-confined variant": r"\bchain-confined\b",
-    "forbidden F1 pseudo-contrast": r"(?<!\d)\.214(?!\d)",
+    # The banned quantity is the positive .214 margin between an edited-state
+    # gated rate and an unedited-base drift.  A negative -.214 cannot be that
+    # margin, and one legitimately appears as a Section 5 interval bound.
+    "forbidden F1 pseudo-contrast": r"(?<![\d.\-−])\.214(?!\d)",
     "latent-rate bracket": r"\btrue reversion\b.{0,60}\bbetween\b",
 }
 
@@ -829,8 +869,10 @@ def check_template_and_frozen_surfaces(
         errors.append(
             f"preamble-only/unreviewed body TeX command(s): {unknown_body_commands!r}"
         )
-    if body_source.count(r"\small") != 1:
-        errors.append(r"\small must occur exactly once in the reviewed table")
+    # One per reviewed table (Tables 1 and 2); a third occurrence would be a
+    # document-level font change rather than a table-local one.
+    if body_source.count(r"\small") != 2:
+        errors.append(r"\small must occur exactly once per reviewed table")
 
     environments = set(
         re.findall(r"\\(?:begin|end)\s*\{([^{}]+)\}", visible_source)
@@ -1187,8 +1229,9 @@ def check_section4_requirements(
         "we infer neither saturation nor an ordered trend",
         "an equal-length content-free filler remains untested",
         "content-independent computational-buffer account",
-        "a within-case contrast between arms, not against",
-        "Realized chain lengths under suppression were not audited",
+        "improves edit success and lowers permissive reversion",
+        "while the strict displacement endpoint does not separate from that baseline",
+        "realized chain lengths under suppression were not audited",
         "constrains a length-only reading rather than eliminating it",
         "arm-paired stratum totals, not RR denominators",
         "without an interaction test",
@@ -1205,13 +1248,18 @@ def check_section4_requirements(
 
     # "Prospectively specified" is reserved for protocols frozen in a dated
     # artifact before results existed; everything recorded afterwards is
-    # "pre-specified".  Section 4 grants the stronger label exactly once, at the
-    # X1 replay attempt, whose manifest carries a result-preceding SHA.
-    if visible.count("prospectively specified") != 1:
-        errors.append(
-            "Section 4 must grant 'prospectively specified' exactly once, to the "
-            f"X1 replay attempt (found {visible.count('prospectively specified')})"
-        )
+    # "pre-specified".  Approving sites beats counting them: other
+    # artifact-backed protocols (the frozen P0 judge files, per WRITING_PLAN
+    # §5) can legitimately earn the label later without tripping this gate.
+    for match in re.finditer(
+        r"prospectively specified(?:\s+[A-Za-z-]+)?", visible
+    ):
+        if match.group(0) not in APPROVED_PROSPECTIVE_LABEL_SITES:
+            errors.append(
+                "Section 4 grants 'prospectively specified' at an unreviewed "
+                f"site: {match.group(0)!r}; artifact-backed sites must be added "
+                "to APPROVED_PROSPECTIVE_LABEL_SITES in the same change"
+            )
 
     # The two nonnumeric states are tied directly to results.json rather than
     # weakening the numeric RJ schema.
@@ -1313,6 +1361,102 @@ def check_section4_requirements(
         )
 
 
+def check_section5_requirements(
+    section_text: str,
+    ledger: list[dict[str, Any]],
+    errors: list[str],
+) -> None:
+    visible_source = strip_tex_comments(section_text)
+    visible = normalize_visible(section_text)
+
+    expected_subsections = (
+        "A Signed, Dose-Graded Think-Span Intervention",
+        "The Control Point Moves the Untouched Answer",
+        "What the Placebo and Competitor Arms Bound",
+        "Endpoint Hierarchy and Multiplicity",
+        "How Far the Guard Transfers",
+    )
+    actual_subsections = tuple(
+        re.findall(r"\\subsection\{([^{}]+)\}", visible_source)
+    )
+    if actual_subsections != expected_subsections:
+        errors.append(
+            "Section 5 subsection order/titles differ from the reviewed ceiling: "
+            f"{actual_subsections!r}"
+        )
+    if re.search(r"\\subsection\*", visible_source):
+        errors.append("Section 5 contains an unreviewed starred subsection")
+
+    required_strings = (
+        # The frozen protocol names T-P, not T-N, as the primary contrast.
+        "The primary contrast was fixed in advance as T versus P",
+        "before any suppressed arm ran",
+        "not an artifact of which control the treated arm is measured against",
+        # Anti-tautology defenses.
+        "nothing is penalized in the answer text",
+        "extending the same penalty to the answer span",
+        "manipulation check on whether the penalty acted inside the span, not an outcome",
+        # Treatment-independent gate, without borrowing the MEMIT audit.
+        "the think span is empty, so a think-scoped processor has nothing to act on",
+        "belongs to the MEMIT replication",
+        "has no changed-row audit of its own",
+        # Dose ladder without an ordered-trend claim.
+        "not ordered across the same settings",
+        "a dose ladder rather than a calibrated dose-response",
+        # M14 marginal-versus-paired reconciliation, both endpoint pairs.
+        "need not equal differences of arm-wise rates",
+        "does not equal",
+        "is the same Qwen-32B run as the largest Qwen cell",
+        # D6 control bounds.
+        "compatible with zero; we set no equivalence margin",
+        "inertness may be claimed only at the answer level",
+        # D7 endpoint hierarchy and multiplicity.
+        "That interval reaches zero.",
+        "paired cases that clear the zero-thinking gate in both arms",
+        "unadjusted and we claim no correction",
+        "without multiplicity adjustment, and we claim none",
+        # The battery's own scope limit, carried from the frozen protocol.
+        "every arm here is an intervened condition",
+        "required in ordinary, uninterrupted generation",
+        # R1 transfer ceilings.
+        "does not test a second editor",
+        "transfers the intervention and not the gap",
+        "not portability to unguarded queries",
+        "a floor rather than an equivalence result",
+        # Positioning.
+        "mechanistic probe and an edit-aware decoding guard",
+    )
+    for target in required_strings:
+        if target not in visible:
+            errors.append(f"Section 5 required target string missing: {target!r}")
+
+    # The battery protocol is a git-recorded prereg, not a result-preceding
+    # artifact SHA, so it never earns the stronger label.
+    if "prospectively specified" in visible:
+        errors.append(
+            "Section 5 must say 'fixed in advance'/'pre-specified'; the battery "
+            "protocol has no result-preceding artifact SHA"
+        )
+
+    # R10: the abstract's arrow must bind to the battery arms, not to the
+    # Section 3 capability cell that happens to carry the same level.
+    required_bindings = {
+        ("19.3", "/rq3/sup_battery/marginal_B3/N/RR", "percent:1"),
+        ("8.5", "/rq3/sup_battery/marginal_B3/T/RR", "percent:1"),
+        ("+.122", "/rq3/sup_battery/contrasts_B3_mean_ci_p/T_minus_P/ES/0", "signed:3"),
+        (".580", "/rq3/alpha_sweep/scope_ablation/think/ES_B0", "fixed:3"),
+        (".727", "/rq3/alpha_sweep/scope_ablation/all/ES_B0", "fixed:3"),
+        ("118", "/rq3/clr_split_M1/mediation_2x2/n_b0ok", "integer"),
+    }
+    actual_bindings = {
+        (entry["display"], entry["pointer"], entry["format"])
+        for entry in ledger
+    }
+    missing_bindings = sorted(required_bindings - actual_bindings)
+    if missing_bindings:
+        errors.append(f"Section 5 required bindings missing: {missing_bindings!r}")
+
+
 def check_authoritative_cloze_ratio(
     results: Any,
     errors: list[str],
@@ -1376,13 +1520,18 @@ def check_marginal_denominator_identities(
             "RR": "/capability/families/R1-Distill-Qwen/rr/3",
             "CLR": "/capability/families/R1-Distill-Qwen/clr/3",
         }
+        # Compare at the published three-decimal display caliber.  The blocks
+        # record the same quantities at different precision by design (the
+        # battery note carries CLR .5455 = 108/198), so exact equality would
+        # turn a legitimate precision upgrade into a failure.
+        caliber = Decimal("0.001")
         for endpoint, capability_pointer in shared_endpoints.items():
             battery_value = decimal_value(
                 resolve_pointer(results, f"/rq3/baseline/{endpoint}")
-            )
+            ).quantize(caliber, rounding=ROUND_HALF_UP)
             capability_value = decimal_value(
                 resolve_pointer(results, capability_pointer)
-            )
+            ).quantize(caliber, rounding=ROUND_HALF_UP)
             if battery_value != capability_value:
                 errors.append(
                     "Qwen-32B capability cell and battery no-suppression arm "
@@ -1392,7 +1541,15 @@ def check_marginal_denominator_identities(
                 )
         if not isinstance(arm_counts, dict) or not arm_counts:
             raise TypeError("battery arm counts must be a non-empty object")
-        largest_effective = max(decimal_value(count) for count in arm_counts.values())
+        # Annotation keys may be added to the arm-count block at any time.
+        effective_counts = [
+            decimal_value(count)
+            for key, count in arm_counts.items()
+            if not key.startswith("_")
+        ]
+        if not effective_counts:
+            raise TypeError("battery arm counts contain no arm entries")
+        largest_effective = max(effective_counts)
         if nominal < largest_effective:
             errors.append(
                 f"attempted row count {nominal} is below the largest effective "
@@ -1626,6 +1783,8 @@ def main() -> int:
             check_section4_requirements(
                 section_text, section_ledger, results, errors
             )
+        elif section_label == "Section 5":
+            check_section5_requirements(section_text, section_ledger, errors)
 
         bindings_sha256 = ledger_bindings_sha256(section_ledger)
         expected_sha256 = APPROVED_SECTION_LEDGER_BINDINGS_SHA256[section_label]
@@ -1671,7 +1830,8 @@ def main() -> int:
         "language gates, unaudited-section numeric gates, "
         f"Section 3 RJ ledger ({section_counts.get('Section 3', 0)} occurrences), "
         f"Section 4 RJ ledger ({section_counts.get('Section 4', 0)} occurrences), "
-        "claim targets, and exact abstract-binding debt"
+        f"Section 5 RJ ledger ({section_counts.get('Section 5', 0)} occurrences), "
+        "claim targets, and full abstract coverage"
     )
     return 0
 

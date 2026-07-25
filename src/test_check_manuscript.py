@@ -51,11 +51,16 @@ def test_canonical_manuscript_passes(candidate_main: Path) -> None:
     completed = run_checker(candidate_main)
     assert completed.returncode == 0, completed.stdout + completed.stderr
     assert "Section 3 RJ ledger (127 occurrences)" in completed.stdout
-    assert "Section 4 RJ ledger (75 occurrences)" in completed.stdout
+    assert "Section 4 RJ ledger (72 occurrences)" in completed.stdout
+    assert "Section 5 RJ ledger (185 occurrences)" in completed.stdout
 
 
 def test_frozen_abstract_mutation_is_rejected(candidate_main: Path) -> None:
-    mutate(candidate_main, "from 19.3\\% to 8.5\\%", "from 19.3\\% to 8.6\\%")
+    mutate(
+        candidate_main,
+        "lowers the resurfacing rate from 19.3\\% to 8.5\\%",
+        "lowers the resurfacing rate from 19.3\\% to 8.6\\%",
+    )
     assert_rejected(
         candidate_main,
         "LaTeX abstract differs from frozen v8.1",
@@ -214,7 +219,6 @@ def test_full_manuscript_banned_language_gate(candidate_main: Path) -> None:
     [
         r"\section{Introduction}",
         r"\section{Related Work}",
-        r"\section{A Chain-Local Causal Control Point}",
         r"\section{Discussion \& Limitations}",
         r"\section{Conclusion}",
         r"\section*{Ethical Statement}",
@@ -257,20 +261,21 @@ def test_stale_kappa_is_rejected_after_tex_normalization(
     assert_rejected(candidate_main, "stale manuscript claim (superseded route kappa)")
 
 
-def test_abstract_binding_debt_self_retires(candidate_main: Path) -> None:
-    marker = r"\subsection{The Gap}"
-    injected = (
-        "Deferred repair RR is \\(8.5\\%\\). "
-        '% RJ: {"claim":"DEBT-rr","display":"8.5",'
-        '"pointer":"/rq3/sup_battery/marginal_B3/T/RR",'
-        '"format":"percent:1"}\n\n'
+def test_abstract_binding_debt_is_retired() -> None:
+    namespace = runpy.run_path(str(CHECKER))
+    assert namespace["PENDING_ABSTRACT_BODY_BINDINGS"] == {}
+
+
+def test_abstract_coverage_breaks_if_section5_stops_binding_the_arrow(
+    candidate_main: Path,
+) -> None:
+    """The retired debt is now load-bearing: Section 5 alone covers 8.5%."""
+    text = candidate_main.read_text(encoding="utf-8")
+    assert text.count('"display":"8.5"') == 2
+    candidate_main.write_text(
+        text.replace('"display":"8.5"', '"display":"8.6"'), encoding="utf-8"
     )
-    mutate(candidate_main, marker, injected + marker)
-    assert_rejected(
-        candidate_main,
-        "frozen-abstract numeric coverage differs",
-        "remove PENDING_ABSTRACT_BODY_BINDINGS",
-    )
+    assert_rejected(candidate_main, "frozen-abstract numeric coverage differs")
 
 
 @pytest.mark.parametrize("filename", ["aaai2027.sty", "aaai2027.bst"])
@@ -511,8 +516,8 @@ def test_reviewed_forward_reference_cannot_be_redirected(
 ) -> None:
     mutate(
         candidate_main,
-        r"Section~\ref{sec:control} tests whether think-span-confined",
-        r"Section~\ref{sec:gap} tests whether think-span-confined",
+        r"Section~\ref{sec:control} tests whether think-span-only",
+        r"Section~\ref{sec:gap} tests whether think-span-only",
     )
     assert_rejected(
         candidate_main,
@@ -857,7 +862,7 @@ def test_authoritative_cloze_ratio_requires_n_over_n_at_100_percent(
 def test_think_span_anchor_variant_is_rejected(candidate_main: Path) -> None:
     mutate(
         candidate_main,
-        "think-span-confined old-answer first-token suppression",
+        "think-span-only old-answer first-token suppression",
         "chain-confined old-answer first-token suppression",
     )
     assert_rejected(candidate_main, "banned language (chain-confined variant)")
@@ -890,33 +895,34 @@ def test_cloze_downweighting_cannot_be_dropped(candidate_main: Path) -> None:
     )
 
 
-def test_forward_reference_effect_size_must_match_ledger(
+def test_section4_forward_reference_stays_numberless(
     candidate_main: Path,
 ) -> None:
+    """Section 4 is the hypothesis tier: it points forward without numbers."""
     mutate(
         candidate_main,
-        r"a paired \(+.138\,[.082,.194]\)",
-        r"a paired \(+.148\,[.082,.194]\)",
+        "improves edit success and lowers permissive reversion against "
+        "unsuppressed chains",
+        "raises edit success by a paired \\(+.138\\) against unsuppressed chains",
     )
     assert_rejected(
         candidate_main,
-        "numeric occurrences ['+.148'",
-        "RJ occurrences ['+.138'",
+        "Section 4 line",
+        "numeric occurrences ['+.138']",
     )
 
 
-def test_forward_reference_baseline_disclaimer_is_required(
-    candidate_main: Path,
-) -> None:
+def test_section4_must_disclose_the_strict_null(candidate_main: Path) -> None:
     mutate(
         candidate_main,
-        "---a within-case contrast between arms, not against \\(B_0\\)",
+        ", while the strict displacement endpoint does not separate from that "
+        "baseline",
         "",
     )
     assert_rejected(
         candidate_main,
         "Section 4 required target string missing: "
-        "'a within-case contrast between arms, not against'",
+        "'while the strict displacement endpoint does not separate from that baseline'",
     )
 
 
@@ -928,7 +934,7 @@ def test_prospective_label_cannot_be_granted_twice(candidate_main: Path) -> None
     )
     assert_rejected(
         candidate_main,
-        "Section 4 must grant 'prospectively specified' exactly once",
+        "Section 4 grants 'prospectively specified' at an unreviewed site",
     )
 
 
@@ -999,6 +1005,103 @@ def test_marginal_denominator_identities_reject_drift(
     errors: list[str] = []
     namespace["check_marginal_denominator_identities"](results, errors)
     assert any(diagnostic in error for error in errors), errors
+
+
+def test_section5_subsection_order_is_frozen(candidate_main: Path) -> None:
+    first = r"\subsection{A Signed, Dose-Graded Think-Span Intervention}"
+    second = r"\subsection{The Control Point Moves the Untouched Answer}"
+    mutate(candidate_main, first, r"\subsection{TEMPORARY-HEADING}")
+    mutate(candidate_main, second, first)
+    mutate(candidate_main, r"\subsection{TEMPORARY-HEADING}", second)
+    assert_rejected(candidate_main, "Section 5 subsection order/titles differ")
+
+
+def test_section5_arrow_must_bind_to_the_battery_arms(
+    candidate_main: Path,
+) -> None:
+    """R10: 19.3% in Section 5 is the N arm, not the Section 3 capability cell.
+
+    Both pointers hold the same value, so only the binding identity catches a
+    swap.
+    """
+    text = candidate_main.read_text(encoding="utf-8")
+    # Two arm-wise percent bindings plus the Table 2 row.
+    assert text.count('"pointer":"/rq3/sup_battery/marginal_B3/N/RR"') == 3
+    candidate_main.write_text(
+        text.replace(
+            '"pointer":"/rq3/sup_battery/marginal_B3/N/RR"',
+            '"pointer":"/capability/families/R1-Distill-Qwen/rr/3"',
+        ),
+        encoding="utf-8",
+    )
+    assert_rejected(candidate_main, "Section 5 required bindings missing")
+
+
+def test_section5_primary_contrast_identity_is_frozen(
+    candidate_main: Path,
+) -> None:
+    """The frozen protocol names T-P, not T-N, as the primary contrast."""
+    mutate(
+        candidate_main,
+        "The primary contrast was fixed in advance as T versus P",
+        "The primary contrast was fixed in advance as T versus N",
+    )
+    assert_rejected(
+        candidate_main,
+        "Section 5 required target string missing: "
+        "'The primary contrast was fixed in advance as T versus P'",
+    )
+
+
+def test_section5_cannot_claim_the_prospective_label(
+    candidate_main: Path,
+) -> None:
+    mutate(
+        candidate_main,
+        "The primary contrast was fixed in advance as T versus P",
+        "The primary contrast was prospectively specified as T versus P",
+    )
+    assert_rejected(
+        candidate_main,
+        "Section 5 must say 'fixed in advance'/'pre-specified'",
+    )
+
+
+@pytest.mark.parametrize(
+    "target",
+    [
+        "nothing is penalized in the answer text",
+        "extending the same penalty to the answer span",
+        "manipulation check on whether the penalty acted inside the span, not an outcome",
+        "every arm here is an intervened condition",
+        "compatible with zero; we set no equivalence margin",
+        "That interval reaches zero.",
+        "a floor rather than an equivalence result",
+        "not portability to unguarded queries",
+    ],
+)
+def test_section5_load_bearing_qualifications_cannot_be_dropped(
+    candidate_main: Path,
+    target: str,
+) -> None:
+    mutate(candidate_main, target, "")
+    assert_rejected(
+        candidate_main,
+        f"Section 5 required target string missing: {target!r}",
+    )
+
+
+def test_negative_interval_bound_is_not_the_banned_f1_contrast(
+    candidate_main: Path,
+) -> None:
+    """-.214 is a legitimate CLR interval bound; only a positive .214 is banned."""
+    completed = run_checker(candidate_main)
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert "-.214" in candidate_main.read_text(encoding="utf-8")
+
+    marker = r"\section{Introduction}"
+    mutate(candidate_main, marker, marker + "\nThe margin above control is .214.")
+    assert_rejected(candidate_main, "banned language (forbidden F1 pseudo-contrast)")
 
 
 def test_noncanonical_results_path_is_rejected(

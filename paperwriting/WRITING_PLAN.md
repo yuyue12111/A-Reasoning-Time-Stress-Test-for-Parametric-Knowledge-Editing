@@ -1,4 +1,4 @@
-# WRITING_PLAN.md · 最终写作作战计划（plan v1.93 的执行层）
+# WRITING_PLAN.md · 最终写作作战计划（plan v1.94 的执行层）
 
 > 状态：**唯一有效的写作计划**（2026-07-14 仲裁定稿，整合三方审计 + GPT-5.6 复核裁决）。
 > 数字唯一真源 = `paperwriting/results.json`（原 `paper/` 已更名，5 个 src 脚本路径已同步修复）。
@@ -53,7 +53,7 @@ Fig.1 按语料形态走 **PRIMARY_RESULT**（7/14；method-pipeline 仅 2/14）
 - logit-lens：installation sanity（n=23，重施编辑后裸 cloze 首 token pairwise gap，无对照）
 - P0 taxonomy：观察性 route census——n=41 实例 / **33 个独立事实**、Bridge 27/Recall 11/RO 3/Assoc 0、κ=.813（`rq2_taxonomy.p0_corrected_taxonomy`）；CLR 无判别力（OLD 13/13 但非 OLD 18/20 也有 CLR，`p0_downstream_crosswalk`）
 - M1：baseline-CLR stratified enrichment（CLR1 层 `−.289 p=.0002` vs CLR0 `+.014 p=.72`，CLR0 有 N_RR=0 地板，且无跨层 interaction，`rq3.clr_split_M1`）——只写样本内富集，不写 near-necessity/effect modification/mediation
-- W-B：先报 prospectively specified 主对比 S−Pshuf RR null；再报 CLR `−.078` 排零、同对比 ES null、S−N ES `+.092` 排零；显著的 S−Pshuf LocAcc 只称“预设 harm metric 上的 secondary contrast”，不得冒充预指定 B2 对照（`wb_representation_repair.confirm_arms`）——合法结论仅为测得的旧对象表达下降未产生可检出的 confirmatory RR repair；`B1_S_minus_Pshuf` 的 B1 是端点标签，正文不得误写成思考预算
+- W-B：先报 **pre-specified**（W2-3/P12 订正：W-B 的 prereg 只有 git-commit 记录、无结果前冻结产物 SHA 或服务器时间戳，按本文件 §5 的授予标准**不得**称 *prospectively specified*；该标签目前只授予 X1，checker 按 allowlist 断言）主对比 S−Pshuf RR null；再报 CLR `−.078` 排零、同对比 ES null、S−N ES `+.092` 排零；显著的 S−Pshuf LocAcc 只称“预设 harm metric 上的 secondary contrast”，不得冒充预指定 B2 对照（`wb_representation_repair.confirm_arms`）——合法结论仅为测得的旧对象表达下降未产生可检出的 confirmatory RR repair；`B1_S_minus_Pshuf` 的 B1 是端点标签，正文不得误写成思考预算
 - T/D/P/C 五臂：**唯一真因果**，识别的是 chain-local old-token control point（`rq3.sup_battery`）
 - **X1 正文披露（Kimi 终审加严）**：prospectively specified replay 载具门 9/18 FAIL、未救门（`x1_replay_gate.gate`）；披露必须站在机理章 routing-hypothesis 讨论的**紧邻位置**，作为"是否直接测过 fixed replay 载具稳定性"这一可预测追问的正面回答——不得藏 §7 limitations 尾部；完整 gate 表进 supplementary。cloze 检查在 §4 必须以 "installation sanity check" 身份 + 全 caveat（无对照/近恒真/条件于回退样本/crosswalk BLOCKED）呈现
 - 合法机理句式：*failure coexists with an installed cloze edit; native chains frequently expose Bridge/Recall routes; an old-token-specific intervention in the chain causally changes the untouched answer.*
@@ -116,6 +116,8 @@ Fig.1 按语料形态走 **PRIMARY_RESULT**（7/14；method-pipeline 仅 2/14）
 - 其余 camera-ready 备忘照旧（J-lens 正式版、W-A 扩展、B23 held 臂等，plan 既有清单）。
 
 ## 8. 定稿判据（7/25 冻结时逐项打勾）
+
+⑪ **supplement 断言可兑现**（W2-3/P9 新增）：§3–§7 中任何断言 supplementary 含有某物的句子（"the supplement records/declares…"），必须在 `prewrite/supp_manifest.md` 有对应行，且该行点明路径与应含字段；正文按名声明而 manifest 无对应行 = 正文在替一份尚未做的 supp 背书。
 
 ① checker 通过：全文每个数字有 results.json path；② 禁语清单零命中；③ X1 FAIL 可见且已防火墙（三句式+撤回句+controls-not-through-replay），并且 X2 strict null / X3 content audit / W-B null / G5 FAIL 全部可见；④ X2/X3 结果已写入（含 "repair not yet tested with MEMIT" 类过期句清零）；⑤ abstract 与全文数字逐一同源；⑥ taxonomy 全文统一 n=41/33 facts/κ=.813；⑦ Fig.1 第一视觉=认证缺口；⑧ related work 引用归属正确；⑨ provenance manifest 与上传 prereg 集合一致；⑩ 正文无未运行实验的结果性陈述。
 
