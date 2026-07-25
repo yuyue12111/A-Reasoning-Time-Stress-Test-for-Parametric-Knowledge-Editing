@@ -47,3 +47,11 @@ stats/
 /_upload/
 /whyaaai.bundle
 .obsidian/
+
+# built manuscript (regenerate: RUNBOOK §11)
+/paperwriting/manuscript/main.pdf
+/paperwriting/manuscript/main.aux
+/paperwriting/manuscript/main.log
+/paperwriting/manuscript/main.bbl
+/paperwriting/manuscript/main.blg
+/paperwriting/manuscript/main.out
