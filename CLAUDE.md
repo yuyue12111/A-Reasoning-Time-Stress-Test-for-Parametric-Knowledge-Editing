@@ -4,7 +4,7 @@
 
 AAAI-27 投稿项目，代号「越想越退」(Thinking Undoes Editing)：量化参数知识编辑（ROME/MEMIT/AlphaEdit）在 R1 式推理模型上随思考预算增加而被推翻的现象 + 机理 + training-free 修补。
 
-**读单（按序）：`plan.md` 头部 v1.x 变更日志（当前 **v2.01**，本项目唯一权威计划）→ `paperwriting/WRITING_PLAN.md`（唯一有效写作计划）→ `paperwriting/results.json`（数字真源）→ `analysis/11–16_*.md` 与对应 prereg（X/P0/CPU closeout 最新证据）→ `RUNBOOK.md`（仅在确有 GPU 任务时）。** `sumandplan1.md` §5/§6 与 `phase-1.md` 是 6 月历史快照，不得覆盖 plan 头部或复活已停止队列。与 plan 冲突的一切行为都需要先升 plan 版本并写变更记录，再执行。
+**读单（按序）：`plan.md` 头部 v1.x 变更日志（当前 **v2.02**，本项目唯一权威计划）→ `paperwriting/WRITING_PLAN.md`（唯一有效写作计划）→ `paperwriting/results.json`（数字真源）→ `analysis/11–16_*.md` 与对应 prereg（X/P0/CPU closeout 最新证据）→ `RUNBOOK.md`（仅在确有 GPU 任务时）。** `sumandplan1.md` §5/§6 与 `phase-1.md` 是 6 月历史快照，不得覆盖 plan 头部或复活已停止队列。与 plan 冲突的一切行为都需要先升 plan 版本并写变更记录，再执行。
 
 ## 硬约束（不可违反）
 
@@ -35,7 +35,7 @@ data/     清洗数据(大文件 gitignore,     results/ 实验 jsonl（gitignor
 - [x] 最终科学 review + 三方仲裁 + GPT-5.6 复核完成（v1.89 落库）。
 - [ ] **唯一当前任务 = 写作冲刺**，按 `paperwriting/WRITING_PLAN.md` 执行。
 
-## 立即任务队列 —— **以 `plan.md v2.01` + `paperwriting/WRITING_PLAN.md` 为准**
+## 立即任务队列 —— **以 `plan.md v2.02` + `paperwriting/WRITING_PLAN.md` 为准**
 
 1. **投稿前科学队列=零**（不跑 B15 interaction、不烧 X-A 池、不加任何新数字）。
 2. **摘要锁已关闭（v1.90③）**：v8.1=内部终版（SHA 见 v1.90①），OpenReview 暂留 v5；**正文完成前不再动摘要**；D1–D8/R1 债务在 §3–§5 成文冻结后才一次性替换表单。Title/TL;DR 永久冻结。

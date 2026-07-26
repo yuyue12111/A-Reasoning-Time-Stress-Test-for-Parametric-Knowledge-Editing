@@ -38,6 +38,10 @@ stats/
 
 # --- Pilot/main results: CoT jsonl, large, regenerable on GPU (anonymized & shipped at submission) ---
 /results/
+results 2/
+/results_*/
+/results.tar.gz
+/results*.tar.gz
 
 # --- EasyEdit runtime logs (make_logs() writes logs/run.log + results.json whenever an editor runs) ---
 /logs/

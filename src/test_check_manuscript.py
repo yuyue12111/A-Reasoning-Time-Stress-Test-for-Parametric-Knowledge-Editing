@@ -1466,3 +1466,32 @@ def test_battery_exhaustiveness_claim_is_limited_to_outcomes() -> None:
     )
     assert "Every outcome contrast we computed appears" in text
     assert "Every contrast we computed appears" not in text
+
+
+def test_placebo_arm_nonreproducibility_is_disclosed() -> None:
+    """W2-11: the retrieved shards do not reproduce the reported P arm.
+
+    Four differences are third-decimal, but P-N CLR flips from reaching zero
+    (p=.054, as the manuscript states) to excluding it (p=.037).  No manuscript
+    number was changed on the strength of the recomputation; the discrepancy is
+    disclosed and left for adjudication.  This test guards the disclosure, not
+    the resolution.
+    """
+    manifest = REPO_ROOT / "paperwriting" / "provenance_manifest.md"
+    text = manifest.read_text(encoding="utf-8")
+    assert "Status: OPEN" in text
+    for token in ("199", "200", ".507", "P−N CLR", "cross_arm.py"):
+        assert token in text, token
+
+    evidence = json.loads(
+        (REPO_ROOT / "paperwriting" / "delivery"
+         / "esup_crossarm_5arm_recompute.json").read_text(encoding="utf-8")
+    )
+    assert evidence["arms_n"]["P"] == 200
+    assert set(evidence["arms_n"]) == {"N", "T", "D", "P", "C"}, "must be the five-arm run"
+
+    results = json.loads(
+        (REPO_ROOT / "paperwriting" / "results.json").read_text(encoding="utf-8")
+    )
+    # The reported values are untouched: disclosure, not silent correction.
+    assert results["rq3"]["sup_battery"]["n"]["P"] == 199
