@@ -1,0 +1,77 @@
+% Supplementary material.  Compiled standalone; NOT \input by main.tex.
+%
+% W2-8/A2b-1: this skeleton exists so that every "in the supplement" promise in
+% the frozen body has a physical destination on 7/28, three days before the
+% supplement itself is due.  Each section below is named after the promise it
+% discharges, with the body line that makes the promise quoted above it.  A
+% section that ships empty is a broken promise, not a formatting detail.
+%
+% Delivery queue and downgrade rules: paperwriting/delivery/t2_supplement_queue.md
+\documentclass[letterpaper]{article}
+\usepackage[submission]{aaai2027}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{natbib}
+\frenchspacing
+\setlength{\pdfpagewidth}{8.5in}
+\setlength{\pdfpageheight}{11in}
+
+\title{Supplementary Material}
+\author{}
+
+\begin{document}
+\maketitle
+
+\section*{Contents}
+This supplement discharges the seven places where the main text defers material,
+and carries the tables the reproducibility checklist points at.  Nothing here
+introduces a quantity that is not already recorded in the frozen results file;
+sections that would require a new computation say so and stop.
+
+% ---------------------------------------------------------------- S2b
+\section{Judge-Panel Missingness Pattern}
+% Discharges: "the missingness pattern is reported in the supplement." (Sec. 3.1 footnote)
+The validation panel returned votes for 87 of 120 stratified items.  This section
+reports \emph{how} the 33 absences are distributed across the rule-positive and
+rule-negative strata, and the rate-limit mechanism that produced them.  It does
+not report a sensitivity analysis: re-scoring under alternative missingness
+assumptions would be a new computation, which the pre-submission freeze forbids.
+
+% ---------------------------------------------------------------- S3b
+\section{Sunk Section-3 Regressions}
+% Discharges: "the regression is in the supplement." and "both are in the supplement." (Sec. 3.3)
+Unedited-base recall control regression; case-block fits (matched and controlled
+slopes) with their case-block intervals.
+
+% ---------------------------------------------------------------- S7
+\section{Cloze Installation-Sanity Artifact}
+% Discharges: "The supplement names the missing per-item artifact ..." (Sec. 4.1)
+Status of the per-item logit-lens file and the precise sense in which the
+per-item crosswalk is unavailable.
+
+% ---------------------------------------------------------------- S1b
+\section{Replay-Gate Table}
+% Discharges: "The complete replay-gate table is in the supplement." (Sec. 4.3)
+The full X1 gate table, including the officially recorded 9/18 FAIL, the
+pre-specified requirement of 15, both prerequisite rates, and the stop rule.
+
+% ---------------------------------------------------------------- S9
+\section{Concept-Direction Endpoint Set}
+% Discharges: "The complete endpoint set is in the supplement." (Sec. 4.5)
+All three arms and all contrasts with intervals.
+
+% ---------------------------------------------------------------- S11
+\section{Hyperparameters and Run Counts}
+% Supports checklist items 4.2 (partial), 4.10, 4.13.
+Per-checkpoint edit layer with how it was fixed --- empirically scanned on two
+checkpoints, set a priori by a fixed relative-depth rule on the others, with
+every conditional fallback sweep left unfired --- suppression penalty, decoding
+settings, seeds, and per-cell run counts.
+
+% ---------------------------------------------------------------- S7b / S3c
+\section{Figures}
+% Discharges: "the evidence ladder and five-arm forest are supplementary figures." (Sec. 5.5)
+% GATE: the five-arm forest may not ship until it carries the strict-displacement
+% panel; shipping the two-panel version would hide the endpoint the manuscript
+% deliberately reports at primary prominence.
+\end{document}

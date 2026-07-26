@@ -1,43 +1,245 @@
 {
-  "candidate": {
-    "path": "paperwriting/delivery/abstract_v8_candidate.txt",
-    "file_sha256": "0c85a03e9cd288b45d6f23502caf17b74e84c28dee0f3a2e62f9202ec4b81e5f",
-    "normalized_text_sha256": "1f9a2b7ed38109b2550142acda48d6f6bd950a2a1ef928c35fbe99077c00ad01"
+ "candidate": {
+  "path": "paperwriting/delivery/abstract_v8_candidate.txt",
+  "file_sha256": "0c85a03e9cd288b45d6f23502caf17b74e84c28dee0f3a2e62f9202ec4b81e5f",
+  "normalized_text_sha256": "1f9a2b7ed38109b2550142acda48d6f6bd950a2a1ef928c35fbe99077c00ad01"
+ },
+ "mapping_rule": "Every v5/v6 predicate is either present_in_prose or moved_to_debt. Credentials, secondary endpoints, and transfer boundaries may move; no moved item is treated as discharged until its manuscript destination is frozen.",
+ "claims": [
+  {
+   "claim_id": "C01",
+   "predicate": "Direct-answer validation can mark an edit successful without establishing its behavior once the model reasons.",
+   "status": "present_in_prose",
+   "candidate_sentence_ids": [
+    "S1",
+    "S8"
+   ],
+   "debt_id": null,
+   "hedge_relation": "same"
   },
-  "mapping_rule": "Every v5/v6 predicate is either present_in_prose or moved_to_debt. Credentials, secondary endpoints, and transfer boundaries may move; no moved item is treated as discharged until its manuscript destination is frozen.",
-  "claims": [
-    {"claim_id":"C01","predicate":"Direct-answer validation can mark an edit successful without establishing its behavior once the model reasons.","status":"present_in_prose","candidate_sentence_ids":["S1","S8"],"debt_id":null,"hedge_relation":"same"},
-    {"claim_id":"C02","predicate":"Each ROME edit on CounterFact is compared at zero thinking and after a natural chain across six fixed checkpoints from two DeepSeek-R1-distill families.","status":"present_in_prose","candidate_sentence_ids":["S2"],"debt_id":null,"hedge_relation":"same"},
-    {"claim_id":"C03","predicate":"At each family's largest tested checkpoint, within-edit success drops 0.106 and 0.107; the paired design is established in S2.","status":"present_in_prose","candidate_sentence_ids":["S2","S3"],"debt_id":"D1","hedge_relation":"same"},
-    {"claim_id":"C04","predicate":"On Qwen-32B, the old answer resurfaces in 19.3% of zero-thinking successes and displaces the new answer in 9.2%.","status":"present_in_prose","candidate_sentence_ids":["S4"],"debt_id":"D2","hedge_relation":"same"},
-    {"claim_id":"C05","predicate":"The Qwen-32B erosion is edit-specific relative to null-compatible old-answer drift in the unedited base.","status":"present_in_prose","candidate_sentence_ids":["S4"],"debt_id":null,"hedge_relation":"same"},
-    {"claim_id":"C06","predicate":"A canned thought does not reproduce the Qwen-32B erosion.","status":"moved_to_debt","candidate_sentence_ids":[],"debt_id":"D8","hedge_relation":"same"},
-    {"claim_id":"C07","predicate":"The erosion persists across three fixed sampling seeds.","status":"moved_to_debt","candidate_sentence_ids":[],"debt_id":"D8","hedge_relation":"same"},
-    {"claim_id":"C08","predicate":"In examined Qwen-32B reversions, the edited association remains detectable at a cloze probe.","status":"present_in_prose","candidate_sentence_ids":["S5"],"debt_id":"D3","hedge_relation":"same"},
-    {"claim_id":"C09","predicate":"A separate route analysis identifies visible in-chain routes that motivate a chain-routing hypothesis.","status":"present_in_prose","candidate_sentence_ids":["S5"],"debt_id":"D4","hedge_relation":"same"},
-    {"claim_id":"C10","predicate":"A think-span-only old-answer first-token intervention leaves answer logits untouched and tests a chain-local control point.","status":"present_in_prose","candidate_sentence_ids":["S6"],"debt_id":"D6","hedge_relation":"same"},
-    {"claim_id":"C11","predicate":"The signed, dose-graded intervention offsets the observed loss in edit success.","status":"present_in_prose","candidate_sentence_ids":["S7"],"debt_id":"D5","hedge_relation":"same"},
-    {"claim_id":"C12","predicate":"The arm-wise resurfacing rate falls from 19.3% without suppression to 8.5% with suppression.","status":"present_in_prose","candidate_sentence_ids":["S7"],"debt_id":"D5","hedge_relation":"same"},
-    {"claim_id":"C13","predicate":"Placebo and same-relation controls have near-null answer-level effects; their endpoint-level limitations remain a manuscript debt.","status":"present_in_prose","candidate_sentence_ids":["S7"],"debt_id":"D6","hedge_relation":"same"},
-    {"claim_id":"C14","predicate":"The ROME strict endpoint improves against controls but not detectably against no suppression.","status":"moved_to_debt","candidate_sentence_ids":[],"debt_id":"D7","hedge_relation":"same"},
-    {"claim_id":"C15","predicate":"Positive 14B and MEMIT edit-success transfer coexists with inconclusive MEMIT strict transfer and a null-compatible fresh-N erosion check.","status":"moved_to_debt","candidate_sentence_ids":[],"debt_id":"R1","hedge_relation":"same"},
-    {"claim_id":"C16","predicate":"Edit evaluation needs a reasoning-time stress test, and the failure admits a chain-local causal control point.","status":"present_in_prose","candidate_sentence_ids":["S8"],"debt_id":null,"hedge_relation":"same"},
-    {"claim_id":"C17","predicate":"The complete-case paired loose-reversion change is −0.102 with uncertainty excluding zero.","status":"moved_to_debt","candidate_sentence_ids":[],"debt_id":"D5","hedge_relation":"same"}
-  ],
-  "debts": {
-    "D1":{"status":"OPEN","rationale":"Restore uncertainty and all-cell context for the two headline point estimates.","destination":"§3 phenomenon subsection and Table 1","required_content":"Both CIs, all six cells, fixed-checkpoint scope, and no monotonicity claim; no Holm statement without a ledgered derivation."},
-    "D2":{"status":"OPEN","rationale":"Restore metric-validation credit and instrument identity removed from the story abstract.","destination":"§3 metric-validation subsection","required_content":"κ=.836, n=87/120, rate-limited exclusions, strict/permissive scorer definitions, and panel/shared-bias caveats."},
-    "D3":{"status":"OPEN","rationale":"Prevent cloze detectability from being read as an intact or non-erased edit.","destination":"§4 installation-sanity discussion","required_content":"23/23, Qwen selected-reversion scope, cloze first-token pairwise probe definition, near-tautological/no-control limitation, and missing per-item crosswalk."},
-    "D4":{"status":"OPEN","rationale":"Restore route-census population and agreement, and disclose that the preregistered X1 replay test failed its carrier-validity gate, so natural semantic mediation is not identified.","destination":"§4 taxonomy and routing-hypothesis discussion","required_content":"101-pool scope, 41/43/17 membership, 41 instances/33 facts, Bridge/Recall/RO/Associative=27/11/3/0, second-panel identity, agreement, and adjacent X1 9/18 FAIL firewall."},
-    "D5":{"status":"OPEN","rationale":"Restore the paired estimands and uncertainty behind the thinking-tax and loose-reversion claims.","destination":"§5 headline intervention table","required_content":"Paired ES +0.138 and CI, marginal levels, paired RR −0.102 and CI, and marginal-versus-complete-case explanation."},
-    "D6":{"status":"OPEN","rationale":"Restore the answer-level limits of the causal calibration summarized in prose.","destination":"§5 intervention-calibration paragraph","required_content":"Answer-level null-compatible qualifications for placebo and same-relation controls, their pairwise contrasts, and the non-null C-arm CLR boundary."},
-    "D7":{"status":"OPEN","rationale":"Keep the secondary strict endpoint from being hidden by the primary ES/loose-RR story.","destination":"§5 endpoint hierarchy","required_content":"T−P and T−C strict results, equally visible T−N p=.073, and bounded multiplicity language."},
-    "D8":{"status":"OPEN","rationale":"Restore robustness controls removed wholesale from the story abstract.","destination":"§3 robustness/control paragraph","required_content":"The canned-thought control, three fixed sampling seeds, primary complete-case estimate, and an explicit prohibition on seed-population generalization."},
-    "R1":{"status":"OPEN","rationale":"Keep positive transfer and adverse/null-compatible transfer boundaries together after the entire transfer clause moved out of the abstract.","destination":"§5 transfer subsection/table","required_content":"ROME-14B ES replication, MEMIT positive ES transfer, MEMIT strict null, and fresh-N erosion null-compatible boundary."}
+  {
+   "claim_id": "C02",
+   "predicate": "Each ROME edit on CounterFact is compared at zero thinking and after a natural chain across six fixed checkpoints from two DeepSeek-R1-distill families.",
+   "status": "present_in_prose",
+   "candidate_sentence_ids": [
+    "S2"
+   ],
+   "debt_id": null,
+   "hedge_relation": "same"
   },
-  "g5": {
-    "disposition_table": "PASS",
-    "manuscript_debts": "OPEN",
-    "adoption_gate": "BLOCKED"
+  {
+   "claim_id": "C03",
+   "predicate": "At each family's largest tested checkpoint, within-edit success drops 0.106 and 0.107; the paired design is established in S2.",
+   "status": "present_in_prose",
+   "candidate_sentence_ids": [
+    "S2",
+    "S3"
+   ],
+   "debt_id": "D1",
+   "hedge_relation": "same"
+  },
+  {
+   "claim_id": "C04",
+   "predicate": "On Qwen-32B, the old answer resurfaces in 19.3% of zero-thinking successes and displaces the new answer in 9.2%.",
+   "status": "present_in_prose",
+   "candidate_sentence_ids": [
+    "S4"
+   ],
+   "debt_id": "D2",
+   "hedge_relation": "same"
+  },
+  {
+   "claim_id": "C05",
+   "predicate": "The Qwen-32B erosion is edit-specific relative to null-compatible old-answer drift in the unedited base.",
+   "status": "present_in_prose",
+   "candidate_sentence_ids": [
+    "S4"
+   ],
+   "debt_id": null,
+   "hedge_relation": "same"
+  },
+  {
+   "claim_id": "C06",
+   "predicate": "A canned thought does not reproduce the Qwen-32B erosion.",
+   "status": "moved_to_debt",
+   "candidate_sentence_ids": [],
+   "debt_id": "D8",
+   "hedge_relation": "same"
+  },
+  {
+   "claim_id": "C07",
+   "predicate": "The erosion persists across three fixed sampling seeds.",
+   "status": "moved_to_debt",
+   "candidate_sentence_ids": [],
+   "debt_id": "D8",
+   "hedge_relation": "same"
+  },
+  {
+   "claim_id": "C08",
+   "predicate": "In examined Qwen-32B reversions, the edited association remains detectable at a cloze probe.",
+   "status": "present_in_prose",
+   "candidate_sentence_ids": [
+    "S5"
+   ],
+   "debt_id": "D3",
+   "hedge_relation": "same"
+  },
+  {
+   "claim_id": "C09",
+   "predicate": "A separate route analysis identifies visible in-chain routes that motivate a chain-routing hypothesis.",
+   "status": "present_in_prose",
+   "candidate_sentence_ids": [
+    "S5"
+   ],
+   "debt_id": "D4",
+   "hedge_relation": "same"
+  },
+  {
+   "claim_id": "C10",
+   "predicate": "A think-span-only old-answer first-token intervention leaves answer logits untouched and tests a chain-local control point.",
+   "status": "present_in_prose",
+   "candidate_sentence_ids": [
+    "S6"
+   ],
+   "debt_id": "D6",
+   "hedge_relation": "same"
+  },
+  {
+   "claim_id": "C11",
+   "predicate": "The signed, dose-graded intervention offsets the observed loss in edit success.",
+   "status": "present_in_prose",
+   "candidate_sentence_ids": [
+    "S7"
+   ],
+   "debt_id": "D5",
+   "hedge_relation": "same"
+  },
+  {
+   "claim_id": "C12",
+   "predicate": "The arm-wise resurfacing rate falls from 19.3% without suppression to 8.5% with suppression.",
+   "status": "present_in_prose",
+   "candidate_sentence_ids": [
+    "S7"
+   ],
+   "debt_id": "D5",
+   "hedge_relation": "same"
+  },
+  {
+   "claim_id": "C13",
+   "predicate": "Placebo and same-relation controls have near-null answer-level effects; their endpoint-level limitations remain a manuscript debt.",
+   "status": "present_in_prose",
+   "candidate_sentence_ids": [
+    "S7"
+   ],
+   "debt_id": "D6",
+   "hedge_relation": "same"
+  },
+  {
+   "claim_id": "C14",
+   "predicate": "The ROME strict endpoint improves against controls but not detectably against no suppression.",
+   "status": "moved_to_debt",
+   "candidate_sentence_ids": [],
+   "debt_id": "D7",
+   "hedge_relation": "same"
+  },
+  {
+   "claim_id": "C15",
+   "predicate": "Positive 14B and MEMIT edit-success transfer coexists with inconclusive MEMIT strict transfer and a null-compatible fresh-N erosion check.",
+   "status": "moved_to_debt",
+   "candidate_sentence_ids": [],
+   "debt_id": "R1",
+   "hedge_relation": "same"
+  },
+  {
+   "claim_id": "C16",
+   "predicate": "Edit evaluation needs a reasoning-time stress test, and the failure admits a chain-local causal control point.",
+   "status": "present_in_prose",
+   "candidate_sentence_ids": [
+    "S8"
+   ],
+   "debt_id": null,
+   "hedge_relation": "same"
+  },
+  {
+   "claim_id": "C17",
+   "predicate": "The complete-case paired loose-reversion change is −0.102 with uncertainty excluding zero.",
+   "status": "moved_to_debt",
+   "candidate_sentence_ids": [],
+   "debt_id": "D5",
+   "hedge_relation": "same"
   }
+ ],
+ "debts": {
+  "D1": {
+   "status": "DISCHARGED",
+   "rationale": "Restore uncertainty and all-cell context for the two headline point estimates.",
+   "destination": "§3 phenomenon subsection and Table 1",
+   "required_content": "Both CIs, all six cells, fixed-checkpoint scope, and no monotonicity claim; no Holm statement without a ledgered derivation.",
+   "discharged_at": "main.tex:98 “the paired ES drops are”; main.tex:99 “We report all six fixed-checkpoint cells”; main.tex:99 “we do not infer an ordered trend across checkp”"
+  },
+  "D2": {
+   "status": "DISCHARGED",
+   "rationale": "Restore metric-validation credit and instrument identity removed from the story abstract.",
+   "destination": "§3 metric-validation subsection",
+   "required_content": "κ=.836, n=87/120, rate-limited exclusions, strict/permissive scorer definitions, and panel/shared-bias caveats.",
+   "discharged_at": "main.tex:101 “permissive old-value resurfacing is”; main.tex:72 “Cohen's \\(\\kappa=.836\\)”; main.tex:72 “votes for \\(87\\) of \\(120\\) stratified items”; main.tex:72 “shared-bias risk”"
+  },
+  "D3": {
+   "status": "DISCHARGED",
+   "rationale": "Prevent cloze detectability from being read as an intact or non-erased edit.",
+   "destination": "§4 installation-sanity discussion",
+   "required_content": "23/23, Qwen selected-reversion scope, cloze first-token pairwise probe definition, near-tautological/no-control limitation, and missing per-item crosswalk.",
+   "discharged_at": "main.tex:135 “the new token had the higher logit in”; main.tex:136 “close to tautological”; main.tex:136 “we place no quantitative weight on this observ”",
+   "discharge_note": "解除条件为 A1-1(W2-8):结论末句的非擦除断言已删,cloze 证据只以 installation-sanity 天花板措辞出现、并自带『下游不赋予定量权重』。"
+  },
+  "D4": {
+   "status": "DISCHARGED",
+   "rationale": "Restore route-census population and agreement, and disclose that the preregistered X1 replay test failed its carrier-validity gate, so natural semantic mediation is not identified.",
+   "destination": "§4 taxonomy and routing-hypothesis discussion",
+   "required_content": "101-pool scope, 41/43/17 membership, 41 instances/33 facts, Bridge/Recall/RO/Associative=27/11/3/0, second-panel identity, agreement, and adjacent X1 9/18 FAIL firewall.",
+   "discharged_at": "main.tex:141 “\\(101\\) candidate chains”; main.tex:72 “\\(41\\) route instances from \\(33\\) unique fact”; main.tex:170 “motivates a chain-routing hypothesis”; main.tex:172 “the vehicle-validity gate is permanently”"
+  },
+  "D5": {
+   "status": "DISCHARGED",
+   "rationale": "Restore the paired estimands and uncertainty behind the thinking-tax and loose-reversion claims.",
+   "destination": "§5 headline intervention table",
+   "required_content": "Paired ES +0.138 and CI, marginal levels, paired RR −0.102 and CI, and marginal-versus-complete-case explanation.",
+   "discharged_at": "main.tex:260 “Against no suppression the same comparison giv”; main.tex:240 “-.102”; main.tex:262 “need not equal differences of arm-wise rates”"
+  },
+  "D6": {
+   "status": "DISCHARGED",
+   "rationale": "Restore the answer-level limits of the causal calibration summarized in prose.",
+   "destination": "§5 intervention-calibration paragraph",
+   "required_content": "Answer-level null-compatible qualifications for placebo and same-relation controls, their pairwise contrasts, and the non-null C-arm CLR boundary.",
+   "discharged_at": "main.tex:267 “Neither control moves the answer.”; main.tex:267 “we set no equivalence margin”; main.tex:269 “whose interval excludes zero”"
+  },
+  "D7": {
+   "status": "DISCHARGED",
+   "rationale": "Keep the secondary strict endpoint from being hidden by the primary ES/loose-RR story.",
+   "destination": "§5 endpoint hierarchy",
+   "required_content": "T−P and T−C strict results, equally visible T−N p=.073, and bounded multiplicity language.",
+   "discharged_at": "main.tex:278 “The secondary strict endpoint separates the tr”; main.tex:278 “That interval reaches zero.”; main.tex:278 “unadjusted and we claim no correction”",
+   "discharge_note": "strict 端点与主端点同等显著度报出,并明写正因其最弱才如此报;未做多重性校正且声明不主张。"
+  },
+  "D8": {
+   "status": "DISCHARGED",
+   "rationale": "Restore robustness controls removed wholesale from the story abstract.",
+   "destination": "§3 robustness/control paragraph",
+   "required_content": "The canned-thought control, three fixed sampling seeds, primary complete-case estimate, and an explicit prohibition on seed-population generalization.",
+   "discharged_at": "main.tex:119 “is a fixed short canned thought”; main.tex:122 “across three fixed seeds”; main.tex:122 “do not identify a sampling-seed population”"
+  },
+  "R1": {
+   "status": "DISCHARGED",
+   "rationale": "Keep positive transfer and adverse/null-compatible transfer boundaries together after the entire transfer clause moved out of the abstract.",
+   "destination": "§5 transfer subsection/table",
+   "required_content": "ROME-14B ES replication, MEMIT positive ES transfer, MEMIT strict null, and fresh-N erosion null-compatible boundary.",
+   "discharged_at": "main.tex:286 “Under MEMIT on the Qwen-14B checkpoint”; main.tex:286 “strict displacement does not separate”; main.tex:286 “fresh no-suppression arm”; main.tex:286 “transfers the intervention and not the gap”"
+  }
+ },
+ "g5": {
+  "disposition_table": "PASS",
+  "manuscript_debts": "CLOSED",
+  "adoption_gate": "UNBLOCKED",
+  "_unblocked_by": "W2-8/A1-3。九条债务各自的 required_content 逐元素在冻结正文中验证存在(见 debts[].discharged_at);D3 的解除条件 A1-1(删结论末句的非擦除断言)本轮已完成。**解锁仅表示可以把 OpenReview 摘要字段换成 v8.1;换表单是作者账户的外部操作,写作环不代执行。**"
+ }
 }

@@ -235,13 +235,16 @@ def _save(fig: plt.Figure, stem: str) -> tuple[Path, Path, Path]:
     svg = PAPER_DIR / f"{stem}.svg"
     pdf = PAPER_DIR / f"{stem}.pdf"
     png = PAPER_DIR / f"{stem}.png"
+    # Metadata is deliberately identity-free: matplotlib writes Creator into
+    # the PDF, it survives inside main.pdf's compressed streams, and strings(1)
+    # on main.pdf will not reveal it.  Do not put the repository name here.
     fig.savefig(
         svg,
         bbox_inches="tight",
         pad_inches=0.04,
         metadata={
             "Title": stem,
-            "Creator": "why-aaai27/src/plots.py",
+            "Creator": "anonymized-generator.py",
             "Date": None,
         },
     )
@@ -257,7 +260,7 @@ def _save(fig: plt.Figure, stem: str) -> tuple[Path, Path, Path]:
         metadata={
             "Title": stem,
             "Author": "Anonymous",
-            "Creator": "why-aaai27/src/plots.py",
+            "Creator": "anonymized-generator.py",
             "CreationDate": None,
             "ModDate": None,
         },
@@ -267,7 +270,7 @@ def _save(fig: plt.Figure, stem: str) -> tuple[Path, Path, Path]:
         bbox_inches="tight",
         pad_inches=0.04,
         dpi=600,
-        metadata={"Software": "why-aaai27/src/plots.py"},
+        metadata={"Software": "anonymized-generator.py"},
     )
     return svg, pdf, png
 

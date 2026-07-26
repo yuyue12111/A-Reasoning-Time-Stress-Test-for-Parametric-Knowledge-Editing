@@ -45,34 +45,34 @@ APPROVED_REFS_SHA256 = (
     "7d8dfaef35c81fb41828ad8e988f841e0ff06f7180f8e843df6748ba9882591f"
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
-    "Section 3": "86be62d733b2fed340fb24842f34918459d417d60e9a0d8a1b98c92bf3aa9944",
-    "Section 4": "190966f02418b871a5f9eca06720b0ade5bbaecb79f6d3aeb3cd8a24925e6097",
-    "Section 5": "6a631f843bc7d06b6739a5ae3a3e42185397dfdcf4ba7989c80e6fc75e9aec61",
+    "Section 3": "4329b22053a2b6c492b2560f398295a3f1cd35f25b41be0610c0982da834f8c6",
+    "Section 4": "b43e9b0800a1ad992ef1981f6b2d3c86fade17f1cbc4020983b822609851b7ca",
+    "Section 5": "f97ea896c19b81cd7c5ed282220b0efd53b826e1db4310280192c56334df3cbc",
     "Section 1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "Section 6": "74b92da36a3543fc67135e4a45641665ddd118c69e3ce97a70bbdc8afb459f84",
+    "Section 6": "338bb48e61a6682ad4b53a1aab869ff2bb9b8f43875d269bf375362b09f47f9f",
     "Section 7": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "Ethical Statement": "77c797799862657f370deb0fb5ea4fd35a125823817e7f1a430d378acc1309f3",
+    "Ethical Statement": "88f0707f1d5c1eda7a9bd547676b54be87881a664dee8eb7c75c5967682bc512",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
-    "Section 3": "d728a801b5902422fd41ce09717a9e8596a2a8be315fda2b66b4f2f4a71afc87",
-    "Section 4": "ed03ed832354f84ade49c9a45f1536213606aea638fdfdc964f7ebfe436327e5",
-    "Section 5": "12556608af9bb39aa17377344c923d0082f280732505ce13c7cbdd3a9080422e",
+    "Section 3": "a0d88f020aa2810112a1960211f7ac063e2e2cf6fb25ee951b91955c866a39ba",
+    "Section 4": "27d4246d01944fc39bf5003c06de4191b3bf82fbe78424899fe472eba9e309c2",
+    "Section 5": "e82749b726992a839fdb809f0c52e5a0eac79da8eac7f2a9c50347ed2f813d48",
     "Section 1": "8501aaa42ef2292ba3c82116bb23b4bd6d156cd7507c184a836f8c5b6b22584e",
     "Section 2": "292ba689d081074876b825ea00d5bb2199733ed2d86f7f66ab224e7979f49424",
-    "Section 6": "3051517aabe93e242b12a77974af53043498c71643b70306c08e0086e388ee26",
-    "Section 7": "267cfbaf9e9c00c3259c745b716700ab926a6cf35cf319aba40a752baffea362",
-    "Ethical Statement": "c51f52124104dbc616385a2cf468081409a52ea0482570f9ea115255dbf4e7dd",
+    "Section 6": "eda5a72782c188375497b0c88ef1ed95649fdfdf05aad2bac6577d02f383f560",
+    "Section 7": "dedf65903652d24584d73e8b1fe7e26546fffc3b8d87bc89b0e109f2dc3bcc07",
+    "Ethical Statement": "3025240e7baefa65f723aef618a0faf3692d73303d6829d867b204d938d754fa",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
-    "Section 3": "5e812e18d357b36155c2e710f3d2920a1a234710849ddd86168feed0826cf418",
-    "Section 4": "e17282292cefc7218ced1dcd858f91443d09a294e25aae4a30b96cfd93c42d96",
-    "Section 5": "2ad926dd4211888083545a381faccf891dd8b2972721e5832ae6d497114ea5ea",
+    "Section 3": "a718453291fa539e02fa58b0e12c0499f31392ca7d86e4eea9cd1e6d372c0635",
+    "Section 4": "0c9a9f293858a5ab082bd8e274b46df8477f3f8fe02987f78d94bc1aaee8d105",
+    "Section 5": "45e01d60ade080ff4b930e25aac4a297a18829e22bee6a3782008cde50526f5b",
     "Section 1": "667225c0512d00ddbabf3be7bd40a08571465e72c04bd87c199e8f0c3b60b3d5",
     "Section 2": "e34cb83df7c519fb190a2a7aa16511a6266e2f09d532111167ec535db7494ea6",
-    "Section 6": "31a62c7c029505c79d741d67d0f352f8ffe1dbc5049720699f75e1980a1f2c14",
-    "Section 7": "a1c16c55371cc59da2a11e80c958dbeb808b850dfcb59ff3ffc66fd5a254b71b",
-    "Ethical Statement": "da4855babead263241000c8ed9b7e23ce286debb2d146271abb7225b101ba14c",
+    "Section 6": "c4f40b879f5a2a15c4a9213de8a4065e0c58816cf1ac092096381601b488b15c",
+    "Section 7": "3aa5eed8fcbdc84c3c903395b725a1d0b6023a86383dad99a9a0c28325a47871",
+    "Ethical Statement": "0943afdd9b1d93f5c1103717e90cc425db9d0467c4f481b1b5296a96ad9db024",
 }
 
 # Every frozen-abstract number now has a same-display body RJ binding: the
@@ -126,6 +126,9 @@ APPROVED_EXACT_POINTERS = frozenset(
         "/rq3/clr_split_M1/mediation_2x2/n_b0ok",
         "/rq3/genbench/gate",
         "/rq3/genbench_b26_tost/ci_level",
+        "/rq3/environment/accelerator_hbm_gb/hopper_class",
+        "/rq3/environment/accelerator_hbm_gb/ada_class",
+        "/rq3/environment/dtype_crosscheck_n",
         "/rq3/sup_battery/marginal_B3/N/RRs",
         "/rq3/sup_battery/marginal_B3/N/RR",
         "/rq3/sup_battery/marginal_B3/T/RR",
@@ -493,6 +496,16 @@ BANNED_PATTERNS = {
     "unhyphenated prespecified variant": r"\bprespecified\b",
     "edit-intact overclaim": r"\bedit intact\b",
     "not-erased overclaim": r"\bnot erased\b",
+    # W2-8/A1-2: a banned clause must be barred in every word form and in its
+    # denial rewrites.  This is the third synonym bypass of the same rule
+    # ("declines at every step" for monotonic*, the noun "erasure" for "erased"),
+    # so the pattern set now covers -ed/-ure/-ing and negated paraphrases.
+    "erasure-noun overclaim": r"\berasure\b",
+    "erased word-form overclaim": r"\berased\b|\berasing\b",
+    "negated-erasure paraphrase": r"\bnot\b[^.]{0,40}\b(?:eras|intact)",
+    # Bare "intact" cannot be banned: Section 2 legitimately reports that prior
+    # work found general capability stays intact.  Bind it to our own edit.
+    "intact overclaim": r"\bedit\w*\b[^.]{0,40}\bintact\b",
     "guaranteed-upper-bound overclaim": r"\bguaranteed upper bound\b",
     "ordered-trend overclaim": r"\bmonotonic\w*\b",
     "chain-localized variant": r"\bchain-localized\b",
@@ -1194,8 +1207,8 @@ def check_global_claim_language(main_text: str, errors: list[str]) -> None:
 
     approved_lower_bound_sentence = (
         "missingness is concentrated among rule-negative rows but does not make "
-        "the available-case kappa a lower bound; missingness sensitivity is "
-        "deferred to the supplement."
+        "the available-case kappa a lower bound; the missingness pattern is "
+        "reported in the supplement."
     )
     for sentence in re.split(r"(?<=[.!?])\s+", lowered):
         if (
@@ -1872,6 +1885,38 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def check_artifact_anonymity(main_path: Path, errors: list[str]) -> None:
+    """Fail if any shipped artifact carries an identity string (W2-8 / A0-4).
+
+    The leak this catches is invisible to ``strings``/``grep``/exiftool: a figure's
+    ``/Creator`` becomes part of a Flate-compressed object stream once the figure is
+    embedded in ``main.pdf``.  ``scrub_artifacts`` inflates every stream before
+    matching, which is why the gate delegates rather than re-implementing a scan.
+
+    A missing ``main.pdf`` is not an error: it is gitignored and rebuilt on demand.
+    Everything that *is* committed is still checked.
+    """
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    try:
+        from scrub_artifacts import leaks_in, targets
+    except ImportError as exc:  # pragma: no cover - import wiring only
+        errors.append(f"anonymity gate unavailable: {exc}")
+        return
+    for artifact in targets():
+        if not artifact.exists():
+            continue
+        hits = leaks_in(artifact)
+        if hits:
+            errors.append(
+                f"anonymity leak in {artifact.name}: {', '.join(hits)}"
+            )
+    built = main_path.parent / "main.pdf"
+    if built.exists():
+        hits = leaks_in(built)
+        if hits:
+            errors.append(f"anonymity leak in built main.pdf: {', '.join(hits)}")
+
+
 def main() -> int:
     args = parse_args()
     errors: list[str] = []
@@ -1964,6 +2009,7 @@ def main() -> int:
         section_counts[section_label] = len(section_ledger)
 
     check_abstract_body_bindings(main_text, combined_ledger, results, errors)
+    check_artifact_anonymity(args.main, errors)
 
     if errors:
         print(f"FAIL: {len(errors)} manuscript check(s) failed", file=sys.stderr)

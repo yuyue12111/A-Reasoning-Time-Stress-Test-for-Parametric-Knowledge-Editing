@@ -23,6 +23,7 @@ def ln(anchor: str) -> str:
 
 _RW = ln("paragraph{How edits are evaluated.}")
 _GB = ln("cost on unedited queries")
+_REPRO = ln("paragraph{Reproducibility.}")
 
 # (item, question shorthand, answer, authorizing evidence)
 ROWS = [
@@ -64,13 +65,17 @@ ROWS = [
  ("3.7", "非公开数据集的详述", "NA", "无非公开数据集。"),
 
  ("4.1", "是否有计算实验", "yes", "全文为计算实验。"),
- ("4.2", "超参取值个数/范围 + 选定判据", "yes",
-  f"正文已给抑制强度全扫（{ln('Penalty strength was varied over 0, 2, 4, 8, 12, and 16')}）。"
-  "**→ Task D 硬承诺（supp S11 超参表）**须补齐三件：(i) 编辑层逐模型扫描与判据"
-  "（Loc≥0.85 约束下取生成式 B0 ES 最高层）；(ii) penalty=8 **由冻结协议预先固定**、"
-  "六点扫描是事后稳健性检查而非选点依据（**不得追认一个当时未记录的选择判据**；"
-  "注意 ES 在 penalty=12 处高于 8，正文『五档之间 ES/RR 无序』已覆盖此事实）；"
-  "(iii) W-B 的 α∈{1,2,5}% 与 α*=1% 的伤害门判据。其余 EasyEdit 超参沿用上游默认、未调。"),
+ ("4.2", "超参取值个数/范围 + 选定判据", "partial",
+  f"**W2-8 改判(原答 yes,现降 partial)**。正文已给抑制强度全扫与其预先固定的 provenance"
+  f"（{ln('Penalty strength was varied over 0, 2, 4, 8, 12, and 16')}）。降级理由是编辑层:"
+  "**六个 checkpoint 中只有两个真扫过**——Qwen-7B(ROME 扫 {5,7,10},n=40,B0;判据 Loc≥.85 下生成式 B0 ES 最高,"
+  "实测 .55/.475/.40 且只有 layer5 的 Loc 达 .85)与 Llama-8B(layer{5,6,7}×clamp 四格 n=60 → 定 layer6/clamp2);"
+  "其余四个(32B L12 / 14B L9 / 1.5B L5 / 70B L14)按 0.18 相对深度**先验设定**,预置的条件回退扫描"
+  "({10,13,16}/{7,9,12}/{4,5,7}/{12,16,20})**一次都没触发**;MEMIT 用冻结多层带、未扫。"
+  "对这四个 checkpoint『尝试过的取值范围』根本不存在,答 yes 一次 ctrl-F 即被证伪。"
+  "**→ Task D(supp S11)** 须给逐 checkpoint 层值与其确定方式;"
+  "**并明令不得为 penalty=8 追认一个当时未记录的选择判据**(它由冻结协议预先固定,六点扫描是事后稳健性检查;"
+  "注意 ES 在 penalty=12 处高于 8,正文『五档间 ES/RR 无序』已覆盖此事实)。"),
  ("4.3", "预处理代码入附录", "yes", "`data/build_dataset.py`。**→ Task D**。"),
  ("4.4", "实验与分析全部源码入代码附录", "yes", "`src/`（含 `edit_loop.py`/`think_budget.py`/`genbench.py`/分析脚本）。**→ Task D**。"),
  ("4.5", "源码公开 + 许可", "yes", "**→ Task D**：`data/LICENSES.md` + 仓库许可。"),
@@ -81,10 +86,11 @@ ROWS = [
   f"§3.3 明写三个固定种子及其配对口径（{ln('across three fixed seeds')}）；"
   "配置层 `experiments/*.yaml` 记 `seed: 42`，`think_budget.py:79` 在生成前 `torch.manual_seed(seed)`。"),
  ("4.8", "计算基础设施", "yes",
-  "**正文无落点，全部由 supplement 授权 → Task D 硬承诺**。须如实写两套异构环境："
-  "(a) Hopper 卡上 bf16 会使 ROME `compute_v` 发散成 NaN，故该侧全程 `float32`；"
-  "(b) Ada 卡侧用 bf16；两者经 n=40 校验可混用。软件版本以 `env.lock` 为准并**标注其冻结日期 2026-06-10**"
-  "（早于 GPU 主跑，不冒充跑时快照）。**平台名与集群路径一律不出现（L4/L5 匿名化类别）**。"),
+  f"**W2-8 新增正文段**:§6 末的 Reproducibility 段（{_REPRO}）给出两类加速器(Hopper 类 141GB HBM / Ada 类 24GB)、"
+  "dtype 政策及其原因(Hopper 侧 bf16 使秩一更新发散成 NaN,故该侧 float32、另侧 bf16,并有 40 例交叉验证)、"
+  "版本以已释出的 lock 文件为准且**标注冻结早于所报运行**,以及 LLM 判官仅作评测仪器、prompts 与原始投票随附。"
+  "三个数字均按 M03 绑到 results.json 的 `rq3.environment` 块。**平台名与集群路径零出现**。"
+  "**遗留**:判官模型**版本串在仓库任何处均无记录** → Task D 须从运行日志找回,找不回则在 provenance_manifest 明写缺失。"),
  ("4.9", "评测指标形式化 + 动机", "yes",
   f"§3.1 给出 ES/RR/RR^s/CLR 的形式定义与嵌套关系，并说明为何是不同错误剖面的操作性端点"
   f"（{ln('These are nested operational endpoints')}）；Loc 的受限用法同段写明。"),
@@ -112,7 +118,7 @@ body = [
  "",
  f"- 对应文件：`paperwriting/manuscript/ReproducibilityChecklist.tex`（AuthorKit27 模板填答，31 项）",
  f"- 行号基准：`main.tex` @ 本次提交的父 commit `{head}`（行号会随后续编辑漂移，锚点引文为准）",
- "- 统计：yes 21 / partial 1 / no 1 / NA 8",
+ "- 统计：yes 20 / partial 2 / no 1 / NA 8（W2-8 将 4.2 由 yes 降为 partial）",
  "",
  "## 为什么理由不写进 .tex",
  "",

@@ -5,6 +5,7 @@ import runpy
 import shutil
 import subprocess
 import sys
+import zlib
 from pathlib import Path
 
 import pytest
@@ -1263,3 +1264,86 @@ def test_reproducibility_checklist_is_fully_answered() -> None:
     for item in ("1.1", "2.1", "3.5", "4.6", "4.13"):
         assert f"| **{item}** |" in ledger, item
     assert "Task D 硬承诺" in ledger, "supplement-authorized answers must be tracked"
+
+
+def test_anonymity_scan_sees_into_compressed_streams(tmp_path: Path) -> None:
+    """W2-8/A0-4: the leak this gate exists for is invisible to strings/grep.
+
+    A figure's /Creator survives into main.pdf inside a Flate stream, so a
+    raw-byte scan reports clean while the artifact is not.
+    """
+    sys.path.insert(0, str(REPO_ROOT / "src"))
+    import scrub_artifacts
+
+    secret = b"/Creator (why-aaai27/src/plots.py)"
+    blob = (
+        b"%PDF-1.4\n5 0 obj\n<< /Filter /FlateDecode >>\nstream\n"
+        + zlib.compress(secret)
+        + b"\nendstream\nendobj\n"
+    )
+    planted = tmp_path / "planted.pdf"
+    planted.write_bytes(blob)
+
+    assert b"why-aaai" not in blob, "precondition: raw bytes must look clean"
+    hits = scrub_artifacts.leaks_in(planted)
+    assert any("compressed stream" in h for h in hits), hits
+
+
+def test_scrub_replacement_preserves_pdf_byte_length() -> None:
+    """Equal-length rewriting is what keeps the xref table valid."""
+    sys.path.insert(0, str(REPO_ROOT / "src"))
+    import scrub_artifacts
+
+    for literal in scrub_artifacts.LEAKING_LITERALS:
+        replacement = scrub_artifacts.neutral_of(len(literal))
+        assert len(replacement) == len(literal), literal
+        assert not scrub_artifacts.IDENTITY_RE.search(replacement), replacement
+
+
+def test_shipped_artifacts_are_anonymous() -> None:
+    """The committed figures must stay clean; main.pdf is rebuilt, so optional."""
+    sys.path.insert(0, str(REPO_ROOT / "src"))
+    import scrub_artifacts
+
+    dirty = {
+        str(p.relative_to(REPO_ROOT)): scrub_artifacts.leaks_in(p)
+        for p in scrub_artifacts.targets()
+        if scrub_artifacts.leaks_in(p)
+    }
+    assert not dirty, dirty
+
+
+def test_figure_generators_do_not_write_the_repository_name() -> None:
+    """A0-2: re-rendering must not put the leak back."""
+    for name in ("plots.py", "plots_nature_skill.py"):
+        source = (REPO_ROOT / "src" / name).read_text(encoding="utf-8")
+        assert "why-aaai27/src" not in source, name
+        assert "metadata=" in source, name
+
+
+@pytest.mark.parametrize(
+    "planted",
+    [
+        "What the failure is not is a clean erasure.",
+        "The edit was not erased by the chain.",
+        "The parametric edit remains intact after reasoning.",
+        "Our results show the association is not erasing under load.",
+    ],
+)
+def test_erasure_claims_are_banned_in_every_word_form(
+    candidate_main: Path, planted: str
+) -> None:
+    """W2-8/A1-2: the rule must survive -ed/-ure/-ing and negated paraphrases.
+
+    Three separate bypasses have now landed in the manuscript by re-wording
+    rather than by re-arguing, so the gate is written against word forms.
+    """
+    marker = r"\section{Introduction}"
+    mutate(candidate_main, marker, marker + "\n" + planted)
+    assert_rejected(candidate_main, "banned language")
+
+
+def test_conclusion_makes_no_non_erasure_claim(candidate_main: Path) -> None:
+    text = candidate_main.read_text(encoding="utf-8")
+    assert "clean erasure" not in text
+    assert "chain-local causal control point" in text

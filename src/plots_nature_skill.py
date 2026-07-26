@@ -249,7 +249,7 @@ def _save_figure(fig: plt.Figure, stem: str) -> tuple[Path, Path, Path]:
         svg_path,
         metadata={
             "Title": stem,
-            "Creator": "why-aaai27/src/plots_nature_skill.py",
+            "Creator": "anonymized-generator.py",
             "Date": None,
         },
     )
@@ -263,7 +263,7 @@ def _save_figure(fig: plt.Figure, stem: str) -> tuple[Path, Path, Path]:
         metadata={
             "Title": stem,
             "Author": "Anonymous",
-            "Creator": "why-aaai27/src/plots_nature_skill.py",
+            "Creator": "anonymized-generator.py",
             "CreationDate": None,
             "ModDate": None,
         },
@@ -271,7 +271,7 @@ def _save_figure(fig: plt.Figure, stem: str) -> tuple[Path, Path, Path]:
     fig.savefig(
         png_path,
         dpi=PNG_DPI,
-        metadata={"Software": "why-aaai27/src/plots_nature_skill.py"},
+        metadata={"Software": "anonymized-generator.py"},
     )
     return svg_path, pdf_path, png_path
 

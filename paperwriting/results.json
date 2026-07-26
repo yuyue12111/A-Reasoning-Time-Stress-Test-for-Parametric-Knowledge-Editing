@@ -1438,6 +1438,18 @@
    },
    "verdict": "★B12 DONE(退化分层=诚实观察):反思标记在 R1 链中近乎无处不在(114 vs 4)→ 该分层无判别力,但这本身有信息——反思是常量不是变量,不能作为区分『override 动作 vs o_old 内容』的杠杆;修复效应在反思链内显著(−0.105 排零)。M5 的 GPU 臂(压反思标记)维持 camera-ready,DROP 判定不变。"
   },
+  "environment": {
+   "_derivation": "M03 式结构化重述,非新科学:全部字段只是把 RUNBOOK.md §7 的硬件/dtype 记录与仓库 env.lock 的既有事实提成可被 % RJ 绑定的标量。无新计算、无新运行、无新工件。平台名与集群路径按 anonymize_spec L4/L5 一律不入库。",
+   "accelerator_hbm_gb": {
+    "hopper_class": 141,
+    "ada_class": 24
+   },
+   "dtype_policy": "Hopper 类卡上 bf16 使 ROME compute_v 优化发散成 NaN(RUNBOOK.md:158 实测),故该侧全程 float32;Ada 类侧 bf16。",
+   "dtype_crosscheck_n": 40,
+   "env_lock_frozen": "2026-06-10",
+   "_env_lock_caveat": "env.lock 冻结于 2026-06-10,早于 GPU 主跑——只能引作『锁定版本』,不得当作运行时快照引用。",
+   "judge_instrument": "外部商用 LLM 家族,仅作评测仪器;prompts 与逐条原始投票随 supplement 释出。**版本串在仓库任何处均无记录**,须从运行日志找回,找不回则在 provenance_manifest 明写缺失。"
+  },
   "genbench_b26_tost": {
    "_status": "B26(终极review 末位):部署口径门加 n 到全量(GSM8K 1319 / MATH-500 500),single+think,32B bf16。TOST 对 ±0.02 等价界(90% CI,两比例保守近似;per-item 配对未回传,配对只会更紧)。",
    "ci_level": 0.9,
