@@ -1347,3 +1347,50 @@ def test_conclusion_makes_no_non_erasure_claim(candidate_main: Path) -> None:
     text = candidate_main.read_text(encoding="utf-8")
     assert "clean erasure" not in text
     assert "chain-local causal control point" in text
+
+
+def test_anonymity_tiers_are_scoped_differently() -> None:
+    """W2-9/F6: the checker gate covers the submission, not the whole repo.
+
+    An internal document name in an experiment comment is a packaging concern.
+    Letting it fail the manuscript gate would make the gate unusable and invite
+    someone to switch it off.
+    """
+    sys.path.insert(0, str(REPO_ROOT / "src"))
+    import scrub_artifacts
+
+    submission = set(scrub_artifacts.targets("submission"))
+    release = set(scrub_artifacts.targets("release"))
+    assert submission < release
+    assert not any(p.suffix == ".yaml" for p in submission)
+    assert any(p.suffix == ".yaml" for p in release)
+    # generic patterns, not author-specific ones
+    for pattern in (rb"/Users/[A-Za-z0-9._-]+", rb"/home/[A-Za-z0-9._-]+"):
+        assert pattern in scrub_artifacts.IDENTITY_PATTERNS
+
+
+def test_results_json_carries_no_absolute_paths() -> None:
+    """W2-9/F6: results.json ships with the code."""
+    text = (REPO_ROOT / "paperwriting" / "results.json").read_text(encoding="utf-8")
+    assert "/Users/" not in text
+    assert ".codex/" not in text
+
+
+def test_licences_exist_for_the_yes_answers() -> None:
+    """W2-9/F8: 3.4 and 4.5 answer yes, so the licence must exist today."""
+    top = (REPO_ROOT / "LICENSE").read_text(encoding="utf-8")
+    assert "MIT License" in top
+    assert "The Authors" in top, "double-blind: no named copyright holder"
+    data = (REPO_ROOT / "data" / "LICENSES.md").read_text(encoding="utf-8")
+    for source in ("CounterFact", "MQuAKE", "GSM8K", "MATH-500"):
+        assert source in data, source
+
+
+def test_section1_sampling_control_has_the_right_sign(candidate_main: Path) -> None:
+    """W2-9/B1: the gap SURVIVES sampling; saying it fails to reproduce there
+    would argue the gap is a greedy-decoding artifact -- the opposite of the
+    conclusion the same sentence draws."""
+    text = candidate_main.read_text(encoding="utf-8")
+    assert "temperature sampling each fail to reproduce" not in text
+    assert "it survives temperature sampling" in text
+    assert "The gap also persists under temperature sampling" in text

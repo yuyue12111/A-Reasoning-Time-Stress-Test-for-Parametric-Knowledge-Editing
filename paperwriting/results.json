@@ -730,7 +730,7 @@
   "x2_memit14b_repair_replication": {
    "_status": "PASS(X2;prereg-x2-x3.md;fresh-N/T/C 同协议;n=200/arm;32 shards/arm;0 errors)。T−C ES@B3 确认性对比 PASS；RR/CLR 同向、严口径 RRs 为 null。C−N 与 0 相容但不是等价认证。v1.87 duplicate-safe CPU rescore 与旧数字零漂移。",
    "source": {
-    "audit_attachment": "/Users/whyu/.codex/attachments/a182907e-4c64-4dc5-9d63-5b43ff3f8b7f/pasted-text.txt",
+    "audit_attachment": "<local attachment path removed for release; identified by the sha256 recorded alongside>",
     "audit_attachment_sha256": "145cf47593fa90a6d40156f2b529a436c6280f0d3e3ad187feb177cc8280355f",
     "server_artifacts": [
      "results/x2_full_audit.json",
@@ -1090,7 +1090,7 @@
   "x3_rome32b_active_paraphrase": {
    "_status": "PASS with v1.87 inference refresh complete. Fresh mp2 N/T/C has n=200 cases/arm, 400 para rows/arm, 32 shards/arm, 0 errors. The sound confirmatory result is T-C strict-PS CI above zero. The legacy three-condition joint gate is retained only as historical audit because C-N CI inclusion of zero is not equivalence and T-N positivity is non-gating. Fixed-N-B0 old-only secondary remains directional/null (110<140 cases).",
    "source": {
-    "audit_attachment": "/Users/whyu/.codex/attachments/6c9ec587-36e6-45b4-aaac-59d3f77863af/pasted-text.txt",
+    "audit_attachment": "<local attachment path removed for release; identified by the sha256 recorded alongside>",
     "audit_attachment_sha256": "88df989a5f3a9b1bec69ca2bbd9632653c71dbb2c94fed7d13a6b775bc85f89b",
     "server_artifacts": [
      "results/x3_full_audit.json",
@@ -1442,8 +1442,10 @@
    "_derivation": "M03 式结构化重述,非新科学:全部字段只是把 RUNBOOK.md §7 的硬件/dtype 记录与仓库 env.lock 的既有事实提成可被 % RJ 绑定的标量。无新计算、无新运行、无新工件。平台名与集群路径按 anonymize_spec L4/L5 一律不入库。",
    "accelerator_hbm_gb": {
     "hopper_class": 141,
+    "hopper_class_secondary": 80,
     "ada_class": 24
    },
+   "_hopper_two_parts": "两块 Hopper 类卡都产出过被报告的数字:141GB 侧跑 headline/A2,80GB 侧跑 genbench A1(plan.md:215)与 base_probe 六尺度(plan.md:300)。只列 141 会漏报一类产出硬件。",
    "dtype_policy": "Hopper 类卡上 bf16 使 ROME compute_v 优化发散成 NaN(RUNBOOK.md:158 实测),故该侧全程 float32;Ada 类侧 bf16。",
    "dtype_crosscheck_n": 40,
    "env_lock_frozen": "2026-06-10",
@@ -1606,7 +1608,7 @@
   "p1_reload_capacity_diagnostic": {
    "_status": "DONE; extended deterministic CPU audit PASS (status=PASS, failures=[], warnings=[], extended_audit_status=PASS). P1 closes topology/node/reload/answer-surface/recorded-update-magnitude explanations for the frozen current-snapshot diagnostic only.",
    "source": {
-    "returned_attachment": "/Users/whyu/.codex/attachments/2f46e14d-255b-4145-955c-8441d699f682/pasted-text.txt",
+    "returned_attachment": "<local attachment path removed for release; identified by the sha256 recorded alongside>",
     "returned_attachment_sha256": "70b506e3971e738fb4173574101e12b56de4ce54ee5ed707f443276e238d3ea2",
     "attachment_note": "The pasted attachment begins after the outer opening brace and is not itself valid JSON. The authoritative raw first-pass artifact remains the server file.",
     "server_first_pass_summary": "results/p1_reload_summary.json",

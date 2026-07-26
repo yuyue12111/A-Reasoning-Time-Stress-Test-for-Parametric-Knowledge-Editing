@@ -48,6 +48,12 @@ IDENTITY_PATTERNS = (
     rb"gap-review",
     rb"prereg-",
     rb"sumandplan",
+    # W2-9/F6: the patterns above are author-specific.  These are generic and
+    # catch a home directory or a generating script in any workspace.
+    rb"/Users/[A-Za-z0-9._-]+",
+    rb"/home/[A-Za-z0-9._-]+",
+    rb"\bplots\w*\.py\b",
+    rb"\.codex/",
 )
 IDENTITY_RE = re.compile(b"|".join(IDENTITY_PATTERNS))
 
@@ -58,8 +64,19 @@ LEAKING_LITERALS = (
     b"why-aaai27/src/plots.py",
 )
 
-SCAN_SUFFIXES = {".pdf", ".png", ".svg"}
-SCAN_ROOTS = ("paperwriting",)
+# Two tiers, because they answer different questions.
+#
+# SUBMISSION is what a reviewer receives on the paper deadline: the built PDF and
+# the figures embedded in it.  This tier gates src/check_manuscript.py, so it must
+# stay narrow -- an internal document name in an experiment comment is a packaging
+# concern, not a reason to block the manuscript.
+#
+# RELEASE is everything that goes out with the code drop, where an internal
+# planning-document name or a home directory is a genuine leak.
+SUBMISSION_SUFFIXES = {".pdf", ".png", ".svg"}
+SUBMISSION_ROOTS = ("paperwriting",)
+RELEASE_SUFFIXES = SUBMISSION_SUFFIXES | {".json", ".csv", ".md", ".txt", ".yaml", ".yml", ".tex", ".py"}
+RELEASE_ROOTS = ("paperwriting", "data", "experiments", "src")
 
 
 def neutral_of(length: int) -> bytes:
@@ -135,11 +152,15 @@ def leaks_in(path: Path) -> list[str]:
     return sorted(found)
 
 
-def targets() -> list[Path]:
+def targets(tier: str = "submission") -> list[Path]:
+    roots, suffixes = (
+        (RELEASE_ROOTS, RELEASE_SUFFIXES) if tier == "release"
+        else (SUBMISSION_ROOTS, SUBMISSION_SUFFIXES)
+    )
     seen: list[Path] = []
-    for root in SCAN_ROOTS:
+    for root in roots:
         for path in sorted((REPO / root).rglob("*")):
-            if path.suffix.lower() in SCAN_SUFFIXES and path.is_file():
+            if path.suffix.lower() in suffixes and path.is_file():
                 seen.append(path)
     return seen
 
@@ -148,13 +169,17 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--scrub", action="store_true", help="rewrite in place")
     parser.add_argument("--audit", action="store_true", help="report only")
+    parser.add_argument("--tier", choices=("submission", "release"),
+                        default="submission",
+                        help="submission = the PDF and its figures (gates the checker); "
+                             "release = everything in the code drop")
     args = parser.parse_args()
     if not (args.scrub or args.audit):
         args.audit = True
 
     if args.scrub:
         total = 0
-        for path in targets():
+        for path in targets(args.tier):
             n = scrub_file(path)
             if n:
                 total += n
@@ -162,7 +187,7 @@ def main() -> int:
         print(f"-- {total} literal(s) replaced")
 
     dirty = []
-    for path in targets():
+    for path in targets(args.tier):
         hits = leaks_in(path)
         if hits:
             dirty.append((path.relative_to(REPO), hits))
@@ -171,7 +196,7 @@ def main() -> int:
         for path, hits in dirty:
             print(f"  {path}: {', '.join(hits)}")
         return 1
-    print(f"ANONYMITY AUDIT: CLEAN ({len(targets())} artifacts, raw + inflated streams)")
+    print(f"ANONYMITY AUDIT ({args.tier}): CLEAN ({len(targets(args.tier))} artifacts, raw + inflated streams)")
     return 0
 
 

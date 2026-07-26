@@ -1,8 +1,8 @@
 # ReproducibilityChecklist 核销台账（W2-7 / Task B / M19）
 
 - 对应文件：`paperwriting/manuscript/ReproducibilityChecklist.tex`（AuthorKit27 模板填答，31 项）
-- 行号基准：`main.tex` @ 本次提交的父 commit `23737ef`（行号会随后续编辑漂移，锚点引文为准）
-- 统计：yes 20 / partial 2 / no 1 / NA 8（W2-8 将 4.2 由 yes 降为 partial）
+- 行号基准：`main.tex` @ 本次提交的父 commit `7a4df5e`（行号会随后续编辑漂移，锚点引文为准）
+- 统计：yes 19 / partial 3 / no 1 / NA 8（W2-8 降 4.2；W2-9 降 4.8）
 
 ## 为什么理由不写进 .tex
 
@@ -27,7 +27,7 @@
 | **3.1** | 是否依赖数据集 | **yes** | CounterFact（main.tex:66）；GSM8K / MATH-500（main.tex:306）。 |
 | **3.2** | 数据集选择理由 | **yes** | §3.1 明写 CounterFact 是「所测编辑器被提出时所用的基准」（main.tex:66）——**本条为 W2-7 新增句**，此前正文只用不释；§6 明写 GSM8K/MATH 用于量化守卫在未编辑 query 上的代价（main.tex:306）。 |
 | **3.3** | 新数据集入 data appendix | **yes** | 本文新造的标注物：41 条路由普查实例的三判官投票、120 项分层验证面板的 87 条有效投票、curated 别名表 `data/aliases.json`、placebo 供体表 `data/placebo_donors.json`、同关系竞争者供体表。**→ Task D 硬承诺（supp S2/S4 + data appendix）**。 |
-| **3.4** | 新数据集公开+许可 | **yes** | **→ Task D 硬承诺**：`data/LICENSES.md`（草稿已在 `release_and_licenses.md`）。 |
+| **3.4** | 新数据集公开+许可 | **yes** | **W2-9 兑现**：顶层 `LICENSE`(MIT) 与 `data/LICENSES.md` **已落库**，逐数据集列出上游许可与「重分发 vs 用脚本再导出」的界线。授权物今天已存在于仓库，非空头承诺。 |
 | **3.5** | 文献数据集有引用 | **yes** | CounterFact→citep meng2022rome（main.tex:66）；GSM8K→citep cobbe2021gsm8k、MATH→citep hendrycks2021math（main.tex:306）。**后两条为 W2-7 新增**：此前 §6 用了这两个数据集却零引用、refs.bib 亦无条目，本项当时只能答 no。 |
 | **3.6** | 文献数据集公开可得 | **yes** | 三者均公开（CounterFact/GSM8K/MATH 及其 500 项子集）。 |
 | **3.7** | 非公开数据集的详述 | **NA** | 无非公开数据集。 |
@@ -35,10 +35,10 @@
 | **4.2** | 超参取值个数/范围 + 选定判据 | **partial** | **W2-8 改判(原答 yes,现降 partial)**。正文已给抑制强度全扫与其预先固定的 provenance（main.tex:214）。降级理由是编辑层:**六个 checkpoint 中只有两个真扫过**——Qwen-7B(ROME 扫 {5,7,10},n=40,B0;判据 Loc≥.85 下生成式 B0 ES 最高,实测 .55/.475/.40 且只有 layer5 的 Loc 达 .85)与 Llama-8B(layer{5,6,7}×clamp 四格 n=60 → 定 layer6/clamp2);其余四个(32B L12 / 14B L9 / 1.5B L5 / 70B L14)按 0.18 相对深度**先验设定**,预置的条件回退扫描({10,13,16}/{7,9,12}/{4,5,7}/{12,16,20})**一次都没触发**;MEMIT 用冻结多层带、未扫。对这四个 checkpoint『尝试过的取值范围』根本不存在,答 yes 一次 ctrl-F 即被证伪。**→ Task D(supp S11)** 须给逐 checkpoint 层值与其确定方式;**并明令不得为 penalty=8 追认一个当时未记录的选择判据**(它由冻结协议预先固定,六点扫描是事后稳健性检查;注意 ES 在 penalty=12 处高于 8,正文『五档间 ES/RR 无序』已覆盖此事实)。 |
 | **4.3** | 预处理代码入附录 | **yes** | `data/build_dataset.py`。**→ Task D**。 |
 | **4.4** | 实验与分析全部源码入代码附录 | **yes** | `src/`（含 `edit_loop.py`/`think_budget.py`/`genbench.py`/分析脚本）。**→ Task D**。 |
-| **4.5** | 源码公开 + 许可 | **yes** | **→ Task D**：`data/LICENSES.md` + 仓库许可。 |
+| **4.5** | 源码公开 + 许可 | **yes** | **W2-9 兑现**：顶层 `LICENSE`(MIT) 已落库，明写不覆盖 `source/` 下第三方仓库与数据集。 |
 | **4.6** | 新方法源码注释指回论文步骤 | **partial** | **诚实降级**：`edit_loop.py`/`think_budget.py` 注释密度高，但锚点指向内部 `plan.md` 章节与 prereg，而非论文小节。发布前逐文件补论文小节映射属可做但未做的工作，故不冒充 yes。 |
 | **4.7** | 随机种子设定方式 | **yes** | §3.3 明写三个固定种子及其配对口径（main.tex:122）；配置层 `experiments/*.yaml` 记 `seed: 42`，`think_budget.py:79` 在生成前 `torch.manual_seed(seed)`。 |
-| **4.8** | 计算基础设施 | **yes** | **W2-8 新增正文段**:§6 末的 Reproducibility 段（main.tex:308）给出两类加速器(Hopper 类 141GB HBM / Ada 类 24GB)、dtype 政策及其原因(Hopper 侧 bf16 使秩一更新发散成 NaN,故该侧 float32、另侧 bf16,并有 40 例交叉验证)、版本以已释出的 lock 文件为准且**标注冻结早于所报运行**,以及 LLM 判官仅作评测仪器、prompts 与原始投票随附。三个数字均按 M03 绑到 results.json 的 `rq3.environment` 块。**平台名与集群路径零出现**。**遗留**:判官模型**版本串在仓库任何处均无记录** → Task D 须从运行日志找回,找不回则在 provenance_manifest 明写缺失。 |
+| **4.8** | 计算基础设施 | **partial** | **W2-9 再降(W2-8 曾答 yes)**。§6 末 Reproducibility 段（main.tex:308）给出加速器类别与**dtype 政策及其原因**(Hopper 类上秩一更新的 bf16 会发散成 NaN,故该侧 float32、Ada 侧 bf16,40 例交叉验证),并把版本指向已释出的 lock 文件。**降级理由**:4.8 明文要求 OS 与库的名称和版本,而正文只有一个指向 lock 文件的指针、零库名——正文页面零余量,补库名句需牺牲第一/第二组的矛盾与引文修订,按既定优先级选择降级而非硬塞。**W2-9 同时修正两处事实**:(a) 指代——原文 “there” 的最近先行词是 Ada 那块而 NaN 在 Hopper 侧,已改为显式命名;(b) **加速器类别原只列两类,实为三类**——H100(80GB)也产出过被报告的数字(genbench A1 见 plan.md:215、base_probe 六尺度见 plan.md:300),已按 M03 在 `rq3.environment` 补 `hopper_class_secondary` 并入正文。**→ Task D**:OS/库名/EasyEdit commit 与判官版本串进 supp S11。 |
 | **4.9** | 评测指标形式化 + 动机 | **yes** | §3.1 给出 ES/RR/RR^s/CLR 的形式定义与嵌套关系，并说明为何是不同错误剖面的操作性端点（main.tex:70）；Loc 的受限用法同段写明。 |
 | **4.10** | 每个结果的运行次数 | **yes** | 贪心档每格单次确定性解码（main.tex:66）；采样档三固定种子、597/600 seed-pair 完整（main.tex:122）。逐格运行次数表 **→ Task D（supp S11）**。 |
 | **4.11** | 超越单点摘要的分布信息 | **yes** | 全文端点均带配对 case-bootstrap 区间（例：main.tex:99）。 |

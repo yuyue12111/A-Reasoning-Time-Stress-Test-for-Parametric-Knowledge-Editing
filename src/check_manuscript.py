@@ -47,32 +47,32 @@ APPROVED_REFS_SHA256 = (
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
     "Section 3": "4329b22053a2b6c492b2560f398295a3f1cd35f25b41be0610c0982da834f8c6",
     "Section 4": "b43e9b0800a1ad992ef1981f6b2d3c86fade17f1cbc4020983b822609851b7ca",
-    "Section 5": "f97ea896c19b81cd7c5ed282220b0efd53b826e1db4310280192c56334df3cbc",
+    "Section 5": "15418e38c59002cc13213b80e7a8efa18e0a4be9e73040b7e25b31edb9a4b29b",
     "Section 1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "Section 6": "338bb48e61a6682ad4b53a1aab869ff2bb9b8f43875d269bf375362b09f47f9f",
+    "Section 6": "ec1920efdf517af8485204281892ad7ecee5ff46a64f203229ad679dfece08d0",
     "Section 7": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "Ethical Statement": "88f0707f1d5c1eda7a9bd547676b54be87881a664dee8eb7c75c5967682bc512",
+    "Ethical Statement": "b1cbe6511c2e65552cef2f3daadff895d025d69c8ce21c87f817f09e6d340f3d",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
     "Section 3": "a0d88f020aa2810112a1960211f7ac063e2e2cf6fb25ee951b91955c866a39ba",
     "Section 4": "27d4246d01944fc39bf5003c06de4191b3bf82fbe78424899fe472eba9e309c2",
-    "Section 5": "e82749b726992a839fdb809f0c52e5a0eac79da8eac7f2a9c50347ed2f813d48",
-    "Section 1": "8501aaa42ef2292ba3c82116bb23b4bd6d156cd7507c184a836f8c5b6b22584e",
-    "Section 2": "292ba689d081074876b825ea00d5bb2199733ed2d86f7f66ab224e7979f49424",
-    "Section 6": "eda5a72782c188375497b0c88ef1ed95649fdfdf05aad2bac6577d02f383f560",
-    "Section 7": "dedf65903652d24584d73e8b1fe7e26546fffc3b8d87bc89b0e109f2dc3bcc07",
-    "Ethical Statement": "3025240e7baefa65f723aef618a0faf3692d73303d6829d867b204d938d754fa",
+    "Section 5": "53ce20ccc71e75487974452435ebd05fb04514896c7d63d0ef07a957ecb73ccc",
+    "Section 1": "aae853bf7e0a53379a2c78a3c7d6a89c97dae3dcdfb066d3d09f6b4d270240ad",
+    "Section 2": "cba22086656772c9bb882f58cc2c0990b83bc6135948424219f0ca19e41045b4",
+    "Section 6": "61fa524c461d087166d03ca02aa8fb8e725090e81d6da69a98cbb12773613ba3",
+    "Section 7": "7b1335fddbb84d04b9ed9d660c75ec1c0ae486336130e56846584772d1c607b0",
+    "Ethical Statement": "83ef177c646dcd11daf75d17094704015afba9266e702c433821b73365fce4e5",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
     "Section 3": "a718453291fa539e02fa58b0e12c0499f31392ca7d86e4eea9cd1e6d372c0635",
     "Section 4": "0c9a9f293858a5ab082bd8e274b46df8477f3f8fe02987f78d94bc1aaee8d105",
-    "Section 5": "45e01d60ade080ff4b930e25aac4a297a18829e22bee6a3782008cde50526f5b",
-    "Section 1": "667225c0512d00ddbabf3be7bd40a08571465e72c04bd87c199e8f0c3b60b3d5",
-    "Section 2": "e34cb83df7c519fb190a2a7aa16511a6266e2f09d532111167ec535db7494ea6",
-    "Section 6": "c4f40b879f5a2a15c4a9213de8a4065e0c58816cf1ac092096381601b488b15c",
-    "Section 7": "3aa5eed8fcbdc84c3c903395b725a1d0b6023a86383dad99a9a0c28325a47871",
-    "Ethical Statement": "0943afdd9b1d93f5c1103717e90cc425db9d0467c4f481b1b5296a96ad9db024",
+    "Section 5": "f03b2c924aa60c13df86c6b84ae6356c77803321d2e1355fb63738cfed6e0882",
+    "Section 1": "552345931e7ebc538e6bf080d76a7c6602bbbf22795f6280495bf1f40e3c215c",
+    "Section 2": "1cf720c3688b67df8a8d09f9b4d03a7089d24e4b795c86f05a4e7fc16aa42499",
+    "Section 6": "e61fcd102d8427e7bbf2c6e6b6652b57ef22dfa1dfeb7e827c3548425295f345",
+    "Section 7": "d9d158cd2eef99a4672157db15b508d0466ef9fe842ab8af679df8bde1263804",
+    "Ethical Statement": "85bc44dc71ba6052f2b11a955bf5154c0926e7130dad19c8f3035b168686d055",
 }
 
 # Every frozen-abstract number now has a same-display body RJ binding: the
@@ -127,6 +127,7 @@ APPROVED_EXACT_POINTERS = frozenset(
         "/rq3/genbench/gate",
         "/rq3/genbench_b26_tost/ci_level",
         "/rq3/environment/accelerator_hbm_gb/hopper_class",
+        "/rq3/environment/accelerator_hbm_gb/hopper_class_secondary",
         "/rq3/environment/accelerator_hbm_gb/ada_class",
         "/rq3/environment/dtype_crosscheck_n",
         "/rq3/sup_battery/marginal_B3/N/RRs",
@@ -501,6 +502,8 @@ BANNED_PATTERNS = {
     # ("declines at every step" for monotonic*, the noun "erasure" for "erased"),
     # so the pattern set now covers -ed/-ure/-ing and negated paraphrases.
     "erasure-noun overclaim": r"\berasure\b",
+    # W2-8/M4: only the verb is licensed; the nominalisation asserts a status.
+    "certification nominalisation": r"\bcertificat(?:ion|ions)\b",
     "erased word-form overclaim": r"\berased\b|\berasing\b",
     "negated-erasure paraphrase": r"\bnot\b[^.]{0,40}\b(?:eras|intact)",
     # Bare "intact" cannot be banned: Section 2 legitimately reports that prior
