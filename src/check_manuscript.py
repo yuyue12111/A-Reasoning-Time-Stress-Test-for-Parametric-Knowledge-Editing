@@ -42,37 +42,37 @@ APPROVED_PREAMBLE_SHA256 = (
     "6d9e90c1d65f8dc77a054e9c01aa69bf42c6663cb535e8a1a31830bdcd041c88"
 )
 APPROVED_REFS_SHA256 = (
-    "b853db5d61c4757f117ff4c091469df97a556248ec88b136040af3a551d99a8a"
+    "7d8dfaef35c81fb41828ad8e988f841e0ff06f7180f8e843df6748ba9882591f"
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
     "Section 3": "86be62d733b2fed340fb24842f34918459d417d60e9a0d8a1b98c92bf3aa9944",
     "Section 4": "190966f02418b871a5f9eca06720b0ade5bbaecb79f6d3aeb3cd8a24925e6097",
-    "Section 5": "f2456f246272421a9fb82223e7e55234ed9a9cb686ff5bb05abb58bed97f8d64",
+    "Section 5": "6a631f843bc7d06b6739a5ae3a3e42185397dfdcf4ba7989c80e6fc75e9aec61",
     "Section 1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "Section 6": "6a095d386ace80e2f1df65dbd552c206236079cc29c7290acc89f7535237af69",
+    "Section 6": "74b92da36a3543fc67135e4a45641665ddd118c69e3ce97a70bbdc8afb459f84",
     "Section 7": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "Ethical Statement": "c2d1dc34583285b871e70f3c32a72c58b17d4281ea68486b18bd411bead9f4ad",
+    "Ethical Statement": "77c797799862657f370deb0fb5ea4fd35a125823817e7f1a430d378acc1309f3",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
-    "Section 3": "cbbc1c5ab2fa2114a14c79b8ac653dae31a71ce3c6b4a035bcb3420d968d1cf3",
-    "Section 4": "03fdead7c14bf3128e92428e69e0456c3426a3c80fe4f111eb18a25e3a7e7f5c",
-    "Section 5": "9920892acdead7d16edee0cb5e5a116dec48bc4bb20905c143c56d2ad758d210",
+    "Section 3": "d728a801b5902422fd41ce09717a9e8596a2a8be315fda2b66b4f2f4a71afc87",
+    "Section 4": "ed03ed832354f84ade49c9a45f1536213606aea638fdfdc964f7ebfe436327e5",
+    "Section 5": "12556608af9bb39aa17377344c923d0082f280732505ce13c7cbdd3a9080422e",
     "Section 1": "8501aaa42ef2292ba3c82116bb23b4bd6d156cd7507c184a836f8c5b6b22584e",
     "Section 2": "292ba689d081074876b825ea00d5bb2199733ed2d86f7f66ab224e7979f49424",
-    "Section 6": "acbb0ed1c8ab02d04e538fbfb4d7df400b59af4e8b568faf4e259300cd08b141",
-    "Section 7": "ff9e84c98835d3c0027129541fe0f2b28ba8238c7c1dfba089c58353c89a7944",
-    "Ethical Statement": "d912b17131100c40b0d56967401bd054a9d30e882c67ea35346fe9ec49afa205",
+    "Section 6": "3051517aabe93e242b12a77974af53043498c71643b70306c08e0086e388ee26",
+    "Section 7": "267cfbaf9e9c00c3259c745b716700ab926a6cf35cf319aba40a752baffea362",
+    "Ethical Statement": "c51f52124104dbc616385a2cf468081409a52ea0482570f9ea115255dbf4e7dd",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
-    "Section 3": "8f004d00472d0f3e1e796b09838e982d74fc030bb32fa84b7b42e3ea3d23955d",
-    "Section 4": "7ec9cbf0532b507ffe64845f32409e2b076ee021d3f513629aee8dffad52a780",
-    "Section 5": "df55c0b091fc3c65de3435d610d70dfcfa2ef3be5bb49d5f774f2c2153727632",
+    "Section 3": "5e812e18d357b36155c2e710f3d2920a1a234710849ddd86168feed0826cf418",
+    "Section 4": "e17282292cefc7218ced1dcd858f91443d09a294e25aae4a30b96cfd93c42d96",
+    "Section 5": "2ad926dd4211888083545a381faccf891dd8b2972721e5832ae6d497114ea5ea",
     "Section 1": "667225c0512d00ddbabf3be7bd40a08571465e72c04bd87c199e8f0c3b60b3d5",
     "Section 2": "e34cb83df7c519fb190a2a7aa16511a6266e2f09d532111167ec535db7494ea6",
-    "Section 6": "c61166bd9574026bd3e8edd5ee63f1237f98d91bf3f77c48c039d4c4eea76e66",
-    "Section 7": "8088ceb48373f298c6b47fac9750f4f54e3327f715c655062a9bcab498e5b6d5",
-    "Ethical Statement": "4a4540d0211b2465d830b5cf8bd4552c6778e0d0dc2d4c37cdeaa72643d77901",
+    "Section 6": "31a62c7c029505c79d741d67d0f352f8ffe1dbc5049720699f75e1980a1f2c14",
+    "Section 7": "a1c16c55371cc59da2a11e80c958dbeb808b850dfcb59ff3ffc66fd5a254b71b",
+    "Ethical Statement": "da4855babead263241000c8ed9b7e23ce286debb2d146271abb7225b101ba14c",
 }
 
 # Every frozen-abstract number now has a same-display body RJ binding: the
@@ -125,6 +125,7 @@ APPROVED_EXACT_POINTERS = frozenset(
         "/rq3/penalty",
         "/rq3/clr_split_M1/mediation_2x2/n_b0ok",
         "/rq3/genbench/gate",
+        "/rq3/genbench_b26_tost/ci_level",
         "/rq3/sup_battery/marginal_B3/N/RRs",
         "/rq3/sup_battery/marginal_B3/N/RR",
         "/rq3/sup_battery/marginal_B3/T/RR",
@@ -1549,7 +1550,7 @@ def check_section5_requirements(
         "belongs to the MEMIT replication",
         "has no changed-row audit of its own",
         # Dose ladder without an ordered-trend claim.
-        "Every suppressed setting leaves the in-span leakage check below the zero clamp",
+        "Every suppressed setting leaves the in-span leakage check below the zero-penalty setting",
         "a dose ladder rather than a calibrated dose-response",
         # M14 marginal-versus-paired reconciliation, both endpoint pairs.
         "need not equal differences of arm-wise rates",

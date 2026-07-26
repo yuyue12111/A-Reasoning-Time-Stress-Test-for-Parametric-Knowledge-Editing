@@ -1094,9 +1094,9 @@ def test_section5_load_bearing_qualifications_cannot_be_dropped(
         ),
         # P17: no ordered-trend synonym, and the run boundary stays explicit.
         (
-            "Every suppressed setting leaves the in-span leakage check below the zero clamp",
+            "Every suppressed setting leaves the in-span leakage check below the zero-penalty setting",
             "The in-span leakage check declines at every step",
-            "Every suppressed setting leaves the in-span leakage check below the zero clamp",
+            "Every suppressed setting leaves the in-span leakage check below the zero-penalty setting",
         ),
     ],
 )
@@ -1169,3 +1169,97 @@ def test_noncanonical_results_path_is_rejected(
     output = completed.stdout + completed.stderr
     assert completed.returncode != 0, output
     assert "numeric source must be the canonical" in output
+
+
+def test_genbench_ci_level_is_bound_not_spelled_out(candidate_main: Path) -> None:
+    """W2-7/C2: the 90% CI level is a bound field, not an unpointed English word."""
+    text = candidate_main.read_text(encoding="utf-8")
+    assert "ninety-percent" not in text, "spell-out was the no-pointer workaround"
+    assert r"90\% intervals" in text
+    assert '"pointer":"/rq3/genbench_b26_tost/ci_level"' in text
+
+    results = json.loads(
+        (REPO_ROOT / "paperwriting" / "results.json").read_text(encoding="utf-8")
+    )
+    block = results["rq3"]["genbench_b26_tost"]
+    assert block["ci_level"] == 0.9
+    # M03: the restated fact must still be visible in the prose it restates.
+    assert "90% CI" in block["_status"]
+    assert "ci90" in block["gsm8k"] and "ci90" in block["math500"]
+
+
+def test_wb_directional_endpoints_declare_zero_exclusion(
+    candidate_main: Path,
+) -> None:
+    """W2-7/C1: all three directional W-B endpoints exclude zero; say so once.
+
+    Qualifying only some of them would let a reader infer the others do not.
+    """
+    text = candidate_main.read_text(encoding="utf-8")
+    assert "Each directional endpoint above has an interval excluding zero." in text
+    start = text.index("An independent concept-direction experiment")
+    end = text.index("does not locate a distinct commitment layer")
+    paragraph = text[start:end]
+    assert "excluding zero" in paragraph, "the clause must sit inside the W-B paragraph"
+
+
+def test_route_table_generator_output_is_not_input_by_the_manuscript() -> None:
+    """W2-7/C3: regenerating the fragment must not read as changing the paper."""
+    main_text = (REPO_ROOT / "paperwriting" / "manuscript" / "main.tex").read_text(
+        encoding="utf-8"
+    )
+    assert r"\input" not in main_text
+    assert r"\label{tab:routes}" in main_text
+    fragment = (REPO_ROOT / "paperwriting" / "table_rq2.tex").read_text(
+        encoding="utf-8"
+    )
+    assert "NOT CONSUMED BY THE MANUSCRIPT" in fragment
+    generator = (REPO_ROOT / "src" / "generate_table_rq2.py").read_text(
+        encoding="utf-8"
+    )
+    assert "does NOT" in generator and "input" in generator
+
+
+def test_suppressor_strength_is_not_called_clamp(candidate_main: Path) -> None:
+    """W2-7/B: "clamp" names the ROME editor knob, not our logit penalty.
+
+    experiments/*.yaml carry both `clamp_norm_factor` (2 or 4, the editor) and
+    `penalty` (0-16, the suppressor).  Calling the suppressor a clamp in the
+    prose sends a reproducer to the wrong parameter.
+    """
+    text = candidate_main.read_text(encoding="utf-8")
+    assert "Clamp strength" not in text
+    assert "clamp strength" not in text
+    assert "zero clamp" not in text
+    assert "Penalty strength was varied over 0, 2, 4, 8, 12, and 16" in text
+
+    results = json.loads(
+        (REPO_ROOT / "paperwriting" / "results.json").read_text(encoding="utf-8")
+    )
+    assert results["rq3"]["alpha_sweep"]["penalty"] == [0, 2, 4, 8, 12, 16]
+
+
+def test_benchmark_datasets_are_cited(candidate_main: Path) -> None:
+    """W2-7/B: checklist item 3.5 has no `partial` escape hatch."""
+    text = candidate_main.read_text(encoding="utf-8")
+    bib = (REPO_ROOT / "paperwriting" / "manuscript" / "refs.bib").read_text(
+        encoding="utf-8"
+    )
+    for key in ("cobbe2021gsm8k", "hendrycks2021math", "meng2022rome"):
+        assert f"@" in bib and key in bib, key
+        assert f"citep{{{key}}}" in text or f"citet{{{key}}}" in text, key
+
+
+def test_reproducibility_checklist_is_fully_answered() -> None:
+    """W2-7/B (M19): every answer slot filled, and each has a provenance row."""
+    checklist = (
+        REPO_ROOT / "paperwriting" / "manuscript" / "ReproducibilityChecklist.tex"
+    ).read_text(encoding="utf-8")
+    # The three survivors live in the template's own instruction block.
+    assert checklist.count("Type your response here") == 3
+    ledger = (
+        REPO_ROOT / "paperwriting" / "delivery" / "checklist_provenance.md"
+    ).read_text(encoding="utf-8")
+    for item in ("1.1", "2.1", "3.5", "4.6", "4.13"):
+        assert f"| **{item}** |" in ledger, item
+    assert "Task D 硬承诺" in ledger, "supplement-authorized answers must be tracked"

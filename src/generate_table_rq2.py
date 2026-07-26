@@ -1,8 +1,14 @@
 """Regenerate paperwriting/table_rq2.tex from the corrected n=41 taxonomy.
 
 The output is a LaTeX fragment only: no table float, caption, or label is added.
-It is safe to include from the writing session after that session supplies the
-final caption and surrounding table environment.
+
+The manuscript does NOT \\input the generated file.  \\input is outside the
+approved command surface enforced by src/check_manuscript.py, so the n=41 route
+table is written out inline in paperwriting/manuscript/main.tex (see
+\\label{tab:routes}).  Running this script therefore does not change the paper;
+its output serves the supplement and acts as a machine-generated cross-check of
+the inline copy.  Any census change must be applied to main.tex by hand and
+re-verified with src/check_manuscript.py.
 
 Usage:
     python src/generate_table_rq2.py
