@@ -1,0 +1,60 @@
+.092 of gated cases without suppression against .042 with          miss. Locality is narrower still—a target-value non-leakage
+it, so the endpoint is thinnest where the effect is smallest.      rate, where a refusal or fluent non-answer counts as non-
+The endpoints differ in instrument quality: on the stratified      leaking rather than preserved behaviour.
+validation sample the permissive matcher has available-case           Natural-chain mediation remains unidentified: the vehicle
+precision .48 against the judge majority, the strict rule .92,     specified in advance failed its own validity gate (Section 4.3).
+so a strict null is not simply noise—and that endpoint does        Identifying it needs a different experiment—substituting lex-
+separate the treated arm from both controls. All p values          ically orthogonal chains with the edit held fixed—which is
+here are unadjusted and we claim no correction; the strict         future work we claim nothing from.
+endpoint is reported at the prominence of the primary ones            The route census rests on labels validated only by agree-
+precisely because it is weakest.                                   ment among judges from one model family, with no human-
+                                                                   audited subsample, so shared bias would not surface.
+5.5   How Far the Guard Transfers                                     Finally, the guard’s cost on unedited queries sits in-
+The intervention was re-run under three changes of setting,        side a 0.02 absolute-accuracy gate at the point estimate
+each with its own control. Under ROME on the Qwen-14B              on full benchmark sets—.000 on 1319 GSM8K items
+checkpoint, against no suppression, paired edit success rises      (Cobbe et al. 2021) and −.010 on 500 MATH items
+by +.135 [.055,.215] and strict displacement also separates,       (Hendrycks et al. 2021)—while the accompanying 90% in-
+-.040 [-.081,-.010] with p = .035—a second scale, not a            tervals, [−.022, .022] and [−.061, .041], are wider than that
+second editor, and strict separation where the Qwen-32B            gate. We report point-equivalence at the tested sets, not equiv-
+battery had none.                                                  alence.
+   Under MEMIT on the Qwen-14B checkpoint, against                 Reproducibility. Runs used Hopper-class parts of 141 and
+the same-relation competitor, paired edit success rises by         80 GB HBM and an Ada-class part of 24 GB. Bfloat16 made
++.100 [.040,.160] while strict displacement does not sepa-         the rank-one update diverge to NaN on the Hopper-class part,
+rate, -.027 [-.080,.027], p = .400; there the competitor’s         so that part ran in float32 and the other in bfloat16, agreeing
+own strict contrast against no suppression is .000 [.000,.000],    on a 40-case cross-check. Library versions are pinned in the
+a floor rather than an equivalence result. That replica-           released lock file, frozen before the runs.
+tion’s fresh no-suppression arm gave a paired ES drop
+of +.060 [−.020, .140], which does not itself establish a
+reasoning-time drop in that cell, so this transfers the inter-                          7    Conclusion
+vention and not the gap.                                           An edit that answers correctly on demand has not been shown
+   Under ROME on the Qwen-32B checkpoint, applying the             to survive the reasoning the model will actually do. Evalu-
+same think-span suppressor to the benchmark’s own para-            ating the same edit at zero thinking and after a native chain
+phrase probes raises strict lexical paraphrase success by          exposes a gap that direct-answer validation cannot see: not
++.055 [.020,.093] over the competitor. This is active appli-       reproduced by an unedited base or a fixed canned thought,
+cation to a paraphrase query, not portability to unguarded         and present at the largest checkpoint we tested in each of two
+queries: a blind audit found 30 of 40 paraphrases valid, 11        lineages. That failure nonetheless admits a chain-local causal
+of 20 cases valid on both, κ = .444; no row was filtered and       control point.
+no valid-subset re-analysis was run. The secondary old-value
+comparison stayed directional at 110 gated cases against a                            Ethical Statement
+frozen floor of 140; its no-suppression levels resemble the
+battery’s but come from an independent run.                        CounterFact writes a counterfactual over a real-world value,
+   We position this as a mechanistic probe and an edit-            so our framing inverts: each reversion becomes the model
+aware decoding guard, not a deployment-ready fix. Target-          restoring a truth we engineered away, the suppressor a tool
+value non-leakage and general-benchmark cost are bound-            for silencing true reasoning. At frozen weights the readings
+aries rather than transfer; Section 6 treats them and whether      are symmetric: a corrective and an adversarial update are the
+guarding reasoning is desirable at all; the evidence ladder        same parameter change. We characterize prior reassertion,
+and five-arm forest are supplementary figures.                     not truth tracking: reversion tracks what the base already en-
+                                                                   coded rather than its veracity, and no matching old-answer
+                                                                   drift was detected in the unedited base (Section 3.2). The
+            6    Discussion & Limitations                          dual-use reading is real; three properties bound this research
+Our claims are about six fixed checkpoints, not scale: we          diagnostic. It is edited-query gated, firing only on the sub-
+report every cell and infer no ordered trend. Both lineages        ject and relation whose edit is defended (Section 5.1); it is
+share one teacher and recipe, so their agreement bounds            no general truth-suppression capability. It steers at inference
+backbone idiosyncrasy, not recipe-specificity (Section 3.2).       time, updating no weights and applying no optimization to-
+   The headline rests on one editor and one dataset: MEMIT         ward concealment. And every reversion we censused stayed
+enters only through the transfer replication; a second bench-      legible: by majority judge label none took the associative
+mark, edit family, and non-counterfactual edits are untested.      route that leaves no verbalized trace (0 of 41). That census is
+   Our endpoints are lexical: edit success, reversion, and dis-    conditioned on reversion, so we do not claim that a trace is
+placement match curated aliases with boundary awareness,           always present, and we do not claim that the absence of such
+so a semantically right answer outside the alias set scores as a   a trace could serve as a monitor.
+

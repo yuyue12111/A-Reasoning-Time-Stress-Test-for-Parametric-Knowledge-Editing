@@ -1,4 +1,4 @@
-# WRITING_PLAN.md · 最终写作作战计划（plan v2.00 的执行层）
+# WRITING_PLAN.md · 最终写作作战计划（plan v2.01 的执行层）
 
 > 状态：**唯一有效的写作计划**（2026-07-14 仲裁定稿，整合三方审计 + GPT-5.6 复核裁决）。
 > 数字唯一真源 = `paperwriting/results.json`（原 `paper/` 已更名，5 个 src 脚本路径已同步修复）。

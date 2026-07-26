@@ -1,0 +1,55 @@
+                       References
+Bi, B.; Liu, S.; Mei, L.; Wang, Y.; Ji, P.; and Cheng,
+X. 2024. Decoding by Contrasting Knowledge: Enhanc-
+ing LLMs’ Confidence on Edited Facts. arXiv preprint
+arXiv:2405.11613.
+Cobbe, K.; Kosaraju, V.; Bavarian, M.; Chen, M.; Jun, H.;
+Kaiser, L.; Plappert, M.; Tworek, J.; Hilton, J.; Nakano, R.;
+Hesse, C.; and Schulman, J. 2021. Training Verifiers to Solve
+Math Word Problems. arXiv preprint arXiv:2110.14168.
+DeepSeek-AI; et al. 2025. DeepSeek-R1: Incentivizing Rea-
+soning Capability in LLMs via Reinforcement Learning. Na-
+ture, 645: 633–638.
+Gekhman, Z.; Aharoni, R.; Ofek, E.; Geva, M.; Reichart, R.;
+and Herzig, J. 2026. Thinking to Recall: How Reasoning
+Unlocks Parametric Knowledge in LLMs. arXiv preprint
+arXiv:2603.09906.
+Gema, A. P.; Hägele, A.; Chen, R.; Arditi, A.; Goldman-
+Wetzler, J.; Fraser-Taliente, K.; Sleight, H.; Petrini, L.;
+Michael, J.; Alex, B.; Minervini, P.; Chen, Y.; Benton, J.;
+and Perez, E. 2025. Inverse Scaling in Test-Time Compute.
+arXiv preprint arXiv:2507.14417.
+He, G.; Song, X.; and Sun, A. 2025. Knowledge Updating?
+No More Model Editing! Just Selective Contextual Reason-
+ing. arXiv preprint arXiv:2503.05212.
+He, G.; Song, X.; Wang, F.; and Sun, A. 2025. Benchmark-
+ing and Rethinking Knowledge Editing for Large Language
+Models. arXiv preprint arXiv:2505.18690.
+Hendrycks, D.; Burns, C.; Kadavath, S.; Arora, A.; Basart, S.;
+Tang, E.; Song, D.; and Steinhardt, J. 2021. Measuring Math-
+ematical Problem Solving With the MATH Dataset. In Ad-
+vances in Neural Information Processing Systems Datasets
+and Benchmarks Track.
+Hua, W.; Guo, J.; Dong, M.; Zhu, H.; Ng, P.; and Wang, Z.
+2024. Propagation and Pitfalls: Reasoning-based Assessment
+of Knowledge Editing through Counterfactual Tasks. arXiv
+preprint arXiv:2401.17585.
+Huang, H.; Wang, H.; Zhang, M.; Wu, S.; Liu, Q.; and
+Wang, L. 2026. CRANE: Knowledge Editing for Reason-
+ing MLLMs. arXiv preprint arXiv:2606.09033.
+Jung, D.; Lee, J.; and Lim, H. 2026. Towards Scalable Life-
+long Knowledge Editing with Selective Knowledge Suppres-
+sion. arXiv preprint arXiv:2604.19089.
+Mao, Q.; Lin, X.; Gu, J.; Wu, J.; Li, S.; and Chen, Y. 2026.
+Benchmarking Safety Risks of Knowledge-Intensive Rea-
+soning under Malicious Knowledge Editing. arXiv preprint
+arXiv:2605.10146.
+Meng, K.; Bau, D.; Andonian, A.; and Belinkov, Y. 2022.
+Locating and Editing Factual Associations in GPT. In
+Advances in Neural Information Processing Systems, vol-
+ume 35, 17359–17372.
+Slocum, S.; Minder, J.; Dumas, C.; Sleight, H.; Greenblatt,
+R.; Marks, S.; and Wang, R. 2025. Believe It or Not: How
+Deeply do LLMs Believe Implanted Facts? arXiv preprint
+arXiv:2510.17941.
+

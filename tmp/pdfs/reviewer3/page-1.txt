@@ -1,0 +1,58 @@
+    Direct-Answer Edit Success Is Not Enough: A Reasoning-Time Stress Test for
+                         Parametric Knowledge Editing
+
+                                                       Anonymous submission
+
+
+
+
+                             Abstract                                   one another. Scoring reads generated text with boundary-
+  An edit can pass direct-answer validation yet lose control
+                                                                        aware value matching rather than teacher-forced logits, and
+  of the final answer when the model reasons. We evaluate               the same test runs at six fixed checkpoints from two lineages
+  each ROME edit on CounterFact twice—at zero thinking and              distilled under one reasoning recipe.
+  after a natural chain—across six fixed checkpoints from two              Our contributions are three.
+  DeepSeek-R1-distill families. At the largest tested checkpoint           A reasoning-time evaluation gap. At the largest tested
+  in each family, edit success drops by 0.106 on Qwen-32B               checkpoint in each lineage, edit success is lower after a na-
+  and 0.107 on Llama-70B. Among zero-thinking successes on              tive chain than at zero thinking, and old answers resurface
+  Qwen-32B, old answers resurface in 19.3% of reasoned final            in reasoned final answers among edits that had already suc-
+  answers and displace new answers outright in 9.2%, while              ceeded. An unedited base and a fixed canned thought each
+  the unedited base shows no detectable old-answer drift. Yet in        fail to reproduce the pattern, and it survives temperature
+  the Qwen-32B reversions we examined, the edited association
+  remains detectable at a cloze probe; separately, route analysis
+                                                                        sampling, so it is neither background drift nor a decoding
+  finds visible in-chain paths to old answers, motivating a chain-      artifact.
+  routing hypothesis. We next test for a chain-local control point         A chain-local causal control point. Suppressing the old
+  by suppressing old-answer first tokens only during Qwen-32B           answer’s first tokens inside the think span—never touching
+  reasoning, leaving answer logits untouched. The signed, dose-         the answer stage—raises edit success and lowers resurfacing
+  graded intervention offsets the edit-success loss and lowers          against a placebo floor, a same-relation competitor, and no
+  the resurfacing rate from 19.3% to 8.5%; placebo and same-            suppression, while the reverse-signed arm moves both end-
+  relation controls have near-null answer-level effects. Direct-        points the other way. We report this as a diagnosis of where
+  answer edit success is not enough: edit evaluation needs a            the failure is steerable, not as a deployed defence.
+  reasoning-time stress test, and the failure it reveals admits a
+                                                                           Bounded transfer, honestly bounded. The intervention
+  chain-local causal control point.
+                                                                        repeats at a second scale and under a second editor, and
+                                                                        applies to the benchmark’s own paraphrase probes; in the
+                      1    Introduction                                 main battery its strict displacement endpoint does not sepa-
+Parametric knowledge editing offers a targeted alternative to           rate from the untreated baseline, though it does at the second
+retraining: find the weights carrying one fact, change them,            scale, and we say so at the same prominence as the effects
+leave the rest alone (Meng et al. 2022). Whether the change             that do.
+took is decided by asking the edited model the edited ques-                Between the failure and the intervention sits a diagnosis
+tion, sometimes with paraphrase and neighbourhood probes.               we leave open: in the reversions we examined the edited
+That protocol carries an assumption it never tests—that an              association is still detectable at a cloze probe, and native
+edit which answers correctly on demand will keep answering              chains show visible paths back to the old value, but the test
+correctly wherever the model is actually used.                          that would have identified natural-chain mediation failed its
+   Deployed reasoning models do not answer on demand.                   carrier-validity gate and we withdraw that claim. What sur-
+They think first, in tokens, and the answer arrives after the           vives is narrower and, we think, more useful: direct-answer
+chain. So an edit is certified at zero thinking while it is used        edit success is not enough, and the failure it hides admits a
+after reasoning, and nothing in current practice measures the           chain-local causal control point.
+distance between the two. Does thinking undo editing?
+   We test that under one protocol. Each edit is applied alone,                            2    Related Work
+evaluated at zero thinking and again after the model’s own              How edits are evaluated. Editing methods are normally
+native chain, then reverted, so requests cannot contaminate             scored on reliability, generalization, and locality. He, Song,
+This is an anonymized submission for review purposes only. Dis-         and Sun (2025) report that ten such methods degrade on
+tribution, citation, or public sharing of this manuscript is strictly   multi-hop and sequential settings and propose Selective Con-
+prohibited. Copyright and publication details will appear in the        textual Reasoning, which retrieves and contextualizes an up-
+final version if accepted.                                              date instead of touching parameters. He et al. (2025) then
+

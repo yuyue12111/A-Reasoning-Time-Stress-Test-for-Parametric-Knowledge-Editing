@@ -54,6 +54,10 @@ IDENTITY_PATTERNS = (
     rb"/home/[A-Za-z0-9._-]+",
     rb"\bplots\w*\.py\b",
     rb"\.codex/",
+    # W2-10/E(b): categories named in anonymize_spec that had no pattern here.
+    rb"WHYAAAI",
+    rb"\bwf_[0-9a-f]{6,}\b",
+    rb"\bworkflow[ _-]?id\b",
 )
 IDENTITY_RE = re.compile(b"|".join(IDENTITY_PATTERNS))
 
@@ -75,8 +79,16 @@ LEAKING_LITERALS = (
 # planning-document name or a home directory is a genuine leak.
 SUBMISSION_SUFFIXES = {".pdf", ".png", ".svg"}
 SUBMISSION_ROOTS = ("paperwriting",)
-RELEASE_SUFFIXES = SUBMISSION_SUFFIXES | {".json", ".csv", ".md", ".txt", ".yaml", ".yml", ".tex", ".py"}
+RELEASE_SUFFIXES = SUBMISSION_SUFFIXES | {
+    ".json", ".csv", ".md", ".txt", ".yaml", ".yml", ".tex", ".py", ".sh", ".lock",
+}
 RELEASE_ROOTS = ("paperwriting", "data", "experiments", "src")
+# Files at the repository root that ship with the code drop.  Listed explicitly
+# rather than by glob so that adding a root file is a deliberate release decision.
+RELEASE_ROOT_FILES = (
+    "env.lock", "env.platform.lock", "RUNBOOK.md", "README.md", "LICENSE",
+    "setup_workspace.sh", "requirements.txt",
+)
 
 
 def neutral_of(length: int) -> bytes:
@@ -162,6 +174,11 @@ def targets(tier: str = "submission") -> list[Path]:
         for path in sorted((REPO / root).rglob("*")):
             if path.suffix.lower() in suffixes and path.is_file():
                 seen.append(path)
+    if tier == "release":
+        for name in RELEASE_ROOT_FILES:
+            candidate = REPO / name
+            if candidate.is_file():
+                seen.append(candidate)
     return seen
 
 
@@ -169,6 +186,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--scrub", action="store_true", help="rewrite in place")
     parser.add_argument("--audit", action="store_true", help="report only")
+    parser.add_argument("--submission-ready", action="store_true",
+                        help="also fail if an expected submission artifact is missing; "
+                             "without this a deleted figure looks like a clean audit")
     parser.add_argument("--tier", choices=("submission", "release"),
                         default="submission",
                         help="submission = the PDF and its figures (gates the checker); "
@@ -185,6 +205,17 @@ def main() -> int:
                 total += n
                 print(f"scrubbed {n}x  {path.relative_to(REPO)}")
         print(f"-- {total} literal(s) replaced")
+
+    if args.submission_ready:
+        expected = [
+            REPO / "paperwriting/manuscript/main.pdf",
+            REPO / "paperwriting/manuscript/fig1_capability.pdf",
+        ]
+        absent = [q for q in expected if not q.is_file()]
+        if absent:
+            print("SUBMISSION NOT READY: missing " +
+                  ", ".join(str(q.relative_to(REPO)) for q in absent))
+            return 1
 
     dirty = []
     for path in targets(args.tier):

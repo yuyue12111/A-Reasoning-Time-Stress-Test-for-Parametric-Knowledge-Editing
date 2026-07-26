@@ -1,0 +1,74 @@
+benchmark editing under realistic autoregressive inference            Scoring is generative, not logit based: on answer and
+rather than teacher-forced decoding, across instruction-tuned      chain texts we remove subject mentions before boundary-
+and reasoning-oriented models, and find parameter-based            aware value matching over curated aliases. For value v,
+editing performs poorly there, including on an R1-distilled        let hv (x) mark an alias hit in text x. Edit success is
+checkpoint whose reasoning reflects outdated knowledge and         ESb = Pr[hnew (ab ) ∧ ¬hold (ab )]. Among requests success-
+overturns the edit. Hua et al. (2024) show with ReCoE that         ful at B0 , permissive reversion RRb records any old-value hit
+edits fail to propagate through the reasoning schemes that         in the later answer, whereas strict lexical displacement RRbs
+depend on them, and analyse the chains to explain why.             also requires the new value absent. These are nested opera-
+Slocum et al. (2025) ask from the other side how deeply            tional endpoints with different error profiles, not mathemat-
+an implanted fact is believed, and find mechanistic editing        ical bounds on a latent semantic rate. Chain leakage CLRb
+implants shallowly. This prior evidence is cross-model and         records an old-value mention in the chain without claim-
+single-configuration: it establishes that editing looks worse      ing semantic commitment. Locality is only a target-value
+under realistic decoding, not how a single edit behaves as its     non-leakage check on the neighbor answer, not a general
+own thinking budget changes.                                       preservation measure.
+                                                                      We keep the two judge instruments distinct.1
+Editing under explicit reasoning. Huang et al. (2026)
+                                                                      Conditioning reversion on zero-thinking success is
+make the closest observation to ours, in the multimodal
+                                                                   treatment-independent for the later intervention study:
+setting: near-perfect teacher-forced accuracy alongside col-
+                                                                   a think-span processor is inactive when the think
+lapsing grounded success once the chain is examined, and
+                                                                   span is empty. In a separate replication audit, the
+attributing it partly to chains that reject the injected fact;
+                                                                   treated-versus-no-suppression comparison covered 400 B0
+there the conflict is visual and there is no budget axis. Mao
+                                                                   prompt/chain/answer tuples with 0 differences; the same-
+et al. (2026) benchmark the adversarial direction, where ma-
+                                                                   relation-control-versus-no-suppression comparison likewise
+liciously edited knowledge corrupts downstream reasoning
+                                                                   covered 400 tuples with 0 differences. Each total comprises
+while general capability stays intact. Gema et al. (2025) doc-
+                                                                   200 cases and two probe types; arm-wise contrasts use case
+ument the general hazard that longer reasoning can lower
+                                                                   intersections.
+accuracy. Gekhman et al. (2026) supply the mechanism our
+diagnosis has to argue with: reasoning tokens aid recall both
+as a computational buffer independent of their content and
+                                                                   3.2    The Gap
+through factual priming by related generated facts.                At the largest tested checkpoint in each family, the
+                                                                   paired ES drops are .106 [.030, .182] on Qwen-32B and
+Intervening at decoding time. Bi et al. (2024) contrast            .107 [.032, .182] on Llama-70B (Figure 1; Table 1). We re-
+edited against unedited next-token distributions to raise a        port all six fixed-checkpoint cells. The cellwise, unadjusted
+model’s confidence in an edited fact, and Jung, Lee, and           95% paired case-bootstrap intervals exclude zero only at
+Lim (2026) suppress original-knowledge probabilities during        the largest tested checkpoint in each family. These cells de-
+decoding for lifelong editing. Both act on the distribution that   limit the headline scope—a scope statement, not a post-hoc
+writes the answer. Ours is scoped to the think span and leaves     selection—and we do not infer an ordered trend across check-
+the answer stage untouched, which is what makes it a probe         points.
+of where the failure is produced rather than a better decoder.        Among zero-thinking successes on Qwen-32B, permissive
+What this paper adds. Four properties are not addressed            old-value resurfacing is 19.3% [12.6%, 26.9%], while strict
+jointly by the work above: a budget-controlled paired contrast     lexical displacement is 9.2%. For the unedited base on the
+on one and the same edit; controls that separate edit-specific     same requests, paired old-answer drift over n = 199 cases is
+erosion from base drift, canned thought, and sampling; sym-        −.0201 [−.0804, .0402], which does not support a matching
+metric results at the largest fixed checkpoint of two backbone     base-model drift. This juxtaposition is consistent with an
+lineages; and a signed, dose-graded intervention confined to       edit-specific pattern, but the two quantities differ in event
+the think span that moves an answer it never touches.              definition and denominator; we make no formal contrast.
+                                                                      The similarity across the two tested backbone lineages
+      3    The Reasoning-Time Evaluation Gap                       disfavors a single-lineage idiosyncrasy, though not recipe-
+3.1       Protocol and Metrics                                        1
+                                                                        The answer-commitment validation panel uses a neutral
+We apply one ROME edit at a time to a CounterFact request          OLD/NEW/NEITHER final-answer task. Its strict rule has
+(Meng et al. 2022)—the benchmark the editor was introduced         available-case Cohen’s κ = .836, agreement = .931, and preci-
+on—generate every configured thinking budget for that edit,        sion/recall = .92/.85 against the three-judge majority; the permis-
+and then restore the original weights before proceeding to the     sive rule has precision/recall = .48/.96. The panel obtained votes
+next request. This loop keeps requests from contaminating          for 87 of 120 stratified items; 33 were excluded by rate limits.
+                                                                   Missingness is concentrated among rule-negative rows but does not
+one another. Our headline comparison pairs zero thinking
+                                                                   make the available-case κ a lower bound; the missingness pattern
+(B0 , a pre-closed empty think span) with a native chain           is reported in the supplement. The separate route-census panel uses
+(B3 ) under greedy decoding, one generation per cell. We           a neutral visible-route categorization task over 41 route instances
+run the same protocol at six fixed checkpoints in the Qwen         from 33 unique facts and reports inter-judge Fleiss’ κ = .813; Sec-
+and Llama lineages distilled under the DeepSeek-R1 recipe          tion 4 defines its population. Both panels use one external judge-
+(DeepSeek-AI et al. 2025).                                         model family, creating shared-bias risk.
+

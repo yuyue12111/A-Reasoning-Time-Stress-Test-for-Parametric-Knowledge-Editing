@@ -42,37 +42,37 @@ APPROVED_PREAMBLE_SHA256 = (
     "6d9e90c1d65f8dc77a054e9c01aa69bf42c6663cb535e8a1a31830bdcd041c88"
 )
 APPROVED_REFS_SHA256 = (
-    "7d8dfaef35c81fb41828ad8e988f841e0ff06f7180f8e843df6748ba9882591f"
+    "9148dfd515b5dfbefb3ae31dfcc7c023cbf0cfc43c82074d084c2b53fb5d1912"
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
     "Section 3": "4329b22053a2b6c492b2560f398295a3f1cd35f25b41be0610c0982da834f8c6",
     "Section 4": "b43e9b0800a1ad992ef1981f6b2d3c86fade17f1cbc4020983b822609851b7ca",
-    "Section 5": "15418e38c59002cc13213b80e7a8efa18e0a4be9e73040b7e25b31edb9a4b29b",
+    "Section 5": "26bda0c9147b658a2375546bea936f859817a625317d4ae7b4b49bce09c8bc7f",
     "Section 1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 6": "ec1920efdf517af8485204281892ad7ecee5ff46a64f203229ad679dfece08d0",
     "Section 7": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "Ethical Statement": "b1cbe6511c2e65552cef2f3daadff895d025d69c8ce21c87f817f09e6d340f3d",
+    "Ethical Statement": "b6a2e72c1fd39e6bd8b5ddfc4fb3b487b9afe515851f54d7923cfc6a9dddcec4",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
     "Section 3": "a0d88f020aa2810112a1960211f7ac063e2e2cf6fb25ee951b91955c866a39ba",
-    "Section 4": "27d4246d01944fc39bf5003c06de4191b3bf82fbe78424899fe472eba9e309c2",
-    "Section 5": "53ce20ccc71e75487974452435ebd05fb04514896c7d63d0ef07a957ecb73ccc",
-    "Section 1": "aae853bf7e0a53379a2c78a3c7d6a89c97dae3dcdfb066d3d09f6b4d270240ad",
-    "Section 2": "cba22086656772c9bb882f58cc2c0990b83bc6135948424219f0ca19e41045b4",
+    "Section 4": "b4daa3d94d13898be4baf9b4b060dd14470f1aba7b180f121de99199ae2c50ae",
+    "Section 5": "2a52f09bd3bf1d6b061e696cd8fa23440f6447286a191a832469bbbb70813f52",
+    "Section 1": "9169b93c5bb958f38c4d24708e4c54e7bc8fa718144bf20b0efb3d0588cf2dd3",
+    "Section 2": "f724d58ed58fb90736b73ae9f87c82aaffe1e72d35db300078fd6d91459652a4",
     "Section 6": "61fa524c461d087166d03ca02aa8fb8e725090e81d6da69a98cbb12773613ba3",
-    "Section 7": "7b1335fddbb84d04b9ed9d660c75ec1c0ae486336130e56846584772d1c607b0",
-    "Ethical Statement": "83ef177c646dcd11daf75d17094704015afba9266e702c433821b73365fce4e5",
+    "Section 7": "9df4c3740279e42aa6a6b3e735ccf70498687a512e6adbf8845a06bf84c17a4a",
+    "Ethical Statement": "60ee4410778f84727b0d8c0c335797763a698f9e0c40a3f85abf81fdfb7aff2c",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
     "Section 3": "a718453291fa539e02fa58b0e12c0499f31392ca7d86e4eea9cd1e6d372c0635",
-    "Section 4": "0c9a9f293858a5ab082bd8e274b46df8477f3f8fe02987f78d94bc1aaee8d105",
-    "Section 5": "f03b2c924aa60c13df86c6b84ae6356c77803321d2e1355fb63738cfed6e0882",
-    "Section 1": "552345931e7ebc538e6bf080d76a7c6602bbbf22795f6280495bf1f40e3c215c",
-    "Section 2": "1cf720c3688b67df8a8d09f9b4d03a7089d24e4b795c86f05a4e7fc16aa42499",
+    "Section 4": "3b38f49e5961f70b6ddb774fba5069c3aa131f881c312eb82b5a60893f626b89",
+    "Section 5": "9547124e6751b98cd6df17dc8a018f00e209439efb184f6fc7d41d645d895f5b",
+    "Section 1": "034ec569a31be76b2f0671846b730d0cd4b046c7f7b3202756bd6bcab260ed65",
+    "Section 2": "7a574ad49c2b8e9f83deb00d20d00883a5ef294d6119261f844253df9f9400d7",
     "Section 6": "e61fcd102d8427e7bbf2c6e6b6652b57ef22dfa1dfeb7e827c3548425295f345",
-    "Section 7": "d9d158cd2eef99a4672157db15b508d0466ef9fe842ab8af679df8bde1263804",
-    "Ethical Statement": "85bc44dc71ba6052f2b11a955bf5154c0926e7130dad19c8f3035b168686d055",
+    "Section 7": "5966f766139e800dfc9d878aaeee988baefb88a54a35b53287d0d0a57e7c1f04",
+    "Ethical Statement": "73da361658c0e8c775626b4a911fe1d8587e2c68318fb9d0547d12f23ad2f30b",
 }
 
 # Every frozen-abstract number now has a same-display body RJ binding: the
@@ -403,6 +403,7 @@ ALLOWED_TEX_COMMANDS = frozenset(
         "neg",
         "paragraph",
         "parbox",
+        "multicolumn",
         "pdfinfo",
         "ref",
         "rm",
@@ -450,6 +451,7 @@ BODY_ALLOWED_TEX_COMMANDS = frozenset(
         "neg",
         "paragraph",
         "parbox",
+        "multicolumn",
         "ref",
         "section",
         "small",
@@ -853,6 +855,14 @@ def mask_nonclaim_numbers(code: str) -> str:
     code = re.sub(
         r"\\includegraphics\[[^\[\]]*\]",
         mask_parbox_dimensions,
+        code,
+    )
+    # W2-10/F: ``\multicolumn{N}{spec}`` spans columns; N is table structure, not
+    # an authored number.  Only the two structural arguments are masked, so any
+    # value inside the cell body is still scanned.
+    code = re.sub(
+        r"\\multicolumn\{\d+\}\{[^{}]*\}",
+        lambda m: "\\multicolumn{SPAN}{ALIGN}",
         code,
     )
     # A dimension-looking token outside that command surface is visible prose.

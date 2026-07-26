@@ -204,7 +204,8 @@
    "rationale": "Restore the paired estimands and uncertainty behind the thinking-tax and loose-reversion claims.",
    "destination": "§5 headline intervention table",
    "required_content": "Paired ES +0.138 and CI, marginal levels, paired RR −0.102 and CI, and marginal-versus-complete-case explanation.",
-   "discharged_at": "main.tex:260 “Against no suppression the same comparison giv”; main.tex:240 “-.102”; main.tex:262 “need not equal differences of arm-wise rates”"
+   "discharged_at": "main.tex:248 “+.122”; main.tex:237 “-.102”; main.tex:250 “need not equal differences of arm-wise rates”; main.tex:237 “T-N”",
+   "discharge_note": "W2-10/F:配对对照的点估与区间已搬进 Table~\\ref{tab:battery}(D5 的 destination 原文即『§5 headline intervention table』),散文保留预指定主对比 +.122/-.095 与marginal-vs-paired 说明。债务内容一件未少,只是换地址。"
   },
   "D6": {
    "status": "DISCHARGED",

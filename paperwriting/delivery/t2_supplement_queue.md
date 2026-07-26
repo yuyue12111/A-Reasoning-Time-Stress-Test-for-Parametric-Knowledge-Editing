@@ -53,3 +53,17 @@
 1. 完整 **dry-run 打包**：按将要上传的目录结构真打一次包并解开验证。
 2. **scrub-grep**：平台名 / 集群路径 / 作者身份 / 邮箱 / 本机绝对路径，零命中。
 3. 跑不通就按 M17 **诚实降级 checklist 答案**并回改 `checklist_provenance.md` 对应行。
+
+## F. W2-10 保守值扫描的处置（C 组）
+
+全量扫 `results.json` 找「同一对比存在更保守版本、而正文只报了较有利那个」。已进正文的两条见 plan v2.01；
+以下判归 supplement，**每条都必须在 S11 或对应节兑现，否则相关 checklist 答案回落**：
+
+| 指针 | 保守值 | 为何算保守 | 兑现处 |
+|---|---|---|---|
+| `/rq3/alpha_sweep/scope_ablation/all/ES_B3` | think .639 vs all .670（分离 **+.031**），而正文报的是 B0 档的 .580→.727（**+.147**）；同档 CLR 两者**完全相同** .268/.268，RR .105/.113 | 正文选在分离最大、且 think 侧按构造不激活的那个预算档报 | supp 消融表给**两个预算档**，并写明 scope=think 的偏好是解释性的、非幅度性的 |
+| `/rq3/x3_rome32b_active_paraphrase/fixed_N_B0_gate_secondary_old_only/T_minus_C` | −.0138 [−.0420,+.0137] p=.450，n=110 门控 / 冻结底 140 | 预注册次级端点被压成一个词 “directional”，而显著的主端点给了完整数值 | supp 给全值 + `directional_low_gate` 状态 |
+| `/emergence/b15_base_recall_control/b0_primary/stratified/base_unknown/slope` | .0331 [−.0755,.1464] 含零（base-known 侧 .1103 [.0272,.1950] 排零） | 同一主分析按正文那句所讨论的协变量分层，一侧排零一侧含零 | S3b 给两层 |
+| `/emergence/cap3_netclr/net_clr/ci95` | .0522 [−.0075,.1111] **含零** | 基座扣除后的 net-CLR 斜率含零 | S6 |
+| `/f2_zerothink_deconfound/arms/B1/RRs` | B1 strict .088、B0P .016 | 正文该处只给 permissive，而 strict 是本文别处一贯并报的保守搭档 | S3b |
+| `/f2_zerothink_deconfound/arms/B0/ES` | 同条件另两次 32B 跑给 B0 ES = **.625**，正文用的 .595 是三者最低 | 同一估计量的不同运行；用最低者作 treated .631 的比较基准 | S11 给三次运行的 B0 ES 与各自 provenance |

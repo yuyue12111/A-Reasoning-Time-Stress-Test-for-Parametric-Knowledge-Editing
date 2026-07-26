@@ -53,7 +53,9 @@ def test_canonical_manuscript_passes(candidate_main: Path) -> None:
     assert completed.returncode == 0, completed.stdout + completed.stderr
     assert "Section 3 RJ ledger (111 occurrences)" in completed.stdout
     assert "Section 4 RJ ledger (64 occurrences)" in completed.stdout
-    assert "Section 5 RJ ledger (191 occurrences)" in completed.stdout
+    # W2-10/F: 22 inline values moved into Table 2, whose rows carry the
+    # bindings instead.  D5's recorded destination is that table.
+    assert "Section 5 RJ ledger (172 occurrences)" in completed.stdout
 
 
 def test_frozen_abstract_mutation_is_rejected(candidate_main: Path) -> None:
@@ -1392,5 +1394,75 @@ def test_section1_sampling_control_has_the_right_sign(candidate_main: Path) -> N
     conclusion the same sentence draws."""
     text = candidate_main.read_text(encoding="utf-8")
     assert "temperature sampling each fail to reproduce" not in text
-    assert "it survives temperature sampling" in text
+    # W2-10/A1 reworded this; assert the direction, not one phrasing.
+    assert "persists under temperature sampling" in text
     assert "The gap also persists under temperature sampling" in text
+
+
+def test_submission_tier_cannot_be_narrowed_by_accident() -> None:
+    """W2-10/E: the submission gate must keep covering the shipped artifact types."""
+    sys.path.insert(0, str(REPO_ROOT / "src"))
+    import scrub_artifacts
+
+    assert {".pdf", ".png", ".svg"} <= scrub_artifacts.SUBMISSION_SUFFIXES
+    assert scrub_artifacts.SUBMISSION_SUFFIXES <= scrub_artifacts.RELEASE_SUFFIXES
+    for suffix in (".sh", ".lock", ".json", ".yaml", ".py"):
+        assert suffix in scrub_artifacts.RELEASE_SUFFIXES, suffix
+    for pattern in (rb"why-aaai", rb"whyu", rb"GitProjects", rb"inspire",
+                    rb"qb-ilm", rb"WHYAAAI", rb"\bwf_[0-9a-f]{6,}\b"):
+        assert pattern in scrub_artifacts.IDENTITY_PATTERNS, pattern
+
+
+def test_release_gate_refuses_while_the_tree_is_dirty() -> None:
+    """W2-10/E(c): the gate is a refusal, not a report.
+
+    It is expected to BLOCK today; anonymize.py has not run.  The test asserts
+    the refusal exists so that packaging cannot be written around it.
+    """
+    completed = subprocess.run(
+        [sys.executable, str(REPO_ROOT / "src" / "package_release.py"), "--check"],
+        cwd=REPO_ROOT, text=True, capture_output=True, check=False,
+    )
+    output = completed.stdout + completed.stderr
+    assert "RELEASE GATE" in output
+    assert completed.returncode != 0, "tree is not anonymised yet; gate must block"
+    assert "Do not package around this gate" in output
+
+
+def test_base_drift_claims_are_scoped_to_where_an_interval_exists() -> None:
+    """W2-10/C: four of six checkpoints show POSITIVE unedited-base drift.
+
+    Only Qwen-32B has a paired interval (-.0201 [-.0804,.0402]); Llama-70B, a
+    co-headline cell, is +.025 with no interval.  Sections 1 and 7 attach the
+    base control to "each of two lineages", so an unqualified "no drift" there
+    would generalise past the one cell that supports it.
+    """
+    import json as _json
+
+    results = _json.loads(
+        (REPO_ROOT / "paperwriting" / "results.json").read_text(encoding="utf-8")
+    )
+    deltas = {
+        k: v["delta_think"]
+        for k, v in results["base_probe"].items()
+        if isinstance(v, dict) and isinstance(v.get("delta_think"), (int, float))
+    }
+    assert len(deltas) == 6, deltas
+    assert sum(1 for d in deltas.values() if d > 0) >= 4, deltas
+    assert deltas["70B"] > 0, deltas
+
+    text = (REPO_ROOT / "paperwriting" / "manuscript" / "main.tex").read_text(
+        encoding="utf-8"
+    )
+    assert "where it carries an interval" in text          # Section 1
+    assert "where that control carries an interval" in text  # Section 7
+    assert "no detectable old-answer drift, and a fixed canned thought" not in text
+
+
+def test_battery_exhaustiveness_claim_is_limited_to_outcomes() -> None:
+    """W2-10/C: the D-N leakage contrast exists and is not in the table."""
+    text = (REPO_ROOT / "paperwriting" / "manuscript" / "main.tex").read_text(
+        encoding="utf-8"
+    )
+    assert "Every outcome contrast we computed appears" in text
+    assert "Every contrast we computed appears" not in text
