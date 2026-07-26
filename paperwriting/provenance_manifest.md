@@ -55,6 +55,30 @@ not established, so the dissociation rests on the competitor alone." Under the
 reproducible values that contrast excludes zero (p = .037), and the placebo would
 not be inert inside the chain either.
 
+**Two further checks (W2-12).**
+
+* *Not a mis-read of a neighbouring arm.* The recomputed placebo and competitor
+  marginals differ on chain leakage (.490 against .475), so the loader is reading
+  two distinct shard sets rather than the same one twice. Their edit-success and
+  reversion levels do coincide, which is why the two margins above them coincide
+  (section 2 below); the leakage difference is what shows they are distinct runs.
+* *Not a late-appended rerun.* One benign explanation would be that a failed row
+  was re-run and appended after the recorded analysis. It is refuted: all eight
+  placebo shards were written within 42 seconds of one another
+  (2026-06-28T09:57:37Z to 09:58:19Z), each contributes exactly 25 B3 cases
+  (8 x 25 = 200), and no shard is later than the rest. The four error rows are
+  distributed across four different shards and are excluded by the loader in
+  every derivation.
+
+The difference of exactly one success in exactly one row (101/199 against
+102/200) therefore has no mechanism visible in the retrieved artifacts.
+
+**Effect on the paper's claims: none.** Section 5.3 no longer rests on whether
+the placebo's leakage contrast reaches zero. It reports that the competitor's
+contrast excludes zero (-.071 [-.121, -.020], true under both derivations) and
+that the placebo's is smaller and carries nothing. Under either column the
+dissociation is carried by the competitor.
+
 **Not silently changed.** No manuscript number has been altered on the strength of
 this recomputation. Which column is authoritative is a scientific question — the
 reported column may come from a corrected pass whose artifact was not preserved —
@@ -89,3 +113,11 @@ hardware. It records the pinned library versions, not a runtime snapshot of any
 reported run. The EasyEdit revision and the vendor patches applied on top of it are
 recorded separately; the judge model's version string is **not recorded anywhere in
 the workspace** and is reported as unavailable rather than reconstructed.
+
+## 5. Platform paths inside the released shards
+
+Every generation shard carries a `_meta` record whose `overrides.stats_dir` holds
+the absolute path the run used on the compute platform, including the project and
+account segments. This is category L4 in the anonymisation spec and must be
+rewritten by `src/anonymize.py` before any shard is released; it is not reachable
+by the manuscript-side audit, which only covers the submitted PDF and its figures.

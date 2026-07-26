@@ -55,7 +55,7 @@ def test_canonical_manuscript_passes(candidate_main: Path) -> None:
     assert "Section 4 RJ ledger (64 occurrences)" in completed.stdout
     # W2-10/F: 22 inline values moved into Table 2, whose rows carry the
     # bindings instead.  D5's recorded destination is that table.
-    assert "Section 5 RJ ledger (172 occurrences)" in completed.stdout
+    assert "Section 5 RJ ledger (168 occurrences)" in completed.stdout
 
 
 def test_frozen_abstract_mutation_is_rejected(candidate_main: Path) -> None:
@@ -1495,3 +1495,20 @@ def test_placebo_arm_nonreproducibility_is_disclosed() -> None:
     )
     # The reported values are untouched: disclosure, not silent correction.
     assert results["rq3"]["sup_battery"]["n"]["P"] == 199
+
+
+def test_dissociation_sentence_is_derivation_independent() -> None:
+    """W2-12/A1: the placebo's leakage interval differs between the recorded and
+    the recomputed derivation (see provenance_manifest.md), so no claim may
+    depend on which side of zero it falls."""
+    text = (REPO_ROOT / "paperwriting" / "manuscript" / "main.tex").read_text(
+        encoding="utf-8"
+    )
+    assert "reaches zero and is not established" not in text
+    assert "the dissociation is carried by the competitor" in text
+    # the competitor's contrast excludes zero under both derivations
+    assert "-.071" in text and "whose interval excludes zero" in text
+    # the strict endpoint keeps its own disambiguation without pointing at
+    # digits that are no longer printed above it
+    assert "the same digits above" not in text
+    assert "in-chain leakage contrast, which shares its digits" in text
