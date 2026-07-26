@@ -1,0 +1,111 @@
+{
+  "artifact": "table_rq2",
+  "numeric_source": "paperwriting/results.json",
+  "status": "PASS",
+  "output": "paperwriting/table_rq2.tex",
+  "output_sha256": "e28d919bbb3e8f77c57da16308155f5d8be1a3954ebf3a3c7908134e99b2c23c",
+  "entries": [
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.n",
+      "raw_value": 41,
+      "rendered_value": "n=41 instances",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.n_unique_facts",
+      "raw_value": 33,
+      "rendered_value": "33 unique facts",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.dist",
+      "raw_value": {
+        "Bridge": 27,
+        "Recall": 11,
+        "Reflective-override": 3,
+        "Associative": 0
+      },
+      "rendered_value": {
+        "Bridge": 27,
+        "Recall": 11,
+        "Reflective-override": 3,
+        "Associative": 0
+      },
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.pct",
+      "raw_value": {
+        "Bridge": 0.6585365853658537,
+        "Recall": 0.2682926829268293,
+        "Reflective-override": 0.07317073170731707,
+        "Associative": 0.0
+      },
+      "rendered_value": {
+        "Bridge": "65.9%",
+        "Recall": "26.8%",
+        "Reflective-override": "7.3%",
+        "Associative": "0.0%"
+      },
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.agreement.fleiss_kappa",
+      "raw_value": 0.8125952260030472,
+      "rendered_value": ".813",
+      "display_transform": "round to 3 decimals",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.agreement.raw_pairwise_agreement",
+      "raw_value": "111/123=.902439",
+      "rendered_value": "111/123=.902",
+      "display_transform": "round rate to 3 decimals",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.agreement",
+      "raw_value": {
+        "unanimous_cases": 35,
+        "two_one_cases": 6,
+        "split_1_1_1_cases": 0
+      },
+      "rendered_value": "unanimous 35; 2--1: 6; split: 0",
+      "status": "MATCH"
+    }
+  ],
+  "invariants": [
+    {
+      "name": "n=41",
+      "status": "PASS"
+    },
+    {
+      "name": "n_unique_facts=33",
+      "status": "PASS"
+    },
+    {
+      "name": "route_counts_match_spec",
+      "status": "PASS"
+    },
+    {
+      "name": "route_percentages_match_spec",
+      "status": "PASS"
+    },
+    {
+      "name": "counts_sum_to_n",
+      "status": "PASS"
+    },
+    {
+      "name": "percentages_equal_count_over_n",
+      "status": "PASS"
+    },
+    {
+      "name": "agreement_matches_spec",
+      "status": "PASS"
+    },
+    {
+      "name": "panel_decisions_sum_to_n",
+      "status": "PASS"
+    }
+  ]
+}

@@ -50,8 +50,8 @@ def assert_rejected(main_path: Path, *diagnostics: str) -> str:
 def test_canonical_manuscript_passes(candidate_main: Path) -> None:
     completed = run_checker(candidate_main)
     assert completed.returncode == 0, completed.stdout + completed.stderr
-    assert "Section 3 RJ ledger (110 occurrences)" in completed.stdout
-    assert "Section 4 RJ ledger (49 occurrences)" in completed.stdout
+    assert "Section 3 RJ ledger (111 occurrences)" in completed.stdout
+    assert "Section 4 RJ ledger (64 occurrences)" in completed.stdout
     assert "Section 5 RJ ledger (191 occurrences)" in completed.stdout
 
 
@@ -1111,6 +1111,26 @@ def test_section5_review_patches_cannot_be_reverted(
         candidate_main,
         f"Section 5 required target string missing: {diagnostic!r}",
     )
+
+
+def test_route_table_binds_the_corrected_census(candidate_main: Path) -> None:
+    """The inlined route table must read the n=41 block, not the 50-pool one."""
+    text = candidate_main.read_text(encoding="utf-8")
+    assert '"pointer":"/rq2_taxonomy/p0_corrected_taxonomy/dist/Bridge"' in text
+    for stale in ("n=50", "68\\%", "0.790"):
+        assert stale not in text, stale
+    mutate(
+        candidate_main,
+        "Route & Instances & Share",
+        "Route & Instances & Share (50-pool)",
+    )
+    assert_rejected(candidate_main, "Section 4 visible semantic surface differs")
+
+
+def test_figure_one_is_wired_and_referenced(candidate_main: Path) -> None:
+    text = candidate_main.read_text(encoding="utf-8")
+    assert r"\includegraphics" in text
+    assert r"Figure~\ref{fig:gap}" in text, "Figure 1 must be cited from the prose"
 
 
 def test_negative_interval_bound_is_not_the_banned_f1_contrast(

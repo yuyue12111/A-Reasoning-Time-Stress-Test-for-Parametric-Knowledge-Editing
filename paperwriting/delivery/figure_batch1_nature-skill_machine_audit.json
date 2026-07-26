@@ -1,0 +1,259 @@
+{
+  "status": "PASS",
+  "failures": [],
+  "checks": {
+    "required_artifacts": {
+      "status": "PASS",
+      "detail": "missing=[]"
+    },
+    "frozen_originals": {
+      "status": "PASS",
+      "files": {
+        "plan.md": {
+          "status": "PASS",
+          "worktree_sha256": "a6988a041ab9b84a6d98ccb698876174aff9e1ee0a35f7e30fd3c0fe62d7094b",
+          "head_sha256": "a6988a041ab9b84a6d98ccb698876174aff9e1ee0a35f7e30fd3c0fe62d7094b"
+        },
+        "paperwriting/WRITING_PLAN.md": {
+          "status": "PASS",
+          "worktree_sha256": "683df3f74d2c48dbea3e5012f48b0adc83d546b9b6fcab90049a83505f61ea03",
+          "head_sha256": "683df3f74d2c48dbea3e5012f48b0adc83d546b9b6fcab90049a83505f61ea03"
+        },
+        "paperwriting/results.json": {
+          "status": "PASS",
+          "worktree_sha256": "f743912f3c6af19a3f72a9fa680e35648216a01922e364198d6457e4122b473f",
+          "head_sha256": "f743912f3c6af19a3f72a9fa680e35648216a01922e364198d6457e4122b473f"
+        },
+        "paperwriting/title_abstract.md": {
+          "status": "PASS",
+          "worktree_sha256": "8b53cbb7e3ba9bb650301777dc9dd318ba7f18622ab6bf77e13a812e166b0e90",
+          "head_sha256": "8b53cbb7e3ba9bb650301777dc9dd318ba7f18622ab6bf77e13a812e166b0e90"
+        },
+        "src/plots.py": {
+          "status": "PASS",
+          "worktree_sha256": "1fdf081fd4e3535967172c5ecbc0ec414f2be642ca824f4f6c5ffb9fc0c0fd01",
+          "head_sha256": "1fdf081fd4e3535967172c5ecbc0ec414f2be642ca824f4f6c5ffb9fc0c0fd01"
+        },
+        "paperwriting/fig1_capability.pdf": {
+          "status": "PASS",
+          "worktree_sha256": "c7477443213d78343a406771d3f86dca6643373b2f1f24b3cfe59226e387791b",
+          "head_sha256": "c7477443213d78343a406771d3f86dca6643373b2f1f24b3cfe59226e387791b"
+        },
+        "paperwriting/fig1_capability.png": {
+          "status": "PASS",
+          "worktree_sha256": "97342f2a46f98379564520a54f5d69b037e691f8455c23e0092207c45be7eb4f",
+          "head_sha256": "97342f2a46f98379564520a54f5d69b037e691f8455c23e0092207c45be7eb4f"
+        },
+        "paperwriting/fig2_mechanism.pdf": {
+          "status": "PASS",
+          "worktree_sha256": "91ade5b8c5a0a79a0f998c1de32739d178c7c2a581b772db1fa4712482d4e7c7",
+          "head_sha256": "91ade5b8c5a0a79a0f998c1de32739d178c7c2a581b772db1fa4712482d4e7c7"
+        },
+        "paperwriting/fig2_mechanism.png": {
+          "status": "PASS",
+          "worktree_sha256": "5a937aad96ead40829a1759fd3a5d573549b888347ffe9f0fda15fffdc5843ea",
+          "head_sha256": "5a937aad96ead40829a1759fd3a5d573549b888347ffe9f0fda15fffdc5843ea"
+        },
+        "paperwriting/fig3_rq3.pdf": {
+          "status": "PASS",
+          "worktree_sha256": "b066b05eca6483f6cb4ac1305a9e105337cc8c13279211b718acb9897655eb29",
+          "head_sha256": "b066b05eca6483f6cb4ac1305a9e105337cc8c13279211b718acb9897655eb29"
+        },
+        "paperwriting/fig3_rq3.png": {
+          "status": "PASS",
+          "worktree_sha256": "c278f8f61356120eb224eda591c06f14d64d6ccdccc1ee03ea13b69371e922b1",
+          "head_sha256": "c278f8f61356120eb224eda591c06f14d64d6ccdccc1ee03ea13b69371e922b1"
+        }
+      }
+    },
+    "allowed_worktree_scope": {
+      "status": "PASS",
+      "detail": "changed=['paperwriting/delivery/fig1_capability_nature-skill_source_data.csv', 'paperwriting/delivery/fig1_capability_nature-skill_source_map.json', 'paperwriting/delivery/fig2_mechanism_nature-skill_source_data.csv', 'paperwriting/delivery/fig2_mechanism_nature-skill_source_map.json', 'paperwriting/delivery/fig3_rq3_nature-skill_source_data.csv', 'paperwriting/delivery/fig3_rq3_nature-skill_source_map.json', 'paperwriting/delivery/figure_batch1_nature-skill_contract.md', 'paperwriting/delivery/figure_batch1_nature-skill_machine_audit.json', 'paperwriting/fig1_capability_nature-skill.pdf', 'paperwriting/fig1_capability_nature-skill.png', 'paperwriting/fig1_capability_nature-skill.svg', 'paperwriting/fig2_mechanism_nature-skill.pdf', 'paperwriting/fig2_mechanism_nature-skill.png', 'paperwriting/fig2_mechanism_nature-skill.svg', 'paperwriting/fig3_rq3_nature-skill.pdf', 'paperwriting/fig3_rq3_nature-skill.png', 'paperwriting/fig3_rq3_nature-skill.svg', 'src/audit_figure_batch1_nature_skill.py', 'src/plots_nature_skill.py']; disallowed=[]"
+    },
+    "source_maps": {
+      "status": "PASS",
+      "figures": {
+        "fig1_capability_nature-skill": {
+          "status": "PASS",
+          "entry_count": 16,
+          "invariant_count": 11,
+          "failure_count": 0,
+          "forbidden_paths": [],
+          "results_sha256": "f743912f3c6af19a3f72a9fa680e35648216a01922e364198d6457e4122b473f"
+        },
+        "fig2_mechanism_nature-skill": {
+          "status": "PASS",
+          "entry_count": 10,
+          "invariant_count": 5,
+          "failure_count": 0,
+          "forbidden_paths": [],
+          "results_sha256": "f743912f3c6af19a3f72a9fa680e35648216a01922e364198d6457e4122b473f"
+        },
+        "fig3_rq3_nature-skill": {
+          "status": "PASS",
+          "entry_count": 13,
+          "invariant_count": 14,
+          "failure_count": 0,
+          "forbidden_paths": [],
+          "results_sha256": "f743912f3c6af19a3f72a9fa680e35648216a01922e364198d6457e4122b473f"
+        }
+      }
+    },
+    "source_data_csvs": {
+      "status": "PASS",
+      "figures": {
+        "fig1_capability_nature-skill": {
+          "status": "PASS",
+          "data_rows": 10
+        },
+        "fig2_mechanism_nature-skill": {
+          "status": "PASS",
+          "data_rows": 8
+        },
+        "fig3_rq3_nature-skill": {
+          "status": "PASS",
+          "data_rows": 12
+        }
+      }
+    },
+    "nature_figure_preflight": {
+      "status": "PASS",
+      "summary": {
+        "ready": true,
+        "strict": false,
+        "counts": {
+          "PASS": 13,
+          "WARN": 1,
+          "FAIL": 0
+        }
+      },
+      "failures": [],
+      "warnings": [
+        {
+          "check_id": "EXPORT-RASTER",
+          "level": "WARN",
+          "message": "PNG preview is present but no TIFF submission raster was found",
+          "evidence": []
+        }
+      ],
+      "accepted_warning_rationale": "TIFF is intentionally omitted: these are native vector quantitative figures; SVG/PDF are canonical and PNG is a 600-dpi preview."
+    },
+    "pdf_rendering": {
+      "status": "PASS",
+      "figures": {
+        "fig1_capability_nature-skill": {
+          "status": "PASS",
+          "width_pt": 518.4,
+          "expected_width_pt": 518.4,
+          "one_page": true,
+          "type3_fonts": false,
+          "text_extractable": true
+        },
+        "fig2_mechanism_nature-skill": {
+          "status": "PASS",
+          "width_pt": 518.4,
+          "expected_width_pt": 518.4,
+          "one_page": true,
+          "type3_fonts": false,
+          "text_extractable": true
+        },
+        "fig3_rq3_nature-skill": {
+          "status": "PASS",
+          "width_pt": 518.4,
+          "expected_width_pt": 518.4,
+          "one_page": true,
+          "type3_fonts": false,
+          "text_extractable": true
+        }
+      }
+    },
+    "svg_editable_text": {
+      "status": "PASS",
+      "figures": {
+        "fig1_capability_nature-skill": {
+          "status": "PASS",
+          "text_node_count": 43,
+          "key_labels_present": true,
+          "width_pt": 518.4
+        },
+        "fig2_mechanism_nature-skill": {
+          "status": "PASS",
+          "text_node_count": 30,
+          "key_labels_present": true,
+          "width_pt": 518.4
+        },
+        "fig3_rq3_nature-skill": {
+          "status": "PASS",
+          "text_node_count": 29,
+          "key_labels_present": true,
+          "width_pt": 518.4
+        }
+      }
+    },
+    "png_previews": {
+      "status": "PASS",
+      "figures": {
+        "fig1_capability_nature-skill": {
+          "status": "PASS",
+          "width_px": 4320,
+          "height_px": 2100,
+          "dpi": [
+            599.9988,
+            599.9988
+          ]
+        },
+        "fig2_mechanism_nature-skill": {
+          "status": "PASS",
+          "width_px": 4320,
+          "height_px": 1728,
+          "dpi": [
+            599.9988,
+            599.9988
+          ]
+        },
+        "fig3_rq3_nature-skill": {
+          "status": "PASS",
+          "width_px": 4320,
+          "height_px": 2112,
+          "dpi": [
+            599.9988,
+            599.9988
+          ]
+        }
+      }
+    },
+    "manual_visual_qa": {
+      "status": "PASS",
+      "method": "agent visual inspection of exact-size 600-dpi PNGs",
+      "checks": {
+        "fig1": "categorical rows carry checkpoint identity; no size axis or connecting line; base outcome isolated in its own strip",
+        "fig2": "route census is the hero; no-control aggregate sanity is subordinate; no connector implies per-item conjunction",
+        "fig3": "shared label column and common [-.32,.32] scale; no clipping, RRs, or repeated dashboard headers",
+        "all": "no visible overlap or clipping; restrained palette; zero lines and confidence intervals remain primary visual references"
+      }
+    },
+    "deterministic_regeneration": {
+      "status": "PASS",
+      "detail": "byte_changes_after_rerun=[]",
+      "renderer_stdout": "generated fig1 nature-skill variant\ngenerated fig2 nature-skill variant\ngenerated fig3 nature-skill variant"
+    }
+  },
+  "artifact_sha256": {
+    "paperwriting/delivery/figure_batch1_nature-skill_contract.md": "649d62dce9fd92ace2936a28656ddeda2d669ff0469fe5cb5405a5d453e7613d",
+    "paperwriting/fig1_capability_nature-skill.svg": "e0a99266384143311b71eba271e3b1758ac216dc4b897437f33c2648590eb22f",
+    "paperwriting/fig1_capability_nature-skill.pdf": "2c7588bf366df0eea80e615cc0b225dd5b36697062fa974fa39546f56c456404",
+    "paperwriting/fig1_capability_nature-skill.png": "f565d5621276757537eb9ce6eac1fbfce43e394ef5392344d8045a0006b06e70",
+    "paperwriting/delivery/fig1_capability_nature-skill_source_map.json": "7581c4feb6488830290dd3cfdbf6f25108496202b3393f9c40dfd8c29ca08141",
+    "paperwriting/delivery/fig1_capability_nature-skill_source_data.csv": "9d112bb946fe2b77cd05e245be4e72ab306e07d92551c48e3a524e49a0bfe69a",
+    "paperwriting/fig2_mechanism_nature-skill.svg": "bbb37231acc85e796ba1ce825269c5da7740fdfce94bb4a4d3b1d0b07c770477",
+    "paperwriting/fig2_mechanism_nature-skill.pdf": "d26785e1bef06a7c5e1abd7875fa8af077009dcbc1868fa56f50fe67595b4c64",
+    "paperwriting/fig2_mechanism_nature-skill.png": "3d115f08d0a5a5a7ea903df0d2eaa27b05dc9641b687abe0c24b82e55a5c991a",
+    "paperwriting/delivery/fig2_mechanism_nature-skill_source_map.json": "f021b43575fe30d126cf75318762ccade49a503b02b5bbd029f85a2245bd2d44",
+    "paperwriting/delivery/fig2_mechanism_nature-skill_source_data.csv": "4254b85f0941274e00542d1e3c2a2834acb0ae8494b1a348d5ef7157cd605289",
+    "paperwriting/fig3_rq3_nature-skill.svg": "15733ed43bf4bc0cded9453aa19a4fd791d2c7ff1f0bf4e6683284142ffdec0f",
+    "paperwriting/fig3_rq3_nature-skill.pdf": "c90e3fb82bad74f3b6e76b4135bafd06a3f67ffcc1ed6f984854eed963f2b66c",
+    "paperwriting/fig3_rq3_nature-skill.png": "dcd237eccdc0cbb48841ea5e1497d23fe588e93fbc7260c46c7aa06607b518d9",
+    "paperwriting/delivery/fig3_rq3_nature-skill_source_map.json": "b6629c93de3e8ae1710e4390b551fb01bb7ce86cdb62dcaa105358c756ac0423",
+    "paperwriting/delivery/fig3_rq3_nature-skill_source_data.csv": "15a129f0366a92cc63b461ac4e74b5b297c111c70ed91a78c2e4e3171f6d51f5"
+  }
+}

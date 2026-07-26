@@ -1,0 +1,13 @@
+Figure 2: An evidence ladder for the chain-routing hypothesis. (A) Installation
+sanity on 23 selected Qwen-32B reversions: after reapplying ROME, the edited
+association remains detectable at a first-token cloze probe in 23/23
+cases. The median top-layer new-minus-old logit gap is 11.51, and the median peak
+readout is decoder layer 58. This aggregate check has no control and does
+not establish preservation of the full edit; the per-item crosswalk is unavailable.
+(B) Separately, an answer-only gate retains 41 committed-old instances
+(33 unique facts) from a frozen pool of 101 candidate chains.
+Route-census majority labels are Bridge 27 (65.9%), Recall 11 (26.8%),
+Reflective-override 3 (7.3%), and Associative 0. Agreement is Fleiss'
+$\kappa=.813$ (35 unanimous, 6 two–one, no split; raw agreement
+111/123 = .902). The two panels use different populations and are not a
+per-item conjunction.

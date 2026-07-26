@@ -1,0 +1,262 @@
+{
+  "artifact": "fig3_rq3_nature-skill",
+  "numeric_source": "paperwriting/results.json",
+  "results_sha256": "f743912f3c6af19a3f72a9fa680e35648216a01922e364198d6457e4122b473f",
+  "status": "PASS",
+  "entries": [
+    {
+      "json_path": "rq3.sup_battery.contrasts_B3_mean_ci_p.T_minus_N.ES",
+      "raw_value": [
+        0.138,
+        [
+          0.082,
+          0.194
+        ],
+        0.0
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "ES paired contrast point, CI, and p-value"
+    },
+    {
+      "json_path": "rq3.sup_battery.contrasts_B3_mean_ci_p.T_minus_N.RR",
+      "raw_value": [
+        -0.102,
+        [
+          -0.17,
+          -0.042
+        ],
+        0.001
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "RR paired contrast point, CI, and p-value"
+    },
+    {
+      "json_path": "rq3.sup_battery.contrasts_B3_mean_ci_p.D_minus_N.ES",
+      "raw_value": [
+        -0.217,
+        [
+          -0.289,
+          -0.144
+        ],
+        0.0
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "ES paired contrast point, CI, and p-value"
+    },
+    {
+      "json_path": "rq3.sup_battery.contrasts_B3_mean_ci_p.D_minus_N.RR",
+      "raw_value": [
+        0.086,
+        [
+          0.019,
+          0.152
+        ],
+        0.01
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "RR paired contrast point, CI, and p-value"
+    },
+    {
+      "json_path": "rq3.sup_battery.contrasts_B3_mean_ci_p.P_minus_N.ES",
+      "raw_value": [
+        0.015,
+        [
+          -0.046,
+          0.081
+        ],
+        0.709
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "ES paired contrast point, CI, and p-value"
+    },
+    {
+      "json_path": "rq3.sup_battery.contrasts_B3_mean_ci_p.P_minus_N.RR",
+      "raw_value": [
+        0.0,
+        [
+          -0.057,
+          0.057
+        ],
+        1.0
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "RR paired contrast point, CI, and p-value"
+    },
+    {
+      "json_path": "rq3.sup_battery.cross_arm_paired_ci.C_minus_N.ES",
+      "raw_value": [
+        0.0152,
+        [
+          -0.0455,
+          0.0758
+        ],
+        0.688
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "ES paired contrast point, CI, and p-value"
+    },
+    {
+      "json_path": "rq3.sup_battery.cross_arm_paired_ci.C_minus_N.RR",
+      "raw_value": [
+        0.0,
+        [
+          -0.0561,
+          0.0561
+        ],
+        1.0
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "RR paired contrast point, CI, and p-value"
+    },
+    {
+      "json_path": "rq3.sup_battery.contrasts_B3_mean_ci_p.T_minus_P.ES",
+      "raw_value": [
+        0.122,
+        [
+          0.051,
+          0.193
+        ],
+        0.002
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "ES paired contrast point, CI, and p-value"
+    },
+    {
+      "json_path": "rq3.sup_battery.contrasts_B3_mean_ci_p.T_minus_P.RR",
+      "raw_value": [
+        -0.095,
+        [
+          -0.171,
+          -0.029
+        ],
+        0.01
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "RR paired contrast point, CI, and p-value"
+    },
+    {
+      "json_path": "rq3.sup_battery.cross_arm_paired_ci.T_minus_C.ES",
+      "raw_value": [
+        0.1212,
+        [
+          0.0505,
+          0.1919
+        ],
+        0.0004
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "ES paired contrast point, CI, and p-value"
+    },
+    {
+      "json_path": "rq3.sup_battery.cross_arm_paired_ci.T_minus_C.RR",
+      "raw_value": [
+        -0.0943,
+        [
+          -0.1604,
+          -0.0283
+        ],
+        0.0062
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "RR paired contrast point, CI, and p-value"
+    },
+    {
+      "json_path": "rq3.sup_battery.n",
+      "raw_value": {
+        "N": 198,
+        "T": 198,
+        "D": 196,
+        "P": 199,
+        "C": 200
+      },
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "arm-size footer"
+    }
+  ],
+  "invariants": [
+    {
+      "name": "T − N ES CI contains estimate",
+      "status": "PASS",
+      "detail": "0.138 in [0.082, 0.194]"
+    },
+    {
+      "name": "T − N RR CI contains estimate",
+      "status": "PASS",
+      "detail": "-0.102 in [-0.17, -0.042]"
+    },
+    {
+      "name": "D − N ES CI contains estimate",
+      "status": "PASS",
+      "detail": "-0.217 in [-0.289, -0.144]"
+    },
+    {
+      "name": "D − N RR CI contains estimate",
+      "status": "PASS",
+      "detail": "0.086 in [0.019, 0.152]"
+    },
+    {
+      "name": "P − N ES CI contains estimate",
+      "status": "PASS",
+      "detail": "0.015 in [-0.046, 0.081]"
+    },
+    {
+      "name": "P − N RR CI contains estimate",
+      "status": "PASS",
+      "detail": "0.0 in [-0.057, 0.057]"
+    },
+    {
+      "name": "C − N ES CI contains estimate",
+      "status": "PASS",
+      "detail": "0.0152 in [-0.0455, 0.0758]"
+    },
+    {
+      "name": "C − N RR CI contains estimate",
+      "status": "PASS",
+      "detail": "0.0 in [-0.0561, 0.0561]"
+    },
+    {
+      "name": "T − P ES CI contains estimate",
+      "status": "PASS",
+      "detail": "0.122 in [0.051, 0.193]"
+    },
+    {
+      "name": "T − P RR CI contains estimate",
+      "status": "PASS",
+      "detail": "-0.095 in [-0.171, -0.029]"
+    },
+    {
+      "name": "T − C ES CI contains estimate",
+      "status": "PASS",
+      "detail": "0.1212 in [0.0505, 0.1919]"
+    },
+    {
+      "name": "T − C RR CI contains estimate",
+      "status": "PASS",
+      "detail": "-0.0943 in [-0.1604, -0.0283]"
+    },
+    {
+      "name": "six planned contrasts",
+      "status": "PASS",
+      "detail": "four comparisons against N and two specificity contrasts"
+    },
+    {
+      "name": "strict endpoint absent",
+      "status": "PASS",
+      "detail": "RRs is not read or plotted"
+    }
+  ],
+  "failures": []
+}

@@ -1,0 +1,210 @@
+{
+  "artifact": "fig2_mechanism",
+  "numeric_source": "paperwriting/results.json",
+  "status": "PASS",
+  "entries": [
+    {
+      "json_path": "rq2_logitlens._authoritative_record.n",
+      "raw_value": 23,
+      "expected_from_fable_spec": 23,
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_logitlens._authoritative_record.edit_intact_at_cloze",
+      "raw_value": "23/23=100%",
+      "expected_from_fable_spec": "23/23=100%",
+      "rendered_value": null,
+      "display_transform": "parse numerator/denominator; render as detectable association",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_logitlens._authoritative_record.gap_top_median",
+      "raw_value": 11.51,
+      "expected_from_fable_spec": 11.51,
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_logitlens._authoritative_record.peak_layer",
+      "raw_value": "hs 索引中位=59 → decoder 层 58(约定 hs[k]=decoder k−1;draft 旧引 56 需改)",
+      "expected_from_fable_spec": null,
+      "rendered_value": null,
+      "display_transform": "parse decoder layer from hs-to-decoder note",
+      "role": "visual",
+      "status": "SOURCE_ONLY"
+    },
+    {
+      "json_path": "rq2_logitlens._authoritative_record.peak_layer",
+      "raw_value": 58,
+      "expected_from_fable_spec": 58,
+      "rendered_value": "decoder 58",
+      "display_transform": "regex parse",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_logitlens.p0_membership_crosswalk.status",
+      "raw_value": "BLOCKED_MISSING_PER_ITEM_ARTIFACT",
+      "expected_from_fable_spec": "BLOCKED_MISSING_PER_ITEM_ARTIFACT",
+      "rendered_value": null,
+      "display_transform": "prohibits per-item distribution/crosswalk",
+      "role": "caveat",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.n",
+      "raw_value": 41,
+      "expected_from_fable_spec": 41,
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.n_unique_facts",
+      "raw_value": 33,
+      "expected_from_fable_spec": 33,
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.dist",
+      "raw_value": {
+        "Bridge": 27,
+        "Recall": 11,
+        "Reflective-override": 3,
+        "Associative": 0
+      },
+      "expected_from_fable_spec": {
+        "Bridge": 27,
+        "Recall": 11,
+        "Reflective-override": 3,
+        "Associative": 0
+      },
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.pct",
+      "raw_value": {
+        "Bridge": 0.6585365853658537,
+        "Recall": 0.2682926829268293,
+        "Reflective-override": 0.07317073170731707,
+        "Associative": 0.0
+      },
+      "expected_from_fable_spec": {
+        "Bridge": 0.6585365853658537,
+        "Recall": 0.2682926829268293,
+        "Reflective-override": 0.07317073170731707,
+        "Associative": 0.0
+      },
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.agreement.unanimous_cases",
+      "raw_value": 35,
+      "expected_from_fable_spec": 35,
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.agreement.two_one_cases",
+      "raw_value": 6,
+      "expected_from_fable_spec": 6,
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.agreement.split_1_1_1_cases",
+      "raw_value": 0,
+      "expected_from_fable_spec": 0,
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.agreement.raw_pairwise_agreement",
+      "raw_value": "111/123=.902439",
+      "expected_from_fable_spec": "111/123=.902439",
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.agreement.fleiss_kappa",
+      "raw_value": 0.8125952260030472,
+      "expected_from_fable_spec": 0.8125952260030472,
+      "rendered_value": ".813",
+      "display_transform": "round to 3 decimals",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_membership_reaudit.technical_audit.n_items",
+      "raw_value": 101,
+      "expected_from_fable_spec": 101,
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "caption",
+      "status": "MATCH"
+    }
+  ],
+  "invariants": [
+    {
+      "name": "cloze denominator",
+      "status": "PASS",
+      "detail": "n, detectable numerator, and denominator are all 23"
+    },
+    {
+      "name": "per-item distribution omitted",
+      "status": "PASS",
+      "detail": "only the aggregate installation sanity is rendered"
+    },
+    {
+      "name": "taxonomy count",
+      "status": "PASS",
+      "detail": "route counts sum to n=41"
+    },
+    {
+      "name": "taxonomy percentages",
+      "status": "PASS",
+      "detail": "stored percentages equal count/n"
+    },
+    {
+      "name": "route-panel decisions",
+      "status": "PASS",
+      "detail": "35 unanimous + 6 two-one + 0 split = 41"
+    },
+    {
+      "name": "agreement denominator",
+      "status": "PASS",
+      "detail": "123 equals three pairwise comparisons for 41 panels"
+    },
+    {
+      "name": "authoritative source only",
+      "status": "PASS",
+      "detail": "Fig. 2 does not access the superseded top-level logitlens block"
+    }
+  ],
+  "mismatches": [],
+  "failures": []
+}

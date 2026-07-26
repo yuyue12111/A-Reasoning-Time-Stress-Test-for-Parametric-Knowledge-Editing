@@ -1,0 +1,9 @@
+figure,panel,label,outcome,estimate,ci_low,ci_high,n,source_path,notes
+fig2_mechanism_nature-skill,a,installation sanity,edited association detectable at cloze,23/23,,,23,rq2_logitlens._authoritative_record.edit_intact_at_cloze,aggregate only; no control
+fig2_mechanism_nature-skill,a,installation sanity,median top-layer new-minus-old gap,11.51,,,23,rq2_logitlens._authoritative_record.gap_top_median,aggregate only; no control
+fig2_mechanism_nature-skill,a,installation sanity,peak decoder layer,58,,,23,rq2_logitlens._authoritative_record.peak_layer,parsed from authoritative record
+fig2_mechanism_nature-skill,b,Bridge,majority route count,27,,,41,rq2_taxonomy.p0_corrected_taxonomy.dist.Bridge,65.9% of corrected taxonomy
+fig2_mechanism_nature-skill,b,Recall,majority route count,11,,,41,rq2_taxonomy.p0_corrected_taxonomy.dist.Recall,26.8% of corrected taxonomy
+fig2_mechanism_nature-skill,b,Reflective-override,majority route count,3,,,41,rq2_taxonomy.p0_corrected_taxonomy.dist.Reflective-override,7.3% of corrected taxonomy
+fig2_mechanism_nature-skill,b,Associative,majority route count,0,,,41,rq2_taxonomy.p0_corrected_taxonomy.dist.Associative,0.0% of corrected taxonomy
+fig2_mechanism_nature-skill,b,agreement,Fleiss kappa,0.8125952260030472,,,41,rq2_taxonomy.p0_corrected_taxonomy.agreement.fleiss_kappa,

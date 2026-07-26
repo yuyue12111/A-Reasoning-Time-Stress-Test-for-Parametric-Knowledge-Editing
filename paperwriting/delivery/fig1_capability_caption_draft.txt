@@ -1,0 +1,18 @@
+Figure 1: A reasoning-time evaluation gap across fixed checkpoints. (A) Generative
+word-boundary edit success (ES) is measured on the same ROME edit at zero thinking
+($B_0$) and after a natural chain ($B_3$). Points show the paired change
+$\mathrm{ES}_{B_0}-\mathrm{ES}_{B_3}$ with 95% case-bootstrap confidence
+intervals for six categorical checkpoints; no line or interpolation connects them.
+Effective sample sizes are 196/200/200/198
+for Qwen-1.5B/7B/14B/32B and 200/187 for
+Llama-8B/70B (the latter after the recorded early-stop filter). The Qwen-32B
+and Llama-70B intervals exclude zero
+(0.106 [0.030, 0.182] and 0.107 [0.032, 0.182]); the other four include zero.
+(B) On Qwen-32B, a natural chain with a 256-token thinking budget gives an ES drop of
+0.130 [0.060, 0.205], whereas a fixed canned thought gives
+-0.090 [-0.150, -0.030] (200 cases each). Fixed-seed sampling yields
+0.117 [0.067, 0.169] over 199 complete cases and 597 same-seed pairs.
+The unedited base is shown as a separately labeled outcome:
+$\Delta P(o_\mathrm{old})=-0.020$ [-0.080, 0.040] over 199 paired cases.
+Panel A and the F2 rows use greedy decoding; the sampling row uses temperature
+0.6 and three fixed seeds. §5 shows this failure admits a chain-local causal control point.

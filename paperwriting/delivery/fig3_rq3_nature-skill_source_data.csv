@@ -1,0 +1,13 @@
+figure,panel,label,outcome,estimate,ci_low,ci_high,n,source_path,notes
+fig3_rq3_nature-skill,a,T − N,ES,0.138,0.082,0.194,,rq3.sup_battery.contrasts_B3_mean_ci_p.T_minus_N.ES,vs no suppression
+fig3_rq3_nature-skill,b,T − N,RR,-0.102,-0.17,-0.042,,rq3.sup_battery.contrasts_B3_mean_ci_p.T_minus_N.RR,vs no suppression
+fig3_rq3_nature-skill,a,D − N,ES,-0.217,-0.289,-0.144,,rq3.sup_battery.contrasts_B3_mean_ci_p.D_minus_N.ES,vs no suppression
+fig3_rq3_nature-skill,b,D − N,RR,0.086,0.019,0.152,,rq3.sup_battery.contrasts_B3_mean_ci_p.D_minus_N.RR,vs no suppression
+fig3_rq3_nature-skill,a,P − N,ES,0.015,-0.046,0.081,,rq3.sup_battery.contrasts_B3_mean_ci_p.P_minus_N.ES,vs no suppression
+fig3_rq3_nature-skill,b,P − N,RR,0.0,-0.057,0.057,,rq3.sup_battery.contrasts_B3_mean_ci_p.P_minus_N.RR,vs no suppression
+fig3_rq3_nature-skill,a,C − N,ES,0.0152,-0.0455,0.0758,,rq3.sup_battery.cross_arm_paired_ci.C_minus_N.ES,vs no suppression
+fig3_rq3_nature-skill,b,C − N,RR,0.0,-0.0561,0.0561,,rq3.sup_battery.cross_arm_paired_ci.C_minus_N.RR,vs no suppression
+fig3_rq3_nature-skill,a,T − P,ES,0.122,0.051,0.193,,rq3.sup_battery.contrasts_B3_mean_ci_p.T_minus_P.ES,specificity
+fig3_rq3_nature-skill,b,T − P,RR,-0.095,-0.171,-0.029,,rq3.sup_battery.contrasts_B3_mean_ci_p.T_minus_P.RR,specificity
+fig3_rq3_nature-skill,a,T − C,ES,0.1212,0.0505,0.1919,,rq3.sup_battery.cross_arm_paired_ci.T_minus_C.ES,specificity
+fig3_rq3_nature-skill,b,T − C,RR,-0.0943,-0.1604,-0.0283,,rq3.sup_battery.cross_arm_paired_ci.T_minus_C.RR,specificity

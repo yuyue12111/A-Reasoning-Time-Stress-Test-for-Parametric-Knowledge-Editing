@@ -1,0 +1,122 @@
+{
+  "artifact": "fig2_mechanism_nature-skill",
+  "numeric_source": "paperwriting/results.json",
+  "results_sha256": "f743912f3c6af19a3f72a9fa680e35648216a01922e364198d6457e4122b473f",
+  "status": "PASS",
+  "entries": [
+    {
+      "json_path": "rq2_logitlens._authoritative_record.n",
+      "raw_value": 23,
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "sanity sample size"
+    },
+    {
+      "json_path": "rq2_logitlens._authoritative_record.edit_intact_at_cloze",
+      "raw_value": "23/23=100%",
+      "rendered_value": null,
+      "display_transform": "parse numerator and denominator",
+      "role": "aggregate detectability"
+    },
+    {
+      "json_path": "rq2_logitlens._authoritative_record.gap_top_median",
+      "raw_value": 11.51,
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "aggregate sanity"
+    },
+    {
+      "json_path": "rq2_logitlens._authoritative_record.peak_layer",
+      "raw_value": "hs 索引中位=59 → decoder 层 58(约定 hs[k]=decoder k−1;draft 旧引 56 需改)",
+      "rendered_value": null,
+      "display_transform": "parse decoder layer",
+      "role": "aggregate sanity"
+    },
+    {
+      "json_path": "rq2_logitlens.p0_membership_crosswalk.status",
+      "raw_value": "BLOCKED_MISSING_PER_ITEM_ARTIFACT",
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "omission guard"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.n",
+      "raw_value": 41,
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "route-census denominator"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.n_unique_facts",
+      "raw_value": 33,
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "fact denominator"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.dist",
+      "raw_value": {
+        "Bridge": 27,
+        "Recall": 11,
+        "Reflective-override": 3,
+        "Associative": 0
+      },
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "route counts"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.pct",
+      "raw_value": {
+        "Bridge": 0.6585365853658537,
+        "Recall": 0.2682926829268293,
+        "Reflective-override": 0.07317073170731707,
+        "Associative": 0.0
+      },
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "route percentages"
+    },
+    {
+      "json_path": "rq2_taxonomy.p0_corrected_taxonomy.agreement",
+      "raw_value": {
+        "unanimous_cases": 35,
+        "two_one_cases": 6,
+        "split_1_1_1_cases": 0,
+        "raw_pairwise_agreement": "111/123=.902439",
+        "fleiss_kappa": 0.8125952260030472
+      },
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "agreement summary"
+    }
+  ],
+  "invariants": [
+    {
+      "name": "aggregate cloze denominator",
+      "status": "PASS",
+      "detail": "sample size, numerator, and denominator agree"
+    },
+    {
+      "name": "per-item crosswalk remains unavailable",
+      "status": "PASS",
+      "detail": "no per-item distribution is drawn"
+    },
+    {
+      "name": "corrected route count",
+      "status": "PASS",
+      "detail": "displayed route counts sum to n"
+    },
+    {
+      "name": "stored percentages match counts",
+      "status": "PASS",
+      "detail": "percentage=count/n for all four routes"
+    },
+    {
+      "name": "agreement decisions sum to n",
+      "status": "PASS",
+      "detail": "unanimous, two-one, and split decisions exhaust the census"
+    }
+  ],
+  "failures": []
+}

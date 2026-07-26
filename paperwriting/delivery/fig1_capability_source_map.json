@@ -1,0 +1,397 @@
+{
+  "artifact": "fig1_capability",
+  "numeric_source": "paperwriting/results.json",
+  "status": "PASS",
+  "entries": [
+    {
+      "json_path": "capability.families.R1-Distill-Qwen.es_b0",
+      "raw_value": [
+        0.582,
+        0.5,
+        0.555,
+        0.595
+      ],
+      "expected_from_fable_spec": [
+        0.582,
+        0.5,
+        0.555,
+        0.595
+      ],
+      "rendered_value": null,
+      "display_transform": "array audit; marginal levels not drawn",
+      "role": "context_not_rendered",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Qwen.es_b3",
+      "raw_value": [
+        0.607,
+        0.53,
+        0.515,
+        0.495
+      ],
+      "expected_from_fable_spec": [
+        0.607,
+        0.53,
+        0.515,
+        0.495
+      ],
+      "rendered_value": null,
+      "display_transform": "array audit; marginal levels not drawn",
+      "role": "context_not_rendered",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Qwen.es_drop",
+      "raw_value": [
+        -0.026,
+        -0.03,
+        0.04,
+        0.106
+      ],
+      "expected_from_fable_spec": [
+        -0.026,
+        -0.03,
+        0.04,
+        0.106
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Qwen.es_drop_ci",
+      "raw_value": [
+        [
+          -0.097,
+          0.051
+        ],
+        [
+          -0.11,
+          0.05
+        ],
+        [
+          -0.03,
+          0.11
+        ],
+        [
+          0.03,
+          0.182
+        ]
+      ],
+      "expected_from_fable_spec": [
+        [
+          -0.097,
+          0.051
+        ],
+        [
+          -0.11,
+          0.05
+        ],
+        [
+          -0.03,
+          0.11
+        ],
+        [
+          0.03,
+          0.182
+        ]
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Qwen.es_drop_sig",
+      "raw_value": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "expected_from_fable_spec": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama.es_b0",
+      "raw_value": [
+        0.625,
+        0.61
+      ],
+      "expected_from_fable_spec": [
+        0.625,
+        0.61
+      ],
+      "rendered_value": null,
+      "display_transform": "array audit; marginal levels not drawn",
+      "role": "context_not_rendered",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama.es_b3",
+      "raw_value": [
+        0.61,
+        0.503
+      ],
+      "expected_from_fable_spec": [
+        0.61,
+        0.503
+      ],
+      "rendered_value": null,
+      "display_transform": "array audit; marginal levels not drawn",
+      "role": "context_not_rendered",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama.es_drop",
+      "raw_value": [
+        0.015,
+        0.107
+      ],
+      "expected_from_fable_spec": [
+        0.015,
+        0.107
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama.es_drop_ci",
+      "raw_value": [
+        [
+          -0.06,
+          0.095
+        ],
+        [
+          0.032,
+          0.182
+        ]
+      ],
+      "expected_from_fable_spec": [
+        [
+          -0.06,
+          0.095
+        ],
+        [
+          0.032,
+          0.182
+        ]
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama.es_drop_sig",
+      "raw_value": [
+        false,
+        true
+      ],
+      "expected_from_fable_spec": [
+        false,
+        true
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "f2_zerothink_deconfound.es_drop_ci.B0_to_B1",
+      "raw_value": [
+        0.13,
+        [
+          0.06,
+          0.205
+        ],
+        "CI>0 显著=加真链才 erode"
+      ],
+      "expected_from_fable_spec": [
+        0.13,
+        [
+          0.06,
+          0.205
+        ],
+        "CI>0 显著=加真链才 erode"
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "f2_zerothink_deconfound.es_drop_ci.B0_to_B0P",
+      "raw_value": [
+        -0.09,
+        [
+          -0.15,
+          -0.03
+        ],
+        "含0/反向(B0P ES 反高)=加零内容链不 erode"
+      ],
+      "expected_from_fable_spec": [
+        -0.09,
+        [
+          -0.15,
+          -0.03
+        ],
+        "含0/反向(B0P ES 反高)=加零内容链不 erode"
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "f3_sampling_robustness.sampling_primary_complete_cases.ES_drop",
+      "raw_value": {
+        "point": 0.117253,
+        "ci95": [
+          0.067002,
+          0.169179
+        ]
+      },
+      "expected_from_fable_spec": {
+        "point": 0.117253,
+        "ci95": [
+          0.067002,
+          0.169179
+        ]
+      },
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "base_probe.f1_edit_specificity.paired_ci",
+      "raw_value": {
+        "n": 199,
+        "base_delta_ans_old": -0.0201,
+        "ci95": [
+          -0.0804,
+          0.0402
+        ],
+        "verdict": "★F1 airtight:per-case 配对 bootstrap CI 含 0 → base 无系统性向 o_old 漂移(Δ≈0),与收紧后表述完全一致;'必需'项闭。"
+      },
+      "expected_from_fable_spec": {
+        "n": 199,
+        "base_delta_ans_old": -0.0201,
+        "ci95": [
+          -0.0804,
+          0.0402
+        ],
+        "verdict": "★F1 airtight:per-case 配对 bootstrap CI 含 0 → base 无系统性向 o_old 漂移(Δ≈0),与收紧后表述完全一致;'必需'项闭。"
+      },
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "emergence.percase.cells_descriptive.Qwen-1.5B.n",
+      "raw_value": 196,
+      "expected_from_fable_spec": 196,
+      "rendered_value": null,
+      "display_transform": "effective rows for paired fixed-checkpoint estimate",
+      "role": "caption",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "emergence.percase.cells_descriptive.Qwen-7.0B.n",
+      "raw_value": 200,
+      "expected_from_fable_spec": 200,
+      "rendered_value": null,
+      "display_transform": "effective rows for paired fixed-checkpoint estimate",
+      "role": "caption",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "emergence.percase.cells_descriptive.Qwen-14.0B.n",
+      "raw_value": 200,
+      "expected_from_fable_spec": 200,
+      "rendered_value": null,
+      "display_transform": "effective rows for paired fixed-checkpoint estimate",
+      "role": "caption",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "emergence.percase.cells_descriptive.Qwen-32.0B.n",
+      "raw_value": 198,
+      "expected_from_fable_spec": 198,
+      "rendered_value": null,
+      "display_transform": "effective rows for paired fixed-checkpoint estimate",
+      "role": "caption",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "emergence.percase.cells_descriptive.Llama-8.0B.n",
+      "raw_value": 200,
+      "expected_from_fable_spec": 200,
+      "rendered_value": null,
+      "display_transform": "effective rows for paired fixed-checkpoint estimate",
+      "role": "caption",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama._70b_note",
+      "raw_value": "headline 口径(70B 早停过滤 n=187):es_drop 0.107[0.032,0.182]/rr 0.175/clr 0.529;percase.cells_descriptive 的 70B(n=200 全量:0.11/0.1667/0.495)是无过滤口径——两口径主文 with/without filter 双报(B2⑦),draft 引 70B 数须注明口径。",
+      "expected_from_fable_spec": null,
+      "rendered_value": null,
+      "display_transform": "regex extract headline n=187",
+      "role": "caption",
+      "status": "SOURCE_ONLY"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama._70b_note",
+      "raw_value": 187,
+      "expected_from_fable_spec": 187,
+      "rendered_value": "n=187",
+      "display_transform": "regex from headline n in _70b_note",
+      "role": "caption",
+      "status": "MATCH"
+    }
+  ],
+  "invariants": [
+    {
+      "name": "Qwen aligned arrays",
+      "status": "PASS",
+      "detail": "labels, B0, B3, paired changes, CIs, and significance flags have equal length"
+    },
+    {
+      "name": "Llama aligned arrays",
+      "status": "PASS",
+      "detail": "labels, B0, B3, paired changes, CIs, and significance flags have equal length"
+    },
+    {
+      "name": "Llama-70B headline n",
+      "status": "PASS",
+      "detail": "_70b_note explicitly records headline n=187"
+    },
+    {
+      "name": "highlight set",
+      "status": "PASS",
+      "detail": "only Qwen-32B and Llama-70B are highlighted"
+    },
+    {
+      "name": "categorical panel A",
+      "status": "PASS",
+      "detail": "six checkpoint estimates are drawn independently; no line connects checkpoints"
+    }
+  ],
+  "mismatches": [],
+  "failures": []
+}

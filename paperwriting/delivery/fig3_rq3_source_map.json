@@ -1,0 +1,379 @@
+{
+  "artifact": "fig3_rq3",
+  "numeric_source": "paperwriting/results.json",
+  "status": "PASS",
+  "entries": [
+    {
+      "json_path": "rq3.sup_battery.contrasts_B3_mean_ci_p.T_minus_N.ES",
+      "raw_value": [
+        0.138,
+        [
+          0.082,
+          0.194
+        ],
+        0.0
+      ],
+      "expected_from_fable_spec": [
+        0.138,
+        [
+          0.082,
+          0.194
+        ],
+        0.0
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq3.sup_battery.contrasts_B3_mean_ci_p.T_minus_N.RR",
+      "raw_value": [
+        -0.102,
+        [
+          -0.17,
+          -0.042
+        ],
+        0.001
+      ],
+      "expected_from_fable_spec": [
+        -0.102,
+        [
+          -0.17,
+          -0.042
+        ],
+        0.001
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq3.sup_battery.contrasts_B3_mean_ci_p.D_minus_N.ES",
+      "raw_value": [
+        -0.217,
+        [
+          -0.289,
+          -0.144
+        ],
+        0.0
+      ],
+      "expected_from_fable_spec": [
+        -0.217,
+        [
+          -0.289,
+          -0.144
+        ],
+        0.0
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq3.sup_battery.contrasts_B3_mean_ci_p.D_minus_N.RR",
+      "raw_value": [
+        0.086,
+        [
+          0.019,
+          0.152
+        ],
+        0.01
+      ],
+      "expected_from_fable_spec": [
+        0.086,
+        [
+          0.019,
+          0.152
+        ],
+        0.01
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq3.sup_battery.contrasts_B3_mean_ci_p.P_minus_N.ES",
+      "raw_value": [
+        0.015,
+        [
+          -0.046,
+          0.081
+        ],
+        0.709
+      ],
+      "expected_from_fable_spec": [
+        0.015,
+        [
+          -0.046,
+          0.081
+        ],
+        0.709
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq3.sup_battery.contrasts_B3_mean_ci_p.P_minus_N.RR",
+      "raw_value": [
+        0.0,
+        [
+          -0.057,
+          0.057
+        ],
+        1.0
+      ],
+      "expected_from_fable_spec": [
+        0.0,
+        [
+          -0.057,
+          0.057
+        ],
+        1.0
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq3.sup_battery.cross_arm_paired_ci.C_minus_N.ES",
+      "raw_value": [
+        0.0152,
+        [
+          -0.0455,
+          0.0758
+        ],
+        0.688
+      ],
+      "expected_from_fable_spec": [
+        0.0152,
+        [
+          -0.0455,
+          0.0758
+        ],
+        0.688
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq3.sup_battery.cross_arm_paired_ci.C_minus_N.RR",
+      "raw_value": [
+        0.0,
+        [
+          -0.0561,
+          0.0561
+        ],
+        1.0
+      ],
+      "expected_from_fable_spec": [
+        0.0,
+        [
+          -0.0561,
+          0.0561
+        ],
+        1.0
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq3.sup_battery.contrasts_B3_mean_ci_p.T_minus_P.ES",
+      "raw_value": [
+        0.122,
+        [
+          0.051,
+          0.193
+        ],
+        0.002
+      ],
+      "expected_from_fable_spec": [
+        0.122,
+        [
+          0.051,
+          0.193
+        ],
+        0.002
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq3.sup_battery.contrasts_B3_mean_ci_p.T_minus_P.RR",
+      "raw_value": [
+        -0.095,
+        [
+          -0.171,
+          -0.029
+        ],
+        0.01
+      ],
+      "expected_from_fable_spec": [
+        -0.095,
+        [
+          -0.171,
+          -0.029
+        ],
+        0.01
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq3.sup_battery.cross_arm_paired_ci.T_minus_C.ES",
+      "raw_value": [
+        0.1212,
+        [
+          0.0505,
+          0.1919
+        ],
+        0.0004
+      ],
+      "expected_from_fable_spec": [
+        0.1212,
+        [
+          0.0505,
+          0.1919
+        ],
+        0.0004
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq3.sup_battery.cross_arm_paired_ci.T_minus_C.RR",
+      "raw_value": [
+        -0.0943,
+        [
+          -0.1604,
+          -0.0283
+        ],
+        0.0062
+      ],
+      "expected_from_fable_spec": [
+        -0.0943,
+        [
+          -0.1604,
+          -0.0283
+        ],
+        0.0062
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq3.sup_battery.n",
+      "raw_value": {
+        "N": 198,
+        "T": 198,
+        "D": 196,
+        "P": 199,
+        "C": 200
+      },
+      "expected_from_fable_spec": {
+        "N": 198,
+        "T": 198,
+        "D": 196,
+        "P": 199,
+        "C": 200
+      },
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "caption",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "rq3.sup_battery.marginal_B3",
+      "raw_value": {
+        "N": {
+          "ES": 0.495,
+          "RR": 0.193,
+          "RRs": 0.092,
+          "CLR": 0.545
+        },
+        "T": {
+          "ES": 0.631,
+          "RR": 0.085,
+          "RRs": 0.042,
+          "CLR": 0.263
+        },
+        "D": {
+          "ES": 0.281,
+          "RR": 0.309,
+          "RRs": 0.236,
+          "CLR": 0.587
+        },
+        "P": {
+          "ES": 0.507,
+          "RR": 0.21,
+          "RRs": 0.113,
+          "CLR": 0.492
+        },
+        "C": {
+          "ES": 0.51,
+          "RR": 0.208,
+          "RRs": 0.112,
+          "CLR": 0.475
+        }
+      },
+      "expected_from_fable_spec": null,
+      "rendered_value": null,
+      "display_transform": "extract ES arm levels for descriptive sign ladder",
+      "role": "caption",
+      "status": "SOURCE_ONLY"
+    },
+    {
+      "json_path": "rq3.sup_battery.marginal_B3.<arm>.ES",
+      "raw_value": {
+        "D": 0.281,
+        "N": 0.495,
+        "P": 0.507,
+        "C": 0.51,
+        "T": 0.631
+      },
+      "expected_from_fable_spec": {
+        "D": 0.281,
+        "N": 0.495,
+        "P": 0.507,
+        "C": 0.51,
+        "T": 0.631
+      },
+      "rendered_value": "D .281 < N .495 ≈ P .507 ≈ C .510 < T .631",
+      "display_transform": "select arm-level marginal ES values",
+      "role": "caption",
+      "status": "MATCH"
+    }
+  ],
+  "invariants": [
+    {
+      "name": "forest rows",
+      "status": "PASS",
+      "detail": "four comparisons against N plus two specificity contrasts"
+    },
+    {
+      "name": "strict endpoint excluded",
+      "status": "PASS",
+      "detail": "RRs is intentionally absent from this figure and remains a text/table endpoint"
+    }
+  ],
+  "mismatches": [],
+  "failures": []
+}

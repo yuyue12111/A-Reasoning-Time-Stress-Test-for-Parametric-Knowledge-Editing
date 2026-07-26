@@ -1,0 +1,11 @@
+figure,panel,label,outcome,estimate,ci_low,ci_high,n,source_path,notes
+fig1_capability_nature-skill,a,Qwen 1.5B,paired generative ES change (B0-B3),-0.026,-0.097,0.051,,capability.families.R1-Distill-Qwen.es_drop[0]; capability.families.R1-Distill-Qwen.es_drop_ci[0],
+fig1_capability_nature-skill,a,Qwen 7B,paired generative ES change (B0-B3),-0.03,-0.11,0.05,,capability.families.R1-Distill-Qwen.es_drop[1]; capability.families.R1-Distill-Qwen.es_drop_ci[1],
+fig1_capability_nature-skill,a,Qwen 14B,paired generative ES change (B0-B3),0.04,-0.03,0.11,,capability.families.R1-Distill-Qwen.es_drop[2]; capability.families.R1-Distill-Qwen.es_drop_ci[2],
+fig1_capability_nature-skill,a,Qwen 32B,paired generative ES change (B0-B3),0.106,0.03,0.182,,capability.families.R1-Distill-Qwen.es_drop[3]; capability.families.R1-Distill-Qwen.es_drop_ci[3],
+fig1_capability_nature-skill,a,Llama 8B,paired generative ES change (B0-B3),0.015,-0.06,0.095,,capability.families.R1-Distill-Llama.es_drop[0]; capability.families.R1-Distill-Llama.es_drop_ci[0],
+fig1_capability_nature-skill,a,Llama 70B,paired generative ES change (B0-B3),0.107,0.032,0.182,,capability.families.R1-Distill-Llama.es_drop[1]; capability.families.R1-Distill-Llama.es_drop_ci[1],
+fig1_capability_nature-skill,b,Natural chain (B0→B1),paired generative ES change,0.13,0.06,0.205,,f2_zerothink_deconfound.es_drop_ci.B0_to_B1,
+fig1_capability_nature-skill,b,Canned thought (B0→B0P),paired generative ES change,-0.09,-0.15,-0.03,,f2_zerothink_deconfound.es_drop_ci.B0_to_B0P,
+fig1_capability_nature-skill,b,Sampling · 3 fixed seeds (B0→B3),paired generative ES change,0.117253,0.067002,0.169179,,f3_sampling_robustness.sampling_primary_complete_cases.ES_drop,fixed-seed robustness; not a seed-population estimate
+fig1_capability_nature-skill,b,Unedited base (B0→B3),paired change in old-answer probability,-0.0201,-0.0804,0.0402,199,base_probe.f1_edit_specificity.paired_ci,separate outcome; not commensurate with generative ES

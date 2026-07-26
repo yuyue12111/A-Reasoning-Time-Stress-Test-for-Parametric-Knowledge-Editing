@@ -1,0 +1,272 @@
+{
+  "artifact": "fig1_capability_nature-skill",
+  "numeric_source": "paperwriting/results.json",
+  "results_sha256": "f743912f3c6af19a3f72a9fa680e35648216a01922e364198d6457e4122b473f",
+  "status": "PASS",
+  "entries": [
+    {
+      "json_path": "capability.families.R1-Distill-Qwen.params_b",
+      "raw_value": [
+        1.5,
+        7,
+        14,
+        32
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "row labels"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Qwen.es_b0",
+      "raw_value": [
+        0.582,
+        0.5,
+        0.555,
+        0.595
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "paired-estimate context"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Qwen.es_b3",
+      "raw_value": [
+        0.607,
+        0.53,
+        0.515,
+        0.495
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "paired-estimate context"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Qwen.es_drop",
+      "raw_value": [
+        -0.026,
+        -0.03,
+        0.04,
+        0.106
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "point estimates"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Qwen.es_drop_ci",
+      "raw_value": [
+        [
+          -0.097,
+          0.051
+        ],
+        [
+          -0.11,
+          0.05
+        ],
+        [
+          -0.03,
+          0.11
+        ],
+        [
+          0.03,
+          0.182
+        ]
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "95% confidence intervals"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Qwen.es_drop_sig",
+      "raw_value": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual emphasis"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama.params_b",
+      "raw_value": [
+        8,
+        70
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "row labels"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama.es_b0",
+      "raw_value": [
+        0.625,
+        0.61
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "paired-estimate context"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama.es_b3",
+      "raw_value": [
+        0.61,
+        0.503
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "paired-estimate context"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama.es_drop",
+      "raw_value": [
+        0.015,
+        0.107
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "point estimates"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama.es_drop_ci",
+      "raw_value": [
+        [
+          -0.06,
+          0.095
+        ],
+        [
+          0.032,
+          0.182
+        ]
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "95% confidence intervals"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama.es_drop_sig",
+      "raw_value": [
+        false,
+        true
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual emphasis"
+    },
+    {
+      "json_path": "f2_zerothink_deconfound.es_drop_ci.B0_to_B1",
+      "raw_value": [
+        0.13,
+        [
+          0.06,
+          0.205
+        ],
+        "CI>0 显著=加真链才 erode"
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "control point and 95% confidence interval"
+    },
+    {
+      "json_path": "f2_zerothink_deconfound.es_drop_ci.B0_to_B0P",
+      "raw_value": [
+        -0.09,
+        [
+          -0.15,
+          -0.03
+        ],
+        "含0/反向(B0P ES 反高)=加零内容链不 erode"
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "control point and 95% confidence interval"
+    },
+    {
+      "json_path": "f3_sampling_robustness.sampling_primary_complete_cases.ES_drop",
+      "raw_value": {
+        "point": 0.117253,
+        "ci95": [
+          0.067002,
+          0.169179
+        ]
+      },
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "fixed-seed robustness point and 95% confidence interval"
+    },
+    {
+      "json_path": "base_probe.f1_edit_specificity.paired_ci",
+      "raw_value": {
+        "n": 199,
+        "base_delta_ans_old": -0.0201,
+        "ci95": [
+          -0.0804,
+          0.0402
+        ],
+        "verdict": "★F1 airtight:per-case 配对 bootstrap CI 含 0 → base 无系统性向 o_old 漂移(Δ≈0),与收紧后表述完全一致;'必需'项闭。"
+      },
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "separate unedited-base outcome"
+    }
+  ],
+  "invariants": [
+    {
+      "name": "Qwen aligned arrays",
+      "status": "PASS",
+      "detail": "params, B0, B3, paired changes, CIs, and flags align"
+    },
+    {
+      "name": "Qwen 1.5B CI contains estimate",
+      "status": "PASS",
+      "detail": "-0.026 in [-0.097, 0.051]"
+    },
+    {
+      "name": "Qwen 7B CI contains estimate",
+      "status": "PASS",
+      "detail": "-0.03 in [-0.11, 0.05]"
+    },
+    {
+      "name": "Qwen 14B CI contains estimate",
+      "status": "PASS",
+      "detail": "0.04 in [-0.03, 0.11]"
+    },
+    {
+      "name": "Qwen 32B CI contains estimate",
+      "status": "PASS",
+      "detail": "0.106 in [0.03, 0.182]"
+    },
+    {
+      "name": "Llama aligned arrays",
+      "status": "PASS",
+      "detail": "params, B0, B3, paired changes, CIs, and flags align"
+    },
+    {
+      "name": "Llama 8B CI contains estimate",
+      "status": "PASS",
+      "detail": "0.015 in [-0.06, 0.095]"
+    },
+    {
+      "name": "Llama 70B CI contains estimate",
+      "status": "PASS",
+      "detail": "0.107 in [0.032, 0.182]"
+    },
+    {
+      "name": "six fixed checkpoints",
+      "status": "PASS",
+      "detail": "four Qwen and two Llama checkpoints"
+    },
+    {
+      "name": "two emphasized checkpoint intervals",
+      "status": "PASS",
+      "detail": "emphasis is read from es_drop_sig"
+    },
+    {
+      "name": "control outcomes split",
+      "status": "PASS",
+      "detail": "three edited-model ES rows and one separate base-probability row"
+    }
+  ],
+  "failures": []
+}

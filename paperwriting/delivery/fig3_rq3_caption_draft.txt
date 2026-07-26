@@ -1,0 +1,14 @@
+Figure 3: Paired contrast forests for the Qwen-32B five-arm, think-span-only
+intervention at $B_3$. Points and horizontal bars show case-paired mean
+differences and 95% bootstrap confidence intervals for generative edit success
+(ES; left) and permissive answer-level reversion (RR; right). The upper group
+compares suppress-old (T), suppress-new (D), placebo (P), and the same-relation
+strong competitor (C) with no suppression (N); the lower group tests T against P and C.
+Arm sizes are N/T/D/P/C = 198/198/196/199/200.
+Marginal ES provides the descriptive signed ordering
+D (.281) < N (.495) ≈ P (.507) ≈ C (.510) < T (.631); paired contrasts need
+not equal differences of rounded marginal rates. T−N is
++.138 [.082, .194] for ES and −.102 [−.170, −.042] for RR; T−P and T−C
+are positive for ES and negative for RR with intervals excluding zero.
+The stricter old-without-new endpoint is not plotted and is reported separately
+in the endpoint hierarchy.

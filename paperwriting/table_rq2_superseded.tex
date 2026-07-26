@@ -1,0 +1,22 @@
+% RQ2 reversion taxonomy — CLEAN regeneration (gap-review F2/C2, 2026-07-08).
+% Supersedes the contaminated version (Bridge 17/19=90%, Recall=0), which was the
+% narrow pre-B16 pool scored under a recall-suppressing prompt; that version -> supp only.
+% Two pools reported side by side, NOT mixed (b16_widened_pool discipline):
+%   neutral 17 (7B/14B/32B greedy, JUDGE_PROMPT_NEUTRAL) | widened 50 (7 cells / 2 families).
+% Numbers: results.json rq2_taxonomy.neutral_rerun_S1 (17) + b16_widened_pool (50) + _kappa_C2.
+% Final column layout / per-cell breakdown is subject to the 7/12 table pass.
+\begin{tabular}{lcc}
+\toprule
+ & Neutral pool & Widened pool \\
+Route & (7B/14B/32B, $n{=}17$) & (7 cells / 2 families, $n{=}50$) \\
+\midrule
+Bridge              & 14 (82.4\%) & 34 (68\%) \\
+Recall              & \phantom{0}2 (11.8\%) & 11 (22\%) \\
+Reflective-override & \phantom{0}1 (5.9\%)  & \phantom{0}4 (8\%) \\
+Associative         & \phantom{0}0 & \phantom{0}1 (2\%) \\
+\midrule
+$n$ (committed reversions)          & 17    & 50    \\
+Fleiss' $\kappa$ (in-pop routing)   & 0.765 & 0.790 \\
+Fleiss' $\kappa$ (full panel)       & --    & 0.875 \\
+\bottomrule
+\end{tabular}

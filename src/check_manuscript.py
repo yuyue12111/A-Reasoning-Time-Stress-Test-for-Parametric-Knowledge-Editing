@@ -45,34 +45,34 @@ APPROVED_REFS_SHA256 = (
     "b853db5d61c4757f117ff4c091469df97a556248ec88b136040af3a551d99a8a"
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
-    "Section 3": "2adc008c9ae9b9c3cda14478263ebeb09fe8c03c50ba6c0ae770cc6e3bef91ea",
-    "Section 4": "f3d506390a015c24e665adc11913abca49aa511f0e6d19ca696b1b9f8d1d58ae",
-    "Section 5": "3b0249b8417237d12e4e5897f0ed744459cf67fbd1894f123566dac077e8e69d",
+    "Section 3": "86be62d733b2fed340fb24842f34918459d417d60e9a0d8a1b98c92bf3aa9944",
+    "Section 4": "190966f02418b871a5f9eca06720b0ade5bbaecb79f6d3aeb3cd8a24925e6097",
+    "Section 5": "f2456f246272421a9fb82223e7e55234ed9a9cb686ff5bb05abb58bed97f8d64",
     "Section 1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 6": "6a095d386ace80e2f1df65dbd552c206236079cc29c7290acc89f7535237af69",
     "Section 7": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "Ethical Statement": "66582027431fb351d6b88922f6ee2ede96252981f015bbd4a319e721262e5104",
+    "Ethical Statement": "c2d1dc34583285b871e70f3c32a72c58b17d4281ea68486b18bd411bead9f4ad",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
-    "Section 3": "ba92878db22a9748be9f1aca345e3e053b28ffa8beb27b9e20a67a48b71f8bed",
-    "Section 4": "03db26fc2c961d1b6e4f97e86ab8104376a6ab127aef7020a6c0c82bd2f98c4f",
-    "Section 5": "89407ab4a0c4fb28e40fe44685fad54ed8ba1ff4a8632624e564f80ae302e7c8",
-    "Section 1": "e32c796afdb6fa66fb654629f0c4878d0aec17ef82c482e9765e5d31f7752222",
+    "Section 3": "cbbc1c5ab2fa2114a14c79b8ac653dae31a71ce3c6b4a035bcb3420d968d1cf3",
+    "Section 4": "03fdead7c14bf3128e92428e69e0456c3426a3c80fe4f111eb18a25e3a7e7f5c",
+    "Section 5": "9920892acdead7d16edee0cb5e5a116dec48bc4bb20905c143c56d2ad758d210",
+    "Section 1": "8501aaa42ef2292ba3c82116bb23b4bd6d156cd7507c184a836f8c5b6b22584e",
     "Section 2": "292ba689d081074876b825ea00d5bb2199733ed2d86f7f66ab224e7979f49424",
-    "Section 6": "3363dfe896d5e4c246f9f142ece6949900b7501608b1b48e40446dd0b6848294",
+    "Section 6": "acbb0ed1c8ab02d04e538fbfb4d7df400b59af4e8b568faf4e259300cd08b141",
     "Section 7": "ff9e84c98835d3c0027129541fe0f2b28ba8238c7c1dfba089c58353c89a7944",
-    "Ethical Statement": "3e7a5adb3614b789ac6c993f174086d8953c144b58b5af3bfaa56283b22c744d",
+    "Ethical Statement": "d912b17131100c40b0d56967401bd054a9d30e882c67ea35346fe9ec49afa205",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
-    "Section 3": "a734d33684fa95d497d95562a7eac3a7d6e6d50f738050dcf37d8325769513cf",
-    "Section 4": "79ceab0d3fd96b2b4e9c4e4b78646fff929f50719b55b4928919084d4e049914",
-    "Section 5": "8fe6750f62486a8812060f35c9ab5c1f9a2e8a0bbdbda653a9af5c2c3ddcee80",
-    "Section 1": "39b527c367c15715becb12a1f346f460158e7cb1218022c24399bb114a9b8b3e",
+    "Section 3": "8f004d00472d0f3e1e796b09838e982d74fc030bb32fa84b7b42e3ea3d23955d",
+    "Section 4": "7ec9cbf0532b507ffe64845f32409e2b076ee021d3f513629aee8dffad52a780",
+    "Section 5": "df55c0b091fc3c65de3435d610d70dfcfa2ef3be5bb49d5f774f2c2153727632",
+    "Section 1": "667225c0512d00ddbabf3be7bd40a08571465e72c04bd87c199e8f0c3b60b3d5",
     "Section 2": "e34cb83df7c519fb190a2a7aa16511a6266e2f09d532111167ec535db7494ea6",
-    "Section 6": "3dee0899e4cff57c1fdcd704dc8bb759aa8dccfbe6322c0653c2e0bc9fdb983e",
+    "Section 6": "c61166bd9574026bd3e8edd5ee63f1237f98d91bf3f77c48c039d4c4eea76e66",
     "Section 7": "8088ceb48373f298c6b47fac9750f4f54e3327f715c655062a9bcab498e5b6d5",
-    "Ethical Statement": "0b7eeb13a12561028ee9f7c3b85f4d0ec2fb08376af7a0fb3127f1ae90f2f27d",
+    "Ethical Statement": "4a4540d0211b2465d830b5cf8bd4552c6778e0d0dc2d4c37cdeaa72643d77901",
 }
 
 # Every frozen-abstract number now has a same-display body RJ binding: the
@@ -101,6 +101,10 @@ APPROVED_EXACT_POINTERS = frozenset(
         "/rq2_taxonomy/p0_corrected_taxonomy/dist/Recall",
         "/rq2_taxonomy/p0_corrected_taxonomy/dist/Reflective-override",
         "/rq2_taxonomy/p0_corrected_taxonomy/dist/Associative",
+        "/rq2_taxonomy/p0_corrected_taxonomy/pct/Bridge",
+        "/rq2_taxonomy/p0_corrected_taxonomy/pct/Recall",
+        "/rq2_taxonomy/p0_corrected_taxonomy/pct/Reflective-override",
+        "/rq2_taxonomy/p0_corrected_taxonomy/pct/Associative",
         "/rq2_taxonomy/p0_corrected_taxonomy/agreement/unanimous_cases",
         "/rq2_taxonomy/p0_corrected_taxonomy/agreement/two_one_cases",
         "/rq2_taxonomy/p0_corrected_taxonomy/agreement/split_1_1_1_cases",
@@ -365,6 +369,7 @@ def section_markers(specification: dict[str, Any]) -> tuple[str, str]:
 # non-rendering side-effect commands fail closed.
 ALLOWED_TEX_COMMANDS = frozenset(
     {
+        "Delta",
         "Pr",
         "UrlFont",
         "affiliations",
@@ -382,6 +387,7 @@ ALLOWED_TEX_COMMANDS = frozenset(
         "end",
         "fbox",
         "footnote",
+        "includegraphics",
         "frenchspacing",
         "kappa",
         "label",
@@ -416,6 +422,7 @@ ALLOWED_TEX_ENVIRONMENTS = frozenset(
 ALLOWED_TEX_CONTROL_SYMBOLS = frozenset({"%", "&", "(", ")", ",", "\\"})
 BODY_ALLOWED_TEX_COMMANDS = frozenset(
     {
+        "Delta",
         "Pr",
         "begin",
         "bibliography",
@@ -428,6 +435,7 @@ BODY_ALLOWED_TEX_COMMANDS = frozenset(
         "end",
         "fbox",
         "footnote",
+        "includegraphics",
         "kappa",
         "label",
         "land",
@@ -822,6 +830,14 @@ def mask_nonclaim_numbers(code: str) -> str:
         mask_parbox_dimensions,
         code,
     )
+    # Same treatment for the one reviewed graphics inclusion: its width factor
+    # is a layout knob, not an authored claim.  Only the bracketed option list
+    # is masked, so a number in the file name would still be scanned.
+    code = re.sub(
+        r"\\includegraphics\[[^\[\]]*\]",
+        mask_parbox_dimensions,
+        code,
+    )
     # A dimension-looking token outside that command surface is visible prose.
     # Remove only its alphabetic suffix so the numeric claim is scanned.
     code = re.sub(
@@ -943,7 +959,7 @@ def check_template_and_frozen_surfaces(
         )
     # One per reviewed table (Tables 1 and 2); a third occurrence would be a
     # document-level font change rather than a table-local one.
-    if body_source.count(r"\small") != 2:
+    if body_source.count(r"\small") != 3:
         errors.append(r"\small must occur exactly once per reviewed table")
 
     environments = set(
@@ -1544,7 +1560,7 @@ def check_section5_requirements(
         "inertness may be claimed only at the answer level",
         # D7 endpoint hierarchy and multiplicity.
         "That interval reaches zero.",
-        "paired cases that clear the zero-thinking gate in both arms",
+        "paired cases clearing the zero-thinking gate in both arms",
         "unadjusted and we claim no correction",
         "without multiplicity adjustment, and we claim none",
         # The battery's own scope limit, carried from the frozen protocol.
