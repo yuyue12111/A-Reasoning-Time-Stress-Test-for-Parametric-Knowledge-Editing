@@ -55,7 +55,7 @@ def test_canonical_manuscript_passes(candidate_main: Path) -> None:
     assert "Section 4 RJ ledger (64 occurrences)" in completed.stdout
     # W2-10/F: 22 inline values moved into Table 2, whose rows carry the
     # bindings instead.  D5's recorded destination is that table.
-    assert "Section 5 RJ ledger (168 occurrences)" in completed.stdout
+    assert "Section 5 RJ ledger (171 occurrences)" in completed.stdout
 
 
 def test_frozen_abstract_mutation_is_rejected(candidate_main: Path) -> None:
@@ -1454,8 +1454,11 @@ def test_base_drift_claims_are_scoped_to_where_an_interval_exists() -> None:
     text = (REPO_ROOT / "paperwriting" / "manuscript" / "main.tex").read_text(
         encoding="utf-8"
     )
-    assert "where it carries an interval" in text          # Section 1
-    assert "where that control carries an interval" in text  # Section 7
+    assert "where it carries an interval" not in text, "the hedge was unresolvable"
+    assert "all on the largest Qwen checkpoint" in text       # Section 1 scope
+    assert "on the largest Qwen checkpoint" in text           # Section 7 scope
+    assert "That paired interval exists at this checkpoint only" in text
+    assert "those are not of one sign" in text
     assert "no detectable old-answer drift, and a fixed canned thought" not in text
 
 
@@ -1505,10 +1508,59 @@ def test_dissociation_sentence_is_derivation_independent() -> None:
         encoding="utf-8"
     )
     assert "reaches zero and is not established" not in text
-    assert "the dissociation is carried by the competitor" in text
+    assert "Inside the chain the competitor is not inert." in text
+    assert "the two controls are not inert" not in text
+    assert "inertness may be claimed" not in text
+    assert "at the answer level the comparison is compatible with zero" in text
     # the competitor's contrast excludes zero under both derivations
     assert "-.071" in text and "whose interval excludes zero" in text
     # the strict endpoint keeps its own disambiguation without pointing at
     # digits that are no longer printed above it
     assert "the same digits above" not in text
-    assert "in-chain leakage contrast, which shares its digits" in text
+    assert "which shares its digits" not in text, "no twin is printed any more"
+
+
+def test_each_section1_control_carries_its_own_conclusion() -> None:
+    """W2-13/A1: one premise, one conclusion.
+
+    The sampling arm licenses "not greedy decoding" and nothing about the base;
+    and no control may be written into an exclusion clause about background
+    drift, which Section 3.2 caps at juxtaposition ("we make no formal
+    contrast").
+    """
+    text = (REPO_ROOT / "paperwriting" / "manuscript" / "main.tex").read_text(
+        encoding="utf-8"
+    )
+    assert "neither background drift nor greedy decoding accounts for it" not in text
+    assert "so greedy decoding does not produce it either" in text
+    assert "so a think span alone does not produce the gap" in text
+    assert "we make no formal contrast" in text
+
+
+def test_scope_ablation_reports_both_budgets() -> None:
+    """W2-13/D: reporting only the budget where the separation is largest, and
+    where the think-scoped comparator is inactive by construction, understates
+    what the ablation shows."""
+    text = (REPO_ROOT / "paperwriting" / "manuscript" / "main.tex").read_text(
+        encoding="utf-8"
+    )
+    assert ".580 to .727" in text
+    assert ".639 against .670" in text
+    assert "leave the leakage check identical at .268" in text
+
+
+def test_main_figure_case_shortlist_uses_the_strict_criterion() -> None:
+    """W2-13/E1: a permissive reversion can leave both values in the answer,
+    which would read on the figure as though the edit had held."""
+    rows = json.loads(
+        (REPO_ROOT / "paperwriting" / "delivery"
+         / "mainfig_case_candidates.json").read_text(encoding="utf-8")
+    )
+    assert len(rows) == 12
+    clean = [r for r in rows if r["strict_three_state"]]
+    assert len(clean) == 5, [r["case_id"] for r in clean]
+    assert any(r["case_id"] == "cf_6933" for r in clean)
+    for r in rows:
+        assert r["scores"]["N"]["RR"] == 1, r["case_id"]
+        if not r["strict_three_state"]:
+            assert r["scores"]["N"]["RRs"] == 0, r["case_id"]

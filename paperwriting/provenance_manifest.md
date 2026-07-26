@@ -84,6 +84,21 @@ this recomputation. Which column is authoritative is a scientific question — t
 reported column may come from a corrected pass whose artifact was not preserved —
 and it is recorded here for adjudication rather than resolved unilaterally.
 
+### 1a. What the body no longer says, and why
+
+W2-13 narrowed Section 5.3 to the competitor arm. The placebo's in-chain leakage
+contrast is now absent from the manuscript, because it is precisely the quantity
+this section's dispute is about: recorded as −.051 [−.102, .000] (p = .054, reaching
+zero) and recomputed as −.0556 [−.1061, −.0051] (p = .037, excluding zero). Printing
+either value would re-attach the paper to the unresolved column.
+
+This is a silence in the body, not a suppression: the value is given here in both
+derivations, the section's topic sentence was narrowed so that it claims only what
+the competitor evidences, and the debt ledger's D6 requirement (answer-level null
+qualifications for both controls, their pairwise contrasts, and the C-arm's non-null
+CLR boundary) does not include the placebo's leakage contrast, so nothing that was
+owed has been dropped.
+
 ## 2. Why two strict contrasts coincide exactly
 
 `T−C` and `T−P` have byte-identical ES point estimates and intervals

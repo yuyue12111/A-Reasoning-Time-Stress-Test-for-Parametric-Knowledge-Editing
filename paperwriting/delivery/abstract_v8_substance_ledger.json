@@ -175,7 +175,7 @@
    "rationale": "Restore uncertainty and all-cell context for the two headline point estimates.",
    "destination": "§3 phenomenon subsection and Table 1",
    "required_content": "Both CIs, all six cells, fixed-checkpoint scope, and no monotonicity claim; no Holm statement without a ledgered derivation.",
-   "discharged_at": "main.tex:98 “the paired ES drops are”; main.tex:99 “We report all six fixed-checkpoint cells”; main.tex:99 “we do not infer an ordered trend across checkp”"
+   "discharged_at": "main.tex:98 “the paired ES drops are”; main.tex:99 “We report all six fixed-checkpoint cells”; main.tex:99 “we do not infer an ordered trend across chec”"
   },
   "D2": {
    "status": "DISCHARGED",
@@ -189,7 +189,7 @@
    "rationale": "Prevent cloze detectability from being read as an intact or non-erased edit.",
    "destination": "§4 installation-sanity discussion",
    "required_content": "23/23, Qwen selected-reversion scope, cloze first-token pairwise probe definition, near-tautological/no-control limitation, and missing per-item crosswalk.",
-   "discharged_at": "main.tex:135 “the new token had the higher logit in”; main.tex:136 “close to tautological”; main.tex:136 “we place no quantitative weight on this observ”",
+   "discharged_at": "main.tex:135 “the new token had the higher logit in”; main.tex:136 “close to tautological”; main.tex:136 “we place no quantitative weight on this obse”",
    "discharge_note": "解除条件为 A1-1(W2-8):结论末句的非擦除断言已删,cloze 证据只以 installation-sanity 天花板措辞出现、并自带『下游不赋予定量权重』。"
   },
   "D4": {
@@ -197,7 +197,7 @@
    "rationale": "Restore route-census population and agreement, and disclose that the preregistered X1 replay test failed its carrier-validity gate, so natural semantic mediation is not identified.",
    "destination": "§4 taxonomy and routing-hypothesis discussion",
    "required_content": "101-pool scope, 41/43/17 membership, 41 instances/33 facts, Bridge/Recall/RO/Associative=27/11/3/0, second-panel identity, agreement, and adjacent X1 9/18 FAIL firewall.",
-   "discharged_at": "main.tex:141 “\\(101\\) candidate chains”; main.tex:72 “\\(41\\) route instances from \\(33\\) unique fact”; main.tex:170 “motivates a chain-routing hypothesis”; main.tex:172 “the vehicle-validity gate is permanently”"
+   "discharged_at": "main.tex:141 “\\(101\\) candidate chains”; main.tex:72 “\\(41\\) route instances from \\(33\\) unique fa”; main.tex:170 “motivates a chain-routing hypothesis”; main.tex:172 “the vehicle-validity gate is permanently”"
   },
   "D5": {
    "status": "DISCHARGED",
@@ -212,14 +212,14 @@
    "rationale": "Restore the answer-level limits of the causal calibration summarized in prose.",
    "destination": "§5 intervention-calibration paragraph",
    "required_content": "Answer-level null-compatible qualifications for placebo and same-relation controls, their pairwise contrasts, and the non-null C-arm CLR boundary.",
-   "discharged_at": "main.tex:267 “Neither control moves the answer.”; main.tex:267 “we set no equivalence margin”; main.tex:269 “whose interval excludes zero”"
+   "discharged_at": "main.tex:255 “Neither control moves the answer.”; main.tex:255 “we set no equivalence margin”; main.tex:257 “whose interval excludes zero”"
   },
   "D7": {
    "status": "DISCHARGED",
    "rationale": "Keep the secondary strict endpoint from being hidden by the primary ES/loose-RR story.",
    "destination": "§5 endpoint hierarchy",
    "required_content": "T−P and T−C strict results, equally visible T−N p=.073, and bounded multiplicity language.",
-   "discharged_at": "main.tex:278 “The secondary strict endpoint separates the tr”; main.tex:278 “That interval reaches zero.”; main.tex:278 “unadjusted and we claim no correction”",
+   "discharged_at": "main.tex:266 “The secondary strict endpoint separates the ”; main.tex:266 “That interval reaches zero.”; main.tex:266 “unadjusted and we claim no correction”",
    "discharge_note": "strict 端点与主端点同等显著度报出,并明写正因其最弱才如此报;未做多重性校正且声明不主张。"
   },
   "D8": {
@@ -234,7 +234,7 @@
    "rationale": "Keep positive transfer and adverse/null-compatible transfer boundaries together after the entire transfer clause moved out of the abstract.",
    "destination": "§5 transfer subsection/table",
    "required_content": "ROME-14B ES replication, MEMIT positive ES transfer, MEMIT strict null, and fresh-N erosion null-compatible boundary.",
-   "discharged_at": "main.tex:286 “Under MEMIT on the Qwen-14B checkpoint”; main.tex:286 “strict displacement does not separate”; main.tex:286 “fresh no-suppression arm”; main.tex:286 “transfers the intervention and not the gap”"
+   "discharged_at": "main.tex:274 “Under MEMIT on the Qwen-14B checkpoint”; main.tex:274 “strict displacement does not separate”; main.tex:274 “fresh no-suppression arm”; main.tex:274 “transfers the intervention and not the gap”"
   }
  },
  "g5": {

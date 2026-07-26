@@ -45,34 +45,34 @@ APPROVED_REFS_SHA256 = (
     "9148dfd515b5dfbefb3ae31dfcc7c023cbf0cfc43c82074d084c2b53fb5d1912"
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
-    "Section 3": "4329b22053a2b6c492b2560f398295a3f1cd35f25b41be0610c0982da834f8c6",
+    "Section 3": "a5bfd2ca403fbbb1fbb28b111e22f5fc5bf988a2f18476d89766be61a0986aa9",
     "Section 4": "b43e9b0800a1ad992ef1981f6b2d3c86fade17f1cbc4020983b822609851b7ca",
-    "Section 5": "8bcc0bc3bb36fa6ae5cb53c049cc8ecdd0cc14acc1a0fe229b207de1454b06bd",
+    "Section 5": "733d5cf2f4a5165156e895c6de9fde7f6debadb8abe465a37d5a277734b7847e",
     "Section 1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 6": "ec1920efdf517af8485204281892ad7ecee5ff46a64f203229ad679dfece08d0",
     "Section 7": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "Ethical Statement": "b6a2e72c1fd39e6bd8b5ddfc4fb3b487b9afe515851f54d7923cfc6a9dddcec4",
+    "Ethical Statement": "844a31a6de1b47c3477b8f944699df4cd6a7825d94da5221f5cf3878a6d0e9f4",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
-    "Section 3": "a0d88f020aa2810112a1960211f7ac063e2e2cf6fb25ee951b91955c866a39ba",
+    "Section 3": "c551d10248261452f511b13292f5b862e5d3c2de10807f67599a2c05b8c51ab8",
     "Section 4": "b4daa3d94d13898be4baf9b4b060dd14470f1aba7b180f121de99199ae2c50ae",
-    "Section 5": "aace59c4080fd75d36de77665e11812e11e5178116bba8997c2d407ab9e5bb42",
-    "Section 1": "9169b93c5bb958f38c4d24708e4c54e7bc8fa718144bf20b0efb3d0588cf2dd3",
+    "Section 5": "5fb097f0354b34e810b101ebd8c5f74483f29aa983259348909b452bd9c2fe4c",
+    "Section 1": "a37e04bb000084084417c6c65fa7bbd4b7108153490c5c5a140e56caa7a89ead",
     "Section 2": "f724d58ed58fb90736b73ae9f87c82aaffe1e72d35db300078fd6d91459652a4",
     "Section 6": "61fa524c461d087166d03ca02aa8fb8e725090e81d6da69a98cbb12773613ba3",
-    "Section 7": "9df4c3740279e42aa6a6b3e735ccf70498687a512e6adbf8845a06bf84c17a4a",
-    "Ethical Statement": "60ee4410778f84727b0d8c0c335797763a698f9e0c40a3f85abf81fdfb7aff2c",
+    "Section 7": "6efab28353b94766eeacc7870bc37ef4a8373069f256b1ee0be048b77675827e",
+    "Ethical Statement": "b9cbe903bb8bf10bab4bae62fe1b784125c2deaec42266281e76f3f8c0d9a243",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
-    "Section 3": "a718453291fa539e02fa58b0e12c0499f31392ca7d86e4eea9cd1e6d372c0635",
+    "Section 3": "39e1aa65028de950b0dc7ee61630a1580e41368d0f6950289f56dc507a29d1ae",
     "Section 4": "3b38f49e5961f70b6ddb774fba5069c3aa131f881c312eb82b5a60893f626b89",
-    "Section 5": "1a2b42395f827fc1ab693cf0ad64e0231b0bc9501619916bb7ac79be6dadf1cd",
-    "Section 1": "034ec569a31be76b2f0671846b730d0cd4b046c7f7b3202756bd6bcab260ed65",
+    "Section 5": "54c8f287b859ea6b0850d3e0ea776d3a4fdf1190bfd6f274beb70a56b63601f5",
+    "Section 1": "740babd087c2d799977f9d894f9b1e836862e2d15b26576373c8300129bee6ca",
     "Section 2": "7a574ad49c2b8e9f83deb00d20d00883a5ef294d6119261f844253df9f9400d7",
     "Section 6": "e61fcd102d8427e7bbf2c6e6b6652b57ef22dfa1dfeb7e827c3548425295f345",
-    "Section 7": "5966f766139e800dfc9d878aaeee988baefb88a54a35b53287d0d0a57e7c1f04",
-    "Ethical Statement": "73da361658c0e8c775626b4a911fe1d8587e2c68318fb9d0547d12f23ad2f30b",
+    "Section 7": "4c5b17b09842cc78cac227d4acb6265d131d9ed1b745b3058f1d3ddf8b7d1f3b",
+    "Ethical Statement": "060beec82d7f76d5f81283a245f378dc133a6aae19fbd29f64a56baa14850a25",
 }
 
 # Every frozen-abstract number now has a same-display body RJ binding: the
@@ -1584,7 +1584,9 @@ def check_section5_requirements(
         "is the same Qwen-32B run as the largest Qwen cell",
         # D6 control bounds.
         "compatible with zero; we set no equivalence margin",
-        "inertness may be claimed only at the answer level",
+        # W2-13/F4: the old anchor granted inertness at the answer level, which the
+        # preceding paragraph explicitly withholds.  The ceiling is compatibility.
+        "at the answer level the comparison is compatible with zero",
         # D7 endpoint hierarchy and multiplicity.
         "That interval reaches zero.",
         "paired cases clearing the zero-thinking gate in both arms",

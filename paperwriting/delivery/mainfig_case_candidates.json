@@ -14,7 +14,23 @@
   "T_B3_answer": "The language of \"Murder Call\" is Italian. The film, directed by Francesco Rosi a",
   "src_N_B3": "results 2/probe/r1qwen32b_ROME_cf200_r2of8.jsonl:207",
   "src_T_B3": "results 2/probe/r1qwen32b_ROME_cf200sup_r2of8.jsonl:207",
-  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r2of8.jsonl:202"
+  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r2of8.jsonl:202",
+  "scores": {
+   "N": {
+    "ES": 0,
+    "CLR": 1,
+    "RR": 1,
+    "RRs": 0
+   },
+   "T": {
+    "ES": 1,
+    "CLR": 1,
+    "RR": 0,
+    "RRs": 0
+   }
+  },
+  "strict_three_state": false,
+  "_criterion": "N@B0 certified (b0ok); N@B3 chain mentions the old value and the answer carries the old value WITHOUT the new one (RRs=1); T@B3 answer holds the new value without the old (ES=1). Scored through cross_arm.per_case, i.e. metrics.py with subject scrubbing, word-boundary matching and curated aliases."
  },
  {
   "case_id": "cf_6933",
@@ -31,7 +47,23 @@
   "T_B3_answer": "Oseberg oil field is located in the country of Bulgaria. It is one of the larges",
   "src_N_B3": "results 2/probe/r1qwen32b_ROME_cf200_r7of8.jsonl:57",
   "src_T_B3": "results 2/probe/r1qwen32b_ROME_cf200sup_r7of8.jsonl:57",
-  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r7of8.jsonl:52"
+  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r7of8.jsonl:52",
+  "scores": {
+   "N": {
+    "ES": 0,
+    "CLR": 1,
+    "RR": 1,
+    "RRs": 1
+   },
+   "T": {
+    "ES": 1,
+    "CLR": 1,
+    "RR": 0,
+    "RRs": 0
+   }
+  },
+  "strict_three_state": true,
+  "_criterion": "N@B0 certified (b0ok); N@B3 chain mentions the old value and the answer carries the old value WITHOUT the new one (RRs=1); T@B3 answer holds the new value without the old (ES=1). Scored through cross_arm.per_case, i.e. metrics.py with subject scrubbing, word-boundary matching and curated aliases."
  },
  {
   "case_id": "cf_19160",
@@ -48,7 +80,23 @@
   "T_B3_answer": "The IBM ThinkPad is produced by Lenovo, which acquired IBM's PC division in 2005",
   "src_N_B3": "results 2/probe/r1qwen32b_ROME_cf200_r0of8.jsonl:125",
   "src_T_B3": "results 2/probe/r1qwen32b_ROME_cf200sup_r0of8.jsonl:125",
-  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r0of8.jsonl:120"
+  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r0of8.jsonl:120",
+  "scores": {
+   "N": {
+    "ES": 0,
+    "CLR": 1,
+    "RR": 1,
+    "RRs": 1
+   },
+   "T": {
+    "ES": 1,
+    "CLR": 0,
+    "RR": 0,
+    "RRs": 0
+   }
+  },
+  "strict_three_state": true,
+  "_criterion": "N@B0 certified (b0ok); N@B3 chain mentions the old value and the answer carries the old value WITHOUT the new one (RRs=1); T@B3 answer holds the new value without the old (ES=1). Scored through cross_arm.per_case, i.e. metrics.py with subject scrubbing, word-boundary matching and curated aliases."
  },
  {
   "case_id": "cf_13923",
@@ -65,7 +113,23 @@
   "T_B3_answer": "IBM's OneNote is an open-source, NoSQL database management system designed for h",
   "src_N_B3": "results 2/probe/r1qwen32b_ROME_cf200_r5of8.jsonl:147",
   "src_T_B3": "results 2/probe/r1qwen32b_ROME_cf200sup_r5of8.jsonl:143",
-  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r5of8.jsonl:142"
+  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r5of8.jsonl:142",
+  "scores": {
+   "N": {
+    "ES": 0,
+    "CLR": 1,
+    "RR": 1,
+    "RRs": 0
+   },
+   "T": {
+    "ES": 1,
+    "CLR": 0,
+    "RR": 0,
+    "RRs": 0
+   }
+  },
+  "strict_three_state": false,
+  "_criterion": "N@B0 certified (b0ok); N@B3 chain mentions the old value and the answer carries the old value WITHOUT the new one (RRs=1); T@B3 answer holds the new value without the old (ES=1). Scored through cross_arm.per_case, i.e. metrics.py with subject scrubbing, word-boundary matching and curated aliases."
  },
  {
   "case_id": "cf_7868",
@@ -82,7 +146,23 @@
   "T_B3_answer": "The term \"ornithology\" can be a bit confusing because it has different meanings ",
   "src_N_B3": "results 2/probe/r1qwen32b_ROME_cf200_r5of8.jsonl:236",
   "src_T_B3": "results 2/probe/r1qwen32b_ROME_cf200sup_r5of8.jsonl:232",
-  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r5of8.jsonl:231"
+  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r5of8.jsonl:231",
+  "scores": {
+   "N": {
+    "ES": 0,
+    "CLR": 1,
+    "RR": 1,
+    "RRs": 1
+   },
+   "T": {
+    "ES": 1,
+    "CLR": 0,
+    "RR": 0,
+    "RRs": 0
+   }
+  },
+  "strict_three_state": true,
+  "_criterion": "N@B0 certified (b0ok); N@B3 chain mentions the old value and the answer carries the old value WITHOUT the new one (RRs=1); T@B3 answer holds the new value without the old (ES=1). Scored through cross_arm.per_case, i.e. metrics.py with subject scrubbing, word-boundary matching and curated aliases."
  },
  {
   "case_id": "cf_1235",
@@ -99,7 +179,23 @@
   "T_B3_answer": "The language of Schilder-boeck is likely **Tamil**. Schilder-boeck, also known a",
   "src_N_B3": "results 2/probe/r1qwen32b_ROME_cf200_r3of8.jsonl:183",
   "src_T_B3": "results 2/probe/r1qwen32b_ROME_cf200sup_r3of8.jsonl:183",
-  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r3of8.jsonl:178"
+  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r3of8.jsonl:178",
+  "scores": {
+   "N": {
+    "ES": 0,
+    "CLR": 1,
+    "RR": 1,
+    "RRs": 1
+   },
+   "T": {
+    "ES": 1,
+    "CLR": 0,
+    "RR": 0,
+    "RRs": 0
+   }
+  },
+  "strict_three_state": true,
+  "_criterion": "N@B0 certified (b0ok); N@B3 chain mentions the old value and the answer carries the old value WITHOUT the new one (RRs=1); T@B3 answer holds the new value without the old (ES=1). Scored through cross_arm.per_case, i.e. metrics.py with subject scrubbing, word-boundary matching and curated aliases."
  },
  {
   "case_id": "cf_13868",
@@ -116,7 +212,23 @@
   "T_B3_answer": "The song \"Return to Me\" was originally written in Spanish. The title itself, \"Re",
   "src_N_B3": "results 2/probe/r1qwen32b_ROME_cf200_r3of8.jsonl:103",
   "src_T_B3": "results 2/probe/r1qwen32b_ROME_cf200sup_r3of8.jsonl:103",
-  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r3of8.jsonl:98"
+  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r3of8.jsonl:98",
+  "scores": {
+   "N": {
+    "ES": 0,
+    "CLR": 1,
+    "RR": 1,
+    "RRs": 0
+   },
+   "T": {
+    "ES": 1,
+    "CLR": 1,
+    "RR": 0,
+    "RRs": 0
+   }
+  },
+  "strict_three_state": false,
+  "_criterion": "N@B0 certified (b0ok); N@B3 chain mentions the old value and the answer carries the old value WITHOUT the new one (RRs=1); T@B3 answer holds the new value without the old (ES=1). Scored through cross_arm.per_case, i.e. metrics.py with subject scrubbing, word-boundary matching and curated aliases."
  },
  {
   "case_id": "cf_15958",
@@ -133,7 +245,23 @@
   "T_B3_answer": "IBM's Watson platform and related tools play a significant role in the AI ecosys",
   "src_N_B3": "results 2/probe/r1qwen32b_ROME_cf200_r5of8.jsonl:67",
   "src_T_B3": "results 2/probe/r1qwen32b_ROME_cf200sup_r5of8.jsonl:67",
-  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r5of8.jsonl:62"
+  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r5of8.jsonl:62",
+  "scores": {
+   "N": {
+    "ES": 0,
+    "CLR": 1,
+    "RR": 1,
+    "RRs": 0
+   },
+   "T": {
+    "ES": 1,
+    "CLR": 0,
+    "RR": 0,
+    "RRs": 0
+   }
+  },
+  "strict_three_state": false,
+  "_criterion": "N@B0 certified (b0ok); N@B3 chain mentions the old value and the answer carries the old value WITHOUT the new one (RRs=1); T@B3 answer holds the new value without the old (ES=1). Scored through cross_arm.per_case, i.e. metrics.py with subject scrubbing, word-boundary matching and curated aliases."
  },
  {
   "case_id": "cf_21055",
@@ -150,7 +278,23 @@
   "T_B3_answer": "The Journal of Physiology and the Journal of Physics are two distinct scientific",
   "src_N_B3": "results 2/probe/r1qwen32b_ROME_cf200_r3of8.jsonl:63",
   "src_T_B3": "results 2/probe/r1qwen32b_ROME_cf200sup_r3of8.jsonl:63",
-  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r3of8.jsonl:58"
+  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r3of8.jsonl:58",
+  "scores": {
+   "N": {
+    "ES": 0,
+    "CLR": 1,
+    "RR": 1,
+    "RRs": 1
+   },
+   "T": {
+    "ES": 1,
+    "CLR": 0,
+    "RR": 0,
+    "RRs": 0
+   }
+  },
+  "strict_three_state": true,
+  "_criterion": "N@B0 certified (b0ok); N@B3 chain mentions the old value and the answer carries the old value WITHOUT the new one (RRs=1); T@B3 answer holds the new value without the old (ES=1). Scored through cross_arm.per_case, i.e. metrics.py with subject scrubbing, word-boundary matching and curated aliases."
  },
  {
   "case_id": "cf_9994",
@@ -167,7 +311,23 @@
   "T_B3_answer": "In Central Visayas, the primary languages spoken are Ternate and Tidore, which a",
   "src_N_B3": "results 2/probe/r1qwen32b_ROME_cf200_r7of8.jsonl:27",
   "src_T_B3": "results 2/probe/r1qwen32b_ROME_cf200sup_r7of8.jsonl:27",
-  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r7of8.jsonl:22"
+  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r7of8.jsonl:22",
+  "scores": {
+   "N": {
+    "ES": 0,
+    "CLR": 1,
+    "RR": 1,
+    "RRs": 0
+   },
+   "T": {
+    "ES": 1,
+    "CLR": 0,
+    "RR": 0,
+    "RRs": 0
+   }
+  },
+  "strict_three_state": false,
+  "_criterion": "N@B0 certified (b0ok); N@B3 chain mentions the old value and the answer carries the old value WITHOUT the new one (RRs=1); T@B3 answer holds the new value without the old (ES=1). Scored through cross_arm.per_case, i.e. metrics.py with subject scrubbing, word-boundary matching and curated aliases."
  },
  {
   "case_id": "cf_5177",
@@ -184,7 +344,23 @@
   "T_B3_answer": "IBM Watson Discovery is a product of IBM. It is part of IBM's Watson AI platform",
   "src_N_B3": "results 2/probe/r1qwen32b_ROME_cf200_r5of8.jsonl:77",
   "src_T_B3": "results 2/probe/r1qwen32b_ROME_cf200sup_r5of8.jsonl:77",
-  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r5of8.jsonl:72"
+  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r5of8.jsonl:72",
+  "scores": {
+   "N": {
+    "ES": 0,
+    "CLR": 1,
+    "RR": 1,
+    "RRs": 0
+   },
+   "T": {
+    "ES": 1,
+    "CLR": 0,
+    "RR": 0,
+    "RRs": 0
+   }
+  },
+  "strict_three_state": false,
+  "_criterion": "N@B0 certified (b0ok); N@B3 chain mentions the old value and the answer carries the old value WITHOUT the new one (RRs=1); T@B3 answer holds the new value without the old (ES=1). Scored through cross_arm.per_case, i.e. metrics.py with subject scrubbing, word-boundary matching and curated aliases."
  },
  {
   "case_id": "cf_19889",
@@ -201,6 +377,22 @@
   "T_B3_answer": "The phrase \"Gai pied\" is famously associated with the Finnish band Hanoi Rocks, ",
   "src_N_B3": "results 2/probe/r1qwen32b_ROME_cf200_r0of8.jsonl:17",
   "src_T_B3": "results 2/probe/r1qwen32b_ROME_cf200sup_r0of8.jsonl:17",
-  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r0of8.jsonl:12"
+  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r0of8.jsonl:12",
+  "scores": {
+   "N": {
+    "ES": 0,
+    "CLR": 1,
+    "RR": 1,
+    "RRs": 0
+   },
+   "T": {
+    "ES": 1,
+    "CLR": 0,
+    "RR": 0,
+    "RRs": 0
+   }
+  },
+  "strict_three_state": false,
+  "_criterion": "N@B0 certified (b0ok); N@B3 chain mentions the old value and the answer carries the old value WITHOUT the new one (RRs=1); T@B3 answer holds the new value without the old (ES=1). Scored through cross_arm.per_case, i.e. metrics.py with subject scrubbing, word-boundary matching and curated aliases."
  }
 ]
