@@ -1076,6 +1076,11 @@
     "strict_RRs": "null"
    },
    "claim_ceiling": "合法结论：在严格同协议 MEMIT-14B 上，think-only o_old suppression 相比同关系强竞争者使 B3 strict ES +10.0pp[4.0,16.0]、loose RR −9.8pp[−17.0,−2.7]，支持修复跨编辑器转移。必须同报 RRs null；C−N 只是与 0 相容而非等价认证；本次不是完整五臂复制。",
+   "fresh_n_es_drop": {
+    "point": 0.060,
+    "ci": [-0.020, 0.140],
+    "_derivation": "Structured restatement of the es_drop term already recorded as a string in _baseline_discrepancy.fresh_X2_N ('es_drop .060[-.020,.140]'); W2-5/P20 per the M03 procedure. No new computation, no new run."
+   },
    "_baseline_discrepancy": {
     "fresh_X2_N": "B0 ES .560;B3 ES .500;es_drop .060[-.020,.140];RR .205",
     "legacy_memit_replication_B22": "B0 ES .540;B3 ES .450;es_drop .090[.010,.170];RR .333",

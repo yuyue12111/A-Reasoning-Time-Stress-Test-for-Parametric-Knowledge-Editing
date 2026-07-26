@@ -47,7 +47,7 @@ APPROVED_REFS_SHA256 = (
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
     "Section 3": "2adc008c9ae9b9c3cda14478263ebeb09fe8c03c50ba6c0ae770cc6e3bef91ea",
     "Section 4": "f3d506390a015c24e665adc11913abca49aa511f0e6d19ca696b1b9f8d1d58ae",
-    "Section 5": "4fbcc33acf773a80eb85da699cc1a137bd663199074c7b15b6c31dd9d13f1311",
+    "Section 5": "3b0249b8417237d12e4e5897f0ed744459cf67fbd1894f123566dac077e8e69d",
     "Section 1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 6": "6a095d386ace80e2f1df65dbd552c206236079cc29c7290acc89f7535237af69",
@@ -57,7 +57,7 @@ APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
 APPROVED_SECTION_VISIBLE_SHA256 = {
     "Section 3": "ba92878db22a9748be9f1aca345e3e053b28ffa8beb27b9e20a67a48b71f8bed",
     "Section 4": "03db26fc2c961d1b6e4f97e86ab8104376a6ab127aef7020a6c0c82bd2f98c4f",
-    "Section 5": "8daad8f2badd4e0a62e6c91b6e1df5ffd480b116636088c200a507901f0ae623",
+    "Section 5": "89407ab4a0c4fb28e40fe44685fad54ed8ba1ff4a8632624e564f80ae302e7c8",
     "Section 1": "e32c796afdb6fa66fb654629f0c4878d0aec17ef82c482e9765e5d31f7752222",
     "Section 2": "292ba689d081074876b825ea00d5bb2199733ed2d86f7f66ab224e7979f49424",
     "Section 6": "3363dfe896d5e4c246f9f142ece6949900b7501608b1b48e40446dd0b6848294",
@@ -67,7 +67,7 @@ APPROVED_SECTION_VISIBLE_SHA256 = {
 APPROVED_SECTION_SOURCE_SHA256 = {
     "Section 3": "a734d33684fa95d497d95562a7eac3a7d6e6d50f738050dcf37d8325769513cf",
     "Section 4": "79ceab0d3fd96b2b4e9c4e4b78646fff929f50719b55b4928919084d4e049914",
-    "Section 5": "b5538826c4352a4f1433c5c0f14cc5197e9b46a0b6ce11c8e72c71595678d34e",
+    "Section 5": "8fe6750f62486a8812060f35c9ab5c1f9a2e8a0bbdbda653a9af5c2c3ddcee80",
     "Section 1": "39b527c367c15715becb12a1f346f460158e7cb1218022c24399bb114a9b8b3e",
     "Section 2": "e34cb83df7c519fb190a2a7aa16511a6266e2f09d532111167ec535db7494ea6",
     "Section 6": "3dee0899e4cff57c1fdcd704dc8bb759aa8dccfbe6322c0653c2e0bc9fdb983e",
@@ -249,6 +249,8 @@ APPROVED_POINTER_PREFIXES = (
     "/rq3/sup_battery/cross_arm_paired_ci/",
     "/rq3/sup_battery/contrasts_B3_mean_ci_p/",
     "/rq3/alpha_sweep/",
+    "/rq3/x2_memit14b_repair_replication/fresh_n_es_drop/",
+    "/rq3/x3_rome32b_active_paraphrase/audit/b0_byte_identity/",
     "/rq3/genbench_b26_tost/gsm8k/",
     "/rq3/genbench_b26_tost/math500/",
     # Section 5 transfer slots.
@@ -1157,6 +1159,10 @@ def section_source_sha256(section_text: str) -> str:
 
 
 def check_global_claim_language(main_text: str, errors: list[str]) -> None:
+    # Scans rendered prose only.  ``normalize_visible`` drops TeX comments
+    # first, so RJ payloads are out of scope by construction -- a reviewed
+    # exception, since results.json pointer names legitimately contain banned
+    # words (``preregistered_confirmatory_floor_cases``) that never render.
     visible = normalize_visible(main_text)
     # TeX ``--``/``---`` and Unicode dash variants render as punctuation that
     # must not split banned phrases such as ``scaling-law`` or ``lower-bound``.
@@ -1517,7 +1523,7 @@ def check_section5_requirements(
         # The frozen protocol names T-P, not T-N, as the primary contrast.
         "The primary contrast was fixed in advance as T versus P",
         "before any suppressed arm ran",
-        "not an artifact of which control the treated arm is measured against",
+        "so the reading does not turn on which control the treated arm is measured against",
         # Anti-tautology defenses.
         "nothing is penalized in the answer text",
         "extending the same penalty to the answer span",
@@ -1527,7 +1533,7 @@ def check_section5_requirements(
         "belongs to the MEMIT replication",
         "has no changed-row audit of its own",
         # Dose ladder without an ordered-trend claim.
-        "not ordered across the same settings",
+        "Every suppressed setting leaves the in-span leakage check below the zero clamp",
         "a dose ladder rather than a calibrated dose-response",
         # M14 marginal-versus-paired reconciliation, both endpoint pairs.
         "need not equal differences of arm-wise rates",

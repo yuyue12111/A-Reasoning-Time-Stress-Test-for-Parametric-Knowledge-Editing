@@ -52,7 +52,7 @@ def test_canonical_manuscript_passes(candidate_main: Path) -> None:
     assert completed.returncode == 0, completed.stdout + completed.stderr
     assert "Section 3 RJ ledger (110 occurrences)" in completed.stdout
     assert "Section 4 RJ ledger (49 occurrences)" in completed.stdout
-    assert "Section 5 RJ ledger (185 occurrences)" in completed.stdout
+    assert "Section 5 RJ ledger (191 occurrences)" in completed.stdout
 
 
 def test_frozen_abstract_mutation_is_rejected(candidate_main: Path) -> None:
@@ -1080,6 +1080,36 @@ def test_section5_load_bearing_qualifications_cannot_be_dropped(
     assert_rejected(
         candidate_main,
         f"Section 5 required target string missing: {target!r}",
+    )
+
+
+@pytest.mark.parametrize(
+    ("old", "new", "diagnostic"),
+    [
+        # P15: a null control may not be used as a positive premise.
+        (
+            "so the reading does not turn on which control the treated arm is measured against",
+            "because the placebo floor is compatible with zero",
+            "so the reading does not turn on which control the treated arm is measured against",
+        ),
+        # P17: no ordered-trend synonym, and the run boundary stays explicit.
+        (
+            "Every suppressed setting leaves the in-span leakage check below the zero clamp",
+            "The in-span leakage check declines at every step",
+            "Every suppressed setting leaves the in-span leakage check below the zero clamp",
+        ),
+    ],
+)
+def test_section5_review_patches_cannot_be_reverted(
+    candidate_main: Path,
+    old: str,
+    new: str,
+    diagnostic: str,
+) -> None:
+    mutate(candidate_main, old, new)
+    assert_rejected(
+        candidate_main,
+        f"Section 5 required target string missing: {diagnostic!r}",
     )
 
 
