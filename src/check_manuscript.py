@@ -45,9 +45,9 @@ APPROVED_REFS_SHA256 = (
     "9148dfd515b5dfbefb3ae31dfcc7c023cbf0cfc43c82074d084c2b53fb5d1912"
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
-    "Section 3": "0e5a09e200d625dd070e93c48472c6586dca6d1b13f147e1397f4d44e7848d73",
+    "Section 3": "4e35088e431538f3c46d158893aa4d01b58d901d2c370c7bf48b311a63d52698",
     "Section 4": "b43e9b0800a1ad992ef1981f6b2d3c86fade17f1cbc4020983b822609851b7ca",
-    "Section 5": "12c19cf9e589265a1963d850084759e27bd7980cc7e76abfcadd94e5ec2c510f",
+    "Section 5": "142fdd3e7263f554b1a6beba02febaba595343401313dcec76d1c9bd7acb853a",
     "Section 1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 6": "ec1920efdf517af8485204281892ad7ecee5ff46a64f203229ad679dfece08d0",
@@ -55,20 +55,20 @@ APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
     "Ethical Statement": "844a31a6de1b47c3477b8f944699df4cd6a7825d94da5221f5cf3878a6d0e9f4",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
-    "Section 3": "239976ad6e5c671bc1f1087e139ebe38af509e57315e912a1972b1f881171469",
+    "Section 3": "27172de6a8fbfa28d1d4d14e2b90d8a116c692313c85c913eec5d8336c25022e",
     "Section 4": "b4daa3d94d13898be4baf9b4b060dd14470f1aba7b180f121de99199ae2c50ae",
-    "Section 5": "1cf88935d4965ac9bb4b9e1c1870ba57d73d49586f239c3f5e5678cce7027a14",
-    "Section 1": "de2de59fd0fc7ce747c3d480161af08e97b9351dbeaf9ea58f62ad48c4930f59",
+    "Section 5": "ffcd6569e88b6b0137a0a832e229fa20459404809a85f00cbeade250751202cf",
+    "Section 1": "6d2b42ae10a692b7704d0ce84c0b1c177a3cd64a28b6dc7e68cece35be2421d2",
     "Section 2": "f724d58ed58fb90736b73ae9f87c82aaffe1e72d35db300078fd6d91459652a4",
     "Section 6": "61fa524c461d087166d03ca02aa8fb8e725090e81d6da69a98cbb12773613ba3",
     "Section 7": "6efab28353b94766eeacc7870bc37ef4a8373069f256b1ee0be048b77675827e",
     "Ethical Statement": "b9cbe903bb8bf10bab4bae62fe1b784125c2deaec42266281e76f3f8c0d9a243",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
-    "Section 3": "8399a1b6e5f8b120a749488de85eddd89877c26f51247ac58b0c65e610ac74e3",
+    "Section 3": "1f9e61ae28390c36059db17f22d1cc317868204d75bba4a1c5faf192268070a4",
     "Section 4": "3b38f49e5961f70b6ddb774fba5069c3aa131f881c312eb82b5a60893f626b89",
-    "Section 5": "2739d6e161b4079eb5c2f5effb27002d0109d78da277c1b08b450efb2172a348",
-    "Section 1": "37498408de9cbe5ce13df16e4d1bd87ed6992884e585bf873e01252a6c36142f",
+    "Section 5": "c087e82d993793301b70e1d9a0581155db0ed9b18c84aa13ecaabb0c9dffa7a1",
+    "Section 1": "02ba6030bd1aeff5114a87aa57e4050677d4fc814892003e796a15a0fd3d9477",
     "Section 2": "7a574ad49c2b8e9f83deb00d20d00883a5ef294d6119261f844253df9f9400d7",
     "Section 6": "e61fcd102d8427e7bbf2c6e6b6652b57ef22dfa1dfeb7e827c3548425295f345",
     "Section 7": "4c5b17b09842cc78cac227d4acb6265d131d9ed1b745b3058f1d3ddf8b7d1f3b",
@@ -121,6 +121,7 @@ APPROVED_EXACT_POINTERS = frozenset(
         "/x1_replay_gate/p0_source_membership_crosswalk/old_new_neither/0",
         "/x1_replay_gate/by_source/f2_b1_greedy/n",
         "/x1_replay_gate/by_source/f2_b1_greedy/b0_strict",
+        "/protocol/think_budget_cap_tokens/B1",
         "/rq3/n",
         "/rq3/penalty",
         "/rq3/clr_split_M1/mediation_2x2/n_b0ok",
@@ -1916,6 +1917,7 @@ def parse_args() -> argparse.Namespace:
 # known promises rather than a rule about all of them.
 SUPPLEMENT_PROMISE_RE = re.compile(
     r"(?i)\bthe supplement\b|\bsupplementary (?:figures?|material)\b"
+    r"|\bprovenance (?:record|manifest)\b|\breleased code\b"
 )
 NUMBER_WORDS = {
     1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six",
@@ -1924,55 +1926,72 @@ NUMBER_WORDS = {
 
 
 def check_supplement_promises(main_path: Path, errors: list[str]) -> None:
-    """Every deferral in the body must have a named home in supplement.tex.
+    """Every deferral to an external artifact must be answered, one for one.
 
-    A promise with no destination is the failure this exists for: it is invisible
-    to every other gate, survives compilation, and is only found by a reader who
-    goes looking for the thing that was promised.
+    Counting was not enough: W2-15 rewrote a promise into a phrasing the pattern
+    did not match, and the count stayed consistent while the promise lost its
+    home.  Each ``% Discharges:`` now carries a verbatim substring of the promise
+    it answers, long enough to be unambiguous, and the gate checks that the
+    substring occurs exactly once in the body and that every promise sits inside
+    exactly one such span.  Copying a fragment cannot drift; paraphrasing it can.
     """
     body = strip_tex_comments(main_path.read_text(encoding="utf-8"))
-    promises = SUPPLEMENT_PROMISE_RE.findall(body)
-    n_promises = len(promises)
+    promises = [m.span() for m in SUPPLEMENT_PROMISE_RE.finditer(body)]
 
-    # Resolved against the repository, not against --main: the checker is run on
-    # temporary copies during testing, and the supplement is a repository artifact
-    # either way.
-    supplement = Path(__file__).resolve().parent.parent / "paperwriting/manuscript/supplement.tex"
+    supplement = (
+        Path(__file__).resolve().parent.parent / "paperwriting/manuscript/supplement.tex"
+    )
     if not supplement.exists():
-        if n_promises:
+        if promises:
             errors.append(
-                f"the body makes {n_promises} supplement promise(s) but "
+                f"the body makes {len(promises)} external-artifact promise(s) but "
                 f"{supplement.name} does not exist"
             )
         return
 
     text = supplement.read_text(encoding="utf-8")
-    discharges = re.findall(r"^% Discharges:", text, flags=re.M)
-    supports = re.findall(r"^% Supports:", text, flags=re.M)
-    if len(discharges) < n_promises:
-        errors.append(
-            f"the body makes {n_promises} supplement promise(s) but supplement.tex "
-            f"declares only {len(discharges)} '% Discharges:' home(s)"
-        )
+    quotes = re.findall(r'^% Discharges: "(.+?)"\s*$', text, flags=re.M)
+    spans: list[tuple[int, int]] = []
+    for quote in quotes:
+        if len(quote) < 40:
+            errors.append(
+                f"'% Discharges:' quote is too short to identify a promise "
+                f"({len(quote)} chars): {quote!r}"
+            )
+            continue
+        hits = [m.span() for m in re.finditer(re.escape(quote), body)]
+        if len(hits) != 1:
+            errors.append(
+                f"'% Discharges:' quote matches the body {len(hits)} time(s), "
+                f"must be exactly once: {quote!r}"
+            )
+            continue
+        spans.append(hits[0])
 
-    # Every section must say what it is there for, so a new one cannot be added
-    # without declaring whether it discharges a promise or supports the checklist.
+    for start, end in promises:
+        owners = [c for c in spans if c[0] <= start and end <= c[1]]
+        if len(owners) != 1:
+            context = " ".join(body[max(0, start - 90):end + 20].split())
+            errors.append(
+                f"external-artifact promise covered by {len(owners)} "
+                f"'% Discharges:' quote(s), must be exactly one: ...{context}"
+            )
+
     sections = re.findall(r"^\\section\{", text, flags=re.M)
-    if len(sections) > len(discharges) + len(supports):
+    markers = re.findall(r"^% (?:Discharges|Supports):", text, flags=re.M)
+    if len(sections) > len(markers):
         errors.append(
             f"supplement.tex has {len(sections)} numbered section(s) but only "
-            f"{len(discharges) + len(supports)} carry a '% Discharges:'/'% Supports:' marker"
+            f"{len(markers)} carry a '% Discharges:'/'% Supports:' marker"
         )
 
-    # The stated count must be the real one; the prose said "seven" while the
-    # body carried a different number.
     stated = re.search(r"discharges the ([a-z]+) places", text)
     if stated:
-        want = NUMBER_WORDS.get(n_promises)
+        want = NUMBER_WORDS.get(len(promises))
         if want and stated.group(1) != want:
             errors.append(
                 f"supplement.tex says it discharges '{stated.group(1)}' places; "
-                f"the body makes {n_promises} ({want})"
+                f"the body makes {len(promises)} ({want})"
             )
     else:
         errors.append("supplement.tex must state how many places it discharges")

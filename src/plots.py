@@ -399,7 +399,7 @@ def _fig1_data(results: dict[str, Any], rec: SourceMap) -> tuple[list[dict[str, 
 
     control_specs = [
         {
-            "label": "True chain",
+            "label": "Short budget",
             "metric": r"$\Delta$ES  ($B_0\!\rightarrow\!B_1$)",
             "path": ("f2_zerothink_deconfound", "es_drop_ci", "B0_to_B1"),
             "expected": [0.13, [0.06, 0.205], "CI>0 显著=加真链才 erode"],
@@ -599,7 +599,7 @@ def fig1_capability(results: dict[str, Any]) -> None:
     ax_b.set_xlim(-0.182, 0.225)
     ax_b.set_ylim(-0.62, 3.88)
     ax_b.set_xlabel("Paired probability change (95% CI)")
-    _panel_title(ax_b, "B", "Qwen-32B controls")
+    _panel_title(ax_b, "B", "Qwen-32B budget and decoding conditions")
     ax_b.text(
         -0.175,
         3.72,

@@ -52,7 +52,7 @@ def assert_rejected(main_path: Path, *diagnostics: str) -> str:
 def test_canonical_manuscript_passes(candidate_main: Path) -> None:
     completed = run_checker(candidate_main)
     assert completed.returncode == 0, completed.stdout + completed.stderr
-    assert "Section 3 RJ ledger (111 occurrences)" in completed.stdout
+    assert "Section 3 RJ ledger (112 occurrences)" in completed.stdout
     assert "Section 4 RJ ledger (64 occurrences)" in completed.stdout
     # W2-10/F: 22 inline values moved into Table 2, whose rows carry the
     # bindings instead.  D5's recorded destination is that table.
@@ -1458,7 +1458,7 @@ def test_base_drift_claims_are_scoped_to_where_an_interval_exists() -> None:
     assert "where it carries an interval" not in text, "the hedge was unresolvable"
     # W2-14/A reworded Section 1's scope clause; both sections still say the
     # controls are the largest Qwen checkpoint's.
-    assert "On the largest Qwen checkpoint the erosion already appears" in text  # Section 1
+    assert "On the largest Qwen checkpoint a separate control run" in text  # Section 1
     assert "on the largest Qwen checkpoint" in text                  # Section 7
     assert "That paired interval exists at this checkpoint only" in text
     assert "those are not of one sign" in text
@@ -1615,7 +1615,11 @@ def test_section1_controls_match_the_figure_and_exclude_the_base() -> None:
     # W2-15 dropped the "three controls" framing: B_1 is the effect appearing at
     # a shorter budget, and B_{0P}/B_1 are two arms of one control run (Sec. 3.3).
     assert "Three controls" not in text
-    assert "the erosion already appears at a shorter native chain" in text
+    # W2-16/C: an ordering claim Section 4.4 declines, across two runs with
+    # different zero-thinking baselines.
+    assert "already appears" not in text
+    assert "a separate control run shows the same direction at a shorter think budget" in text
+    assert "against that run's own zero-thinking baseline" in text
     assert "a fixed short canned thought improves edit success instead" in text
     assert "so a think span alone does not produce the gap" not in text, (
         "that excludes the content-independent buffer account Section 4.4 keeps alive"
@@ -1640,7 +1644,7 @@ def test_section53_names_its_evidence_and_marks_the_placebo_silence() -> None:
     assert "leaving the answer where it was" not in text
     assert "the dissociation this section rests on" not in text
     assert "the evidence is the contrast fixed in advance, T versus P" in text
-    assert "The placebo's in-chain comparison is derivation-dependent" in text
+    assert "The placebo arm is not byte-reproducible from the released shards" in text
     # -.051 [-.102,.000] legitimately appears in Table 2 as the STRICT T-N row,
     # a different quantity that shares digits; the recomputed placebo value is
     # unique to the disputed column and must stay out.
@@ -1648,7 +1652,8 @@ def test_section53_names_its_evidence_and_marks_the_placebo_silence() -> None:
     # the placebo IS named -- B3 requires the silence to be marked, not hidden --
     # but neither derivation's value may appear beside it
     section = text.split("What the Placebo and Competitor")[1].split("\\subsection")[0]
-    assert "The placebo's in-chain comparison is derivation-dependent" in section
+    assert "The placebo arm is not byte-reproducible from the released shards" in section
+    assert "moves in the third decimal and no conclusion changes" in section
     assert "p=.054" not in section and "p = .054" not in section
 
 
@@ -1664,7 +1669,7 @@ def test_a_supplement_promise_without_a_home_is_rejected(
     marker = r"\section{Introduction}"
     mutate(candidate_main, marker,
            marker + "\nThe full ablation is in the supplement.")
-    assert_rejected(candidate_main, "supplement promise")
+    assert_rejected(candidate_main, "external-artifact promise")
 
 
 def test_supplement_sections_must_declare_their_purpose() -> None:
@@ -1682,11 +1687,13 @@ def test_supplement_sections_must_declare_their_purpose() -> None:
     )
     body = re.sub(r"(?m)(?<!\\)%.*$", "", body)
     promises = re.findall(
-        r"(?i)\bthe supplement\b|\bsupplementary (?:figures?|material)\b", body
+        r"(?i)\bthe supplement\b|\bsupplementary (?:figures?|material)\b"
+        r"|\bprovenance (?:record|manifest)\b|\breleased code\b", body
     )
     discharges = re.findall(r"^% Discharges:", text, flags=re.M)
     assert len(discharges) >= len(promises), (len(discharges), len(promises))
-    assert "discharges the seven places" in text or len(promises) != 7
+    stated = re.search(r"discharges the ([a-z]+) places", text)
+    assert stated, "the supplement must state its count"
 
 
 @pytest.mark.parametrize(
@@ -1708,3 +1715,67 @@ def test_answer_held_nominal_and_negated_forms_are_banned(
     marker = r"\section{Introduction}"
     mutate(candidate_main, marker, marker + "\n" + planted)
     assert_rejected(candidate_main, "banned language")
+
+
+def test_promise_gate_catches_a_rephrased_deferral(candidate_main: Path) -> None:
+    """W2-16/E: the W2-15 failure, as a regression.
+
+    Counting promises let a rewrite from "in the supplement" to a phrasing the
+    pattern did not match keep the count consistent while the promise lost its
+    home.  Pairing each marker to a verbatim substring makes that impossible:
+    the rewritten sentence no longer matches its own quote.
+    """
+    marker = r"\section{Introduction}"
+    mutate(candidate_main, marker,
+           marker + "\nThe full derivation is in the released provenance record.")
+    assert_rejected(candidate_main, "external-artifact promise")
+
+
+def test_discharge_quotes_are_copied_not_paraphrased() -> None:
+    """Each marker must be a verbatim, unique substring of the body.
+
+    A paraphrase drifts as the sentence is edited; a copy cannot.
+    """
+    supplement = (REPO_ROOT / "paperwriting" / "manuscript" / "supplement.tex").read_text(
+        encoding="utf-8"
+    )
+    body = (REPO_ROOT / "paperwriting" / "manuscript" / "main.tex").read_text(
+        encoding="utf-8"
+    )
+    body = re.sub(r"(?m)(?<!\\)%.*$", "", body)
+    quotes = re.findall(r'^% Discharges: "(.+?)"\s*$', supplement, flags=re.M)
+    assert quotes, "no discharge markers found"
+    for quote in quotes:
+        assert len(quote) >= 40, quote
+        assert body.count(quote) == 1, (quote, body.count(quote))
+
+
+def test_b1_is_defined_and_not_called_native() -> None:
+    """W2-16/B: B_1 caps the think span; a truncated chain is not a native one,
+    and Section 4.4's buffer account turns on that difference."""
+    text = (REPO_ROOT / "paperwriting" / "manuscript" / "main.tex").read_text(
+        encoding="utf-8"
+    )
+    assert "Each budget caps the think span" in text
+    assert "the harness does" in text
+    assert r"caps the span at \(256\) tokens" in text
+    assert "native \\(B_1\\)" not in text
+    assert "short native chain (\\(B_1\\))" not in text
+
+    results = json.loads(
+        (REPO_ROOT / "paperwriting" / "results.json").read_text(encoding="utf-8")
+    )
+    assert results["protocol"]["think_budget_cap_tokens"]["B1"] == 256
+
+
+def test_figure_labels_agree_with_the_caption() -> None:
+    """W2-16/A: the reader looks at the figure, not the caption.
+
+    The generator called three different conditions "controls" and named a
+    capped budget a "True chain", which is what let Section 1 miscount them.
+    """
+    source = (REPO_ROOT / "src" / "plots.py").read_text(encoding="utf-8")
+    assert '"Qwen-32B controls"' not in source
+    assert '"True chain"' not in source
+    assert '"Qwen-32B budget and decoding conditions"' in source
+    assert '"Short budget"' in source

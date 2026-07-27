@@ -205,6 +205,13 @@
    }
   }
  },
+ "protocol": {
+  "_derivation": "M03 结构化重述,非新数:think budget 的上限表来自 src/think_budget.py:33 的 CAP,并被每个生成分片的 _meta.think_budget_cap 原样记录。此处只把该既有常量提成可被 % RJ 绑定的字段。无新计算、无新运行。",
+  "think_budget_cap_tokens": {
+   "B1": 256,
+   "B3": 8192
+  }
+ },
  "rq3": {
   "model": "32B",
   "n": 200,
