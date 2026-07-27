@@ -1455,8 +1455,10 @@ def test_base_drift_claims_are_scoped_to_where_an_interval_exists() -> None:
         encoding="utf-8"
     )
     assert "where it carries an interval" not in text, "the hedge was unresolvable"
-    assert "all on the largest Qwen checkpoint" in text       # Section 1 scope
-    assert "on the largest Qwen checkpoint" in text           # Section 7 scope
+    # W2-14/A reworded Section 1's scope clause; both sections still say the
+    # controls are the largest Qwen checkpoint's.
+    assert "Three controls on the largest Qwen checkpoint" in text   # Section 1
+    assert "on the largest Qwen checkpoint" in text                  # Section 7
     assert "That paired interval exists at this checkpoint only" in text
     assert "those are not of one sign" in text
     assert "no detectable old-answer drift, and a fixed canned thought" not in text
@@ -1532,8 +1534,11 @@ def test_each_section1_control_carries_its_own_conclusion() -> None:
         encoding="utf-8"
     )
     assert "neither background drift nor greedy decoding accounts for it" not in text
-    assert "so greedy decoding does not produce it either" in text
-    assert "so a think span alone does not produce the gap" in text
+    assert "so greedy decoding does not produce it" in text
+    # W2-14/A replaced this: "a think span alone" generalised past the one canned
+    # thought that was run, and excluded the buffer account Section 4.4 keeps alive.
+    assert "so a think span alone does not produce the gap" not in text
+    assert "the one fixed canned thought we tested improves it instead" in text
     assert "we make no formal contrast" in text
 
 
@@ -1564,3 +1569,77 @@ def test_main_figure_case_shortlist_uses_the_strict_criterion() -> None:
         assert r["scores"]["N"]["RR"] == 1, r["case_id"]
         if not r["strict_three_state"]:
             assert r["scores"]["N"]["RRs"] == 0, r["case_id"]
+
+
+@pytest.mark.parametrize(
+    "planted",
+    [
+        "The competitor perturbs the chain while leaving the answer where it was.",
+        "Under the placebo the answer did not move.",
+        "The answer stayed at the new value throughout.",
+    ],
+)
+def test_answer_held_assertions_are_banned(candidate_main: Path, planted: str) -> None:
+    """W2-14/C: the fourth bypass class.
+
+    W2-13 moved the required string from the granting clause to the disclaimer
+    after it, leaving the assertion itself unguarded.  A ban has to be written
+    against the assertion form, not against its label or its neighbouring hedge.
+    """
+    marker = r"\section{Introduction}"
+    mutate(candidate_main, marker, marker + "\n" + planted)
+    assert_rejected(candidate_main, "banned language")
+
+
+def test_mechanical_statements_about_the_answer_span_stay_legal(
+    candidate_main: Path,
+) -> None:
+    """The penalty not acting on the answer span is a fact about the method."""
+    completed = run_checker(candidate_main)
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    text = candidate_main.read_text(encoding="utf-8")
+    assert "nothing is penalized in the answer text" in text
+    assert "moves an answer it never touches" in text
+
+
+def test_section1_controls_match_the_figure_and_exclude_the_base() -> None:
+    """W2-14/A: the governing clause may not supply conclusions its branches do
+    not license, and the counted set must be the one Figure 1(B) plots."""
+    text = (REPO_ROOT / "paperwriting" / "manuscript" / "main.tex").read_text(
+        encoding="utf-8"
+    )
+    assert "Three controls on the largest Qwen checkpoint each bound a different alternative" in text
+    assert "the one fixed canned thought we tested improves it instead" in text
+    assert "so a think span alone does not produce the gap" not in text, (
+        "that excludes the content-independent buffer account Section 4.4 keeps alive"
+    )
+    # the base is outside the count and explicitly juxtaposed, as in the caption
+    assert "Separately, juxtaposed rather than contrasted, the unedited base" in text
+    # the same wording appears in Section 1 and in the Figure 1 caption
+    assert text.count("juxtaposed rather than contrasted") >= 2
+    # the forward pointer names the question Section 4.4 actually asks
+    assert "Whether length alone accounts for the effect" in text
+    assert "content-independent computational-buffer account" in text
+    assert "remains a live alternative" in text
+
+
+def test_section53_names_its_evidence_and_marks_the_placebo_silence() -> None:
+    """W2-14/B: no assertion that the answer held; the section's evidence is the
+    pre-specified contrast, not the competitor bound; and the silence about the
+    placebo is marked rather than left to read as inertness."""
+    text = (REPO_ROOT / "paperwriting" / "manuscript" / "main.tex").read_text(
+        encoding="utf-8"
+    )
+    assert "leaving the answer where it was" not in text
+    assert "the dissociation this section rests on" not in text
+    assert "the evidence is the contrast fixed in advance, T versus P" in text
+    assert "The placebo's in-chain comparison is derivation-dependent" in text
+    # -.051 [-.102,.000] legitimately appears in Table 2 as the STRICT T-N row,
+    # a different quantity that shares digits; the recomputed placebo value is
+    # unique to the disputed column and must stay out.
+    assert "-.0556" not in text
+    # the placebo IS named -- B3 requires the silence to be marked, not hidden --
+    # but neither derivation's value may appear beside it
+    section = text.split("What the Placebo and Competitor")[1].split("\\subsection")[0]
+    assert "The placebo's in-chain comparison is derivation-dependent" in section
+    assert "p=.054" not in section and "p = .054" not in section

@@ -73,11 +73,13 @@ not be inert inside the chain either.
 The difference of exactly one success in exactly one row (101/199 against
 102/200) therefore has no mechanism visible in the retrieved artifacts.
 
-**Effect on the paper's claims: none.** Section 5.3 no longer rests on whether
-the placebo's leakage contrast reaches zero. It reports that the competitor's
-contrast excludes zero (-.071 [-.121, -.020], true under both derivations) and
-that the placebo's is smaller and carries nothing. Under either column the
-dissociation is carried by the competitor.
+**Effect on the paper's claims: none.** As of W2-14, Section 5.3 states that the
+competitor's in-chain contrast excludes zero (-.071 [-.121, -.020], true under both
+derivations); that this bounds the treated arm's specificity rather than supplying
+its evidence, which remains the pre-specified T-versus-P contrast; and that the
+placebo's in-chain comparison is derivation-dependent, carries nothing there, and is
+recorded here with both derivations. Nothing in the section turns on which column is
+authoritative.
 
 **Not silently changed.** No manuscript number has been altered on the strength of
 this recomputation. Which column is authoritative is a scientific question — the

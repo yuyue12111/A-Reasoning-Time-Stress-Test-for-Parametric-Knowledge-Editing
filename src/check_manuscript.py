@@ -47,7 +47,7 @@ APPROVED_REFS_SHA256 = (
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
     "Section 3": "a5bfd2ca403fbbb1fbb28b111e22f5fc5bf988a2f18476d89766be61a0986aa9",
     "Section 4": "b43e9b0800a1ad992ef1981f6b2d3c86fade17f1cbc4020983b822609851b7ca",
-    "Section 5": "733d5cf2f4a5165156e895c6de9fde7f6debadb8abe465a37d5a277734b7847e",
+    "Section 5": "f4098f591186626304cce067ce3dbbe44cc2bc26f396adf7593c9707c3307709",
     "Section 1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 6": "ec1920efdf517af8485204281892ad7ecee5ff46a64f203229ad679dfece08d0",
@@ -57,8 +57,8 @@ APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
 APPROVED_SECTION_VISIBLE_SHA256 = {
     "Section 3": "c551d10248261452f511b13292f5b862e5d3c2de10807f67599a2c05b8c51ab8",
     "Section 4": "b4daa3d94d13898be4baf9b4b060dd14470f1aba7b180f121de99199ae2c50ae",
-    "Section 5": "5fb097f0354b34e810b101ebd8c5f74483f29aa983259348909b452bd9c2fe4c",
-    "Section 1": "a37e04bb000084084417c6c65fa7bbd4b7108153490c5c5a140e56caa7a89ead",
+    "Section 5": "b341d2231c8ef409de35c693e7925c44b79708b76882ce16f1db1e21c0ceb359",
+    "Section 1": "8439b78c2e04645dc8441646b97ef286f07793ed66b19b9e4d011deaf8cb8681",
     "Section 2": "f724d58ed58fb90736b73ae9f87c82aaffe1e72d35db300078fd6d91459652a4",
     "Section 6": "61fa524c461d087166d03ca02aa8fb8e725090e81d6da69a98cbb12773613ba3",
     "Section 7": "6efab28353b94766eeacc7870bc37ef4a8373069f256b1ee0be048b77675827e",
@@ -67,8 +67,8 @@ APPROVED_SECTION_VISIBLE_SHA256 = {
 APPROVED_SECTION_SOURCE_SHA256 = {
     "Section 3": "39e1aa65028de950b0dc7ee61630a1580e41368d0f6950289f56dc507a29d1ae",
     "Section 4": "3b38f49e5961f70b6ddb774fba5069c3aa131f881c312eb82b5a60893f626b89",
-    "Section 5": "54c8f287b859ea6b0850d3e0ea776d3a4fdf1190bfd6f274beb70a56b63601f5",
-    "Section 1": "740babd087c2d799977f9d894f9b1e836862e2d15b26576373c8300129bee6ca",
+    "Section 5": "1ef2496b20d9b6f84d62b620f6bf735717ccc608c555b18a73be7f67b12d3381",
+    "Section 1": "d5aef76d96092be76d9690264adfd9ae060d2f2f7873d79fd7d88e8783bb94dd",
     "Section 2": "7a574ad49c2b8e9f83deb00d20d00883a5ef294d6119261f844253df9f9400d7",
     "Section 6": "e61fcd102d8427e7bbf2c6e6b6652b57ef22dfa1dfeb7e827c3548425295f345",
     "Section 7": "4c5b17b09842cc78cac227d4acb6265d131d9ed1b745b3058f1d3ddf8b7d1f3b",
@@ -506,6 +506,13 @@ BANNED_PATTERNS = {
     "erasure-noun overclaim": r"\berasure\b",
     # W2-8/M4: only the verb is licensed; the nominalisation asserts a status.
     "certification nominalisation": r"\bcertificat(?:ion|ions)\b",
+    # W2-14/C: the fourth bypass class.  W2-13 moved the required string from the
+    # granting clause to the disclaimer that follows it, which left the assertion
+    # ("leaving the answer where it was") unguarded.  A ban must be written against
+    # the assertion form itself, not against its label or its neighbouring hedge.
+    # Scoped to the ANSWER as an outcome: statements that the penalty does not act
+    # on the answer span are mechanical and stay legal.
+    "answer-held assertion": r"leav\w+ the answer where it was|the answer (?:did|does) not move|the answer stay\w+|the answer[^.]{0,15}\bremained unchanged\b",
     "erased word-form overclaim": r"\berased\b|\berasing\b",
     "negated-erasure paraphrase": r"\bnot\b[^.]{0,40}\b(?:eras|intact)",
     # Bare "intact" cannot be banned: Section 2 legitimately reports that prior
