@@ -52,11 +52,11 @@ def assert_rejected(main_path: Path, *diagnostics: str) -> str:
 def test_canonical_manuscript_passes(candidate_main: Path) -> None:
     completed = run_checker(candidate_main)
     assert completed.returncode == 0, completed.stdout + completed.stderr
-    assert "Section 3 RJ ledger (112 occurrences)" in completed.stdout
-    assert "Section 4 RJ ledger (64 occurrences)" in completed.stdout
+    assert "Section 3 RJ ledger (123 occurrences)" in completed.stdout
+    assert "Section 4 RJ ledger (54 occurrences)" in completed.stdout
     # W2-10/F: 22 inline values moved into Table 2, whose rows carry the
     # bindings instead.  D5's recorded destination is that table.
-    assert "Section 5 RJ ledger (171 occurrences)" in completed.stdout
+    assert "Section 5 RJ ledger (164 occurrences)" in completed.stdout
 
 
 def test_frozen_abstract_mutation_is_rejected(candidate_main: Path) -> None:
@@ -276,9 +276,13 @@ def test_abstract_binding_debt_is_retired() -> None:
 def test_abstract_coverage_breaks_if_section5_stops_binding_the_arrow(
     candidate_main: Path,
 ) -> None:
-    """The retired debt is now load-bearing: Section 5 alone covers 8.5%."""
+    """The retired debt is now load-bearing: Section 5 alone covers 8.5%.
+
+    W3-2 dropped the footnote's reversion worked example, so the arm-wise
+    sentence is now the only site; one binding, not two, carries the abstract.
+    """
     text = candidate_main.read_text(encoding="utf-8")
-    assert text.count('"display":"8.5"') == 2
+    assert text.count('"display":"8.5"') == 1
     candidate_main.write_text(
         text.replace('"display":"8.5"', '"display":"8.6"'), encoding="utf-8"
     )
@@ -333,11 +337,10 @@ def test_section4_rejects_unledgered_number(candidate_main: Path) -> None:
 
 
 def test_section4_subsection_order_is_frozen(candidate_main: Path) -> None:
-    first = (
-        r"\subsection{Installation Sanity: "
-        r"The Edited Association Remains Cloze-Detectable}"
-    )
-    second = r"\subsection{Visible In-Chain Routes}"
+    # W3-2 folded the installation sanity check into the section preamble, so
+    # the frozen order now starts at the route census.
+    first = r"\subsection{Visible In-Chain Routes}"
+    second = r"\subsection{The Chain-Routing Hypothesis and a Failed Replay Vehicle}"
     mutate(candidate_main, first, r"\subsection{TEMPORARY-HEADING}")
     mutate(candidate_main, second, first)
     mutate(candidate_main, r"\subsection{TEMPORARY-HEADING}", second)
@@ -639,11 +642,22 @@ def test_section4_starred_subsections_are_rejected(
 def test_reviewed_table_environment_shape_is_frozen(
     candidate_main: Path,
 ) -> None:
-    mutate(candidate_main, r"\begin{table}[t]", r"\begin{table*}[t]")
-    mutate(candidate_main, r"\end{table}", r"\end{table*}")
+    # W3-2 removed the one single-column table, so the reviewed shape is now
+    # "both surviving tables span the page"; narrowing one is still a change
+    # the source snapshot must catch.
+    text = candidate_main.read_text(encoding="utf-8")
+    assert r"\begin{table}[" not in text
+    assert text.count(r"\begin{table*}[t]") == 2
+    mutate(
+        candidate_main,
+        "\\begin{table*}[t]\n\\centering\n\\small\n\\begin{tabular}{llrrrr}\n"
+        "\\toprule\nArm",
+        "\\begin{table}[t]\n\\centering\n\\small\n\\begin{tabular}{llrrrr}\n"
+        "\\toprule\nArm",
+    )
     assert_rejected(
         candidate_main,
-        "Section 4 TeX source structure differs from the reviewed snapshot",
+        "Section 5 TeX source structure differs from the reviewed snapshot",
     )
 
 
@@ -1021,8 +1035,8 @@ def test_section5_arrow_must_bind_to_the_battery_arms(
     swap.
     """
     text = candidate_main.read_text(encoding="utf-8")
-    # Two arm-wise percent bindings plus the Table 2 row.
-    assert text.count('"pointer":"/rq3/sup_battery/marginal_B3/N/RR"') == 3
+    # One arm-wise percent binding plus the battery-table row.
+    assert text.count('"pointer":"/rq3/sup_battery/marginal_B3/N/RR"') == 2
     candidate_main.write_text(
         text.replace(
             '"pointer":"/rq3/sup_battery/marginal_B3/N/RR"',
@@ -1117,18 +1131,24 @@ def test_section5_review_patches_cannot_be_reverted(
     )
 
 
-def test_route_table_binds_the_corrected_census(candidate_main: Path) -> None:
-    """The inlined route table must read the n=41 block, not the 50-pool one."""
+def test_route_census_binds_the_corrected_block(candidate_main: Path) -> None:
+    """The route counts must read the n=41 block, not the 50-pool one.
+
+    W3-2 dropped the route table: its four counts already stood in the Section
+    4 prose, and the shares were derived from them.  The prose is now the only
+    site, so it is the one that has to stay bound and stay labelled as an
+    outcome-conditioned surface.
+    """
     text = candidate_main.read_text(encoding="utf-8")
     assert '"pointer":"/rq2_taxonomy/p0_corrected_taxonomy/dist/Bridge"' in text
     for stale in ("n=50", "68\\%", "0.790"):
         assert stale not in text, stale
     mutate(
         candidate_main,
-        "Route & Instances & Share",
-        "Route & Instances & Share (50-pool)",
+        "Within this outcome-conditioned failure surface, the route counts are",
+        "Within this predictor of reversion, the route counts are",
     )
-    assert_rejected(candidate_main, "Section 4 visible semantic surface differs")
+    assert_rejected(candidate_main, "outcome-conditioned failure surface")
 
 
 def test_figure_one_is_wired_and_referenced(candidate_main: Path) -> None:
@@ -1200,7 +1220,7 @@ def test_wb_directional_endpoints_declare_zero_exclusion(
     Qualifying only some of them would let a reader infer the others do not.
     """
     text = candidate_main.read_text(encoding="utf-8")
-    assert "Each directional endpoint above has an interval excluding zero." in text
+    assert "Each directional endpoint above has an interval excluding zero" in text
     start = text.index("An independent concept-direction experiment")
     end = text.index("does not locate a distinct commitment layer")
     paragraph = text[start:end]
@@ -1213,7 +1233,10 @@ def test_route_table_generator_output_is_not_input_by_the_manuscript() -> None:
         encoding="utf-8"
     )
     assert r"\input" not in main_text
-    assert r"\label{tab:routes}" in main_text
+    # W3-2 removed the rendered table; the generator's fragment must still be
+    # unreachable from the manuscript, which is what this test is for.
+    assert r"\label{tab:routes}" not in main_text
+    assert r"\(27\) Bridge, \(11\) Recall" in main_text
     fragment = (REPO_ROOT / "paperwriting" / "table_rq2.tex").read_text(
         encoding="utf-8"
     )
@@ -1458,7 +1481,10 @@ def test_base_drift_claims_are_scoped_to_where_an_interval_exists() -> None:
     assert "where it carries an interval" not in text, "the hedge was unresolvable"
     # W2-14/A reworded Section 1's scope clause; both sections still say the
     # controls are the largest Qwen checkpoint's.
-    assert "On the largest Qwen checkpoint a separate control run" in text  # Section 1
+    assert (  # Section 1
+        "On the largest Qwen checkpoint the same direction appears at a shorter"
+        " think budget" in text
+    )
     assert "on the largest Qwen checkpoint" in text                  # Section 7
     assert "That paired interval exists at this checkpoint only" in text
     assert "those are not of one sign" in text
@@ -1555,7 +1581,7 @@ def test_scope_ablation_reports_both_budgets() -> None:
     )
     assert ".580 to .727" in text
     assert ".639 against .670" in text
-    assert "leave the leakage check identical at .268" in text
+    assert "the leakage check identical at .268" in text
 
 
 def test_main_figure_case_shortlist_uses_the_strict_criterion() -> None:
@@ -1618,7 +1644,15 @@ def test_section1_controls_match_the_figure_and_exclude_the_base() -> None:
     # W2-16/C: an ordering claim Section 4.4 declines, across two runs with
     # different zero-thinking baselines.
     assert "already appears" not in text
-    assert "a separate control run shows the same direction at a shorter think budget" in text
+    # W3-2 moved the bounds into a footnote on the same sentence.  The
+    # properties are unchanged: the short-budget arm is scoped to the largest
+    # Qwen checkpoint, it is a control run of its own, and it is read against
+    # that run's baseline rather than the main run's.
+    assert (
+        "On the largest Qwen checkpoint the same direction appears at a shorter"
+        " think budget" in text
+    )
+    assert "two arms of one control run" in text
     assert "against that run's own zero-thinking baseline" in text
     assert "a fixed short canned thought improves edit success instead" in text
     assert "so a think span alone does not produce the gap" not in text, (
@@ -1628,8 +1662,10 @@ def test_section1_controls_match_the_figure_and_exclude_the_base() -> None:
     assert "Separately, juxtaposed rather than contrasted, the unedited base" in text
     # the same wording appears in Section 1 and in the Figure 1 caption
     assert text.count("juxtaposed rather than contrasted") >= 2
-    # the forward pointer names the question Section 4.4 actually asks
-    assert "Whether length alone accounts for the effect" in text
+    # the forward pointer names the question Section 4.4 actually asks; W3-2
+    # moved it inside the footnote's clause list, so it is no longer sentence-
+    # initial, but it must still be the question that is named
+    assert "whether length alone accounts for the effect" in text
     assert "content-independent computational-buffer account" in text
     assert "remains a live alternative" in text
 

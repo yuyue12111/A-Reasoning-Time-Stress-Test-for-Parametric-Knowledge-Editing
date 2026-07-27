@@ -210,6 +210,38 @@
   "think_budget_cap_tokens": {
    "B1": 256,
    "B3": 8192
+  },
+  "population": {
+   "_derivation": "M03 结构化重述,非新数。每个字段逐一取自既有代码/配置常量或既有运行记录,全链路见 paperwriting/delivery/w3_population_provenance.md §1。candidate_frame=src/prefilter.py:80 的 3*n;survivors=plan.md v1.19① 与 analysis/10_pilot_rome_n200.md:4 记录的那次预过滤存活计数;sampled_n=src/run_pilot.py:23-27 的 load_cases 取前 n。无新计算、无新运行。",
+   "shuffle_seed": 42,
+   "candidate_frame": 600,
+   "survivors": 248,
+   "sampled_n": 200,
+   "checkpoints_sharing_pool": 6,
+   "filter_model": "DeepSeek-R1-Distill-Qwen-7B",
+   "filter_budget": "B3",
+   "filter_rule": "unedited-model answer text matches an old-value alias (src/prefilter.py:119-120)",
+   "filter_never_run_at": "B0"
+  },
+  "edit_hparams": {
+   "_derivation": "M03 结构化重述,非新数。rome_layer 逐一取自 experiments/probe_*.yaml 与 pilot.yaml 的 editors.ROME.layers;clamp_default 取自 source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml:11,clamp_llama8b 取自 experiments/probe_llama8b.yaml 的 override;scanned/relative_depth/locality_acceptance_line 取自 plan.md v1.18② 与 v1.99②(后者已把该表逐项对过配置)。无新计算、无新运行。",
+   "rome_layer": {
+    "Qwen-1.5B": 5,
+    "Qwen-7B": 5,
+    "Qwen-14B": 9,
+    "Qwen-32B": 12,
+    "Llama-8B": 6,
+    "Llama-70B": 14
+   },
+   "layer_scanned_checkpoints": [
+    "Qwen-7B",
+    "Llama-8B"
+   ],
+   "n_layer_scanned": 2,
+   "relative_depth_rule": 0.18,
+   "clamp_default": 4,
+   "clamp_llama8b": 2,
+   "locality_acceptance_line": 0.85
   }
  },
  "rq3": {

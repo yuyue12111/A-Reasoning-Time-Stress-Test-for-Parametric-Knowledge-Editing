@@ -45,34 +45,34 @@ APPROVED_REFS_SHA256 = (
     "9148dfd515b5dfbefb3ae31dfcc7c023cbf0cfc43c82074d084c2b53fb5d1912"
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
-    "Section 3": "4e35088e431538f3c46d158893aa4d01b58d901d2c370c7bf48b311a63d52698",
-    "Section 4": "b43e9b0800a1ad992ef1981f6b2d3c86fade17f1cbc4020983b822609851b7ca",
-    "Section 5": "142fdd3e7263f554b1a6beba02febaba595343401313dcec76d1c9bd7acb853a",
+    "Section 3": "e60d039d8879ce993e6235d28686b5866638ba50d0c6fec8dbfd31d6cc33ff5b",
+    "Section 4": "98c8d3d1c51e324a885d7243bb6d05b2f05f9443ce54c60ea7739ecccb7c8dac",
+    "Section 5": "1cb512d1cb6c837317b90ca815b680b6f55f9746024fb722ac259c1b40521da8",
     "Section 1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 6": "ec1920efdf517af8485204281892ad7ecee5ff46a64f203229ad679dfece08d0",
     "Section 7": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "Ethical Statement": "844a31a6de1b47c3477b8f944699df4cd6a7825d94da5221f5cf3878a6d0e9f4",
+    "Ethical Statement": "7c27178fa8e3df265d432105bc74d3b4fa47fe1dca8094a9695dc90cb4b8dbf2",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
-    "Section 3": "27172de6a8fbfa28d1d4d14e2b90d8a116c692313c85c913eec5d8336c25022e",
-    "Section 4": "b4daa3d94d13898be4baf9b4b060dd14470f1aba7b180f121de99199ae2c50ae",
-    "Section 5": "ffcd6569e88b6b0137a0a832e229fa20459404809a85f00cbeade250751202cf",
-    "Section 1": "6d2b42ae10a692b7704d0ce84c0b1c177a3cd64a28b6dc7e68cece35be2421d2",
+    "Section 3": "fdb67c7194beb6541a76415ea05ae2b60c25ce60d3edcd790615814802a168d2",
+    "Section 4": "cce811a64d9fdbb23ec1d21fa900d13b3e5d2cc49a5cca894cabb65ced3c5c16",
+    "Section 5": "93b72b747f8e9ad7a95e11b11e048d1b02bd0937ead2b619d00439cc63ad29e7",
+    "Section 1": "30689b87d8eeadf11f1a8a99d2e21c240fca92ee4658816ff353b257fbb9b458",
     "Section 2": "f724d58ed58fb90736b73ae9f87c82aaffe1e72d35db300078fd6d91459652a4",
-    "Section 6": "61fa524c461d087166d03ca02aa8fb8e725090e81d6da69a98cbb12773613ba3",
+    "Section 6": "75fe3e0f98254e687a27bb1b3d1f4565cad2ff66d359df8091f922c01316472c",
     "Section 7": "6efab28353b94766eeacc7870bc37ef4a8373069f256b1ee0be048b77675827e",
-    "Ethical Statement": "b9cbe903bb8bf10bab4bae62fe1b784125c2deaec42266281e76f3f8c0d9a243",
+    "Ethical Statement": "7be82c0bce18ca086ce80905a6b17dcc17a17ce88f8a987ffe84736f9a30060e",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
-    "Section 3": "1f9e61ae28390c36059db17f22d1cc317868204d75bba4a1c5faf192268070a4",
-    "Section 4": "3b38f49e5961f70b6ddb774fba5069c3aa131f881c312eb82b5a60893f626b89",
-    "Section 5": "c087e82d993793301b70e1d9a0581155db0ed9b18c84aa13ecaabb0c9dffa7a1",
-    "Section 1": "02ba6030bd1aeff5114a87aa57e4050677d4fc814892003e796a15a0fd3d9477",
+    "Section 3": "f3b6ac270ed75e59179ab8c709ef9ab937a6e3dc53992ea033713facc1b6b584",
+    "Section 4": "6a4a48ef6eabaadc6694ad242dbaf689c62b2fac3ce15434968b530b669a2d55",
+    "Section 5": "321f46b89e860ef9faf0ff839e8d857b72c956fe739bb1201f68b98c2d8b6768",
+    "Section 1": "d19cdb476ff85031ea42b1362e461811ce8323c675b0f2eb94980270b2a0d320",
     "Section 2": "7a574ad49c2b8e9f83deb00d20d00883a5ef294d6119261f844253df9f9400d7",
-    "Section 6": "e61fcd102d8427e7bbf2c6e6b6652b57ef22dfa1dfeb7e827c3548425295f345",
+    "Section 6": "bf8fbb8f56a0edd23680412f04d2fd0f5efe492b3c07cbf875b3fbceda6b124c",
     "Section 7": "4c5b17b09842cc78cac227d4acb6265d131d9ed1b745b3058f1d3ddf8b7d1f3b",
-    "Ethical Statement": "060beec82d7f76d5f81283a245f378dc133a6aae19fbd29f64a56baa14850a25",
+    "Ethical Statement": "33ff3f8c331b9377cb811fe907a3156da992363b47c07191f7c66b9db92d718d",
 }
 
 # Every frozen-abstract number now has a same-display body RJ binding: the
@@ -122,6 +122,21 @@ APPROVED_EXACT_POINTERS = frozenset(
         "/x1_replay_gate/by_source/f2_b1_greedy/n",
         "/x1_replay_gate/by_source/f2_b1_greedy/b0_strict",
         "/protocol/think_budget_cap_tokens/B1",
+        "/protocol/think_budget_cap_tokens/B3",
+        # W3-1.  The population and edit-hyperparameter constants: M03-class
+        # restatements of code and config, each carrying its own _derivation.
+        "/protocol/population/candidate_frame",
+        "/protocol/population/survivors",
+        "/protocol/population/sampled_n",
+        "/protocol/edit_hparams/relative_depth_rule",
+        "/protocol/edit_hparams/clamp_default",
+        "/protocol/edit_hparams/clamp_llama8b",
+        "/protocol/edit_hparams/locality_acceptance_line",
+        # Edit quality per checkpoint.  ``_loc`` is the authoritative field and
+        # is named exactly rather than copied, so the two cannot drift apart.
+        "/capability/families/R1-Distill-Qwen/_loc/3",
+        "/capability/families/R1-Distill-Llama/_loc/0",
+        "/capability/families/R1-Distill-Llama/_loc/1",
         "/rq3/n",
         "/rq3/penalty",
         "/rq3/clr_split_M1/mediation_2x2/n_b0ok",
@@ -996,9 +1011,10 @@ def check_template_and_frozen_surfaces(
         errors.append(
             f"preamble-only/unreviewed body TeX command(s): {unknown_body_commands!r}"
         )
-    # One per reviewed table (Tables 1 and 2); a third occurrence would be a
-    # document-level font change rather than a table-local one.
-    if body_source.count(r"\small") != 3:
+    # One per reviewed table.  W3-2 dropped the route-count table, whose four
+    # counts already stood in the Section 4 prose, leaving two; a further
+    # occurrence would be a document-level font change, not a table-local one.
+    if body_source.count(r"\small") != 2:
         errors.append(r"\small must occur exactly once per reviewed table")
 
     environments = set(
@@ -1313,7 +1329,10 @@ def check_section4_requirements(
     visible = normalize_visible(section_text)
 
     expected_subsections = (
-        "Installation Sanity: The Edited Association Remains Cloze-Detectable",
+        # W3-2 folded the installation sanity check into the section preamble
+        # and its footnote: the result is near-tautological by our own account,
+        # so demoting the claim, with every qualifier still attached to it, is
+        # the direction the honesty rule allows.
         "Visible In-Chain Routes",
         "The Chain-Routing Hypothesis and a Failed Replay Vehicle",
         "The Length-Only Account",
