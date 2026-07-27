@@ -10,9 +10,9 @@ population and its denominator at once.
 |---|---:|---:|---:|---:|---:|
 | Introduction | 22 | 0.91 | 0 | 24.9 | 60 |
 | Related Work | 16 | 0.62 | 1 | 24.7 | 60 |
-| The Reasoning-Time Evaluation Gap | 56 | 1.14 | 2 | 22.6 | 58 |
-| Causal Diagnosis | 46 | 1.09 | 0 | 22.7 | 48 |
-| A Chain-Local Causal Control Point | 60 | 1.25 | 1 | 25.6 | 61 |
+| The Reasoning-Time Evaluation Gap | 60 | 1.12 | 2 | 22.4 | 58 |
+| Visible Routes and an Unidentified Mechanism | 41 | 1.17 | 0 | 24.6 | 57 |
+| A Chain-Local Causal Control Point | 59 | 1.25 | 1 | 26.2 | 61 |
 | Discussion & Limitations | 13 | 0.46 | 0 | 23.5 | 47 |
 | Conclusion | 3 | 1.00 | 0 | 28.3 | 56 |
 | Ethical Statement | 8 | 0.75 | 0 | 22.6 | 41 |
@@ -26,8 +26,8 @@ population and its denominator at once.
 * **3 roles, 61 words** — _A Chain-Local Causal Control Point_ — Under MEMIT on the Qwen-14B checkpoint, against the same-relation competitor, paired edit success rises by +.100\,[.040,.160] while strict displacement does not separate, -.027\,[-.080,.027], p=.400; there the competitor's own strict contrast against no suppression is .000\,[.000,.000], a floor rather than an equivalence result, so the same null holds against no suppression; on edit success that competitor is not a floor, at +.015\,[.000,.035].
 * **3 roles, 43 words** — _A Chain-Local Causal Control Point_ — On the contrast fixed in advance, suppressing the old answer beats the placebo floor: paired edit success rises by +.122 and permissive reversion falls by -.095, and the comparison against no suppression gives a close quantity; Table tab:battery carries them with their intervals.
 * **3 roles, 39 words** — _A Chain-Local Causal Control Point_ — Under ROME on the Qwen-14B checkpoint, against no suppression, paired edit success rises by +.135\,[.055,.215] and strict displacement also separates, -.040\,[-.081,-.010] with p=.035 a second scale, not a second editor, and strict separation where the Qwen-32B battery had none.
-* **3 roles, 38 words** — _The Reasoning-Time Evaluation Gap_ — (A) For each of the six fixed checkpoints, the within-case paired change in generative edit success from zero thinking to a native chain, on a categorical axis; filled markers denote the checkpoints whose 95\% paired interval excludes zero.
+* **3 roles, 38 words** — _The Reasoning-Time Evaluation Gap_ — (A) For each of the six fixed checkpoints, the within-case paired drop in generative edit success from zero thinking to a native chain, on a categorical axis; filled markers denote the checkpoints whose 95\% paired interval excludes zero.
 * **3 roles, 32 words** — _A Chain-Local Causal Control Point_ — That replication's fresh no-suppression arm gave a paired ES drop of +.060\,[-.020,.140], which does not itself establish a reasoning-time drop in that cell, so this transfers the intervention and not the gap.
-* **3 roles, 27 words** — _Causal Diagnosis_ — In a separate post-hoc A3 candidate crosswalk, subject-scrubbed CLR appears in 13/13 majority-OLD items and 18/20 non-OLD candidates; within that crosswalk, CLR is non-sufficient for OLD commitment.
 * **3 roles, 26 words** — _The Reasoning-Time Evaluation Gap_ — At the largest tested checkpoint in each family, the paired ES drops are .106\,[.030,.182] on Qwen-32B and .107\,[.032,.182] on Llama-70B (Figure fig:gap ; Table tab:gap ).
 * **3 roles, 26 words** — _The Reasoning-Time Evaluation Gap_ — Pairing B_0 and B_3 within case and seed gives a complete-case ES drop of .117\,[.067,.169] over 199 of 200 cases and 597 of 600 seed pairs.
+* **3 roles, 26 words** — _A Chain-Local Causal Control Point_ — The zero-penalty point is the no-suppression arm itself; the five suppressed points come from a smaller separate run, and none of the six carries an interval.

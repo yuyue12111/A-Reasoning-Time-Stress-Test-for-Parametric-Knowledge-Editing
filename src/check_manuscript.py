@@ -45,9 +45,9 @@ APPROVED_REFS_SHA256 = (
     "9148dfd515b5dfbefb3ae31dfcc7c023cbf0cfc43c82074d084c2b53fb5d1912"
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
-    "Section 3": "e60d039d8879ce993e6235d28686b5866638ba50d0c6fec8dbfd31d6cc33ff5b",
-    "Section 4": "98c8d3d1c51e324a885d7243bb6d05b2f05f9443ce54c60ea7739ecccb7c8dac",
-    "Section 5": "1cb512d1cb6c837317b90ca815b680b6f55f9746024fb722ac259c1b40521da8",
+    "Section 3": "1e534ff81b167020d64213dcdbf3cd39e3a4caa524f405fefa1b9713fbf81833",
+    "Section 4": "bd38d794b03c8f5f92f195c023edf40451aa1c372ef079f95659c68949fa1070",
+    "Section 5": "9a84f9e97ac2da99ab745a3dcf164d16bfe2d41505726c8442c94c69e3b7b7de",
     "Section 1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 6": "ec1920efdf517af8485204281892ad7ecee5ff46a64f203229ad679dfece08d0",
@@ -55,9 +55,9 @@ APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
     "Ethical Statement": "7c27178fa8e3df265d432105bc74d3b4fa47fe1dca8094a9695dc90cb4b8dbf2",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
-    "Section 3": "fdb67c7194beb6541a76415ea05ae2b60c25ce60d3edcd790615814802a168d2",
-    "Section 4": "cce811a64d9fdbb23ec1d21fa900d13b3e5d2cc49a5cca894cabb65ced3c5c16",
-    "Section 5": "93b72b747f8e9ad7a95e11b11e048d1b02bd0937ead2b619d00439cc63ad29e7",
+    "Section 3": "511e8ea58143c88673bf26ad9736a1f31244b44f35d2efb489d273667823c6d1",
+    "Section 4": "1c57f22db7c39531fe94b27f854e5588a3dae93a5f7304a820fa0d4ab0c327f7",
+    "Section 5": "e66938fbf20fb463e3c43ed014cb635048d5cee6401b9f445c721cdb222e30db",
     "Section 1": "30689b87d8eeadf11f1a8a99d2e21c240fca92ee4658816ff353b257fbb9b458",
     "Section 2": "f724d58ed58fb90736b73ae9f87c82aaffe1e72d35db300078fd6d91459652a4",
     "Section 6": "75fe3e0f98254e687a27bb1b3d1f4565cad2ff66d359df8091f922c01316472c",
@@ -65,9 +65,9 @@ APPROVED_SECTION_VISIBLE_SHA256 = {
     "Ethical Statement": "7be82c0bce18ca086ce80905a6b17dcc17a17ce88f8a987ffe84736f9a30060e",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
-    "Section 3": "f3b6ac270ed75e59179ab8c709ef9ab937a6e3dc53992ea033713facc1b6b584",
-    "Section 4": "6a4a48ef6eabaadc6694ad242dbaf689c62b2fac3ce15434968b530b669a2d55",
-    "Section 5": "321f46b89e860ef9faf0ff839e8d857b72c956fe739bb1201f68b98c2d8b6768",
+    "Section 3": "ea847fffc9d9172679a66862d72735f890349125f5dc5499ef909d6aefc02e62",
+    "Section 4": "5b996ede489faf8cb72c22e8cc462d75e2d2af15493588fcd05d5859badd8391",
+    "Section 5": "fa29d9afd0c7208d0255da4eb5d9ebd6306df035bca61d1d5650cf0a9eb40c6e",
     "Section 1": "d19cdb476ff85031ea42b1362e461811ce8323c675b0f2eb94980270b2a0d320",
     "Section 2": "7a574ad49c2b8e9f83deb00d20d00883a5ef294d6119261f844253df9f9400d7",
     "Section 6": "bf8fbb8f56a0edd23680412f04d2fd0f5efe492b3c07cbf875b3fbceda6b124c",
@@ -134,6 +134,7 @@ APPROVED_EXACT_POINTERS = frozenset(
         "/protocol/edit_hparams/locality_acceptance_line",
         # Edit quality per checkpoint.  ``_loc`` is the authoritative field and
         # is named exactly rather than copied, so the two cannot drift apart.
+        "/capability/families/R1-Distill-Qwen/_loc/0",
         "/capability/families/R1-Distill-Qwen/_loc/3",
         "/capability/families/R1-Distill-Llama/_loc/0",
         "/capability/families/R1-Distill-Llama/_loc/1",
@@ -311,7 +312,7 @@ REQUIRED_SECTION_ORDER = (
     "Introduction",
     "Related Work",
     "The Reasoning-Time Evaluation Gap",
-    "Causal Diagnosis",
+    "Visible Routes and an Unidentified Mechanism",
     "A Chain-Local Causal Control Point",
     r"Discussion \& Limitations",
     "Conclusion",
@@ -336,11 +337,11 @@ AUDITED_SECTION_SPECS = (
     {
         "label": "Section 3",
         "title": "The Reasoning-Time Evaluation Gap",
-        "end_title": "Causal Diagnosis",
+        "end_title": "Visible Routes and an Unidentified Mechanism",
     },
     {
         "label": "Section 4",
-        "title": "Causal Diagnosis",
+        "title": "Visible Routes and an Unidentified Mechanism",
         "end_title": "A Chain-Local Causal Control Point",
     },
     {
@@ -1349,19 +1350,25 @@ def check_section4_requirements(
     if re.search(r"\\subsection\*", visible_source):
         errors.append("Section 4 contains an unreviewed starred subsection")
 
+    # W3-2/B.  These strings accumulated one review round at a time, and
+    # collectively they pinned every Section 4 disclosure to the body of the
+    # section three external reviews all say must compress.  A gate that only
+    # knows about the body cannot tell "disclosed" from "printed here", which is
+    # a fact about layout rather than about honesty.  So they now split in two.
+    #
+    # BODY: removing it from the body lets a reader of the body alone -- the
+    # actual Phase-1 reviewing condition -- reach a conclusion the evidence does
+    # not support.  Guards against a forbidden inference, withdrawals, scope
+    # statements, and anchors whose order carries meaning all live here.
     required_strings = (
         "This section assembles the diagnosis that motivates the primary intervention",
         "This is only an installation sanity check",
         "no control, no interval",
         "close to tautological",
         "conditional on the selected reversion sample",
-        "audit sample overlap and membership composition",
-        "reproduce the case-level tally",
         "supplement names the missing per-item artifact",
-        "results/probe/logitlens_cf200_ROME_B3.jsonl",
         "we place no quantitative weight on this observation downstream",
         "drawn from six checkpoints across both backbone lineages",
-        "greedy, short-budget, and sampled generations represented",
         "lexical candidacy is not equivalent to OLD membership by judge majority",
         "we do not transport that estimate to this pooled census",
         "outcome-conditioned failure surface",
@@ -1393,9 +1400,36 @@ def check_section4_requirements(
         "Neither observation identifies natural-chain mediation",
         "the test behind our chain-local causal control point",
     )
+    # COVERAGE: detail whose absence from the body costs a reader precision but
+    # licenses nothing -- a filename, a pool's generation mix, the endpoint set
+    # of a secondary contrast.  It must still be disclosed somewhere the reader
+    # can reach, so the gate accepts the body or supplement.tex, and the
+    # supplement route is only open because check_supplement_promises separately
+    # forces the body to carry a pointer and the supplement to answer it.
+    coverage_strings = (
+        "audit sample overlap and membership composition",
+        "reproduce the case-level tally",
+        "results/probe/logitlens_cf200_ROME_B3.jsonl",
+        "greedy, short-budget, and sampled generations represented",
+    )
     for target in required_strings:
         if target not in visible:
             errors.append(f"Section 4 required target string missing: {target!r}")
+
+    supplement_visible = ""
+    supplement_path = REPO_ROOT / "paperwriting" / "manuscript" / "supplement.tex"
+    if supplement_path.exists():
+        supplement_visible = normalize_visible(
+            supplement_path.read_text(encoding="utf-8")
+        )
+    for target in coverage_strings:
+        if target in visible:
+            continue
+        if target in supplement_visible:
+            continue
+        errors.append(
+            f"Section 4 disclosure is in neither the body nor the supplement: {target!r}"
+        )
 
     # "Prospectively specified" is reserved for protocols frozen in a dated
     # artifact before results existed; everything recorded afterwards is
@@ -1624,7 +1658,13 @@ def check_section5_requirements(
         "unadjusted and we claim no correction",
         "without multiplicity adjustment, and we claim none",
         # The battery's own scope limit, carried from the frozen protocol.
-        "every arm here is an intervened condition",
+        # W3-2/D.  The old wording of this guard, "every arm here is an
+        # intervened condition", was false: arm N penalises nothing and is
+        # the same unintervened Qwen-32B run as Table 1's largest Qwen cell.
+        # The conclusion it protects is unchanged and still required -- the
+        # demonstration needs an intervention, so it cannot establish that
+        # the chain route is used when nothing intervenes.
+        "the demonstration runs through an intervention",
         "required in ordinary, uninterrupted generation",
         # R1 transfer ceilings.
         "not a second editor",
@@ -2016,6 +2056,51 @@ def check_supplement_promises(main_path: Path, errors: list[str]) -> None:
         errors.append("supplement.tex must state how many places it discharges")
 
 
+# W3-2/F.  "It reads better now" is an impression until something holds it.
+# Each entry is (max mean roles per sentence, max sentences carrying four or
+# more roles), measured by src/audit_narrative_load.py.  A role is a job the
+# sentence is doing -- asserting a result, bounding it, naming a scope, naming a
+# denominator, pointing elsewhere -- so four in one sentence is a reader holding
+# four things at once.  Ceilings ratchet down only: raising one is a decision to
+# make the paper harder to read and must be made deliberately, in this file.
+NARRATIVE_LOAD_CEILINGS: dict[str, tuple[float, int]] = {
+    "Introduction": (0.95, 0),
+    "The Reasoning-Time Evaluation Gap": (1.18, 2),
+    "A Chain-Local Causal Control Point": (1.28, 1),
+}
+
+
+def check_narrative_load(main_path: Path, errors: list[str]) -> None:
+    """Fail if a section is asking its sentences to carry more than the ceiling."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    try:
+        from audit_narrative_load import measure
+    except ImportError as exc:  # pragma: no cover - import wiring only
+        errors.append(f"narrative-load gate unavailable: {exc}")
+        return
+    rows = {
+        str(row["section"]): row
+        for row in measure(main_path.read_text(encoding="utf-8"))[0]
+    }
+    for section, (max_mean, max_overloaded) in NARRATIVE_LOAD_CEILINGS.items():
+        row = rows.get(section)
+        if row is None:
+            errors.append(f"narrative-load gate cannot find section {section!r}")
+            continue
+        mean = float(row["mean_roles"])
+        overloaded = int(row["overloaded"])
+        if mean > max_mean:
+            errors.append(
+                f"{section}: {mean:.2f} mean roles per sentence exceeds the "
+                f"{max_mean:.2f} ceiling"
+            )
+        if overloaded > max_overloaded:
+            errors.append(
+                f"{section}: {overloaded} sentences carry four or more roles, "
+                f"ceiling is {max_overloaded}"
+            )
+
+
 def check_artifact_anonymity(main_path: Path, errors: list[str]) -> None:
     """Fail if any shipped artifact carries an identity string (W2-8 / A0-4).
 
@@ -2142,6 +2227,7 @@ def main() -> int:
     check_abstract_body_bindings(main_text, combined_ledger, results, errors)
     check_artifact_anonymity(args.main, errors)
     check_supplement_promises(args.main, errors)
+    check_narrative_load(args.main, errors)
 
     if errors:
         print(f"FAIL: {len(errors)} manuscript check(s) failed", file=sys.stderr)

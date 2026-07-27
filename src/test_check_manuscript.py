@@ -52,8 +52,8 @@ def assert_rejected(main_path: Path, *diagnostics: str) -> str:
 def test_canonical_manuscript_passes(candidate_main: Path) -> None:
     completed = run_checker(candidate_main)
     assert completed.returncode == 0, completed.stdout + completed.stderr
-    assert "Section 3 RJ ledger (123 occurrences)" in completed.stdout
-    assert "Section 4 RJ ledger (54 occurrences)" in completed.stdout
+    assert "Section 3 RJ ledger (124 occurrences)" in completed.stdout
+    assert "Section 4 RJ ledger (49 occurrences)" in completed.stdout
     # W2-10/F: 22 inline values moved into Table 2, whose rows carry the
     # bindings instead.  D5's recorded destination is that table.
     assert "Section 5 RJ ledger (164 occurrences)" in completed.stdout
@@ -75,11 +75,11 @@ def test_frozen_abstract_mutation_is_rejected(candidate_main: Path) -> None:
 def test_commented_boundary_cannot_hide_unledgered_number(
     candidate_main: Path,
 ) -> None:
-    marker = r"\section{Causal Diagnosis}"
+    marker = r"\section{Visible Routes and an Unidentified Mechanism}"
     mutate(
         candidate_main,
         marker,
-        "%\\section{Causal Diagnosis}\n"
+        "%\\section{Visible Routes and an Unidentified Mechanism}\n"
         "Unledgered value 999.\n"
         + marker,
     )
@@ -887,7 +887,9 @@ def test_blocked_cloze_artifact_must_be_named(candidate_main: Path) -> None:
     )
     assert_rejected(
         candidate_main,
-        "Section 4 required target string missing: "
+        # W3-2/B moved the filename into the coverage class: it may live in the
+        # body or the supplement, but it may not vanish from both.
+        "Section 4 disclosure is in neither the body nor the supplement: "
         "'results/probe/logitlens_cf200_ROME_B3.jsonl'",
     )
 
@@ -1083,7 +1085,7 @@ def test_section5_cannot_claim_the_prospective_label(
         "nothing is penalized in the answer text",
         "extending the same penalty to the answer span",
         "manipulation check on whether the penalty acted inside the span, not an outcome",
-        "every arm here is an intervened condition",
+        "the demonstration runs through an intervention",
         "compatible with zero; we set no equivalence margin",
         "That interval reaches zero.",
         "a floor rather than an equivalence result",
@@ -1221,7 +1223,7 @@ def test_wb_directional_endpoints_declare_zero_exclusion(
     """
     text = candidate_main.read_text(encoding="utf-8")
     assert "Each directional endpoint above has an interval excluding zero" in text
-    start = text.index("An independent concept-direction experiment")
+    start = text.index("A concept-direction experiment")
     end = text.index("does not locate a distinct commitment layer")
     paragraph = text[start:end]
     assert "excluding zero" in paragraph, "the clause must sit inside the W-B paragraph"

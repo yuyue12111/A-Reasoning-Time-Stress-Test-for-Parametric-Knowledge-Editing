@@ -24,6 +24,26 @@ The model at step 5 is **DeepSeek-R1-Distill-Qwen-7B** (`pilot.yaml`
 `hparams_overrides.model_name`) — the checkpoint the pilot ran on, not the
 checkpoint any given later run uses.
 
+**Two facts about this pool that W3-2 established and Section 3.1 now states.**
+
+*It was selected by a scorer that was later fixed.* The prefilter ran on or
+before 2026-06-17; commit `515b87a` (2026-06-22) changed `metrics.hit` to require
+word boundaries and to drop aliases shorter than four characters, because the
+alias table carries 287 one-to-three-character ISO country and language codes
+that a pure substring match fires on. `prefilter.py:120` calls exactly that
+function. No prefilter re-run, pool rebuild or re-selection appears anywhere in
+the record after that date; the documented remediation was re-scoring existing
+generations, not regenerating or re-selecting them. So every reported rate uses
+the fixed matcher while pool membership does not. The magnitude is not estimated
+here and no estimate of it belongs in the paper.
+
+*No `B0`-selected pool exists.* `RUNBOOK.md:79` reads 存活率预计 40–60%（B0 实测
+~50%）, which is a note about what a `--budget B0` filter's survival rate would
+be. No log, shard, merged pool or commit behind it survives, and no reported run
+uses a `B0`-gated pool. The manuscript therefore says no `B0`-gated pool was
+built, and does not print the ~50%, which has no artifact and so no
+`results.json` path.
+
 Survival is `248 / 600 = 41.3%`, inside the `40-60%` band `plan.md:566` predicted
 before the run. That agreement is the only independent corroboration of the 248;
 `data/counterfact.prefiltered.jsonl` is gitignored and not in the workspace, so
@@ -114,10 +134,35 @@ Two things follow that the manuscript did not say before this round.
   records that in-chain leakage was stable across clamp 2/3/4 (.31-.33), which
   bounds but does not eliminate the concern.
 
-Neighbour-prompt target-value non-leakage, from
-`capability.families.*._loc`: Qwen-1.5B .954, Qwen-32B .958, Llama-8B .835,
-Llama-70B .930. Qwen-7B and Qwen-14B are `null` — **not recorded anywhere in the
-workspace**, so the manuscript reports the four that exist and does not
-reconstruct the two that do not. Llama-8B's .835 is below the .85 the layer scan
-used as its own acceptance line; it was kept rather than retuned, which the
-project recorded at the time as a deliberate refusal to tune to a threshold.
+Neighbour-prompt target-value non-leakage, from `capability.families.*._loc`:
+Qwen-1.5B .954, Qwen-32B .958, Llama-8B .835, Llama-70B .930.
+
+**These are not all at the same budget** — established in W3-2 by recomputing
+each value from the raw shards and matching the ES/CLR/RR columns back to the
+capability rows, so the runs are identified, not inferred:
+
+| checkpoint | recorded `_loc` | budget | the same run's other budget |
+|---|---|---|---|
+| Qwen-1.5B | .954 | **B0** | B3 .913 |
+| Qwen-32B | .958 | **B3** | B0 .970 |
+| Llama-8B | .835 | **B0** | B3 .865 |
+| Llama-70B | .930 | **B0**, on the 13-case-filtered n=187 subset | B3 .936; unfiltered B0 .915 |
+
+Corroboration: `plan.md:229` records Llama-8B's as "Loc B0 0.835";
+`results.json`'s own `/rq3/alpha_sweep/_schema` labels the α=0 headline baseline
+(Loc .958, same run, same value) a B3 quantity. Section 3.1 therefore states the
+budget for each rather than presenting them as one homogeneous number.
+
+Qwen-7B and Qwen-14B are `null` in the capability block. An earlier draft of this
+file said they were "not recorded anywhere in the workspace"; **that was wrong**.
+The raw shards yield Qwen-7B B0 .985 / B3 .975 and Qwen-14B B0 .960 / B3 .950;
+`plan.md:150` records Qwen-7B layer-scan locality at B0; and `results.json` itself
+carries Qwen-14B locality under the second editor (`memit_replication` B0 .965 /
+B3 .950). What is true, and what the manuscript now says, is narrower: **we never
+recorded a scored ROME-headline locality for those two checkpoints**. Nothing was
+recomputed into the paper — the pre-submission freeze forbids it — so the body
+reports the four recorded values and says the other two were not recorded.
+
+Llama-8B's .835 is below the .85 the layer scan used as its own acceptance line;
+it was kept rather than retuned, which the project recorded at the time as a
+deliberate refusal to tune to a threshold.

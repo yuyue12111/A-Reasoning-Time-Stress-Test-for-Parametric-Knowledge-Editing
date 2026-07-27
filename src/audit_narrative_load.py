@@ -106,14 +106,15 @@ def split_sections(text: str) -> list[tuple[str, str]]:
     return out
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--main", default=str(MAIN))
-    parser.add_argument("--markdown", default=None)
-    args = parser.parse_args()
+def measure(main_text: str) -> tuple[list[dict[str, object]], list[tuple[int, int, str, str]]]:
+    """Per-section load rows plus every sentence, heaviest first.
 
-    source = strip_comments(Path(args.main).read_text(encoding="utf-8"))
-    rows, heaviest = [], []
+    Shared with ``src/check_manuscript.py`` so the gate and the report can never
+    disagree about what was measured.
+    """
+    source = strip_comments(main_text)
+    rows: list[dict[str, object]] = []
+    heaviest: list[tuple[int, int, str, str]] = []
     for title, body in split_sections(source):
         items = sentences(visible(body))
         if not items:
@@ -132,8 +133,17 @@ def main() -> int:
         )
         for item, load, count in zip(items, loads, words):
             heaviest.append((load, count, title, item))
-
     heaviest.sort(key=lambda entry: (-entry[0], -entry[1]))
+    return rows, heaviest
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--main", default=str(MAIN))
+    parser.add_argument("--markdown", default=None)
+    args = parser.parse_args()
+
+    rows, heaviest = measure(Path(args.main).read_text(encoding="utf-8"))
 
     lines = [
         "# Narrative load per sentence",
