@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import runpy
 import shutil
 import subprocess
@@ -1457,7 +1458,7 @@ def test_base_drift_claims_are_scoped_to_where_an_interval_exists() -> None:
     assert "where it carries an interval" not in text, "the hedge was unresolvable"
     # W2-14/A reworded Section 1's scope clause; both sections still say the
     # controls are the largest Qwen checkpoint's.
-    assert "Three controls on the largest Qwen checkpoint" in text   # Section 1
+    assert "On the largest Qwen checkpoint the erosion already appears" in text  # Section 1
     assert "on the largest Qwen checkpoint" in text                  # Section 7
     assert "That paired interval exists at this checkpoint only" in text
     assert "those are not of one sign" in text
@@ -1538,7 +1539,10 @@ def test_each_section1_control_carries_its_own_conclusion() -> None:
     # W2-14/A replaced this: "a think span alone" generalised past the one canned
     # thought that was run, and excluded the buffer account Section 4.4 keeps alive.
     assert "so a think span alone does not produce the gap" not in text
-    assert "the one fixed canned thought we tested improves it instead" in text
+    assert "without isolating length" in text, (
+        "the canned-thought conclusion must carry its own limitation"
+    )
+    assert "a fixed short canned thought improves edit success instead" in text
     assert "we make no formal contrast" in text
 
 
@@ -1608,8 +1612,11 @@ def test_section1_controls_match_the_figure_and_exclude_the_base() -> None:
     text = (REPO_ROOT / "paperwriting" / "manuscript" / "main.tex").read_text(
         encoding="utf-8"
     )
-    assert "Three controls on the largest Qwen checkpoint each bound a different alternative" in text
-    assert "the one fixed canned thought we tested improves it instead" in text
+    # W2-15 dropped the "three controls" framing: B_1 is the effect appearing at
+    # a shorter budget, and B_{0P}/B_1 are two arms of one control run (Sec. 3.3).
+    assert "Three controls" not in text
+    assert "the erosion already appears at a shorter native chain" in text
+    assert "a fixed short canned thought improves edit success instead" in text
     assert "so a think span alone does not produce the gap" not in text, (
         "that excludes the content-independent buffer account Section 4.4 keeps alive"
     )
@@ -1643,3 +1650,61 @@ def test_section53_names_its_evidence_and_marks_the_placebo_silence() -> None:
     section = text.split("What the Placebo and Competitor")[1].split("\\subsection")[0]
     assert "The placebo's in-chain comparison is derivation-dependent" in section
     assert "p=.054" not in section and "p = .054" not in section
+
+
+def test_a_supplement_promise_without_a_home_is_rejected(
+    candidate_main: Path,
+) -> None:
+    """W2-15/4: this is the failure the two hard-coded strings could not see.
+
+    A deferral with no destination compiles cleanly, passes every numeric and
+    language gate, and is found only by a reader who goes looking for what was
+    promised.
+    """
+    marker = r"\section{Introduction}"
+    mutate(candidate_main, marker,
+           marker + "\nThe full ablation is in the supplement.")
+    assert_rejected(candidate_main, "supplement promise")
+
+
+def test_supplement_sections_must_declare_their_purpose() -> None:
+    """Every numbered section says what it discharges or supports, so one cannot
+    be added without stating which promise it answers."""
+    text = (REPO_ROOT / "paperwriting" / "manuscript" / "supplement.tex").read_text(
+        encoding="utf-8"
+    )
+    sections = re.findall(r"^\\section\{", text, flags=re.M)
+    markers = re.findall(r"^% (?:Discharges|Supports):", text, flags=re.M)
+    assert len(sections) <= len(markers), (len(sections), len(markers))
+
+    body = (REPO_ROOT / "paperwriting" / "manuscript" / "main.tex").read_text(
+        encoding="utf-8"
+    )
+    body = re.sub(r"(?m)(?<!\\)%.*$", "", body)
+    promises = re.findall(
+        r"(?i)\bthe supplement\b|\bsupplementary (?:figures?|material)\b", body
+    )
+    discharges = re.findall(r"^% Discharges:", text, flags=re.M)
+    assert len(discharges) >= len(promises), (len(discharges), len(promises))
+    assert "discharges the seven places" in text or len(promises) != 7
+
+
+@pytest.mark.parametrize(
+    "planted",
+    [
+        "The competitor perturbs the chain without moving the answer.",
+        "The placebo leaves the answer unchanged.",
+        "At that level the answer is unaffected.",
+        "Under both controls the answer holds.",
+        "We observe no answer-level movement.",
+        "This establishes answer-level inertness.",
+    ],
+)
+def test_answer_held_nominal_and_negated_forms_are_banned(
+    candidate_main: Path, planted: str
+) -> None:
+    """W2-15/5: second time the same lesson.  A ban written against one verb
+    leaves the nominalisation and the preservation phrasing open."""
+    marker = r"\section{Introduction}"
+    mutate(candidate_main, marker, marker + "\n" + planted)
+    assert_rejected(candidate_main, "banned language")
