@@ -704,8 +704,8 @@ def test_section4_semantic_role_swaps_are_rejected(
     ("old", "new"),
     [
         (
-            "This is only an installation sanity check",
-            "This is not only an installation sanity check",
+            "This is an installation sanity check",
+            "This is not an installation sanity check",
         ),
         (
             "primary RR contrast was compatible with zero",
@@ -729,7 +729,7 @@ def test_section4_required_claim_polarity_is_frozen(
 def test_required_claim_cannot_be_hidden_in_label(
     candidate_main: Path,
 ) -> None:
-    target = "This is only an installation sanity check"
+    target = "This is an installation sanity check"
     mutate(
         candidate_main,
         target,
@@ -1646,28 +1646,31 @@ def test_section1_controls_match_the_figure_and_exclude_the_base() -> None:
     # W2-16/C: an ordering claim Section 4.4 declines, across two runs with
     # different zero-thinking baselines.
     assert "already appears" not in text
-    # W3-2 moved the bounds into a footnote on the same sentence.  The
-    # properties are unchanged: the short-budget arm is scoped to the largest
-    # Qwen checkpoint, it is a control run of its own, and it is read against
-    # that run's baseline rather than the main run's.
+    # W4/C1 deleted the Section 1 bounds footnote; each property it carried is
+    # asserted at its surviving carrier instead.  Own-run baseline: the control
+    # run is introduced as a dedicated run in Section 3.3, and the caption keeps
+    # the two-arms-of-one-run identity.
     assert (
         "On the largest Qwen checkpoint the same direction appears at a shorter"
         " think budget" in text
     )
     assert "two arms of one control run" in text
-    assert "against that run's own zero-thinking baseline" in text
+    assert "A dedicated Qwen-32B control gives" in text
     assert "a fixed short canned thought improves edit success instead" in text
     assert "so a think span alone does not produce the gap" not in text, (
         "that excludes the content-independent buffer account Section 4.4 keeps alive"
     )
-    # the base is outside the count and explicitly juxtaposed, as in the caption
-    assert "Separately, juxtaposed rather than contrasted, the unedited base" in text
-    # the same wording appears in Section 1 and in the Figure 1 caption
-    assert text.count("juxtaposed rather than contrasted") >= 2
-    # the forward pointer names the question Section 4.4 actually asks; W3-2
-    # moved it inside the footnote's clause list, so it is no longer sentence-
-    # initial, but it must still be the question that is named
-    assert "whether length alone accounts for the effect" in text
+    # the base is outside the count and explicitly juxtaposed, in the Figure 1
+    # caption (the sole remaining carrier after W4/C1)
+    assert (
+        "an outcome with a different event definition and denominator that is "
+        "juxtaposed rather than contrasted" in text
+    )
+    assert text.count("juxtaposed rather than contrasted") >= 1
+    # the forward pointer to the length-only account survives in Section 3.3
+    # body wording after W4/C1
+    assert "does not isolate length" in text
+    assert "revisits the length-only account" in text
     assert "content-independent computational-buffer account" in text
     assert "remains a live alternative" in text
 

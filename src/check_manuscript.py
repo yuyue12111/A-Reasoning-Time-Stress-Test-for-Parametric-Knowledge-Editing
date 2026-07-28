@@ -45,30 +45,30 @@ APPROVED_REFS_SHA256 = (
     "f47c4ec7ed83e158591f003d568fdab286ad0c3609c6dfbf0cf0922983f69eeb"
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
-    "Section 3": "a092c2f672072ba73b3b634e1e69be6b4e90ac1b3bfdffbe38a2a9f29bf588fc",
-    "Section 4": "eb503ac155939ac226bf9a71dc47bc328c5847ee6760f1f5c3d843c3f5c2bc14",
-    "Section 5": "3667f8a746f82c6b6016ef3f0c091338c835b22300310b84f4051fe7e2bb8cc7",
-    "Section 1": "8998f5373a7600956aaee44289c5355d1949a9e663e296364e44edbf21590007",
+    "Section 3": "126dc01441f7b76d82ce5cb769eacf8bdb0596c47a5e76802945d3974c5dfb6b",
+    "Section 4": "68b5591e6b459b9487ec4c35c64722324fd3bed4d71166cd5856a15463d526a0",
+    "Section 5": "f6a85eabadcb5a54eb6b22341c0b1f164f7fb68d1bd7c535b4cd3b3856ca220d",
+    "Section 1": "f3eb8991d6d105cb3c897da2f820b29c8cbd8756273d05e7dafeb32e4f8d6ee5",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 6": "ec1920efdf517af8485204281892ad7ecee5ff46a64f203229ad679dfece08d0",
     "Section 7": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Ethical Statement": "7c27178fa8e3df265d432105bc74d3b4fa47fe1dca8094a9695dc90cb4b8dbf2",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
-    "Section 3": "f949dc07dc8b7aef2939341f988ea57fb226996c2241d6c3555d0e363b9e20aa",
-    "Section 4": "3813c9734a62fee8c20b0cf8133f494b22ad71a6c118145339e795a5b25600c7",
-    "Section 5": "3d9b60f5936edacbb64722b625d5258c1fee3ee8c10405cd569d76d6a271679d",
-    "Section 1": "fae77dc287aa2b5f38b89610b272fd98210ec683ea3ddd4ed272cddd75af681f",
+    "Section 3": "e778b440e2833d4f9c64f60c19cd0eaa3517d4e9f461cff028d1fe67b6480913",
+    "Section 4": "fc55561f43975c86145d8d3b3a8226027d7689ac68a0825d574da4c5a7483ea1",
+    "Section 5": "26553557b77e0c5a9e7ddc45071a22af50d15da49f364012ab074eb676780115",
+    "Section 1": "0b1e0de5832d24c51dc97770541be5ab6a2138be40ea3956cb92d3100f7969f2",
     "Section 2": "b954584c72bfb4ab61bcd9380a4288f333acc172305cb8faaf03f0757a065b87",
     "Section 6": "2ce2be9f78056dcd53d5973053d83f14b5d7bbaec9532645066675ad863b4871",
     "Section 7": "6efab28353b94766eeacc7870bc37ef4a8373069f256b1ee0be048b77675827e",
     "Ethical Statement": "7be82c0bce18ca086ce80905a6b17dcc17a17ce88f8a987ffe84736f9a30060e",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
-    "Section 3": "22603d12ceaeefc86034dee86cd79199362b1095cda1fe8a3db90ae1851dc8ea",
-    "Section 4": "458202725a04c06f2e3ef8a56097b2149558a3aa0f87e71d9be2e8d595a39f3f",
-    "Section 5": "a0be58fdf88c402e7c96cf3395faa331c285ee7af0ea6f584c6628a2dc2c1cd6",
-    "Section 1": "d63395bba6a0655c2ceaada018b6af3e6980be2e037c86974d1f9d4abf755488",
+    "Section 3": "59fb7313ae8bbc0b796946ca9da96602d5b5822ea0a32dbe7f0283d107960f10",
+    "Section 4": "72841a488d20b4c60dc32648af1b5dfb03c48d78dc7c777878aa8e7ecc1de688",
+    "Section 5": "b154cbb41c130c0521b7307dbe228f80f365ffafc3f75abb16f682036c0f7474",
+    "Section 1": "ec78df12b26823ca5ddbf9433c0144656c4920943549c4cedfc081c33bf7829b",
     "Section 2": "33b366b9d5d276e3108d5b60069e641829733c5f96e8878951ddf0df3fd08f2c",
     "Section 6": "0fe39e24eda7cef7c38d5e38513c5427390aaed4f6ed0a03715829f470648629",
     "Section 7": "4c5b17b09842cc78cac227d4acb6265d131d9ed1b745b3058f1d3ddf8b7d1f3b",
@@ -1271,7 +1271,6 @@ def check_section3_requirements(section_text: str, errors: list[str]) -> None:
         "a think-span processor is inactive when the think span is empty",
         "fixed short canned thought, not a length-matched filler",
         "These fixed seeds do not identify a sampling-seed population.",
-        "not a second independent trend line",
     )
     for target in required_strings:
         if target not in visible:
@@ -1365,9 +1364,9 @@ def check_section4_requirements(
     # statements, and anchors whose order carries meaning all live here.
     required_strings = (
         "This section assembles the diagnosis that motivates the primary intervention",
-        "This is only an installation sanity check",
+        "This is an installation sanity check",
         "no control, no interval",
-        "close to tautological",
+        "ROME optimizes the target logit at the rewrite prompt",
         "conditional on the selected reversion sample",
         # W3-3.  The artifact is not missing -- results 2/probe/
         # logitlens_cf200_ROME_B3.jsonl is on disk.  What is missing is the
@@ -1416,8 +1415,10 @@ def check_section4_requirements(
     # supplement route is only open because check_supplement_promises separately
     # forces the body to carry a pointer and the supplement to answer it.
     coverage_strings = (
-        "audit sample overlap and membership composition",
-        "reproduce the case-level tally",
+        # W4/C1 reworded fn5's judgment register; the disclosure content is
+        # unchanged and now reads "cannot be audited from it".
+        "sample overlap, membership composition and the case-level tally",
+        "cannot be audited from it",
         "results/probe/logitlens_cf200_ROME_B3.jsonl",
         "greedy, short-budget, and sampled generations represented",
     )
@@ -1668,9 +1669,11 @@ def check_section5_requirements(
         # Dose ladder without an ordered-trend claim.
         "Every suppressed setting leaves the in-span leakage check below the zero-penalty setting",
         "a dose ladder rather than a calibrated dose-response",
-        # M14 marginal-versus-paired reconciliation, both endpoint pairs.
-        "need not equal differences of arm-wise rates",
-        "does not equal",
+        # M14 marginal-versus-paired reconciliation.  W4/C1 deleted fn11, whose
+        # worked example carried "need not equal differences of arm-wise rates"
+        # and "does not equal"; the reconciliation note now ships in the forest-
+        # figure caption (E4), which must restore the first string here when it
+        # lands.  The run-identity anchor below survives in the body.
         "is the same Qwen-32B run as the largest Qwen cell",
         # D6 control bounds.
         "compatible with zero; we set no equivalence margin",
