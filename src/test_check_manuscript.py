@@ -52,11 +52,12 @@ def assert_rejected(main_path: Path, *diagnostics: str) -> str:
 def test_canonical_manuscript_passes(candidate_main: Path) -> None:
     completed = run_checker(candidate_main)
     assert completed.returncode == 0, completed.stdout + completed.stderr
-    assert "Section 3 RJ ledger (124 occurrences)" in completed.stdout
-    assert "Section 4 RJ ledger (49 occurrences)" in completed.stdout
-    # W2-10/F: 22 inline values moved into Table 2, whose rows carry the
-    # bindings instead.  D5's recorded destination is that table.
-    assert "Section 5 RJ ledger (164 occurrences)" in completed.stdout
+    # W4 counts: C7-A11 added the .107 caption comparison (S3 124->125); C4
+    # moved the X1 decomposition to the supplement (S4 49->39); C1 deleted
+    # fn11's worked example and C5-R1 the third .48 (S5 164->158).
+    assert "Section 3 RJ ledger (125 occurrences)" in completed.stdout
+    assert "Section 4 RJ ledger (39 occurrences)" in completed.stdout
+    assert "Section 5 RJ ledger (158 occurrences)" in completed.stdout
 
 
 def test_frozen_abstract_mutation_is_rejected(candidate_main: Path) -> None:
@@ -75,11 +76,11 @@ def test_frozen_abstract_mutation_is_rejected(candidate_main: Path) -> None:
 def test_commented_boundary_cannot_hide_unledgered_number(
     candidate_main: Path,
 ) -> None:
-    marker = r"\section{Visible Routes and an Unidentified Mechanism}"
+    marker = r"\section{Visible Routes Back to the Old Answer}"
     mutate(
         candidate_main,
         marker,
-        "%\\section{Visible Routes and an Unidentified Mechanism}\n"
+        "%\\section{Visible Routes Back to the Old Answer}\n"
         "Unledgered value 999.\n"
         + marker,
     )
@@ -276,13 +277,14 @@ def test_abstract_binding_debt_is_retired() -> None:
 def test_abstract_coverage_breaks_if_section5_stops_binding_the_arrow(
     candidate_main: Path,
 ) -> None:
-    """The retired debt is now load-bearing: Section 5 alone covers 8.5%.
+    """The retired debt is now load-bearing: 8.5% has exactly two sites.
 
-    W3-2 dropped the footnote's reversion worked example, so the arm-wise
-    sentence is now the only site; one binding, not two, carries the abstract.
+    W3-2 dropped the footnote's reversion worked example; W4/C2 added the
+    Section 1 contribution binding, so the arm-wise Section 5 sentence and
+    Section 1 together carry the abstract.  Mutating both must break coverage.
     """
     text = candidate_main.read_text(encoding="utf-8")
-    assert text.count('"display":"8.5"') == 1
+    assert text.count('"display":"8.5"') == 2
     candidate_main.write_text(
         text.replace('"display":"8.5"', '"display":"8.6"'), encoding="utf-8"
     )
@@ -340,7 +342,7 @@ def test_section4_subsection_order_is_frozen(candidate_main: Path) -> None:
     # W3-2 folded the installation sanity check into the section preamble, so
     # the frozen order now starts at the route census.
     first = r"\subsection{Visible In-Chain Routes}"
-    second = r"\subsection{The Chain-Routing Hypothesis and a Failed Replay Vehicle}"
+    second = r"\subsection{The Chain-Routing Hypothesis}"
     mutate(candidate_main, first, r"\subsection{TEMPORARY-HEADING}")
     mutate(candidate_main, second, first)
     mutate(candidate_main, r"\subsection{TEMPORARY-HEADING}", second)
@@ -348,17 +350,15 @@ def test_section4_subsection_order_is_frozen(candidate_main: Path) -> None:
 
 
 def test_x1_disclosure_order_is_enforced(candidate_main: Path) -> None:
-    decomposition = "Both prerequisites limited the conjunction:"
+    # W4/C4: the decomposition lives in the supplement; the body order is
+    # FAIL -> withdrawal -> non-rescuing pointer -> terminal ruling ->
+    # replay-independent controls.  Mentioning the non-rescuing audit before
+    # the official failure breaks the order.
     mutate(
         candidate_main,
-        decomposition,
-        "A non-rescuing post-hoc audit precedes the decomposition.  "
-        + decomposition,
-    )
-    mutate(
-        candidate_main,
-        "A non-rescuing post-hoc audit found",
-        "A post-hoc audit found",
+        "The replay conjunction succeeded",
+        "A non-rescuing post-hoc audit informed this test.  "
+        "The replay conjunction succeeded",
     )
     assert_rejected(candidate_main, "Section 4 X1 disclosure order")
 
@@ -677,10 +677,12 @@ def test_reviewed_table_environment_shape_is_frozen(
             "T (no suppression) versus N (old-answer first-token suppression)",
         ),
         (
-            "fresh-\\(B_0\\) strict direct-answer success held in \\(14/18\\) "
-            "cases, while replayed answers received an OLD majority in \\(12/18\\)",
-            "replayed answers received an OLD majority in \\(14/18\\) cases, "
-            "while fresh-\\(B_0\\) strict direct-answer success held in \\(12/18\\)",
+            "was \\(-.289\\,[-.444,-.156]\\) for CLR-positive cases with "
+            "bootstrap \\(p=.0002\\), against \\(+.014\\,[.000,.041]\\) "
+            "with \\(p=.72\\) for CLR-zero",
+            "was \\(+.014\\,[.000,.041]\\) for CLR-positive cases with "
+            "bootstrap \\(p=.72\\), against \\(-.289\\,[-.444,-.156]\\) "
+            "with \\(p=.0002\\) for CLR-zero",
         ),
         (
             "the new token had the higher logit",
@@ -1037,8 +1039,9 @@ def test_section5_arrow_must_bind_to_the_battery_arms(
     swap.
     """
     text = candidate_main.read_text(encoding="utf-8")
-    # One arm-wise percent binding plus the battery-table row.
-    assert text.count('"pointer":"/rq3/sup_battery/marginal_B3/N/RR"') == 2
+    # The arm-wise percent binding, the battery-table row, and the W4/C2
+    # contribution-two binding in Section 1.
+    assert text.count('"pointer":"/rq3/sup_battery/marginal_B3/N/RR"') == 3
     candidate_main.write_text(
         text.replace(
             '"pointer":"/rq3/sup_battery/marginal_B3/N/RR"',
@@ -1567,7 +1570,9 @@ def test_each_section1_control_carries_its_own_conclusion() -> None:
     # W2-14/A replaced this: "a think span alone" generalised past the one canned
     # thought that was run, and excluded the buffer account Section 4.4 keeps alive.
     assert "so a think span alone does not produce the gap" not in text
-    assert "without isolating length" in text, (
+    # W4/C1 deleted the Section 1 bounds footnote; the canned-thought
+    # limitation's surviving carrier is the Section 3.3 body wording.
+    assert "does not isolate length" in text, (
         "the canned-thought conclusion must carry its own limitation"
     )
     assert "a fixed short canned thought improves edit success instead" in text

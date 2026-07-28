@@ -45,33 +45,33 @@ APPROVED_REFS_SHA256 = (
     "f47c4ec7ed83e158591f003d568fdab286ad0c3609c6dfbf0cf0922983f69eeb"
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
-    "Section 3": "126dc01441f7b76d82ce5cb769eacf8bdb0596c47a5e76802945d3974c5dfb6b",
-    "Section 4": "68b5591e6b459b9487ec4c35c64722324fd3bed4d71166cd5856a15463d526a0",
-    "Section 5": "f6a85eabadcb5a54eb6b22341c0b1f164f7fb68d1bd7c535b4cd3b3856ca220d",
-    "Section 1": "f3eb8991d6d105cb3c897da2f820b29c8cbd8756273d05e7dafeb32e4f8d6ee5",
+    "Section 3": "57ff39b8835a1587ef7eacf580926ba12ecd8b94865da4d8156f0800d82fdc60",
+    "Section 4": "c5fd711d525c1c99058ad7378164cf22a24ab722bc976c1efa3b49f339edd669",
+    "Section 5": "3095811cce670ac2b27c5e45757ff87e96a72d0beaaafb8314637361308715bb",
+    "Section 1": "dbb9900c53e0decf6b994f16a3977ad895bec4a764be41fca4a1c0f79ac31111",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "Section 6": "ec1920efdf517af8485204281892ad7ecee5ff46a64f203229ad679dfece08d0",
+    "Section 6": "a8602fd48b1cfaf5876e3d04efc7a0567c639944e7e906963b7003ce44884514",
     "Section 7": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Ethical Statement": "7c27178fa8e3df265d432105bc74d3b4fa47fe1dca8094a9695dc90cb4b8dbf2",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
-    "Section 3": "e778b440e2833d4f9c64f60c19cd0eaa3517d4e9f461cff028d1fe67b6480913",
-    "Section 4": "fc55561f43975c86145d8d3b3a8226027d7689ac68a0825d574da4c5a7483ea1",
-    "Section 5": "26553557b77e0c5a9e7ddc45071a22af50d15da49f364012ab074eb676780115",
-    "Section 1": "0b1e0de5832d24c51dc97770541be5ab6a2138be40ea3956cb92d3100f7969f2",
-    "Section 2": "b954584c72bfb4ab61bcd9380a4288f333acc172305cb8faaf03f0757a065b87",
-    "Section 6": "2ce2be9f78056dcd53d5973053d83f14b5d7bbaec9532645066675ad863b4871",
-    "Section 7": "6efab28353b94766eeacc7870bc37ef4a8373069f256b1ee0be048b77675827e",
+    "Section 3": "8efacdf82d9c9541fe4a719336cd1f71f6166fdb6241f3bf1e736d3c1b91e543",
+    "Section 4": "0b65eb43d4dc0590bd1ad973d36c997f78dc9eba7ab9a445c3bbe5daca46506b",
+    "Section 5": "76e22049448654b86540cbccbacd7f25bb3d43eb19d40a45de1e496a6e17c510",
+    "Section 1": "6eab5a4f2857d234ea942e325f40b9929a9547482ac2ec54e1c5576a506474c3",
+    "Section 2": "3b4f54620d1a5b5c8fd5857b26f5f0b63c5af932af01fd38e79787e843cecc4e",
+    "Section 6": "6b54d00b354d5523c8f2e91f8c796cf03ac9d7b0218053fe325da1d484080978",
+    "Section 7": "4850e4c48f05ed61c444bc672813c4fc3f7af0013afa3e8137a7fc909f20ad1f",
     "Ethical Statement": "7be82c0bce18ca086ce80905a6b17dcc17a17ce88f8a987ffe84736f9a30060e",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
-    "Section 3": "59fb7313ae8bbc0b796946ca9da96602d5b5822ea0a32dbe7f0283d107960f10",
-    "Section 4": "72841a488d20b4c60dc32648af1b5dfb03c48d78dc7c777878aa8e7ecc1de688",
-    "Section 5": "b154cbb41c130c0521b7307dbe228f80f365ffafc3f75abb16f682036c0f7474",
-    "Section 1": "ec78df12b26823ca5ddbf9433c0144656c4920943549c4cedfc081c33bf7829b",
-    "Section 2": "33b366b9d5d276e3108d5b60069e641829733c5f96e8878951ddf0df3fd08f2c",
-    "Section 6": "0fe39e24eda7cef7c38d5e38513c5427390aaed4f6ed0a03715829f470648629",
-    "Section 7": "4c5b17b09842cc78cac227d4acb6265d131d9ed1b745b3058f1d3ddf8b7d1f3b",
+    "Section 3": "d9c45416a349fb5b0ebdb2cab98ff4055f5784a41419d04d78acae0ed8d1f62c",
+    "Section 4": "f491ef623179472e97f263be2b9508e48a40385b0fd311e64f98159b276939d3",
+    "Section 5": "a513dacddb9e468b3264d25c232dcc0f814ea36406e95f3291b3b3e3b4fbccd3",
+    "Section 1": "a291bdf38878b9ba1dd4d6046cf447309660ceb790c044fcdb165d7eb2a92d1a",
+    "Section 2": "d7f0d84bb20c05f0f452ec6963322183d039d97b40cefac02ae63a89cae83bf1",
+    "Section 6": "899c0e004f8dd51481d36600a6d48e3e43c89565ec8e7d3125766761e02a0ab9",
+    "Section 7": "e9e1811076f9bbf6e89abb2974cb1f075e9764e015515755dd0bee67902d04cf",
     "Ethical Statement": "33ff3f8c331b9377cb811fe907a3156da992363b47c07191f7c66b9db92d718d",
 }
 
@@ -309,7 +309,7 @@ REQUIRED_SECTION_ORDER = (
     "Introduction",
     "Related Work",
     "The Reasoning-Time Evaluation Gap",
-    "Visible Routes and an Unidentified Mechanism",
+    "Visible Routes Back to the Old Answer",
     "A Chain-Local Causal Control Point",
     r"Discussion \& Limitations",
     "Conclusion",
@@ -334,11 +334,11 @@ AUDITED_SECTION_SPECS = (
     {
         "label": "Section 3",
         "title": "The Reasoning-Time Evaluation Gap",
-        "end_title": "Visible Routes and an Unidentified Mechanism",
+        "end_title": "Visible Routes Back to the Old Answer",
     },
     {
         "label": "Section 4",
-        "title": "Visible Routes and an Unidentified Mechanism",
+        "title": "Visible Routes Back to the Old Answer",
         "end_title": "A Chain-Local Causal Control Point",
     },
     {
@@ -1337,7 +1337,7 @@ def check_section4_requirements(
         # so demoting the claim, with every qualifier still attached to it, is
         # the direction the honesty rule allows.
         "Visible In-Chain Routes",
-        "The Chain-Routing Hypothesis and a Failed Replay Vehicle",
+        "The Chain-Routing Hypothesis",
         "The Length-Only Account",
         "CLR-Stratified Enrichment and a Dose-Limited Boundary Test",
     )
@@ -1405,7 +1405,6 @@ def check_section4_requirements(
         # ("B2 共主"); calling its contrast secondary demoted our own harm finding.
         "the pre-registered co-primary harm endpoint",
         "did not yield detectable confirmatory RR repair",
-        "Neither observation identifies natural-chain mediation",
         "the test behind our chain-local causal control point",
     )
     # COVERAGE: detail whose absence from the body costs a reader precision but
@@ -1476,23 +1475,23 @@ def check_section4_requirements(
                 f"Section 4 {label} state is {observed!r}, expected {expected!r}"
             )
 
-    # Official failure, component decomposition, and post-hoc diagnosis must
-    # stay in that order; the independent Section 5 firewall follows them.
+    # W4/C4 moved the component decomposition (14/18, 12/18, 13/18, 1/5 and
+    # the replay-judge kappa) to the supplement's vehicle-audit section; the
+    # body keeps the official failure, the withdrawal, the supplement pointer
+    # that names the non-rescuing audit, the terminal ruling, and the
+    # independent Section 5 firewall, in that order.
     ordered_targets = (
         "9/18",
-        "14/18",
-        "12/18",
+        "we withdraw the planned natural-chain mediation claim",
         "non-rescuing post-hoc audit",
-        "13/18",
-        "1/5",
         "neither confirmed nor refuted",
         "its controls do not route through replay",
     )
     offsets = [visible.find(target) for target in ordered_targets]
     if any(offset < 0 for offset in offsets) or offsets != sorted(offsets):
         errors.append(
-            "Section 4 X1 disclosure order must be FAIL -> decomposition -> "
-            "non-rescuing diagnosis -> terminal ruling -> replay-independent controls"
+            "Section 4 X1 disclosure order must be FAIL -> withdrawal -> "
+            "non-rescuing pointer -> terminal ruling -> replay-independent controls"
         )
 
     # High-risk length claims must retain their reviewed source identities.
@@ -1521,10 +1520,8 @@ def check_section4_requirements(
             ".958",
             "answer-only membership gate",
         ),
-        "/x1_replay_gate/judge_agreement/fleiss_kappa": (
-            ".9195",
-            "replay answer judges",
-        ),
+        # W4/C4: the replay-judge kappa (.9195) moved to the supplement's
+        # vehicle-audit section with the decomposition it qualifies.
     }
     section_lines = section_text.splitlines()
     for pointer, (display, context) in kappa_specs.items():
@@ -1580,7 +1577,9 @@ def check_narrative_section_requirements(
                 "Section 1 must close on the chain-local causal control point"
             )
     elif section_label == "Section 2":
-        if "Four properties are not addressed jointly" not in visible:
+        # W4/C7-A7: positive word order; still a boundary statement, not a
+        # priority claim.
+        if "four properties the work above does not address jointly" not in visible:
             errors.append(
                 "Section 2 must state the four-property boundary, not a priority claim"
             )
