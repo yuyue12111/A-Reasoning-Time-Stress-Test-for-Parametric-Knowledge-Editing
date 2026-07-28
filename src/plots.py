@@ -490,12 +490,16 @@ def _fig1_data(results: dict[str, Any], rec: SourceMap) -> tuple[list[dict[str, 
         transform="regex extract headline n=187",
         role="caption",
     )
-    match = re.search(r"headline.*?n=187", note)
-    rec.invariant("Llama-70B headline n", match is not None, "_70b_note explicitly records headline n=187")
-    ns["Llama-70B"] = 187
+    # W3-3/0.  The pattern used to bake 187 into itself and the derived call
+    # compared the literal 187 to the literal 187, so a note recording a
+    # different headline n would still have passed.  Parse the digits out.
+    match = re.search(r"headline.*?n=(\d+)", note)
+    rec.invariant("Llama-70B headline n", match is not None, "_70b_note explicitly records a headline n")
+    parsed_n = int(match.group(1)) if match else None
+    ns["Llama-70B"] = parsed_n
     rec.derived(
         source_path=_json_path(note_path),
-        raw_value=187,
+        raw_value=parsed_n,
         rendered="n=187",
         transform="regex from headline n in _70b_note",
         expected=187,
@@ -513,11 +517,10 @@ def fig1_capability(results: dict[str, Any]) -> None:
         == [("Qwen", "32B"), ("Llama", "70B")],
         "only Qwen-32B and Llama-70B are highlighted",
     )
-    rec.invariant(
-        "categorical panel A",
-        True,
-        "six checkpoint estimates are drawn independently; no line connects checkpoints",
-    )
+    # W3-3/0.  This was the literal True, recorded before any axes existed, so it
+    # could not observe the thing it named.  The check now runs after panel A is
+    # drawn and asserts the count and the absence of a connecting line.
+    _CATEGORICAL_PANEL_CHECK = ("categorical panel A", len(checkpoints) == 6)
 
     fig = plt.figure(figsize=(7.20, 3.55), constrained_layout=True)
     grid = fig.add_gridspec(1, 2, width_ratios=[1.13, 1.0], wspace=0.12)
@@ -574,6 +577,13 @@ def fig1_capability(results: dict[str, Any]) -> None:
         va="bottom",
         color=N_MID,
         fontsize=9,
+    )
+    connectors = [line for line in ax_a.get_lines() if line.get_linestyle() not in {"None", "none", " "}
+                  and len(line.get_xdata()) > 2]
+    rec.invariant(
+        _CATEGORICAL_PANEL_CHECK[0],
+        _CATEGORICAL_PANEL_CHECK[1] and not connectors,
+        "six checkpoint estimates are drawn independently; no line connects checkpoints",
     )
     _clean_axis(ax_a, grid_axis="y")
 
@@ -764,9 +774,11 @@ def fig2_mechanism(results: dict[str, Any]) -> None:
         raw_agreement.startswith("111/123"),
         "123 equals three pairwise comparisons for 41 panels",
     )
+    # W3-3/0.  The old condition compared a literal tuple to the literal it was
+    # built from.  Ask the recorder what was actually read instead.
     rec.invariant(
         "authoritative source only",
-        _json_path(cloze_base).startswith("rq2_logitlens."),
+        all(not entry["json_path"].startswith("logitlens") for entry in rec.entries),
         "Fig. 2 does not access the superseded top-level logitlens block",
     )
 
@@ -1082,11 +1094,6 @@ def fig3_rq3(results: dict[str, Any]) -> None:
         role="caption",
     )
     rec.invariant("forest rows", len(rows) == 6, "four comparisons against N plus two specificity contrasts")
-    rec.invariant(
-        "strict endpoint excluded",
-        True,
-        "RRs is intentionally absent from this figure and remains a text/table endpoint",
-    )
 
     fig, axes = plt.subplots(
         1,
@@ -1097,10 +1104,23 @@ def fig3_rq3(results: dict[str, Any]) -> None:
         gridspec_kw={"wspace": 0.05},
     )
     y_positions = [6.0, 5.0, 4.0, 3.0, 1.35, 0.35]
-    for ax, metric, title, xlim in [
+    panels = [
         (axes[0], "es", r"$\Delta$ generative ES at $B_3$", (-0.325, 0.235)),
         (axes[1], "rr", r"$\Delta$ permissive RR at $B_3$", (-0.215, 0.175)),
-    ]:
+    ]
+    # W3-3/0.  This invariant used to be the literal True, so it passed whatever
+    # the figure plotted and asserted the opposite of what supplement.tex holds:
+    # the GATE there blocks this figure from shipping *until* it carries a
+    # strict-displacement panel.  The condition now reads the panels and the rows,
+    # so it reports the figure's real state and flips when the panel is added.
+    plotted = {metric for _, metric, _, _ in panels}
+    rec.invariant(
+        "strict endpoint still missing, so this figure is not shippable",
+        "rrs" not in plotted and all("rrs" not in row for row in rows),
+        "neither the rows nor the panels carry RRs; supplement.tex blocks this "
+        "figure until a strict-displacement panel exists",
+    )
+    for ax, metric, title, xlim in panels:
         ax.axhspan(2.55, 6.48, color=PALE_NEUTRAL, zorder=0)
         ax.axhspan(-0.10, 1.80, color=PALE_BAND, zorder=0)
         ax.axvline(0, color=N_DARK, linewidth=0.8, linestyle=(0, (2, 2)))

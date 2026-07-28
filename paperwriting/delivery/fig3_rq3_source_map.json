@@ -369,9 +369,9 @@
       "detail": "four comparisons against N plus two specificity contrasts"
     },
     {
-      "name": "strict endpoint excluded",
+      "name": "strict endpoint still missing, so this figure is not shippable",
       "status": "PASS",
-      "detail": "RRs is intentionally absent from this figure and remains a text/table endpoint"
+      "detail": "neither the rows nor the panels carry RRs; supplement.tex blocks this figure until a strict-displacement panel exists"
     }
   ],
   "mismatches": [],

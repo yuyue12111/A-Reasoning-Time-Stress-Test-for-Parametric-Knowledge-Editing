@@ -8,11 +8,11 @@ population and its denominator at once.
 
 | section | sentences | mean roles | 4+ roles | mean words | longest |
 |---|---:|---:|---:|---:|---:|
-| Introduction | 22 | 0.91 | 0 | 24.9 | 60 |
+| Introduction | 22 | 0.91 | 0 | 25.1 | 60 |
 | Related Work | 16 | 0.62 | 1 | 24.7 | 60 |
-| The Reasoning-Time Evaluation Gap | 60 | 1.12 | 2 | 22.4 | 58 |
+| The Reasoning-Time Evaluation Gap | 60 | 1.12 | 2 | 22.7 | 58 |
 | Visible Routes and an Unidentified Mechanism | 41 | 1.17 | 0 | 24.6 | 57 |
-| A Chain-Local Causal Control Point | 59 | 1.25 | 1 | 26.2 | 61 |
+| A Chain-Local Causal Control Point | 59 | 1.25 | 1 | 26.3 | 61 |
 | Discussion & Limitations | 13 | 0.46 | 0 | 23.5 | 47 |
 | Conclusion | 3 | 1.00 | 0 | 28.3 | 56 |
 | Ethical Statement | 8 | 0.75 | 0 | 22.6 | 41 |

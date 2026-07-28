@@ -379,7 +379,7 @@
     {
       "name": "Llama-70B headline n",
       "status": "PASS",
-      "detail": "_70b_note explicitly records headline n=187"
+      "detail": "_70b_note explicitly records a headline n"
     },
     {
       "name": "highlight set",

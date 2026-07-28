@@ -42,33 +42,33 @@ APPROVED_PREAMBLE_SHA256 = (
     "6d9e90c1d65f8dc77a054e9c01aa69bf42c6663cb535e8a1a31830bdcd041c88"
 )
 APPROVED_REFS_SHA256 = (
-    "9148dfd515b5dfbefb3ae31dfcc7c023cbf0cfc43c82074d084c2b53fb5d1912"
+    "f47c4ec7ed83e158591f003d568fdab286ad0c3609c6dfbf0cf0922983f69eeb"
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
-    "Section 3": "1e534ff81b167020d64213dcdbf3cd39e3a4caa524f405fefa1b9713fbf81833",
+    "Section 3": "1b84beb263b7004a281f139180979c582e42bbff7290c65f627e0ac8937037a3",
     "Section 4": "bd38d794b03c8f5f92f195c023edf40451aa1c372ef079f95659c68949fa1070",
-    "Section 5": "9a84f9e97ac2da99ab745a3dcf164d16bfe2d41505726c8442c94c69e3b7b7de",
-    "Section 1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "Section 5": "d2b25dc170bfc5e27215d94622ee7c975eab0a514ee3e3f87cff29cda56633a8",
+    "Section 1": "8998f5373a7600956aaee44289c5355d1949a9e663e296364e44edbf21590007",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 6": "ec1920efdf517af8485204281892ad7ecee5ff46a64f203229ad679dfece08d0",
     "Section 7": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Ethical Statement": "7c27178fa8e3df265d432105bc74d3b4fa47fe1dca8094a9695dc90cb4b8dbf2",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
-    "Section 3": "511e8ea58143c88673bf26ad9736a1f31244b44f35d2efb489d273667823c6d1",
+    "Section 3": "3f936729eafc04f6de3f6d621d0fc5d48cfc16e4746d6c3c6fa13ae8e3c12114",
     "Section 4": "1c57f22db7c39531fe94b27f854e5588a3dae93a5f7304a820fa0d4ab0c327f7",
-    "Section 5": "e66938fbf20fb463e3c43ed014cb635048d5cee6401b9f445c721cdb222e30db",
-    "Section 1": "30689b87d8eeadf11f1a8a99d2e21c240fca92ee4658816ff353b257fbb9b458",
+    "Section 5": "8fc6ed131cda504cd2826fa6ae524944916626c62d2467cb4fee4baa653d1dcf",
+    "Section 1": "fae77dc287aa2b5f38b89610b272fd98210ec683ea3ddd4ed272cddd75af681f",
     "Section 2": "f724d58ed58fb90736b73ae9f87c82aaffe1e72d35db300078fd6d91459652a4",
     "Section 6": "75fe3e0f98254e687a27bb1b3d1f4565cad2ff66d359df8091f922c01316472c",
     "Section 7": "6efab28353b94766eeacc7870bc37ef4a8373069f256b1ee0be048b77675827e",
     "Ethical Statement": "7be82c0bce18ca086ce80905a6b17dcc17a17ce88f8a987ffe84736f9a30060e",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
-    "Section 3": "ea847fffc9d9172679a66862d72735f890349125f5dc5499ef909d6aefc02e62",
+    "Section 3": "fb5db70ece448a46bb31f725703eac5b2b49439f355d2ecf18d5cdd2b2662985",
     "Section 4": "5b996ede489faf8cb72c22e8cc462d75e2d2af15493588fcd05d5859badd8391",
-    "Section 5": "fa29d9afd0c7208d0255da4eb5d9ebd6306df035bca61d1d5650cf0a9eb40c6e",
-    "Section 1": "d19cdb476ff85031ea42b1362e461811ce8323c675b0f2eb94980270b2a0d320",
+    "Section 5": "51d52e4df491c674955b0a3786d7783f07614ea6769d882fb1a8c8da4a6578fc",
+    "Section 1": "d63395bba6a0655c2ceaada018b6af3e6980be2e037c86974d1f9d4abf755488",
     "Section 2": "7a574ad49c2b8e9f83deb00d20d00883a5ef294d6119261f844253df9f9400d7",
     "Section 6": "bf8fbb8f56a0edd23680412f04d2fd0f5efe492b3c07cbf875b3fbceda6b124c",
     "Section 7": "4c5b17b09842cc78cac227d4acb6265d131d9ed1b745b3058f1d3ddf8b7d1f3b",
@@ -1294,7 +1294,7 @@ def check_section3_requirements(section_text: str, errors: list[str]) -> None:
     # D1/D2/D8 surface gates.
     debt_targets = {
         "D1": ("all six fixed-checkpoint cells", "paired case-bootstrap intervals"),
-        "D2": ("87", "120", "rate limits", "shared-bias risk"),
+        "D2": ("votes for 87 of 120 stratified items", "rate limits", "shared-bias risk"),
         "D8": ("fixed short canned thought", "three fixed seeds", "complete-case ES drop"),
     }
     for debt, targets in debt_targets.items():
@@ -1814,7 +1814,15 @@ def check_marginal_denominator_identities(
 
 
 def check_unaudited_section_numbers(main_text: str, errors: list[str]) -> None:
-    """Reject numbers in sections whose occurrence-level ledgers have not landed."""
+    """Reject numbers in sections whose occurrence-level ledgers have not landed.
+
+    W3-3/0: every region this built was in ``AUDITED_SECTION_TITLES``, so the
+    loop skipped all of them and the gate examined nothing while the success
+    banner reported it as a pass.  Every section now carries a ledger, which is
+    the good outcome -- but the check has to say so rather than pretend to work,
+    so it now fails when a section appears that no audit spec covers, and the
+    banner names what actually ran.
+    """
 
     numbered_markers = [
         rf"\section{{{title}}}" for title in REQUIRED_SECTION_ORDER
@@ -1830,6 +1838,9 @@ def check_unaudited_section_numbers(main_text: str, errors: list[str]) -> None:
             end_marker = ethical_marker
         regions.append((title, start_marker, end_marker))
     regions.append(("Ethical Statement", ethical_marker, bibliography_marker))
+
+    if not AUDITED_SECTION_TITLES:
+        errors.append("no section is audited; the ledger machinery is not wired up")
 
     for title, start_marker, end_marker in regions:
         if title in AUDITED_SECTION_TITLES:
@@ -2036,12 +2047,37 @@ def check_supplement_promises(main_path: Path, errors: list[str]) -> None:
                 f"'% Discharges:' quote(s), must be exactly one: ...{context}"
             )
 
-    sections = re.findall(r"^\\section\{", text, flags=re.M)
-    markers = re.findall(r"^% (?:Discharges|Supports):", text, flags=re.M)
-    if len(sections) > len(markers):
+    # W3-3/0.  Counting sections against markers said nothing about where a
+    # marker sat or whether the section under it had any content: an empty
+    # \section{Figures} carrying a correct marker passed, which is the state
+    # this check was written to make impossible.  Parse the spans instead.
+    starts = [m.start() for m in re.finditer(r"^\\section\{", text, flags=re.M)]
+    titles = re.findall(r"^\\section\{([^{}]*)\}", text, flags=re.M)
+    bounds = starts + [len(text)]
+    for index, (title, start) in enumerate(zip(titles, starts)):
+        span = text[start:bounds[index + 1]]
+        if not re.search(r"^% (?:Discharges|Supports):", span, flags=re.M):
+            errors.append(
+                f"supplement.tex section {title!r} carries no "
+                "'% Discharges:'/'% Supports:' marker"
+            )
+        prose = re.sub(r"^%.*$", "", span, flags=re.M)
+        prose = re.sub(r"^\\section\{[^{}]*\}", "", prose).strip()
+        prose = re.sub(r"\\end\{document\}", "", prose).strip()
+        if len(prose.split()) < 15:
+            errors.append(
+                f"supplement.tex section {title!r} discharges a promise with "
+                f"{len(prose.split())} words of content; a section that ships "
+                "empty is a broken promise, not a formatting detail"
+            )
+    orphans = [
+        m.start()
+        for m in re.finditer(r"^% (?:Discharges|Supports):", text, flags=re.M)
+        if not starts or m.start() < starts[0]
+    ]
+    if orphans:
         errors.append(
-            f"supplement.tex has {len(sections)} numbered section(s) but only "
-            f"{len(markers)} carry a '% Discharges:'/'% Supports:' marker"
+            f"supplement.tex has {len(orphans)} marker(s) before any \\section"
         )
 
     stated = re.search(r"discharges the ([a-z]+) places", text)
@@ -2244,7 +2280,7 @@ def main() -> int:
 
     print(
         "PASS: frozen title/abstract, adjacent template copies, full-manuscript "
-        "language gates, unaudited-section numeric gates, "
+        "language gates, "
         f"Section 3 RJ ledger ({section_counts.get('Section 3', 0)} occurrences), "
         f"Section 4 RJ ledger ({section_counts.get('Section 4', 0)} occurrences), "
         f"Section 5 RJ ledger ({section_counts.get('Section 5', 0)} occurrences), "
