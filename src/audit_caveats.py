@@ -142,6 +142,9 @@ def snapshot(main_text: str) -> list[dict[str, str]]:
     return out
 
 
+COMPARE_AGAINST: list[str] = [""]
+
+
 def compare(before: list[dict], after: list[dict], moves: dict[str, str]) -> int:
     before_ids = {entry["id"]: entry for entry in before}
     after_ids = {entry["id"]: entry for entry in after}
@@ -165,6 +168,18 @@ def compare(before: list[dict], after: list[dict], moves: dict[str, str]) -> int
         if successor and successor in after_ids:
             print(f"  reworded {entry['id']} -> {successor}: {after_ids[successor]['text'][:70]}")
             continue
+        # A caveat can survive while ceasing to look like one: drop an
+        # unsupported inference from a sentence and the remaining statement of
+        # fact carries no hedge marker, so the fingerprint set loses it.  The
+        # map may therefore name a verbatim quote instead of an id, but the
+        # quote has to be in the manuscript -- the editor points at real text or
+        # the clause counts as lost.
+        if successor and successor.startswith("STATED_WITHOUT_HEDGE:"):
+            quote = successor.split(":", 1)[1].strip()
+            if quote and quote in COMPARE_AGAINST[0]:
+                print(f"  de-hedged {entry['id']}: {quote[:70]}")
+                continue
+            print(f"  MAPPED QUOTE NOT IN MANUSCRIPT for {entry['id']}: {quote[:70]}")
         unaccounted.append(entry)
 
     if fresh:
@@ -194,6 +209,7 @@ def main() -> int:
         before = json.loads(Path(args.compare[0]).read_text(encoding="utf-8"))
         after = json.loads(Path(args.compare[1]).read_text(encoding="utf-8"))
         moves = json.loads(Path(args.map).read_text(encoding="utf-8")) if args.map else {}
+        COMPARE_AGAINST[0] = visible(strip_comments(Path(args.main).read_text(encoding="utf-8")))
         return compare(before, after, moves)
 
     entries = snapshot(Path(args.main).read_text(encoding="utf-8"))

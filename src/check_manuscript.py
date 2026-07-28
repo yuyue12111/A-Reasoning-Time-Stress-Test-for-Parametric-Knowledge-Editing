@@ -47,7 +47,7 @@ APPROVED_REFS_SHA256 = (
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
     "Section 3": "1b84beb263b7004a281f139180979c582e42bbff7290c65f627e0ac8937037a3",
     "Section 4": "bd38d794b03c8f5f92f195c023edf40451aa1c372ef079f95659c68949fa1070",
-    "Section 5": "d2b25dc170bfc5e27215d94622ee7c975eab0a514ee3e3f87cff29cda56633a8",
+    "Section 5": "d4b0f54a5f2ee2d943980d2ab342653cdba7762d5fbe3cee52bbccbc5d7260eb",
     "Section 1": "8998f5373a7600956aaee44289c5355d1949a9e663e296364e44edbf21590007",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 6": "ec1920efdf517af8485204281892ad7ecee5ff46a64f203229ad679dfece08d0",
@@ -57,7 +57,7 @@ APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
 APPROVED_SECTION_VISIBLE_SHA256 = {
     "Section 3": "3f936729eafc04f6de3f6d621d0fc5d48cfc16e4746d6c3c6fa13ae8e3c12114",
     "Section 4": "1c57f22db7c39531fe94b27f854e5588a3dae93a5f7304a820fa0d4ab0c327f7",
-    "Section 5": "8fc6ed131cda504cd2826fa6ae524944916626c62d2467cb4fee4baa653d1dcf",
+    "Section 5": "1038f93f26aef59d09942f8a8b1f6c7cd745c9bd98369af11ffd95155e904e9a",
     "Section 1": "fae77dc287aa2b5f38b89610b272fd98210ec683ea3ddd4ed272cddd75af681f",
     "Section 2": "f724d58ed58fb90736b73ae9f87c82aaffe1e72d35db300078fd6d91459652a4",
     "Section 6": "75fe3e0f98254e687a27bb1b3d1f4565cad2ff66d359df8091f922c01316472c",
@@ -67,7 +67,7 @@ APPROVED_SECTION_VISIBLE_SHA256 = {
 APPROVED_SECTION_SOURCE_SHA256 = {
     "Section 3": "fb5db70ece448a46bb31f725703eac5b2b49439f355d2ecf18d5cdd2b2662985",
     "Section 4": "5b996ede489faf8cb72c22e8cc462d75e2d2af15493588fcd05d5859badd8391",
-    "Section 5": "51d52e4df491c674955b0a3786d7783f07614ea6769d882fb1a8c8da4a6578fc",
+    "Section 5": "20c8fee81f0d9b2d3d626988c13bb05dc90d748afad19e19fd2c4c934693aada",
     "Section 1": "d63395bba6a0655c2ceaada018b6af3e6980be2e037c86974d1f9d4abf755488",
     "Section 2": "7a574ad49c2b8e9f83deb00d20d00883a5ef294d6119261f844253df9f9400d7",
     "Section 6": "bf8fbb8f56a0edd23680412f04d2fd0f5efe492b3c07cbf875b3fbceda6b124c",
@@ -1271,6 +1271,7 @@ def check_section3_requirements(section_text: str, errors: list[str]) -> None:
         "available-case Cohen's",
         "inter-judge Fleiss'",
         "not mathematical bounds",
+        "a think-span processor is inactive when the think span is empty",
         "fixed short canned thought, not a length-matched filler",
         "These fixed seeds do not identify a sampling-seed population.",
         "not a second independent trend line",
@@ -1630,14 +1631,26 @@ def check_section5_requirements(
     required_strings = (
         # The frozen protocol names T-P, not T-N, as the primary contrast.
         "The primary contrast was fixed in advance as T versus P",
-        "before any suppressed arm ran",
+        # W3-3.  The old string asserted the protocol predated *every* suppressed
+        # arm.  It did not: experiments/probe32b_sup.yaml (the treated arm, penalty
+        # 8) is commit 5193ba2 of 2026-06-24 and prereg-esup.md with its donor list
+        # is 2420cb8 of 2026-06-28, four days later, and the prereg's own lock line
+        # claims only "earlier than any D/P GPU result".  What the protocol did fix
+        # ahead of the data -- the comparator and the sign order -- is what the gate
+        # now protects.
+        "before the placebo and direction arms ran",
         "so the reading does not turn on which control the treated arm is measured against",
         # Anti-tautology defenses.
         "nothing is penalized in the answer text",
         "extending the same penalty to the answer span",
         "manipulation check on whether the penalty acted inside the span, not an outcome",
         # Treatment-independent gate, without borrowing the MEMIT audit.
-        "the think span is empty, so a think-scoped processor has nothing to act on",
+        # W3-3/2C.  Section 3.1 is the canonical statement of why conditioning on
+        # zero-thinking success is treatment-independent; Section 5 said it a second
+        # time in different words.  The reason is now required where it is defined
+        # (Section 3) and the claim plus its cross-reference is what Section 5 must
+        # carry, so the protection survives the de-duplication.
+        "treatment-independent by construction",
         "belongs to the MEMIT replication",
         "has no changed-row audit of its own",
         # Dose ladder without an ordered-trend claim.
@@ -1656,7 +1669,12 @@ def check_section5_requirements(
         "That interval reaches zero.",
         "paired cases clearing the zero-thinking gate in both arms",
         "unadjusted and we claim no correction",
-        "without multiplicity adjustment, and we claim none",
+        # W3-3/2C.  The paper said "unadjusted, and we claim none" three times: here,
+        # in Section 5.4 over the p values, and in the battery caption over the
+        # intervals.  The two specific statements are the ones a reader needs beside
+        # the quantities they govern, and both are required below, so the general
+        # third statement no longer earns its line.
+        "Intervals are unadjusted for multiplicity",
         # The battery's own scope limit, carried from the frozen protocol.
         # W3-2/D.  The old wording of this guard, "every arm here is an
         # intervened condition", was false: arm N penalises nothing and is
@@ -2102,7 +2120,8 @@ def check_supplement_promises(main_path: Path, errors: list[str]) -> None:
 NARRATIVE_LOAD_CEILINGS: dict[str, tuple[float, int]] = {
     "Introduction": (0.95, 0),
     "The Reasoning-Time Evaluation Gap": (1.18, 2),
-    "A Chain-Local Causal Control Point": (1.28, 1),
+    # W3-3 ratchet: 1.254 -> 1.233 after the de-duplication and channel swap.
+    "A Chain-Local Causal Control Point": (1.24, 1),
 }
 
 

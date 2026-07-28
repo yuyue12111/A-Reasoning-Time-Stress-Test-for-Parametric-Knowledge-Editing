@@ -1,0 +1,13 @@
+{
+  "_note": "W3-3 caveat reroutes.  Each key is a clause fingerprint from caveats_w3_3_before.json that no longer appears verbatim; each value is either the fingerprint of the clause that now carries it, or STATED_WITHOUT_HEDGE:<verbatim quote> when the content survives in a sentence that no longer uses a hedge marker.  Nothing here is a deletion: if a caveat had been dropped there would be no successor to name.",
+
+  "edf9610af343efea": "a9b874022958ec89",
+  "25518dfaf623c963": "a9b874022958ec89",
+  "9f90dcc43eb2cf7d": "d994cfb87f515f79",
+  "506843b29de12308": "c601987e529abd62",
+  "3acad4b0633ab9e7": "42d0eba4d8d32280",
+  "8d9307f778c7820f": "a7621e67fc0f0b3b",
+  "4a541fcbda4d3826": "d0c6e7f4f9db7c23",
+
+  "3d6ef1912be2c4bd": "STATED_WITHOUT_HEDGE:the permissive matcher has available-case precision .48 against the judge majority, the strict rule .92"
+}
