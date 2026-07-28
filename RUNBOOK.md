@@ -76,7 +76,7 @@ tail -n1 /tmp/pf_r*.log     # 应 8 行 "本次判 N 存活 M"，无 Traceback/K
 PYTHONPATH=source/EasyEdit python src/prefilter.py --config experiments/pilot.yaml --merge   # 无 GPU，合分片
 # → data/counterfact.prefiltered.jsonl（去重 + 按洗牌序 + 截 2×n=400）
 ```
-存活率预计 40–60%（B0 实测 ~50%）。`--budget B0` 更快但对推理模型可能漏召；默认 **B3**（自然思考）最忠实。
+存活率预计 40–60%。`--budget B0` 更快但对推理模型可能漏召；默认 **B3**（自然思考）最忠实。
 先用 `--limit 16` 跑一遍冒烟（每卡 2 条，~3min）确认 8 卡都点亮、无报错，再去掉 `--limit` 正式跑。
 
 ### 4b layer 扫描（plan §7，**合格线 B0 下 ES≥90% & Locality≥85%，判生成式 ES_b 不判 rewrite_acc**）
