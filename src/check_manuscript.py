@@ -46,8 +46,8 @@ APPROVED_REFS_SHA256 = (
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
     "Section 3": "57ff39b8835a1587ef7eacf580926ba12ecd8b94865da4d8156f0800d82fdc60",
-    "Section 4": "c5fd711d525c1c99058ad7378164cf22a24ab722bc976c1efa3b49f339edd669",
-    "Section 5": "3095811cce670ac2b27c5e45757ff87e96a72d0beaaafb8314637361308715bb",
+    "Section 4": "182e6e2118081164eaff41c7df3536369d83d8f3efa1c0a0b7af891dce95c119",
+    "Section 5": "1eb180662abbf0be65f5c3d2ed96a88f0dda50f02a19d773a806755d85280c5c",
     "Section 1": "dbb9900c53e0decf6b994f16a3977ad895bec4a764be41fca4a1c0f79ac31111",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 6": "a8602fd48b1cfaf5876e3d04efc7a0567c639944e7e906963b7003ce44884514",
@@ -55,22 +55,22 @@ APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
     "Ethical Statement": "7c27178fa8e3df265d432105bc74d3b4fa47fe1dca8094a9695dc90cb4b8dbf2",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
-    "Section 3": "8efacdf82d9c9541fe4a719336cd1f71f6166fdb6241f3bf1e736d3c1b91e543",
-    "Section 4": "0b65eb43d4dc0590bd1ad973d36c997f78dc9eba7ab9a445c3bbe5daca46506b",
-    "Section 5": "76e22049448654b86540cbccbacd7f25bb3d43eb19d40a45de1e496a6e17c510",
+    "Section 3": "3451c9ef1bccd0a2b09f4adb0da02ab82c046eefb5125103a1dd3db63b6b58f0",
+    "Section 4": "fb483ffe7d75b2b7babc49a22ba813078bdcfc41f3d4cf6e1fd1e87e8eec9bae",
+    "Section 5": "9a07d873e9543db1bcf6f1c15d3aa7a9c519d2de5214a5dfd89e2c58a0df508f",
     "Section 1": "6eab5a4f2857d234ea942e325f40b9929a9547482ac2ec54e1c5576a506474c3",
-    "Section 2": "3b4f54620d1a5b5c8fd5857b26f5f0b63c5af932af01fd38e79787e843cecc4e",
-    "Section 6": "6b54d00b354d5523c8f2e91f8c796cf03ac9d7b0218053fe325da1d484080978",
+    "Section 2": "1500f448aa3ff10f807c658227fa3b9e9c617d07e5f117c7f8a31e211e32793c",
+    "Section 6": "98f0061bb776dfa771597aaf0102a3fa6f3450b9ab69b20bd8c70d39ff140926",
     "Section 7": "4850e4c48f05ed61c444bc672813c4fc3f7af0013afa3e8137a7fc909f20ad1f",
     "Ethical Statement": "7be82c0bce18ca086ce80905a6b17dcc17a17ce88f8a987ffe84736f9a30060e",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
-    "Section 3": "d9c45416a349fb5b0ebdb2cab98ff4055f5784a41419d04d78acae0ed8d1f62c",
-    "Section 4": "f491ef623179472e97f263be2b9508e48a40385b0fd311e64f98159b276939d3",
-    "Section 5": "a513dacddb9e468b3264d25c232dcc0f814ea36406e95f3291b3b3e3b4fbccd3",
+    "Section 3": "0789684672c56d9c2afff91969b90f2ae79dd3a4c0d14405d94a30a5ba872e83",
+    "Section 4": "7d2810d3f174db0089a4c2b5202c72ab152b2012e7db506dcc130392d7da140b",
+    "Section 5": "ef1e6c589ffb4d80389e87098717dd65fa3118c9fff66fc52882f5fb2cf1c784",
     "Section 1": "a291bdf38878b9ba1dd4d6046cf447309660ceb790c044fcdb165d7eb2a92d1a",
-    "Section 2": "d7f0d84bb20c05f0f452ec6963322183d039d97b40cefac02ae63a89cae83bf1",
-    "Section 6": "899c0e004f8dd51481d36600a6d48e3e43c89565ec8e7d3125766761e02a0ab9",
+    "Section 2": "52e3af0b742109b7619d0acd374402f96215378713f56c7e85562cebffc1d650",
+    "Section 6": "de429d806cc007476fdcb604321a42149609bad34e475c55de7183c98fda3c64",
     "Section 7": "e9e1811076f9bbf6e89abb2974cb1f075e9764e015515755dd0bee67902d04cf",
     "Ethical Statement": "33ff3f8c331b9377cb811fe907a3156da992363b47c07191f7c66b9db92d718d",
 }
@@ -437,7 +437,9 @@ ALLOWED_TEX_COMMANDS = frozenset(
     }
 )
 ALLOWED_TEX_ENVIRONMENTS = frozenset(
-    {"abstract", "document", "figure*", "table", "table*", "tabular"}
+    # W4/E: the forest ships as a single-column figure (the full-width variant
+    # broke the 7-page body budget), so plain {figure} joins the reviewed set.
+    {"abstract", "document", "figure", "figure*", "table", "table*", "tabular"}
 )
 ALLOWED_TEX_CONTROL_SYMBOLS = frozenset({"%", "&", "(", ")", ",", "\\"})
 BODY_ALLOWED_TEX_COMMANDS = frozenset(
@@ -1668,11 +1670,11 @@ def check_section5_requirements(
         # Dose ladder without an ordered-trend claim.
         "Every suppressed setting leaves the in-span leakage check below the zero-penalty setting",
         "a dose ladder rather than a calibrated dose-response",
-        # M14 marginal-versus-paired reconciliation.  W4/C1 deleted fn11, whose
-        # worked example carried "need not equal differences of arm-wise rates"
-        # and "does not equal"; the reconciliation note now ships in the forest-
-        # figure caption (E4), which must restore the first string here when it
-        # lands.  The run-identity anchor below survives in the body.
+        # M14 marginal-versus-paired reconciliation.  W4/C1 deleted fn11's
+        # worked example; W4/E4 landed the forest figure whose caption now
+        # carries the reconciliation note, restoring the string as promised in
+        # gate-change ledger #9.
+        "need not equal differences of arm-wise rates",
         "is the same Qwen-32B run as the largest Qwen cell",
         # D6 control bounds.
         "compatible with zero; we set no equivalence margin",

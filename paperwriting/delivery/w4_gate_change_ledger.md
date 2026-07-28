@@ -25,3 +25,7 @@
 | 17 | C4 | （非门）§4 路线图删 `a failed replay test`；§4.3 首句 dup `not a length-matched filler` 第二次出现删 | C4/C5-R16；§3.3 保唯一披露（required string 未动） | §4.3 以 At B_3 直接开段；§4.4 fn9 数字提正文、RJ 重排、分母 caveat 留脚注 |
 | 18 | C7-A7 | §2 anchor（:1580）`Four properties are not addressed jointly` → `four properties the work above does not address jointly` | 语序正向化；意图不变：仍是边界陈述、未加任何优先权词（checker 注释同步记载） | 新词面在 §2 What-this-paper-adds 段原位 |
 | 19 | C5-R1 | （非门）§4.1 `.48` 第三次出现删（RJ 条目 R-loose-precision 同删） | R1 收敛 3→2：KEEP fn2（数字包）+ §5.4（论证位） | §4.1 句保留两条 required string（lexical candidacy…/we do not transport…），数字改经 Section 指针到 §3.1 |
+| 20 | E4 | §5 required `need not equal differences of arm-wise rates` 回加（履行 #9 义务）；tab:battery 收缩为 levels 单栏表；54 条对照 RJ 移交 fig3_rq3 source map（RRs 面板令 shipping gate 通过） | E4 落地 | 载体=森林图 caption（含全句）；battery caption 保 `Intervals are unadjusted for multiplicity` 逐字 + 分母句改单表语态 |
+| 21 | E | `ALLOWED_TEX_ENVIRONMENTS` 增 `figure`（单栏） | 全宽森林+全宽主图使正文溢出 7 页预算（实测 9 页）；森林改单栏纵排三面板后合规 | 森林 = 单栏 figure[t!]，源位 §5 preamble（§4 区禁图不可再前移） |
+| 22 | E1 | **偏离砍序**：E1 主图（fig0_protocol）从正文撤下，砍序终档（E4 回退）未执行 | 实测：E4 回退净省 ~140 词 < 缺口 341 词，且牺牲 strict 面板正文在场；撤 fig0（~170 词）+ 定向微削闭合缺口、科学损伤最小。fig0 三格式产物保留（paperwriting/ + manuscript/），供 supplement 7/31 收录 | 计划 session 复审点：若不同意此取舍，备选=恢复 fig0 并执行 E4 回退 + 再削正文 ~200 词 |
+| 23 | C6/挤压 | （非门）§5.2 择控句删 `the abstract's arm-wise levels are not an artifact of that choice` 从句（required string `there the reading does not turn on…` 原词面保留） | 版面闭合所需微削之一；无门锚 | 语义由保留的 required 句 + `; the strict endpoint does` 承载 |

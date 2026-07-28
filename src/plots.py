@@ -563,8 +563,10 @@ def fig1_capability(results: dict[str, Any]) -> None:
     ax_a.set_ylabel(r"Paired ES change  ($\mathrm{ES}_{B_0}-\mathrm{ES}_{B_3}$)")
     ax_a.set_xlabel("Fixed checkpoint (categorical; no interpolation)")
     _panel_title(ax_a, "A", "Direct-answer success after a natural chain")
-    ax_a.text(1.5, 0.205, "Qwen backbone", ha="center", va="top", color=N_DARK, fontsize=9)
-    ax_a.text(5.15, 0.205, "Llama backbone", ha="center", va="top", color=N_DARK, fontsize=9)
+    # W4/E2: 0.205 collided with the panel title row; keep the labels inside
+    # the axes, clear of the title band.
+    ax_a.text(1.5, 0.190, "Qwen backbone", ha="center", va="top", color=N_DARK, fontsize=9)
+    ax_a.text(5.15, 0.190, "Llama backbone", ha="center", va="top", color=N_DARK, fontsize=9)
     ax_a.text(
         -0.43,
         -0.122,
@@ -988,16 +990,19 @@ def _contrast(
     path_base: Sequence[str | int],
     expected_es: list[Any],
     expected_rr: list[Any],
+    expected_rrs: list[Any],
     color: str,
     marker: str,
     group: str,
 ) -> dict[str, Any]:
     es = rec.read(results, (*path_base, "ES"), expected=expected_es)
     rr = rec.read(results, (*path_base, "RR"), expected=expected_rr)
+    rrs = rec.read(results, (*path_base, "RRs"), expected=expected_rrs)
     return {
         "label": label,
         "es": {"point": float(es[0]), "ci": [float(es[1][0]), float(es[1][1])]},
         "rr": {"point": float(rr[0]), "ci": [float(rr[1][0]), float(rr[1][1])]},
+        "rrs": {"point": float(rrs[0]), "ci": [float(rrs[1][0]), float(rrs[1][1])]},
         "color": color,
         "marker": marker,
         "group": group,
@@ -1016,6 +1021,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
             path_base=(*mean_ci, "T_minus_N"),
             expected_es=[0.138, [0.082, 0.194], 0.0],
             expected_rr=[-0.102, [-0.17, -0.042], 0.001],
+            expected_rrs=[-0.051, [-0.102, 0.0], 0.073],
             color=HERO,
             marker="o",
             group="vs N",
@@ -1027,6 +1033,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
             path_base=(*mean_ci, "D_minus_N"),
             expected_es=[-0.217, [-0.289, -0.144], 0.0],
             expected_rr=[0.086, [0.019, 0.152], 0.01],
+            expected_rrs=[0.095, [0.038, 0.162], 0.002],
             color=DIR_DN,
             marker="v",
             group="vs N",
@@ -1038,6 +1045,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
             path_base=(*mean_ci, "P_minus_N"),
             expected_es=[0.015, [-0.046, 0.081], 0.709],
             expected_rr=[0.0, [-0.057, 0.057], 1.0],
+            expected_rrs=[-0.009, [-0.047, 0.028], 0.828],
             color=N_LIGHT,
             marker="s",
             group="vs N",
@@ -1049,6 +1057,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
             path_base=(*crossarm, "C_minus_N"),
             expected_es=[0.0152, [-0.0455, 0.0758], 0.688],
             expected_rr=[0.0, [-0.0561, 0.0561], 1.0],
+            expected_rrs=[-0.0093, [-0.0467, 0.028], 0.8282],
             color=N_MID,
             marker="D",
             group="vs N",
@@ -1060,6 +1069,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
             path_base=(*mean_ci, "T_minus_P"),
             expected_es=[0.122, [0.051, 0.193], 0.002],
             expected_rr=[-0.095, [-0.171, -0.029], 0.01],
+            expected_rrs=[-0.057, [-0.114, -0.01], 0.029],
             color=HERO,
             marker="o",
             group="specificity",
@@ -1071,6 +1081,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
             path_base=(*crossarm, "T_minus_C"),
             expected_es=[0.1212, [0.0505, 0.1919], 0.0004],
             expected_rr=[-0.0943, [-0.1604, -0.0283], 0.0062],
+            expected_rrs=[-0.0566, [-0.1132, -0.0094], 0.0324],
             color=HERO,
             marker="o",
             group="specificity",
@@ -1107,18 +1118,23 @@ def fig3_rq3(results: dict[str, Any]) -> None:
         "four comparisons against N plus two specificity contrasts",
     )
 
+    # W4/E4+cut: single-column stacked layout -- the full-width variant did not
+    # fit the 7-page body budget, and dropping the figure (the sanctioned
+    # fallback) would have cost the strict panel its place in the body.
     fig, axes = plt.subplots(
+        3,
         1,
-        2,
-        figsize=(7.20, 4.15),
+        figsize=(3.3, 4.45),
         sharey=True,
         constrained_layout=True,
-        gridspec_kw={"wspace": 0.05},
+        gridspec_kw={"hspace": 0.04},
     )
     y_positions = [6.0, 5.0, 4.0, 3.0, 1.35, 0.35]
     panels = [
         (axes[0], "es", r"$\Delta$ generative ES at $B_3$", (-0.325, 0.235)),
         (axes[1], "rr", r"$\Delta$ permissive RR at $B_3$", (-0.215, 0.175)),
+        # W4/E4: the strict panel ships or the figure does not (shipping gate).
+        (axes[2], "rrs", r"$\Delta$ strict $RR^s$ at $B_3$ (secondary)", (-0.16, 0.21)),
     ]
     # W3-3.  Two attempts at a "strict endpoint excluded" invariant lived here:
     # the literal True, and then a conjunction over the same literals that built
@@ -1148,41 +1164,42 @@ def fig3_rq3(results: dict[str, Any]) -> None:
                 filled=row["label"] not in {"P − N"},
             )
         ax.set_xlim(*xlim)
-        ax.set_ylim(-0.35, 6.85)
-        ax.set_xlabel("Paired arm difference (95% bootstrap CI)")
-        _panel_title(ax, "A" if metric == "es" else "B", title)
+        ax.set_ylim(-0.35, 7.35)
+        if metric == "rrs":
+            ax.set_xlabel("Paired arm difference (95% bootstrap CI)")
+        _panel_title(ax, {"es": "A", "rr": "B", "rrs": "C"}[metric], title)
         _clean_axis(ax, grid_axis="x")
         ax.text(
             xlim[0] + 0.01 * (xlim[1] - xlim[0]),
-            6.68,
+            7.18,
             "Against no suppression (N)",
             ha="left",
             va="top",
-            fontsize=9,
+            fontsize=7.5,
             fontweight="bold",
             color=N_DARK,
         )
         ax.text(
             xlim[0] + 0.01 * (xlim[1] - xlim[0]),
-            1.70,
+            2.46,
             "Specificity contrasts",
             ha="left",
             va="top",
-            fontsize=9,
+            fontsize=7.5,
             fontweight="bold",
             color=N_DARK,
         )
     axes[0].set_yticks(y_positions, [r["label"] for r in rows])
-    axes[0].tick_params(axis="y", length=0, pad=5)
-    axes[1].tick_params(axis="y", length=0)
+    for ax in axes:
+        ax.tick_params(axis="y", length=0, pad=4)
     fig.text(
         0.5,
-        -0.015,
-        "N none   ·   T suppress old   ·   D suppress new   ·   "
-        "P placebo   ·   C same-relation competitor",
+        -0.012,
+        "N none · T suppress old · D suppress new\n"
+        "P placebo · C same-relation competitor",
         ha="center",
         va="top",
-        fontsize=9,
+        fontsize=7.5,
         color=N_DARK,
     )
 
@@ -1190,22 +1207,131 @@ def fig3_rq3(results: dict[str, Any]) -> None:
 Figure 3: Paired contrast forests for the Qwen-32B five-arm, think-span-only
 intervention at $B_3$. Points and horizontal bars show case-paired mean
 differences and 95% bootstrap confidence intervals for generative edit success
-(ES; left) and permissive answer-level reversion (RR; right). The upper group
-compares suppress-old (T), suppress-new (D), placebo (P), and the same-relation
-strong competitor (C) with no suppression (N); the lower group tests T against P and C.
+(ES; left), permissive answer-level reversion (RR; centre), and the secondary
+strict lexical displacement ($RR^s$; right). The upper group compares
+suppress-old (T), suppress-new (D), placebo (P), and the same-relation strong
+competitor (C) with no suppression (N); the lower group tests T against P and C.
 Arm sizes are N/T/D/P/C = {n_by_arm['N']}/{n_by_arm['T']}/{n_by_arm['D']}/{n_by_arm['P']}/{n_by_arm['C']}.
-Marginal ES provides the descriptive signed ordering
-D (.281) < N (.495) ≈ P (.507) ≈ C (.510) < T (.631); paired contrasts need
-not equal differences of rounded marginal rates. T−N is
-+.138 [.082, .194] for ES and −.102 [−.170, −.042] for RR; T−P and T−C
-are positive for ES and negative for RR with intervals excluding zero.
-The stricter old-without-new endpoint is not plotted and is reported separately
-in the endpoint hierarchy.
+A paired reversion contrast uses the intersection of the two arms' zero-thinking
+gate sets, so its denominator is neither arm's n, and paired differences need
+not equal differences of arm-wise rates. Marginal ES provides the descriptive
+signed ordering D (.281) < N (.495) ≈ P (.507) ≈ C (.510) < T (.631). On the
+strict panel T separates from P and C but not from N; unadjusted p values
+appear in the text. Intervals are unadjusted for multiplicity.
 """
     _save(fig, "fig3_rq3")
     plt.close(fig)
     _write_caption("fig3_rq3", caption)
     rec.write()
+
+
+
+
+def fig0_protocol(results: dict[str, Any]) -> None:
+    """W4/E1+cut2: the protocol story as a single-column schematic.
+
+    No panel reproduces a recorded generation: every label is protocol
+    notation (o_old, o_new, think tags), never model text.  The caption drafts
+    carry zero numbers so the manuscript caption needs no RJ bindings.
+    """
+    del results  # deliberately unused: nothing here may depend on data
+    fig, ax = plt.subplots(figsize=(3.3, 2.28), constrained_layout=True)
+    ax.set_xlim(0, 3.4)
+    ax.set_ylim(-0.09, 2.94)
+    ax.axis("off")
+
+    from matplotlib.patches import FancyBboxPatch
+
+    def box(y, h, title, body, edge):
+        patch = FancyBboxPatch(
+            (0.16, y),
+            3.08,
+            h,
+            boxstyle="round,pad=0.045",
+            linewidth=1.0,
+            edgecolor=edge,
+            facecolor="white",
+        )
+        ax.add_patch(patch)
+        ax.text(
+            0.30,
+            y + h - 0.065,
+            title,
+            ha="left",
+            va="top",
+            fontsize=7.6,
+            fontweight="bold",
+            color=INK,
+        )
+        ax.text(
+            0.30,
+            y + 0.235,
+            body,
+            ha="left",
+            va="top",
+            fontsize=7.4,
+            color=INK,
+        )
+
+    def down_arrow(y0, y1, color, x=0.62):
+        ax.annotate(
+            "",
+            xy=(x, y1),
+            xytext=(x, y0),
+            arrowprops={"arrowstyle": "-|>", "color": color, "linewidth": 1.1},
+        )
+
+    box(
+        2.42,
+        0.44,
+        "One ROME edit, validated then restored",
+        r"$(s,\,r)\colon\; o_{old} \to o_{new}$",
+        N_DARK,
+    )
+    box(
+        1.62,
+        0.44,
+        r"$B_0$ · zero thinking — edit passes",
+        r"<think></think>   answer: $o_{new}$",
+        N_MID,
+    )
+    box(
+        0.82,
+        0.44,
+        r"$B_3$ · native chain — edit undone",
+        r"<think>$\ldots o_{old}\ldots$</think>   answer: $o_{old}$",
+        DIR_DN,
+    )
+    box(
+        0.02,
+        0.44,
+        "T · think-span suppression — restored",
+        r"<think>$\oslash\, o_{old}\ldots$</think>   answer: $o_{new}$",
+        HERO,
+    )
+    down_arrow(2.40, 2.10, N_MID)
+    down_arrow(1.60, 1.30, DIR_DN)
+    down_arrow(0.80, 0.50, HERO)
+    ax.text(
+        0.74,
+        0.635,
+        "answer logits untouched",
+        fontsize=6.8,
+        color=N_MID,
+        ha="left",
+        va="center",
+    )
+
+    caption = """
+Figure 1 (protocol schematic, single column): a single edit validated at zero
+thinking, the same weights reverting after a native chain, and the
+think-span-only suppressor restoring the edited answer.  All labels are
+protocol notation; no panel reproduces a recorded generation, and the caption
+carries no numbers.
+"""
+    _save(fig, "fig0_protocol")
+    plt.close(fig)
+    _write_caption("fig0_protocol", caption)
 
 
 def main() -> None:
@@ -1218,7 +1344,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--only",
-        choices=("all", "fig1", "fig2", "fig3"),
+        choices=("all", "fig0", "fig1", "fig2", "fig3"),
         default="all",
         help="render one figure or the full batch",
     )
@@ -1228,6 +1354,7 @@ def main() -> None:
         results = json.load(handle)
 
     targets = {
+        "fig0": fig0_protocol,
         "fig1": fig1_capability,
         "fig2": fig2_mechanism,
         "fig3": fig3_rq3,

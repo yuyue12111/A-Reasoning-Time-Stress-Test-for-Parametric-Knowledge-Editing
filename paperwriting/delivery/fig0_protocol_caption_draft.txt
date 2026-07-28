@@ -1,0 +1,5 @@
+Figure 1 (protocol schematic, single column): a single edit validated at zero
+thinking, the same weights reverting after a native chain, and the
+think-span-only suppressor restoring the edited answer.  All labels are
+protocol notation; no panel reproduces a recorded generation, and the caption
+carries no numbers.

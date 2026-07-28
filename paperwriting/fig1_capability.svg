@@ -343,10 +343,10 @@ L 183.744812 37.656222
     <text style="font-weight: 700; font-size: 10px; font-family: 'Arial', 'Helvetica Neue', 'Helvetica', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #272727" x="45.741406" y="10.160469" transform="rotate(-0 45.741406 10.160469)">Direct-answer success after a natural chain</text>
    </g>
    <g id="text_20">
-    <text style="font-size: 9px; font-family: 'Arial', 'Helvetica Neue', 'Helvetica', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #4d4d4d" x="90.862137" y="30.651118" transform="rotate(-0 90.862137 30.651118)">Qwen backbone</text>
+    <text style="font-size: 9px; font-family: 'Arial', 'Helvetica Neue', 'Helvetica', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #4d4d4d" x="90.862137" y="39.496193" transform="rotate(-0 90.862137 39.496193)">Qwen backbone</text>
    </g>
    <g id="text_21">
-    <text style="font-size: 9px; font-family: 'Arial', 'Helvetica Neue', 'Helvetica', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #4d4d4d" x="171.199048" y="30.64602" transform="rotate(-0 171.199048 30.64602)">Llama backbone</text>
+    <text style="font-size: 9px; font-family: 'Arial', 'Helvetica Neue', 'Helvetica', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #4d4d4d" x="171.199048" y="39.491095" transform="rotate(-0 171.199048 39.491095)">Llama backbone</text>
    </g>
    <g id="text_22">
     <text style="font-size: 9px; font-family: 'Arial', 'Helvetica Neue', 'Helvetica', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #767676" x="48.38262" y="215.022186" transform="rotate(-0 48.38262 215.022186)">positive = lower edit success after reasoning</text>
