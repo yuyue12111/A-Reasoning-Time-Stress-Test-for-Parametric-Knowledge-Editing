@@ -1020,7 +1020,7 @@ def test_marginal_denominator_identities_reject_drift(
 
 
 def test_section5_subsection_order_is_frozen(candidate_main: Path) -> None:
-    first = r"\subsection{A Signed, Dose-Graded Think-Span Intervention}"
+    first = r"\subsection{A Signed Think-Span Intervention}"
     second = r"\subsection{The Control Point Moves the Untouched Answer}"
     mutate(candidate_main, first, r"\subsection{TEMPORARY-HEADING}")
     mutate(candidate_main, second, first)

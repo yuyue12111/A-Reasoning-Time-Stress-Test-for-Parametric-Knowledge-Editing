@@ -45,8 +45,8 @@ APPROVED_REFS_SHA256 = (
     "f47c4ec7ed83e158591f003d568fdab286ad0c3609c6dfbf0cf0922983f69eeb"
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
-    "Section 3": "1b84beb263b7004a281f139180979c582e42bbff7290c65f627e0ac8937037a3",
-    "Section 4": "63743d778ed14e9fa0e60056cee2b788e669d5a21e7f098c379d7e8e3e417a1d",
+    "Section 3": "a092c2f672072ba73b3b634e1e69be6b4e90ac1b3bfdffbe38a2a9f29bf588fc",
+    "Section 4": "eb503ac155939ac226bf9a71dc47bc328c5847ee6760f1f5c3d843c3f5c2bc14",
     "Section 5": "3667f8a746f82c6b6016ef3f0c091338c835b22300310b84f4051fe7e2bb8cc7",
     "Section 1": "8998f5373a7600956aaee44289c5355d1949a9e663e296364e44edbf21590007",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
@@ -55,22 +55,22 @@ APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
     "Ethical Statement": "7c27178fa8e3df265d432105bc74d3b4fa47fe1dca8094a9695dc90cb4b8dbf2",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
-    "Section 3": "3f936729eafc04f6de3f6d621d0fc5d48cfc16e4746d6c3c6fa13ae8e3c12114",
-    "Section 4": "8021d0dcfad0b1517db232fae9cd67c4171727595017cc47f7081c78c4a2de7d",
-    "Section 5": "55b88e81d0a240af34406e7553d93ad0ebe81c9e78d7f436271825b1010422ca",
+    "Section 3": "f949dc07dc8b7aef2939341f988ea57fb226996c2241d6c3555d0e363b9e20aa",
+    "Section 4": "3813c9734a62fee8c20b0cf8133f494b22ad71a6c118145339e795a5b25600c7",
+    "Section 5": "3d9b60f5936edacbb64722b625d5258c1fee3ee8c10405cd569d76d6a271679d",
     "Section 1": "fae77dc287aa2b5f38b89610b272fd98210ec683ea3ddd4ed272cddd75af681f",
-    "Section 2": "f724d58ed58fb90736b73ae9f87c82aaffe1e72d35db300078fd6d91459652a4",
-    "Section 6": "75fe3e0f98254e687a27bb1b3d1f4565cad2ff66d359df8091f922c01316472c",
+    "Section 2": "b954584c72bfb4ab61bcd9380a4288f333acc172305cb8faaf03f0757a065b87",
+    "Section 6": "2ce2be9f78056dcd53d5973053d83f14b5d7bbaec9532645066675ad863b4871",
     "Section 7": "6efab28353b94766eeacc7870bc37ef4a8373069f256b1ee0be048b77675827e",
     "Ethical Statement": "7be82c0bce18ca086ce80905a6b17dcc17a17ce88f8a987ffe84736f9a30060e",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
-    "Section 3": "fb5db70ece448a46bb31f725703eac5b2b49439f355d2ecf18d5cdd2b2662985",
-    "Section 4": "039f4b54900e9caf2cbe20b1c4b9e1d7020336672d5849e36e5eca7fae16f7d3",
-    "Section 5": "2eb17dc77d4a24cd24086e42edfa5d342c46a98778a357091c146b115095de20",
+    "Section 3": "22603d12ceaeefc86034dee86cd79199362b1095cda1fe8a3db90ae1851dc8ea",
+    "Section 4": "458202725a04c06f2e3ef8a56097b2149558a3aa0f87e71d9be2e8d595a39f3f",
+    "Section 5": "a0be58fdf88c402e7c96cf3395faa331c285ee7af0ea6f584c6628a2dc2c1cd6",
     "Section 1": "d63395bba6a0655c2ceaada018b6af3e6980be2e037c86974d1f9d4abf755488",
-    "Section 2": "7a574ad49c2b8e9f83deb00d20d00883a5ef294d6119261f844253df9f9400d7",
-    "Section 6": "bf8fbb8f56a0edd23680412f04d2fd0f5efe492b3c07cbf875b3fbceda6b124c",
+    "Section 2": "33b366b9d5d276e3108d5b60069e641829733c5f96e8878951ddf0df3fd08f2c",
+    "Section 6": "0fe39e24eda7cef7c38d5e38513c5427390aaed4f6ed0a03715829f470648629",
     "Section 7": "4c5b17b09842cc78cac227d4acb6265d131d9ed1b745b3058f1d3ddf8b7d1f3b",
     "Ethical Statement": "33ff3f8c331b9377cb811fe907a3156da992363b47c07191f7c66b9db92d718d",
 }
@@ -293,15 +293,12 @@ APPROVED_POINTER_PREFIXES = (
 UNSAFE_POINTER_PARTS = ("superseded", "historical", "legacy")
 
 # WRITING_PLAN §5 grants "prospectively specified" only where a dated artifact
-# (SHA-in-artifact, server timestamp, platform log) predates the results.  Each
-# approved manuscript site is listed with the artifact that earns it; anything
-# else must say "pre-specified".
-APPROVED_PROSPECTIVE_LABEL_SITES = frozenset(
-    {
-        # X1 replay: the 18-case manifest SHA was frozen before the gate ran.
-        "prospectively specified attempt",
-    }
-)
+# (SHA-in-artifact, server timestamp, platform log) predates the results.  No
+# current site earns it: the X1 manifest SHA pins the pool's content, not the
+# date it was frozen (W4 gate-truth audit), so the manuscript now describes the
+# pinning itself and this set is empty.  A future artifact-backed site must be
+# added here with the artifact that earns it.
+APPROVED_PROSPECTIVE_LABEL_SITES = frozenset()
 
 NUMERIC_RE = re.compile(
     r"(?<![A-Za-z0-9])[-+\N{MINUS SIGN}]?"
@@ -1295,7 +1292,12 @@ def check_section3_requirements(section_text: str, errors: list[str]) -> None:
     # D1/D2/D8 surface gates.
     debt_targets = {
         "D1": ("all six fixed-checkpoint cells", "paired case-bootstrap intervals"),
-        "D2": ("votes for 87 of 120 stratified items", "rate limits", "shared-bias risk"),
+        "D2": (
+            "votes for 87 of 120 stratified items",
+            "rate limits",
+            "shared-bias risk",
+            "error independence across panels cannot be assessed",
+        ),
         "D8": ("fixed short canned thought", "three fixed seeds", "complete-case ES drop"),
     }
     for debt, targets in debt_targets.items():
@@ -1378,8 +1380,8 @@ def check_section4_requirements(
         "we do not transport that estimate to this pooled census",
         "outcome-conditioned failure surface",
         "non-sufficient for OLD commitment",
-        "one external judge-model family",
-        "prospectively specified attempt",
+        "pinned by a checksummed manifest",
+        "its stop rule recorded in the accompanying protocol document",
         "vehicle-validity gate is permanently Fail",
         "the stop rule prevented the planned semantic-control arms from running",
         "we withdraw the planned natural-chain mediation claim",
@@ -1617,7 +1619,7 @@ def check_section5_requirements(
     visible = normalize_visible(section_text)
 
     expected_subsections = (
-        "A Signed, Dose-Graded Think-Span Intervention",
+        "A Signed Think-Span Intervention",
         "The Control Point Moves the Untouched Answer",
         "What the Placebo and Competitor Arms Bound",
         "Endpoint Hierarchy and Multiplicity",
