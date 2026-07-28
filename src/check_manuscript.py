@@ -35,8 +35,13 @@ FROZEN_TITLE = (
     "Direct-Answer Edit Success Is Not Enough: A Reasoning-Time Stress Test "
     "for Parametric Knowledge Editing"
 )
+# W4/Track F: five reviewer-named edits, each granted in the W4 plan --
+# dose-graded deleted (B1c global), near-null -> separation register, cloze
+# half-sentence and "Yet" dropped with the route bridge kept, the
+# largest-checkpoint-only interval scope added, base drift qualified to that
+# checkpoint as a juxtaposition, and the reverse-signed arm's evidence added.
 FROZEN_ABSTRACT_SHA256 = (
-    "0c85a03e9cd288b45d6f23502caf17b74e84c28dee0f3a2e62f9202ec4b81e5f"
+    "b7830a8531aac7a2fa2673b8d7188342b7ef1def936add95b6a0339a96ed2b09"
 )
 APPROVED_PREAMBLE_SHA256 = (
     "6d9e90c1d65f8dc77a054e9c01aa69bf42c6663cb535e8a1a31830bdcd041c88"
