@@ -11,14 +11,15 @@ population and its denominator at once.
 | Introduction | 22 | 0.91 | 0 | 25.1 | 60 |
 | Related Work | 16 | 0.62 | 1 | 24.7 | 60 |
 | The Reasoning-Time Evaluation Gap | 60 | 1.12 | 2 | 22.7 | 58 |
-| Visible Routes and an Unidentified Mechanism | 41 | 1.17 | 0 | 24.6 | 57 |
-| A Chain-Local Causal Control Point | 59 | 1.22 | 1 | 26.5 | 65 |
+| Visible Routes and an Unidentified Mechanism | 39 | 1.13 | 1 | 25.5 | 63 |
+| A Chain-Local Causal Control Point | 59 | 1.22 | 1 | 26.7 | 65 |
 | Discussion & Limitations | 13 | 0.46 | 0 | 23.5 | 47 |
 | Conclusion | 3 | 1.00 | 0 | 28.3 | 56 |
 | Ethical Statement | 8 | 0.75 | 0 | 22.6 | 41 |
 
 ## The twelve heaviest sentences
 
+* **4 roles, 63 words** — _Visible Routes and an Unidentified Mechanism_ — Within this pool, lexical candidacy is not equivalent to OLD membership by judge majority: Section sec:gap-protocol reports available-case precision .48 for the permissive matcher on its stratified sample and we do not transport that estimate to this pooled census; a separate post-hoc crosswalk finds subject-scrubbed CLR in 13/13 majority-OLD items and 18/20 non-OLD candidates, so within it CLR is non-sufficient for OLD commitment.
 * **4 roles, 60 words** — _Related Work_ — Four properties are not addressed jointly by the work above: a budget-controlled paired contrast on one and the same edit; controls that separate edit-specific erosion from base drift, canned thought, and sampling; symmetric results at the largest fixed checkpoint of two backbone lineages; and a signed, dose-graded intervention confined to the think span that moves an answer it never touches.
 * **4 roles, 33 words** — _A Chain-Local Causal Control Point_ — Paired changes are complete-case within-edit contrasts and need not equal differences of arm-wise rates: edit success moves .495 to .631 arm-wise against a paired +.138, and .495 plus +.138 does not equal .631.
 * **4 roles, 21 words** — _The Reasoning-Time Evaluation Gap_ — ES levels are marginal; drops and intervals are within-case complete-pair estimates and need not equal marginal differences when rows are missing.
@@ -30,4 +31,3 @@ population and its denominator at once.
 * **3 roles, 38 words** — _The Reasoning-Time Evaluation Gap_ — (A) For each of the six fixed checkpoints, the within-case paired drop in generative edit success from zero thinking to a native chain, on a categorical axis; filled markers denote the checkpoints whose 95\% paired interval excludes zero.
 * **3 roles, 32 words** — _A Chain-Local Causal Control Point_ — That replication's fresh no-suppression arm gave a paired ES drop of +.060\,[-.020,.140], which does not itself establish a reasoning-time drop in that cell, so this transfers the intervention and not the gap.
 * **3 roles, 26 words** — _The Reasoning-Time Evaluation Gap_ — At the largest tested checkpoint in each family, the paired ES drops are .106\,[.030,.182] on Qwen-32B and .107\,[.032,.182] on Llama-70B (Figure fig:gap ; Table tab:gap ).
-* **3 roles, 26 words** — _The Reasoning-Time Evaluation Gap_ — Pairing B_0 and B_3 within case and seed gives a complete-case ES drop of .117\,[.067,.169] over 199 of 200 cases and 597 of 600 seed pairs.

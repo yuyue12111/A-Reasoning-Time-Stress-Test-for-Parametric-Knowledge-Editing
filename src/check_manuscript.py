@@ -46,8 +46,8 @@ APPROVED_REFS_SHA256 = (
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
     "Section 3": "1b84beb263b7004a281f139180979c582e42bbff7290c65f627e0ac8937037a3",
-    "Section 4": "bd38d794b03c8f5f92f195c023edf40451aa1c372ef079f95659c68949fa1070",
-    "Section 5": "d4b0f54a5f2ee2d943980d2ab342653cdba7762d5fbe3cee52bbccbc5d7260eb",
+    "Section 4": "63743d778ed14e9fa0e60056cee2b788e669d5a21e7f098c379d7e8e3e417a1d",
+    "Section 5": "3667f8a746f82c6b6016ef3f0c091338c835b22300310b84f4051fe7e2bb8cc7",
     "Section 1": "8998f5373a7600956aaee44289c5355d1949a9e663e296364e44edbf21590007",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 6": "ec1920efdf517af8485204281892ad7ecee5ff46a64f203229ad679dfece08d0",
@@ -56,8 +56,8 @@ APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
     "Section 3": "3f936729eafc04f6de3f6d621d0fc5d48cfc16e4746d6c3c6fa13ae8e3c12114",
-    "Section 4": "1c57f22db7c39531fe94b27f854e5588a3dae93a5f7304a820fa0d4ab0c327f7",
-    "Section 5": "1038f93f26aef59d09942f8a8b1f6c7cd745c9bd98369af11ffd95155e904e9a",
+    "Section 4": "8021d0dcfad0b1517db232fae9cd67c4171727595017cc47f7081c78c4a2de7d",
+    "Section 5": "55b88e81d0a240af34406e7553d93ad0ebe81c9e78d7f436271825b1010422ca",
     "Section 1": "fae77dc287aa2b5f38b89610b272fd98210ec683ea3ddd4ed272cddd75af681f",
     "Section 2": "f724d58ed58fb90736b73ae9f87c82aaffe1e72d35db300078fd6d91459652a4",
     "Section 6": "75fe3e0f98254e687a27bb1b3d1f4565cad2ff66d359df8091f922c01316472c",
@@ -66,8 +66,8 @@ APPROVED_SECTION_VISIBLE_SHA256 = {
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
     "Section 3": "fb5db70ece448a46bb31f725703eac5b2b49439f355d2ecf18d5cdd2b2662985",
-    "Section 4": "5b996ede489faf8cb72c22e8cc462d75e2d2af15493588fcd05d5859badd8391",
-    "Section 5": "20c8fee81f0d9b2d3d626988c13bb05dc90d748afad19e19fd2c4c934693aada",
+    "Section 4": "039f4b54900e9caf2cbe20b1c4b9e1d7020336672d5849e36e5eca7fae16f7d3",
+    "Section 5": "2eb17dc77d4a24cd24086e42edfa5d342c46a98778a357091c146b115095de20",
     "Section 1": "d63395bba6a0655c2ceaada018b6af3e6980be2e037c86974d1f9d4abf755488",
     "Section 2": "7a574ad49c2b8e9f83deb00d20d00883a5ef294d6119261f844253df9f9400d7",
     "Section 6": "bf8fbb8f56a0edd23680412f04d2fd0f5efe492b3c07cbf875b3fbceda6b124c",
@@ -1367,7 +1367,11 @@ def check_section4_requirements(
         "no control, no interval",
         "close to tautological",
         "conditional on the selected reversion sample",
-        "supplement names the missing per-item artifact",
+        # W3-3.  The artifact is not missing -- results 2/probe/
+        # logitlens_cf200_ROME_B3.jsonl is on disk.  What is missing is the
+        # crosswalk to the membership sample, which is the true reason the tally
+        # carries no downstream weight.
+        "was never crosswalked to the membership sample",
         "we place no quantitative weight on this observation downstream",
         "drawn from six checkpoints across both backbone lineages",
         "lexical candidacy is not equivalent to OLD membership by judge majority",
@@ -1396,7 +1400,9 @@ def check_section4_requirements(
         "without an interaction test",
         "the pre-specified primary RR contrast was compatible with zero",
         "ES remained null-compatible",
-        "a secondary concept-versus-shuffle contrast on the pre-specified LocAcc harm metric",
+        # W3-3.  prereg-wseries.md designates LocAcc the co-primary harm endpoint
+        # ("B2 共主"); calling its contrast secondary demoted our own harm finding.
+        "the pre-registered co-primary harm endpoint",
         "did not yield detectable confirmatory RR repair",
         "Neither observation identifies natural-chain mediation",
         "the test behind our chain-local causal control point",
@@ -1639,7 +1645,11 @@ def check_section5_requirements(
         # ahead of the data -- the comparator and the sign order -- is what the gate
         # now protects.
         "before the placebo and direction arms ran",
-        "so the reading does not turn on which control the treated arm is measured against",
+        # W3-3.  True on the two primary endpoints only: the strict endpoint
+        # separates the treated arm from both controls but not from the untreated
+        # baseline, so there the choice of control is exactly what the reading turns
+        # on.  The gate now protects the scoped claim.
+        "there the reading does not turn on which control the treated arm is measured against",
         # Anti-tautology defenses.
         "nothing is penalized in the answer text",
         "extending the same penalty to the answer span",
@@ -1834,50 +1844,45 @@ def check_marginal_denominator_identities(
 def check_unaudited_section_numbers(main_text: str, errors: list[str]) -> None:
     """Reject numbers in sections whose occurrence-level ledgers have not landed.
 
-    W3-3/0: every region this built was in ``AUDITED_SECTION_TITLES``, so the
-    loop skipped all of them and the gate examined nothing while the success
-    banner reported it as a pass.  Every section now carries a ledger, which is
-    the good outcome -- but the check has to say so rather than pretend to work,
-    so it now fails when a section appears that no audit spec covers, and the
-    banner names what actually ran.
+    Twice now this has been written so that it examines nothing.  The first
+    version skipped every region because it built the region list from
+    ``REQUIRED_SECTION_ORDER`` and then skipped anything in
+    ``AUDITED_SECTION_TITLES`` -- two literals that mirror each other.  The W3-3
+    repair kept that structure and so kept the defect: the only source of a
+    section name was still a literal, never the manuscript.
+
+    The regions now come from the headings actually present in ``main.tex``, so
+    a section added to the paper without a matching audit spec produces a region
+    whose numbers are scanned, which is the thing the check is named for.
     """
 
-    numbered_markers = [
-        rf"\section{{{title}}}" for title in REQUIRED_SECTION_ORDER
+    source = strip_tex_comments(main_text)
+    headings = [
+        (match.group(1), match.start())
+        for match in re.finditer(r"\\section\*?\{([^{}]+)\}", source)
     ]
-    ethical_marker = r"\section*{Ethical Statement}"
-    bibliography_marker = r"\bibliography{refs}"
-    regions: list[tuple[str, str, str]] = []
-    for index, title in enumerate(REQUIRED_SECTION_ORDER):
-        start_marker = numbered_markers[index]
-        if index + 1 < len(numbered_markers):
-            end_marker = numbered_markers[index + 1]
-        else:
-            end_marker = ethical_marker
-        regions.append((title, start_marker, end_marker))
-    regions.append(("Ethical Statement", ethical_marker, bibliography_marker))
+    if not headings:
+        errors.append("main.tex has no \\section headings; the region scan cannot run")
+        return
 
-    if not AUDITED_SECTION_TITLES:
-        errors.append("no section is audited; the ledger machinery is not wired up")
+    bibliography = source.find(r"\bibliography{refs}")
+    stops = [offset for _, offset in headings[1:]]
+    stops.append(bibliography if bibliography > 0 else len(source))
 
-    for title, start_marker, end_marker in regions:
+    for (title, offset), stop in zip(headings, stops):
         if title in AUDITED_SECTION_TITLES:
             continue
-        try:
-            region = extract_between_markers(
-                main_text,
-                start_marker,
-                end_marker,
-                f"unaudited section {title}",
-            )
-        except ValueError as exc:
-            errors.append(str(exc))
-            continue
-        numbers = numeric_occurrences(strip_tex_comments(region))
+        region = source[offset:stop]
+        numbers = numeric_occurrences(region)
         if numbers:
             errors.append(
                 f"unaudited section {title!r} contains numeric tokens {numbers!r}; "
                 "add that section's occurrence-level RJ audit before prose numbers"
+            )
+        else:
+            errors.append(
+                f"section {title!r} appears in main.tex with no entry in "
+                "AUDITED_SECTION_SPECS; add one before it carries any claim"
             )
 
 
@@ -2125,6 +2130,54 @@ NARRATIVE_LOAD_CEILINGS: dict[str, tuple[float, int]] = {
 }
 
 
+def check_forest_shipping_gate(main_path: Path, errors: list[str]) -> None:
+    """Enforce supplement.tex's own rule about the five-arm forest.
+
+    supplement.tex says the forest may not ship until it carries a
+    strict-displacement panel, because a two-panel version hides the endpoint the
+    manuscript deliberately reports at primary prominence.  Nothing enforced it:
+    the check lived in plots.py as an invariant that recorded PASS to certify the
+    figure was *not* shippable, and SourceMap.write raises only on FAIL.  A rule
+    about shipping belongs where shipping is decided, so it lives here and reads
+    the figure's own source map.
+    """
+    repo = Path(__file__).resolve().parent.parent
+    shipped = []
+    for candidate in ("main.tex", "supplement.tex"):
+        path = repo / "paperwriting" / "manuscript" / candidate
+        if not path.exists():
+            continue
+        text = strip_tex_comments(path.read_text(encoding="utf-8"))
+        if re.search(r"\\includegraphics[^{}]*\{[^{}]*fig3[^{}]*\}", text):
+            shipped.append(candidate)
+    if not shipped:
+        return
+
+    source_map = repo / "paperwriting" / "delivery" / "fig3_rq3_source_map.json"
+    if not source_map.exists():
+        errors.append(
+            f"{', '.join(shipped)} ships the five-arm forest but its source map is missing"
+        )
+        return
+    # Substring-matching the file would pass on incidental text: the raw value of
+    # a whole arm object carries an RRs field even when nothing strict is
+    # plotted.  Ask which quantities the figure actually read.
+    try:
+        entries = json.loads(source_map.read_text(encoding="utf-8")).get("entries", [])
+    except json.JSONDecodeError as exc:
+        errors.append(f"fig3 source map is unreadable: {exc}")
+        return
+    plotted_strict = any(
+        str(entry.get("json_path", "")).rsplit(".", 1)[-1] == "RRs" for entry in entries
+    )
+    if not plotted_strict:
+        errors.append(
+            f"{', '.join(shipped)} ships the five-arm forest while its source map "
+            "records no strict-displacement quantity; supplement.tex blocks that "
+            "figure until it carries the strict panel"
+        )
+
+
 def check_narrative_load(main_path: Path, errors: list[str]) -> None:
     """Fail if a section is asking its sentences to carry more than the ceiling."""
     sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -2283,6 +2336,7 @@ def main() -> int:
     check_artifact_anonymity(args.main, errors)
     check_supplement_promises(args.main, errors)
     check_narrative_load(args.main, errors)
+    check_forest_shipping_gate(args.main, errors)
 
     if errors:
         print(f"FAIL: {len(errors)} manuscript check(s) failed", file=sys.stderr)

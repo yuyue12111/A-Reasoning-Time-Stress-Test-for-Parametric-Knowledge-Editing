@@ -537,8 +537,8 @@ def test_reviewed_paragraph_boundary_cannot_change(
 ) -> None:
     mutate(
         candidate_main,
-        "conditional on the selected reversion sample.  The supplement names",
-        "conditional on the selected reversion sample.\n\nThe supplement names",
+        "conditional on the selected reversion sample.  The per-item record,",
+        "conditional on the selected reversion sample.\n\nThe per-item record,",
     )
     assert_rejected(
         candidate_main,
@@ -897,7 +897,7 @@ def test_blocked_cloze_artifact_must_be_named(candidate_main: Path) -> None:
 def test_cloze_downweighting_cannot_be_dropped(candidate_main: Path) -> None:
     mutate(
         candidate_main,
-        "; absent it, we place no quantitative weight on this observation downstream",
+        ", and we place no quantitative weight on this observation downstream",
         "",
     )
     assert_rejected(
@@ -1108,9 +1108,9 @@ def test_section5_load_bearing_qualifications_cannot_be_dropped(
     [
         # P15: a null control may not be used as a positive premise.
         (
-            "so the reading does not turn on which control the treated arm is measured against",
+            "there the reading does not turn on which control the treated arm is measured against",
             "because the placebo floor is compatible with zero",
-            "so the reading does not turn on which control the treated arm is measured against",
+            "there the reading does not turn on which control the treated arm is measured against",
         ),
         # P17: no ordered-trend synonym, and the run boundary stays explicit.
         (

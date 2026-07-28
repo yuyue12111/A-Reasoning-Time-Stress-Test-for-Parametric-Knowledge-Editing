@@ -517,10 +517,6 @@ def fig1_capability(results: dict[str, Any]) -> None:
         == [("Qwen", "32B"), ("Llama", "70B")],
         "only Qwen-32B and Llama-70B are highlighted",
     )
-    # W3-3/0.  This was the literal True, recorded before any axes existed, so it
-    # could not observe the thing it named.  The check now runs after panel A is
-    # drawn and asserts the count and the absence of a connecting line.
-    _CATEGORICAL_PANEL_CHECK = ("categorical panel A", len(checkpoints) == 6)
 
     fig = plt.figure(figsize=(7.20, 3.55), constrained_layout=True)
     grid = fig.add_gridspec(1, 2, width_ratios=[1.13, 1.0], wspace=0.12)
@@ -578,12 +574,21 @@ def fig1_capability(results: dict[str, Any]) -> None:
         color=N_MID,
         fontsize=9,
     )
-    connectors = [line for line in ax_a.get_lines() if line.get_linestyle() not in {"None", "none", " "}
-                  and len(line.get_xdata()) > 2]
+    # W3-3, third attempt.  The first two versions compared literals to literals
+    # -- len(checkpoints) is fixed by the label lists in this file, and the
+    # connector filter can never match because every call here is either
+    # linestyle="none" or an axhline.  What can actually go wrong is the zip
+    # above silently dropping cells when x_positions and checkpoints disagree,
+    # so count the markers that reached the axes.
+    drawn = [
+        line for line in ax_a.get_lines()
+        if line.get_marker() not in {"", "None", None} and len(line.get_xdata()) == 1
+    ]
     rec.invariant(
-        _CATEGORICAL_PANEL_CHECK[0],
-        _CATEGORICAL_PANEL_CHECK[1] and not connectors,
-        "six checkpoint estimates are drawn independently; no line connects checkpoints",
+        "categorical panel A",
+        len(x_positions) == len(checkpoints) and len(drawn) == len(checkpoints),
+        f"one independent estimate per checkpoint reached the axes "
+        f"({len(drawn)} markers for {len(checkpoints)} checkpoints)",
     )
     _clean_axis(ax_a, grid_axis="y")
 
@@ -1093,7 +1098,14 @@ def fig3_rq3(results: dict[str, Any]) -> None:
         expected=expected_ladder,
         role="caption",
     )
-    rec.invariant("forest rows", len(rows) == 6, "four comparisons against N plus two specificity contrasts")
+    # W3-3.  len(rows) == 6 compared a literal-derived length to the literal 6.
+    # The contrasts themselves are what must be present, so check the labels.
+    rec.invariant(
+        "forest rows",
+        sorted(row["label"] for row in rows)
+        == sorted(["T \u2212 N", "D \u2212 N", "P \u2212 N", "C \u2212 N", "T \u2212 P", "T \u2212 C"]),
+        "four comparisons against N plus two specificity contrasts",
+    )
 
     fig, axes = plt.subplots(
         1,
@@ -1108,17 +1120,17 @@ def fig3_rq3(results: dict[str, Any]) -> None:
         (axes[0], "es", r"$\Delta$ generative ES at $B_3$", (-0.325, 0.235)),
         (axes[1], "rr", r"$\Delta$ permissive RR at $B_3$", (-0.215, 0.175)),
     ]
-    # W3-3/0.  This invariant used to be the literal True, so it passed whatever
-    # the figure plotted and asserted the opposite of what supplement.tex holds:
-    # the GATE there blocks this figure from shipping *until* it carries a
-    # strict-displacement panel.  The condition now reads the panels and the rows,
-    # so it reports the figure's real state and flips when the panel is added.
-    plotted = {metric for _, metric, _, _ in panels}
+    # W3-3.  Two attempts at a "strict endpoint excluded" invariant lived here:
+    # the literal True, and then a conjunction over the same literals that built
+    # panels and rows, which was equally constant and, worse, recorded PASS to
+    # certify the figure was NOT shippable -- while SourceMap.write raises only
+    # on FAIL.  A shipping rule cannot be enforced from the renderer, so it now
+    # lives in check_manuscript.check_forest_shipping_gate, which blocks any
+    # .tex that includes this figure while its source map records no RRs.
     rec.invariant(
-        "strict endpoint still missing, so this figure is not shippable",
-        "rrs" not in plotted and all("rrs" not in row for row in rows),
-        "neither the rows nor the panels carry RRs; supplement.tex blocks this "
-        "figure until a strict-displacement panel exists",
+        "every planned contrast reached the plot",
+        len(y_positions) == len(rows),
+        "no contrast is silently dropped by the zip against y_positions",
     )
     for ax, metric, title, xlim in panels:
         ax.axhspan(2.55, 6.48, color=PALE_NEUTRAL, zorder=0)
