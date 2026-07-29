@@ -1527,7 +1527,7 @@ def fig_teaser(results: dict[str, Any]) -> None:
         )
 
     with plt.rc_context(W5_RC):
-        FW, FH = 3.45, 2.84
+        FW, FH = 3.45, 2.78
         fig = plt.figure(figsize=(FW, FH))
         ax = fig.add_axes([0, 0, 1, 1])
         ax.set_xlim(0, 1)
@@ -1834,7 +1834,7 @@ def fig_arms(results: dict[str, Any]) -> None:
              "RRs": "Strict $RR^s$ (secondary)"}
 
     with plt.rc_context(W5_RC):
-        fig, ax = plt.subplots(figsize=(7.0, 1.68), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(7.0, 1.62), constrained_layout=True)
         BW, STEP, GW = 0.15, 0.175, 1.32
         centers = [0.0, GW, 2 * GW]
         bars_drawn = 0

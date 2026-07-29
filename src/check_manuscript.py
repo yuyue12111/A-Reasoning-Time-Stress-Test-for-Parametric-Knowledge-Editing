@@ -52,7 +52,7 @@ APPROVED_REFS_SHA256 = (
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
     "Section 3": "4728462889e36125a395892e408c84c362170d27d7b7658cc768a876d71ce760",
     "Section 4": "5b30ef0b0f286488a3c33980abc857b11af71a96671d045ab0118d070a5720dc",
-    "Section 5": "65af091d6427da1bad176c5009d53e08dc822214854b4278858162c24f5a737a",
+    "Section 5": "4ac4923164e0b5e7b28267712685c46dbb595e31f0b8eff06f539d6bd89d8698",
     "Section 1": "dbb9900c53e0decf6b994f16a3977ad895bec4a764be41fca4a1c0f79ac31111",
     "Section 2": "bbd7ea5f71ea3bf0dcc2e44c067340c88b872fa28e55c0652e5b16367e7fb963",
     "Section 6": "05a6061974bb5a4c9ef82bc32c3744dd92eef8662afab4559580386f9f27ecc9",
@@ -62,7 +62,7 @@ APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
 APPROVED_SECTION_VISIBLE_SHA256 = {
     "Section 3": "11b152beade4cf5b060561624cfbf06626f28e5d084254b4b610c421b08cd904",
     "Section 4": "3ba46f6de1daf5732b6bdda714f1dd58aec614923d63f5ca3cda5256d6cdf152",
-    "Section 5": "b4f63d32f9131b09ce261836a70f02b0b3bdc950d375129980123cc0182fe49e",
+    "Section 5": "dc92f51532bf217af746e1468db5f3989f33382e93d2c2cee76749b82fb7c2ca",
     "Section 1": "881bf6063ff4cb2752a4faf4d0c48cb52048a0ba45a927f4f562f353c372300c",
     "Section 2": "7bb876a990d0f98c6e25a3f842c9b4c88034f64d9301eaab8c73a95c391cff4d",
     "Section 6": "e908074025e981678b5346440fd30ab443813e22e9554a8f719cb25dfa4f5a25",
@@ -72,7 +72,7 @@ APPROVED_SECTION_VISIBLE_SHA256 = {
 APPROVED_SECTION_SOURCE_SHA256 = {
     "Section 3": "fa83a185a7e4e02d046e390ea09109f86f6b5639e655ed71fa648780d3e65548",
     "Section 4": "a2eb49c733fc4cab54badda1287b59661053b9e391c12eb5fc241502e2510095",
-    "Section 5": "4753073d980a48e5dbfd0cad5570c1599c6b65db714324598b8fe3ac36477ab5",
+    "Section 5": "ca414bf548de1157d8f60f222b21b071ef1b0f2999e874d8d318b5db87c63d12",
     "Section 1": "dde3b42492cab93235470fec99a7b988cf86731261b56181fdce06c728872dea",
     "Section 2": "95029b36085d90e541829e97cbef33cd7dbc036fe5de9a2b5d9895e10224ff0b",
     "Section 6": "32ac66797da1ebcfb28e009401e7eae1ee188584711834132e5813445beec1ba",
@@ -427,6 +427,7 @@ ALLOWED_TEX_COMMANDS = frozenset(
         "paragraph",
         "parbox",
         "multicolumn",
+        "medskip",
         "cdot",
         "cmidrule",
         "dagger",
@@ -484,6 +485,7 @@ BODY_ALLOWED_TEX_COMMANDS = frozenset(
         "paragraph",
         "parbox",
         "multicolumn",
+        "medskip",
         "cdot",
         "cmidrule",
         "dagger",

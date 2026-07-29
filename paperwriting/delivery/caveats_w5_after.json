@@ -510,16 +510,16 @@
   "text": "a paired reversion contrast uses the intersection of the two arms' gate sets, so its denominator is neither arm's n , and paired differences need not equal differences of arm-wise rates."
  },
  {
-  "id": "2c456e02d277fe3b",
+  "id": "1bf7f35f801f9766",
   "section": "A Chain-Local Causal Control Point",
   "zone": "caption",
-  "text": "p values are unadjusted bootstrap values at recorded resolution, and Intervals are unadjusted for multiplicity."
+  "text": "Bold marks intervals excluding zero, and Intervals are unadjusted for multiplicity."
  },
  {
-  "id": "d7392c00fb2f813f",
+  "id": "fd5c4cc76df639a7",
   "section": "A Chain-Local Causal Control Point",
   "zone": "caption",
-  "text": "The in-span leakage check is a manipulation check rather than an outcome, reported in the text."
+  "text": "The in-span leakage check is a manipulation check rather than an outcome, in the text."
  },
  {
   "id": "1579d9610b9d95e2",
@@ -528,10 +528,10 @@
   "text": "the rest are the mean-CI family, never mixed within a contrast."
  },
  {
-  "id": "203f7fac533186f1",
+  "id": "2cbcb179029c2115",
   "section": "A Chain-Local Causal Control Point",
   "zone": "table",
-  "text": "unadjusted p at recorded resolution) (r) 1-6 Contrast 2 l ES [CI] p 2 l RR [CI] p RR^s [CI] p T$-$N ^ 2 l .138 [.082, .194] .000 2 l -.102 [-.170, -.042] .001 -.051 [-.102, .000] .073 T$-$P 2 l .122 [.051, .193] .002 2 l -.095 [-.171, -.029] .010 -.057 [-.114, -.010] .029 T$-$C ^ 2 l .121 [.051, .192] .000 2 l -.094 [-.160, -.028] .006 -.057 [-.113, -.009] .032 D$-$N 2 l -.217 [-.289, -.144] .000 2 l .086 [.019, .152] .010 .095 [.038, .162] .002 P$-$N 2 l .015 [-.046, .081] .709 2 l .000 [-.057, .057] 1.00 -.009 [-.047, .028] .828 C$-$N ^ 2 l .015 [-.046, .076] .688 2 l .000 [-.056, .056] 1.00 -.009 [-.047, .028] .828 6 @ l Transfers of the intervention, and guard cost on unedited queries (r) 1-6 Setting Contrast Endpoint 3 l [CI] p ROME Qwen-14B (second scale) T$-$N ES 3 l .135 [.055, .215] .001 T$-$N RR^s 3 l -.040 [-.081, -.010] .035 MEMIT Qwen-14B (second editor) T$-$C ES 3 l .100 [.040, .160] .002 T$-$C RR^s 3 l -.027 [-.080, .027] .400 ROME Qwen-32B (paraphrase probes) T$-$C strict PS 3 l .055 [.020, .093] .003 GSM8K ( n = 1319 , unedited) on$-$off Acc 3 l .000 [-.022, .022] ^ 90 % -- MATH ( n = 500 , unedited) on$-$off Acc 3 l -.010 [-.061, .041] ^ 90 % --"
+  "text": "unadjusted p at recorded resolution) (r) 1-7 Contrast ES [CI] p RR [CI] p RR^s [CI] p T$-$N ^ .138 [.082, .194] .000 -.102 [-.170, -.042] .001 -.051 [-.102, .000] .073 T$-$P .122 [.051, .193] .002 -.095 [-.171, -.029] .010 -.057 [-.114, -.010] .029 T$-$C ^ .121 [.051, .192] .000 -.094 [-.160, -.028] .006 -.057 [-.113, -.009] .032 D$-$N -.217 [-.289, -.144] .000 .086 [.019, .152] .010 .095 [.038, .162] .002 P$-$N .015 [-.046, .081] .709 .000 [-.057, .057] 1.00 -.009 [-.047, .028] .828 C$-$N ^ .015 [-.046, .076] .688 .000 [-.056, .056] 1.00 -.009 [-.047, .028] .828"
  },
  {
   "id": "923d8fb8e6f3f083",
