@@ -31,6 +31,8 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+import matplotlib.patches as mpatches
 import matplotlib.font_manager as fm
 
 
@@ -48,6 +50,18 @@ DIR_UP = "#2E9E44"
 DIR_DN = "#B64342"
 PALE_NEUTRAL = "#F6F7F8"
 PALE_BAND = "#F3F1EE"
+
+# W4-2 restyle palette (CVD + print validated upstream; style-only, no data).
+QWEN_BLUE = "#2E6FBF"
+LLAMA_ORANGE = "#D97B2A"
+FAV_FILL = "#5B9BE0"
+ADVERSE_RED = "#D65442"
+NULL_GRAY = "#8A8F98"
+INK_PRIMARY = "#1F2937"
+INK_SECONDARY = "#6B7280"
+BAND_TEAL = "#8ECFC9"
+BAND_LILAC = "#BEB8DC"
+GRID_GRAY = "#E5E7EB"
 WHITE = "#FFFFFF"
 
 
@@ -282,7 +296,14 @@ def _clean_axis(ax: plt.Axes, *, grid_axis: str = "y") -> None:
     ax.set_axisbelow(True)
 
 
-def _panel_title(ax: plt.Axes, letter: str, title: str) -> None:
+def _panel_title(
+    ax: plt.Axes,
+    letter: str,
+    title: str,
+    *,
+    fontsize: float = 10.0,
+    wrap: bool = False,
+) -> None:
     """Place a compact panel letter beside a left-aligned panel title."""
 
     ax.text(
@@ -292,9 +313,9 @@ def _panel_title(ax: plt.Axes, letter: str, title: str) -> None:
         transform=ax.transAxes,
         ha="left",
         va="bottom",
-        fontsize=8.5,
+        fontsize=max(7.0, fontsize - 1.5),
         fontweight="bold",
-        color=INK,
+        color=INK_PRIMARY,
     )
     ax.text(
         0.00,
@@ -303,9 +324,10 @@ def _panel_title(ax: plt.Axes, letter: str, title: str) -> None:
         transform=ax.transAxes,
         ha="left",
         va="bottom",
-        fontsize=10,
+        fontsize=fontsize,
         fontweight="bold",
-        color=INK,
+        color=INK_PRIMARY,
+        wrap=wrap,
     )
 
 
@@ -319,18 +341,30 @@ def _forest_point(
     marker: str,
     filled: bool = True,
     zorder: int = 4,
+    linewidth: float = 1.35,
+    markersize: float = 5.6,
+    facecolor: str | None = None,
 ) -> None:
     lo, hi = float(ci[0]), float(ci[1])
     if not lo <= point <= hi:
         raise ValueError(f"point {point} is outside CI [{lo}, {hi}]")
-    ax.hlines(y, lo, hi, color=color, linewidth=1.35, zorder=zorder - 1)
-    ax.vlines([lo, hi], y - 0.065, y + 0.065, color=color, linewidth=0.85, zorder=zorder)
+    ax.hlines(y, lo, hi, color=color, linewidth=linewidth, zorder=zorder - 1)
+    ax.vlines(
+        [lo, hi],
+        y - 0.065,
+        y + 0.065,
+        color=color,
+        linewidth=max(0.85, linewidth * 0.6),
+        zorder=zorder,
+    )
+    if facecolor is None:
+        facecolor = color if filled else WHITE
     ax.plot(
         point,
         y,
         marker=marker,
-        markersize=5.6,
-        markerfacecolor=color if filled else WHITE,
+        markersize=markersize,
+        markerfacecolor=facecolor,
         markeredgecolor=color,
         markeredgewidth=1.0,
         linestyle="none",
@@ -404,7 +438,7 @@ def _fig1_data(results: dict[str, Any], rec: SourceMap) -> tuple[list[dict[str, 
             "path": ("f2_zerothink_deconfound", "es_drop_ci", "B0_to_B1"),
             "expected": [0.13, [0.06, 0.205], "CI>0 显著=加真链才 erode"],
             "marker": "o",
-            "color": HERO,
+            "color": QWEN_BLUE,
             "outcome_group": "Edited model · paired ES drop",
         },
         {
@@ -417,7 +451,7 @@ def _fig1_data(results: dict[str, Any], rec: SourceMap) -> tuple[list[dict[str, 
                 "含0/反向(B0P ES 反高)=加零内容链不 erode",
             ],
             "marker": "s",
-            "color": N_MID,
+            "color": QWEN_BLUE,
             "outcome_group": "Edited model · paired ES drop",
         },
         {
@@ -430,7 +464,7 @@ def _fig1_data(results: dict[str, Any], rec: SourceMap) -> tuple[list[dict[str, 
             ),
             "expected": {"point": 0.117253, "ci95": [0.067002, 0.169179]},
             "marker": "D",
-            "color": HERO,
+            "color": QWEN_BLUE,
             "outcome_group": "Edited model · paired ES drop",
         },
         {
@@ -447,7 +481,7 @@ def _fig1_data(results: dict[str, Any], rec: SourceMap) -> tuple[list[dict[str, 
                 ),
             },
             "marker": "^",
-            "color": N_MID,
+            "color": NULL_GRAY,
             "outcome_group": "Unedited base · old-answer drift",
         },
     ]
@@ -518,63 +552,99 @@ def fig1_capability(results: dict[str, Any]) -> None:
         "only Qwen-32B and Llama-70B are highlighted",
     )
 
+    # W4-2: the figure prints at 0.58\textwidth (4.05in), a 0.5625 scale of
+    # this 7.20in canvas.  Rendered 12.4pt prints 7pt (the tick floor);
+    # markers >=9.6pt print >=5.4pt with the significant pair at 6.2pt; CI
+    # linewidth 3.0 prints 1.7.  The printed 8pt base the spec asked for does
+    # not fit two panels in 4.05in of print width -- titles and row labels
+    # overflow the canvas -- so text tops out at 13.5pt rendered (7.6pt
+    # printed) with shortened strings; widening the print is a main.tex
+    # decision outside this change.
     fig = plt.figure(figsize=(7.20, 3.55), constrained_layout=True)
-    grid = fig.add_gridspec(1, 2, width_ratios=[1.13, 1.0], wspace=0.12)
+    grid = fig.add_gridspec(1, 2, width_ratios=[1.80, 1.0], wspace=0.08)
     ax_a = fig.add_subplot(grid[0, 0])
     ax_b = fig.add_subplot(grid[0, 1])
 
     # Panel A: categorical paired ES changes, with a visual family gap and no line.
-    x_positions = [0.0, 1.0, 2.0, 3.0, 4.65, 5.65]
-    ax_a.axvspan(-0.45, 3.45, color=PALE_NEUTRAL, zorder=0)
-    ax_a.axvspan(4.20, 6.10, color=PALE_NEUTRAL, zorder=0)
+    x_positions = [0.0, 1.5, 3.0, 4.5, 7.0, 8.5]
+    ax_a.axvspan(-0.65, 5.15, color=PALE_NEUTRAL, zorder=0)
+    ax_a.axvspan(6.35, 9.15, color=PALE_NEUTRAL, zorder=0)
     for x, cell in zip(x_positions, checkpoints):
-        color = HERO if cell["sig"] else N_MID
+        family_color = QWEN_BLUE if cell["family"] == "Qwen" else LLAMA_ORANGE
         marker = "D" if cell["sig"] else "o"
         ax_a.plot(
             x,
             cell["point"],
             marker=marker,
-            markersize=5.6,
-            markerfacecolor=color if cell["sig"] else WHITE,
-            markeredgecolor=color,
-            markeredgewidth=1.0,
+            markersize=11.0 if cell["sig"] else 9.6,
+            markerfacecolor=(
+                family_color
+                if cell["sig"]
+                else mcolors.to_rgba(family_color, 0.35)
+            ),
+            markeredgecolor=family_color,
+            markeredgewidth=2.5 if cell["sig"] else 1.6,
             linestyle="none",
             zorder=5,
         )
         lo, hi = cell["ci"]
-        ax_a.vlines(x, lo, hi, color=color, linewidth=1.35, zorder=3)
-        ax_a.hlines([lo, hi], x - 0.070, x + 0.070, color=color, linewidth=0.85, zorder=3)
+        ax_a.vlines(x, lo, hi, color=family_color, linewidth=3.0, zorder=3)
+        ax_a.hlines([lo, hi], x - 0.14, x + 0.14, color=family_color, linewidth=1.8, zorder=3)
         if cell["sig"]:
             ax_a.annotate(
                 f"{cell['point']:.3f}",
                 (x, cell["point"]),
-                xytext=(0, 9),
+                xytext=(0, 12),
                 textcoords="offset points",
                 ha="center",
                 va="bottom",
-                color=HERO,
+                color=INK_PRIMARY,
                 fontweight="bold",
-                fontsize=9,
+                fontsize=12,
             )
-    ax_a.axhline(0, color=N_DARK, linewidth=0.8, linestyle=(0, (2, 2)))
+    ax_a.axhline(0, color=INK_PRIMARY, linewidth=2.0, linestyle=(0, (2, 2)))
     ax_a.set_xticks(x_positions, [c["label"] for c in checkpoints])
-    ax_a.set_xlim(-0.55, 6.20)
+    ax_a.tick_params(axis="x", labelsize=12.4)
+    ax_a.tick_params(axis="y", labelsize=12.4)
+    ax_a.set_xlim(-0.80, 9.30)
     ax_a.set_ylim(-0.135, 0.218)
-    ax_a.set_ylabel(r"Paired ES change  ($\mathrm{ES}_{B_0}-\mathrm{ES}_{B_3}$)")
-    ax_a.set_xlabel("Fixed checkpoint (categorical; no interpolation)")
-    _panel_title(ax_a, "A", "Direct-answer success after a natural chain")
-    # W4/E2: 0.205 collided with the panel title row; keep the labels inside
-    # the axes, clear of the title band.
-    ax_a.text(1.5, 0.190, "Qwen backbone", ha="center", va="top", color=N_DARK, fontsize=9)
-    ax_a.text(5.15, 0.190, "Llama backbone", ha="center", va="top", color=N_DARK, fontsize=9)
+    ax_a.set_ylabel(
+        r"Paired ES change  ($\mathrm{ES}_{B_0}-\mathrm{ES}_{B_3}$)", fontsize=12.4
+    )
+    ax_a.set_xlabel("Fixed checkpoint (categorical; no interpolation)", fontsize=12.4)
+    _panel_title(ax_a, "A", "Paired ES drop after a native chain", fontsize=13.5)
+    # W4-2: in-plot family keys -- a small series-colored square plus ink text
+    # above each family band, replacing the old backbone captions.
+    for x0, name, col in ((0.0, "Qwen", QWEN_BLUE), (6.5, "Llama", LLAMA_ORANGE)):
+        ax_a.add_patch(
+            mpatches.Rectangle(
+                (x0 - 0.52, 0.190),
+                0.40,
+                0.016,
+                facecolor=col,
+                edgecolor="none",
+                zorder=6,
+            )
+        )
+        ax_a.text(
+            x0 + 0.08,
+            0.199,
+            name,
+            ha="left",
+            va="center",
+            color=INK_PRIMARY,
+            fontsize=12.4,
+            fontweight="bold",
+            zorder=6,
+        )
     ax_a.text(
-        -0.43,
-        -0.122,
+        -0.60,
+        -0.124,
         "positive = lower edit success after reasoning",
         ha="left",
         va="bottom",
-        color=N_MID,
-        fontsize=9,
+        color=INK_SECONDARY,
+        fontsize=11,
     )
     # W3-3, third attempt.  The first two versions compared literals to literals
     # -- len(checkpoints) is fixed by the label lists in this file, and the
@@ -593,6 +663,9 @@ def fig1_capability(results: dict[str, Any]) -> None:
         f"({len(drawn)} markers for {len(checkpoints)} checkpoints)",
     )
     _clean_axis(ax_a, grid_axis="y")
+    # W4-2: horizontal light-gray gridlines only.
+    ax_a.grid(True, axis="y", color=GRID_GRAY, linewidth=0.9)
+    ax_a.set_axisbelow(True)
 
     # Panel B: outcome-specific paired probability changes.
     y_positions = [3.25, 2.25, 1.25, -0.10]
@@ -608,23 +681,32 @@ def fig1_capability(results: dict[str, Any]) -> None:
             color=row["color"],
             marker=row["marker"],
             filled=row["label"] != "Canned thought",
+            linewidth=3.0,
+            markersize=10.7,
         )
     labels = [f"{r['label']}\n{r['metric']}" for r in controls]
     ax_b.set_yticks(y_positions, labels)
-    ax_b.tick_params(axis="y", length=0, pad=4)
-    ax_b.axvline(0, color=N_DARK, linewidth=0.8, linestyle=(0, (2, 2)))
+    ax_b.tick_params(axis="y", length=0, pad=4, labelsize=11.5)
+    ax_b.tick_params(axis="x", labelsize=12.4)
+    ax_b.axvline(0, color=INK_PRIMARY, linewidth=2.0, linestyle=(0, (2, 2)))
     ax_b.set_xlim(-0.182, 0.225)
     ax_b.set_ylim(-0.62, 3.88)
-    ax_b.set_xlabel("Paired probability change (95% CI)")
-    _panel_title(ax_b, "B", "Qwen-32B budget and decoding conditions")
+    ax_b.set_xlabel("Paired probability change (95% CI)", fontsize=12.4)
+    _panel_title(
+        ax_b,
+        "B",
+        "Qwen-32B budget and decoding conditions",
+        fontsize=12.4,
+        wrap=True,
+    )
     ax_b.text(
         -0.175,
         3.72,
-        "Edited model · generative ES drop",
+        "Edited model · ES drop",
         ha="left",
         va="top",
-        color=N_DARK,
-        fontsize=9,
+        color=INK_PRIMARY,
+        fontsize=11.5,
         fontweight="bold",
         bbox={"facecolor": PALE_NEUTRAL, "edgecolor": "none", "pad": 0.2},
         zorder=6,
@@ -635,8 +717,8 @@ def fig1_capability(results: dict[str, Any]) -> None:
         r"Unedited base · $\Delta P(o_{\rm old})$",
         ha="left",
         va="top",
-        color=N_DARK,
-        fontsize=9,
+        color=INK_PRIMARY,
+        fontsize=11.5,
         fontweight="bold",
         bbox={"facecolor": PALE_BAND, "edgecolor": "none", "pad": 0.2},
         zorder=6,
@@ -1022,7 +1104,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
             expected_es=[0.138, [0.082, 0.194], 0.0],
             expected_rr=[-0.102, [-0.17, -0.042], 0.001],
             expected_rrs=[-0.051, [-0.102, 0.0], 0.073],
-            color=HERO,
+            color=QWEN_BLUE,
             marker="o",
             group="vs N",
         ),
@@ -1034,7 +1116,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
             expected_es=[-0.217, [-0.289, -0.144], 0.0],
             expected_rr=[0.086, [0.019, 0.152], 0.01],
             expected_rrs=[0.095, [0.038, 0.162], 0.002],
-            color=DIR_DN,
+            color=ADVERSE_RED,
             marker="v",
             group="vs N",
         ),
@@ -1046,7 +1128,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
             expected_es=[0.015, [-0.046, 0.081], 0.709],
             expected_rr=[0.0, [-0.057, 0.057], 1.0],
             expected_rrs=[-0.009, [-0.047, 0.028], 0.828],
-            color=N_LIGHT,
+            color=NULL_GRAY,
             marker="s",
             group="vs N",
         ),
@@ -1058,7 +1140,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
             expected_es=[0.0152, [-0.0455, 0.0758], 0.688],
             expected_rr=[0.0, [-0.0561, 0.0561], 1.0],
             expected_rrs=[-0.0093, [-0.0467, 0.028], 0.8282],
-            color=N_MID,
+            color=NULL_GRAY,
             marker="D",
             group="vs N",
         ),
@@ -1070,7 +1152,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
             expected_es=[0.122, [0.051, 0.193], 0.002],
             expected_rr=[-0.095, [-0.171, -0.029], 0.01],
             expected_rrs=[-0.057, [-0.114, -0.01], 0.029],
-            color=HERO,
+            color=QWEN_BLUE,
             marker="o",
             group="specificity",
         ),
@@ -1082,7 +1164,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
             expected_es=[0.1212, [0.0505, 0.1919], 0.0004],
             expected_rr=[-0.0943, [-0.1604, -0.0283], 0.0062],
             expected_rrs=[-0.0566, [-0.1132, -0.0094], 0.0324],
-            color=HERO,
+            color=QWEN_BLUE,
             marker="o",
             group="specificity",
         ),
@@ -1126,15 +1208,18 @@ def fig3_rq3(results: dict[str, Any]) -> None:
         1,
         figsize=(3.3, 4.45),
         sharey=True,
+        sharex=True,
         constrained_layout=True,
         gridspec_kw={"hspace": 0.04},
     )
     y_positions = [6.0, 5.0, 4.0, 3.0, 1.35, 0.35]
+    # W4-2: one shared x scale so only the bottom panel needs tick labels.
+    SHARED_XLIM = (-0.33, 0.24)
     panels = [
-        (axes[0], "es", r"$\Delta$ generative ES at $B_3$", (-0.325, 0.235)),
-        (axes[1], "rr", r"$\Delta$ permissive RR at $B_3$", (-0.215, 0.175)),
+        (axes[0], "es", r"$\Delta$ generative ES at $B_3$", SHARED_XLIM),
+        (axes[1], "rr", r"$\Delta$ permissive RR at $B_3$", SHARED_XLIM),
         # W4/E4: the strict panel ships or the figure does not (shipping gate).
-        (axes[2], "rrs", r"$\Delta$ strict $RR^s$ at $B_3$ (secondary)", (-0.16, 0.21)),
+        (axes[2], "rrs", r"$\Delta$ strict $RR^s$ at $B_3$ (secondary)", SHARED_XLIM),
     ]
     # W3-3.  Two attempts at a "strict endpoint excluded" invariant lived here:
     # the literal True, and then a conjunction over the same literals that built
@@ -1149,8 +1234,8 @@ def fig3_rq3(results: dict[str, Any]) -> None:
         "no contrast is silently dropped by the zip against y_positions",
     )
     for ax, metric, title, xlim in panels:
-        ax.axhspan(2.55, 6.48, color=PALE_NEUTRAL, zorder=0)
-        ax.axhspan(-0.10, 1.80, color=PALE_BAND, zorder=0)
+        ax.axhspan(2.55, 6.48, color=BAND_TEAL, alpha=0.12, zorder=0)
+        ax.axhspan(-0.10, 1.80, color=BAND_LILAC, alpha=0.12, zorder=0)
         ax.axvline(0, color=N_DARK, linewidth=0.8, linestyle=(0, (2, 2)))
         for y, row in zip(y_positions, rows):
             values = row[metric]
@@ -1161,7 +1246,8 @@ def fig3_rq3(results: dict[str, Any]) -> None:
                 ci=values["ci"],
                 color=row["color"],
                 marker=row["marker"],
-                filled=row["label"] not in {"P − N"},
+                filled=row["label"] not in {"P − N", "C − N"},
+                facecolor=(FAV_FILL if row["color"] == QWEN_BLUE else None),
             )
         ax.set_xlim(*xlim)
         ax.set_ylim(-0.35, 7.35)
@@ -1177,7 +1263,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
             va="top",
             fontsize=7.5,
             fontweight="bold",
-            color=N_DARK,
+            color=INK_PRIMARY,
         )
         ax.text(
             xlim[0] + 0.01 * (xlim[1] - xlim[0]),
@@ -1187,7 +1273,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
             va="top",
             fontsize=7.5,
             fontweight="bold",
-            color=N_DARK,
+            color=INK_PRIMARY,
         )
     axes[0].set_yticks(y_positions, [r["label"] for r in rows])
     for ax in axes:
@@ -1200,7 +1286,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
         ha="center",
         va="top",
         fontsize=7.5,
-        color=N_DARK,
+        color=INK_PRIMARY,
     )
 
     caption = rf"""
