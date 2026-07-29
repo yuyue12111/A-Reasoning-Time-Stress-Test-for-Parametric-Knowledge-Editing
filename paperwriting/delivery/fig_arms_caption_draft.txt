@@ -1,0 +1,5 @@
+Figure 3 (five arms): arm-wise levels at B3 on the two primary endpoints
+and the secondary strict displacement, with the paired T-N contrast
+bracketed per endpoint (bold where its 95% CI excludes zero; the strict
+interval touches zero).  Levels are points -- no interval is recorded for
+levels; every paired contrast with its CI and unadjusted p is in Table 2.

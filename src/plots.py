@@ -1420,6 +1420,500 @@ carries no numbers.
     _write_caption("fig0_protocol", caption)
 
 
+
+
+# =========================================================================
+# W5 visual layer -- teaser / drop chart / five-arm grouped bars.
+# One design system: STIX serif, pale fill (alpha .40) + saturated edge,
+# boxed legends, no grids.  Semantic rule shared across figures: red is the
+# old-answer-favoring direction (B3, arm D), blue the edit-favoring one
+# (B0, arm T); N/P/C form a gray null cluster with hatch redundancy.
+# Iron rule: arm-wise / checkpoint-wise LEVELS carry no intervals -- none
+# are recorded -- so no level bar may grow a whisker here.
+# =========================================================================
+
+W5_BLUE = "#2E6FBF"
+W5_RED = "#D65442"
+W5_NGRAY = "#6F7680"
+W5_PGRAY = "#818892"
+W5_CTAN = "#8E836B"
+W5_INK = "#1F2937"
+W5_INK2 = "#6B7280"
+
+W5_RC = {
+    "font.family": "serif",
+    "font.serif": ["STIXGeneral", "DejaVu Serif"],
+    "mathtext.fontset": "stix",
+    "font.size": 8,
+    "axes.linewidth": 0.8,
+    "xtick.labelsize": 8,
+    "ytick.labelsize": 8,
+    "axes.edgecolor": "black",
+    "xtick.color": "black",
+    "ytick.color": "black",
+    "text.color": W5_INK,
+    "axes.labelcolor": "black",
+}
+
+
+def _w5_tint(color: str, alpha: float = 0.40):
+    return mcolors.to_rgba(color, alpha)
+
+
+def _load_probe_line(src: str) -> dict[str, Any]:
+    """Read 'path:lineno' from a retained probe jsonl (1-indexed line)."""
+    path_str, _, lineno = src.rpartition(":")
+    path = ROOT / path_str
+    with path.open() as handle:
+        for index, line in enumerate(handle, start=1):
+            if index == int(lineno):
+                return json.loads(line)
+    raise ValueError(f"line {lineno} not found in {path}")
+
+
+def fig_teaser(results: dict[str, Any]) -> None:
+    """Figure 1: one recorded case, three answers from the same weights.
+
+    Every quoted span is asserted, byte for byte, against the retained
+    probe jsonl before anything is drawn; a mismatch refuses to render.
+    """
+    rec = SourceMap("fig_teaser")
+    case = results["teaser_case"]
+    frac = float(
+        rec.read(results, ("teaser_case", "old_at_frac"), expected=0.041,
+                 role="caption")
+    )
+    n_b0 = _load_probe_line(case["src_N_B0"])
+    n_b3 = _load_probe_line(case["src_N_B3"])
+    t_b3 = _load_probe_line(case["src_T_B3"])
+    rec.invariant(
+        "records are the teaser case at the right budgets",
+        all(r["case_id"] == "cf_6933" for r in (n_b0, n_b3, t_b3))
+        and n_b0["budget"] == "B0"
+        and n_b3["budget"] == "B3"
+        and t_b3["budget"] == "B3",
+        "case_id/budget fields of the three retained rows",
+    )
+
+    QUOTES = {
+        "n_b0_answer": (n_b0["answer"],
+                        "located in the country of **Bulgaria**"),
+        "n_b3_chain": (n_b3["cot"],
+                       "Oseberg sounds like it could be a Scandinavian name, "
+                       "maybe Norwegian? I think Norway has some significant "
+                       "oil fields"),
+        "n_b3_answer": (n_b3["answer"],
+                        "located in Norway, specifically on the Norwegian"),
+        "t_b3_chain": (t_b3["cot"],
+                       "maybe Norwegian? I think there are some oil fields "
+                       "in the North Sea"),
+        "t_b3_answer": (t_b3["answer"],
+                        "located in the country of Bulgaria"),
+    }
+    for name, (haystack, needle) in QUOTES.items():
+        rec.invariant(
+            f"verbatim quote {name}",
+            needle in haystack,
+            f"rendered span is a substring of the retained text ({name})",
+        )
+        rec.derived(
+            source_path=case["src_N_B0" if name == "n_b0_answer" else
+                             "src_N_B3" if name.startswith("n_b3") else
+                             "src_T_B3"],
+            raw_value=needle,
+            rendered=needle,
+            transform="verbatim excerpt (markdown ** rendered as bold)",
+            role="quote",
+        )
+
+    with plt.rc_context(W5_RC):
+        FW, FH = 3.45, 3.42
+        fig = plt.figure(figsize=(FW, FH))
+        ax = fig.add_axes([0, 0, 1, 1])
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1)
+        ax.axis("off")
+        renderer = fig.canvas.get_renderer()
+
+        def rich(x, y, segs, size=6.6):
+            for txt, kw in segs:
+                artist = ax.text(x, y, txt, fontsize=size, va="top",
+                                 ha="left", **kw)
+                bb = artist.get_window_extent(renderer=renderer)
+                x += bb.width / (FW * fig.dpi)
+            return x
+
+        def rbox(y0, h, edge, fill_alpha=0.09):
+            ax.add_patch(mpatches.FancyBboxPatch(
+                (0.075, y0), 0.905, h,
+                boxstyle="round,pad=0.008", linewidth=1.0, edgecolor=edge,
+                facecolor=mcolors.to_rgba(edge, fill_alpha),
+                mutation_aspect=FW / FH))
+
+        def chip(x, y, w, text, color):
+            ax.add_patch(mpatches.FancyBboxPatch(
+                (x, y - 0.021), w, 0.042,
+                boxstyle="round,pad=0.006", linewidth=0, facecolor=color,
+                mutation_aspect=FW / FH))
+            ax.text(x + w / 2, y, text, fontsize=6.5, color="white",
+                    fontweight="bold", ha="center", va="center")
+
+        def stepno(y, n, color):
+            ax.add_patch(mpatches.Circle((0.038, y), 0.021, facecolor=color,
+                                         edgecolor="none"))
+            ax.text(0.038, y, str(n), fontsize=6.6, color="white",
+                    fontweight="bold", ha="center", va="center")
+
+        R = dict(color=W5_RED, fontweight="bold")
+        B = dict(color=W5_BLUE, fontweight="bold")
+        P = dict(color=W5_INK)
+        G = dict(color=W5_INK2)
+        IT = dict(color=W5_INK2, style="italic")
+
+        # header: the edit
+        rbox(0.900, 0.082, W5_NGRAY, 0.06)
+        rich(0.10, 0.968, [("ROME edit", dict(color=W5_INK,
+                                              fontweight="bold")),
+                           (" \u00b7 one CounterFact request", G)], size=7.0)
+        x = rich(0.10, 0.926,
+                 [("(Oseberg oil field, located in):", P)], size=7.0)
+        x2 = rich(x + 0.022, 0.926, [("Norway", R)], size=7.0)
+        ax.plot([x + 0.022, x2], [0.909, 0.909], color=W5_RED, lw=0.9)
+        rich(x2 + 0.012, 0.926, [(" \u2192  ", P), ("Bulgaria", B)], size=7.0)
+
+        # row 1: B0
+        stepno(0.842, 1, W5_BLUE)
+        rbox(0.772, 0.112, W5_BLUE)
+        chip(0.095, 0.856, 0.230, "$B_0$ \u00b7 zero thinking", W5_BLUE)
+        rich(0.345, 0.870, [("edit passes $\\checkmark$", B)], size=6.8)
+        rich(0.10, 0.820,
+             [("A: ", G),
+              ("\u201cOseberg oil field is located in the country of ", P),
+              ("Bulgaria", B), (".\u201d", P)])
+
+        # row 2: B3
+        stepno(0.660, 2, W5_RED)
+        rbox(0.468, 0.286, W5_RED)
+        chip(0.095, 0.722, 0.230, "$B_3$ \u00b7 native chain", W5_RED)
+        rich(0.345, 0.736, [("edit undone $\\times$", R)], size=6.8)
+        rich(0.10, 0.686,
+             [("\u27e8think\u27e9 ", G),
+              ("\u201cOseberg sounds like it could be a Scandinavian", P)])
+        rich(0.118, 0.646, [("name, maybe ", P), ("Norwegian", R),
+                            ("? I think ", P), ("Norway", R),
+                            (" has some", P)])
+        rich(0.118, 0.606, [("significant oil fields\u2026\u201d ", P),
+                            ("\u27e8/think\u27e9", G),
+                            ("  \u2014 old value at 4% of the chain", IT)])
+        rich(0.10, 0.556,
+             [("A: ", G), ("\u201cOseberg oil field is located in ", P),
+              ("Norway", R), (", specifically", P)])
+        rich(0.118, 0.516, [("on the ", P), ("Norwegian", R),
+                            ("\u2026\u201d", P)])
+
+        # row 3: T
+        stepno(0.406, 3, W5_BLUE)
+        rbox(0.158, 0.296, W5_BLUE)
+        chip(0.095, 0.420, 0.318, "+ think-span suppression", W5_BLUE)
+        rich(0.428, 0.434, [("edit restored $\\checkmark$", B)], size=6.8)
+        rich(0.10, 0.384,
+             [("old-answer first tokens penalized in the think span", IT)])
+        rich(0.10, 0.348, [("only; answer logits untouched", IT)])
+        rich(0.10, 0.302,
+             [("\u27e8think\u27e9 ", G), ("\u201c\u2026maybe ", P),
+              ("Norwegian", R), ("? I think ", P),
+              ("there are some", B)])
+        rich(0.118, 0.262, [("oil fields in the North Sea", B),
+                            ("\u2026\u201d ", P),
+                            ("\u27e8/think\u27e9", G),
+                            ("  \u2014 the commitment deflects", IT)])
+        rich(0.10, 0.212,
+             [("A: ", G),
+              ("\u201cOseberg oil field is located in the country of ", P),
+              ("Bulgaria", B), (".\u201d", P)])
+
+        # connective arrows between step circles
+        for y0, y1 in ((0.818, 0.688), (0.634, 0.428)):
+            ax.annotate("", xy=(0.038, y1), xytext=(0.038, y0),
+                        arrowprops=dict(arrowstyle="-|>", color=W5_INK2,
+                                        lw=0.9))
+
+        rich(0.075, 0.076,
+             [("Verbatim excerpts from one recorded Qwen-32B case;", IT)],
+             size=6.0)
+        rich(0.075, 0.042,
+             [("the same weights answer all three ways.", IT)], size=6.0)
+
+        _save(fig, "fig_teaser")
+        plt.close(fig)
+
+    caption = f"""
+Figure 1 (teaser): one recorded Qwen-32B case, verbatim.  The ROME-edited
+model passes direct-answer validation at zero thinking, reverts to the old
+value after its own native chain (the old value first appears {frac:.0%}
+of the way into the chain), and answers with the edited value again when
+old-answer first tokens are penalized inside the think span only.
+Illustrative recorded case; Sections 3-5 give the population picture.
+"""
+    _write_caption("fig_teaser", caption)
+    rec.write()
+
+
+def fig_drop(results: dict[str, Any]) -> None:
+    """Figure 2: paired ES bars per checkpoint; drop arrows where the paired
+    CI excludes zero.  Levels carry no intervals -- none are recorded."""
+    rec = SourceMap("fig_drop")
+    fam = {}
+    fam["Qwen"] = {
+        "labels": ["1.5B", "7B", "14B", "32B"],
+        "b0": rec.read(results, ("capability", "families", "R1-Distill-Qwen",
+                                 "es_b0"),
+                       expected=[0.582, 0.5, 0.555, 0.595]),
+        "b3": rec.read(results, ("capability", "families", "R1-Distill-Qwen",
+                                 "es_b3"),
+                       expected=[0.607, 0.53, 0.515, 0.495]),
+        "drop": rec.read(results, ("capability", "families",
+                                   "R1-Distill-Qwen", "es_drop"),
+                         expected=[-0.026, -0.03, 0.04, 0.106]),
+        "ci": rec.read(results, ("capability", "families", "R1-Distill-Qwen",
+                                 "es_drop_ci"),
+                       expected=[[-0.097, 0.051], [-0.11, 0.05],
+                                 [-0.03, 0.11], [0.03, 0.182]]),
+    }
+    fam["Llama"] = {
+        "labels": ["8B", "70B"],
+        "b0": rec.read(results, ("capability", "families", "R1-Distill-Llama",
+                                 "es_b0"), expected=[0.625, 0.61]),
+        "b3": rec.read(results, ("capability", "families", "R1-Distill-Llama",
+                                 "es_b3"), expected=[0.61, 0.503]),
+        "drop": rec.read(results, ("capability", "families",
+                                   "R1-Distill-Llama", "es_drop"),
+                         expected=[0.015, 0.107]),
+        "ci": rec.read(results, ("capability", "families", "R1-Distill-Llama",
+                                 "es_drop_ci"),
+                       expected=[[-0.06, 0.095], [0.032, 0.182]]),
+    }
+
+    with plt.rc_context(W5_RC):
+        fig = plt.figure(figsize=(7.0, 2.30), constrained_layout=True)
+        gs = fig.add_gridspec(1, 2, width_ratios=[2.0, 1.05], wspace=0.05)
+        axes = {"Qwen": fig.add_subplot(gs[0, 0])}
+        axes["Llama"] = fig.add_subplot(gs[0, 1], sharey=axes["Qwen"])
+
+        drawn_arrows = 0
+        expected_arrows = 0
+        for name, ax in axes.items():
+            data = fam[name]
+            W = 0.36
+            for i, label in enumerate(data["labels"]):
+                b0 = float(data["b0"][i])
+                b3 = float(data["b3"][i])
+                drop = float(data["drop"][i])
+                lo, hi = (float(v) for v in data["ci"][i])
+                x = float(i)
+                ax.bar(x - W / 2 - .012, b0, W,
+                       facecolor=_w5_tint(W5_BLUE, .42), edgecolor=W5_BLUE,
+                       linewidth=1.3, zorder=3)
+                ax.bar(x + W / 2 + .012, b3, W,
+                       facecolor=_w5_tint(W5_RED, .38), edgecolor=W5_RED,
+                       linewidth=1.3, zorder=3)
+                if lo > 0 or hi < 0:
+                    expected_arrows += 1
+                    ax.annotate(
+                        "", xy=(x + W / 2 + .012, b3 + .015),
+                        xytext=(x - W / 2 - .012, b0 + .022),
+                        arrowprops=dict(
+                            arrowstyle="-|>,head_width=0.22,head_length=0.44",
+                            color=W5_RED, lw=1.7,
+                            connectionstyle="arc3,rad=-0.38"),
+                        zorder=6)
+                    drawn_arrows += 1
+                    ax.text(x + .13, max(b0, b3) + .118,
+                            f"{drop:.3f}".lstrip("0"), ha="center",
+                            fontsize=9.5, fontweight="bold", color=W5_RED)
+                    ax.text(x + .13, max(b0, b3) + .068,
+                            f"[{lo:.3f}, {hi:.3f}]".replace("0.", "."),
+                            ha="center", fontsize=5.6, color=W5_INK2)
+            ax.set_xticks(range(len(data["labels"])), data["labels"])
+            ax.set_xlim(-0.62, len(data["labels"]) - 0.38)
+            ax.set_ylim(0, 0.84)
+            ax.set_yticks([0, .2, .4, .6, .8])
+            ax.set_title(f"{name} (R1-distill)", fontsize=9,
+                         fontweight="bold", pad=5)
+            ax.tick_params(axis="x", length=0)
+            ax.spines[["top", "right"]].set_visible(False)
+
+        rec.invariant(
+            "arrows mark exactly the cells whose paired CI excludes zero",
+            drawn_arrows == expected_arrows and drawn_arrows == 2,
+            f"{drawn_arrows} arrows for {expected_arrows} excluding cells "
+            "(Qwen-32B and Llama-70B by the recorded intervals)",
+        )
+        rec.invariant(
+            "levels carry no intervals",
+            not any(line.get_ydata().size > 1 and line.get_marker() == "_"
+                    for ax in axes.values() for line in ax.get_lines()),
+            "no whisker artists exist; es_b0/es_b3 are recorded as points only",
+        )
+
+        hs = [mpatches.Patch(facecolor=_w5_tint(W5_BLUE, .42),
+                             edgecolor=W5_BLUE, linewidth=1.2,
+                             label="$B_0$ \u00b7 zero thinking"),
+              mpatches.Patch(facecolor=_w5_tint(W5_RED, .38),
+                             edgecolor=W5_RED, linewidth=1.2,
+                             label="$B_3$ \u00b7 native chain")]
+        axes["Qwen"].legend(handles=hs, loc="lower left",
+                            bbox_to_anchor=(0.005, 0.015), fontsize=7,
+                            frameon=True, fancybox=False, edgecolor="black",
+                            framealpha=1.0, borderpad=0.5, handlelength=1.3,
+                            handletextpad=0.5, labelspacing=0.35)
+        axes["Qwen"].set_ylabel("Generative edit success (ES)", fontsize=8)
+        plt.setp(axes["Llama"].get_yticklabels(), visible=False)
+        axes["Llama"].tick_params(axis="y", length=0)
+
+        _save(fig, "fig_drop")
+        plt.close(fig)
+
+    caption = """
+Figure 2 (drop chart): direct-answer ES at zero thinking versus after a
+native chain, per fixed checkpoint.  Levels are points (no interval is
+recorded for levels); the red arrows mark the two checkpoints whose paired
+drop CI excludes zero, with the drop and its 95% CI printed beside them.
+The remaining cells' drops and intervals are in Table 1.
+"""
+    _write_caption("fig_drop", caption)
+    rec.write()
+
+
+def fig_arms(results: dict[str, Any]) -> None:
+    """Figure 3: five-arm levels at B3 on three endpoints, with the paired
+    T-N contrast bracketed per endpoint.  Levels carry no intervals."""
+    rec = SourceMap("fig_arms")
+    arms = ["N", "T", "D", "P", "C"]
+    levels = {}
+    for metric in ("ES", "RR", "RRs"):
+        levels[metric] = {
+            arm: float(rec.read(results,
+                                ("rq3", "sup_battery", "marginal_B3", arm,
+                                 metric)))
+            for arm in arms
+        }
+    expected_levels = {
+        "ES": {"N": .495, "T": .631, "D": .281, "P": .507, "C": .510},
+        "RR": {"N": .193, "T": .085, "D": .309, "P": .210, "C": .208},
+        "RRs": {"N": .092, "T": .042, "D": .236, "P": .113, "C": .112},
+    }
+    rec.derived(
+        source_path="rq3.sup_battery.marginal_B3.<arm>.<metric>",
+        raw_value=levels, rendered="15 level bars",
+        transform="round to three decimals for the reviewed expectation",
+        expected=expected_levels)
+
+    tn = {}
+    for metric, expected in (
+        ("ES", [0.1378, [0.0816, 0.1939], 0.0]),
+        ("RR", [-0.1017, [-0.1695, -0.0424], 0.001]),
+        ("RRs", [-0.0508, [-0.1017, 0.0], 0.0732]),
+    ):
+        tn[metric] = rec.read(
+            results,
+            ("rq3", "sup_battery", "cross_arm_paired_ci", "T_minus_N",
+             metric),
+            expected=expected)
+
+    STYLE = {
+        "N": dict(ec=W5_NGRAY, hatch=None),
+        "T": dict(ec=W5_BLUE, hatch=None),
+        "D": dict(ec=W5_RED, hatch=None),
+        "P": dict(ec=W5_PGRAY, hatch="///"),
+        "C": dict(ec=W5_CTAN, hatch="\\\\\\"),
+    }
+    NAME = {"N": "none", "T": "suppress old", "D": "suppress new",
+            "P": "placebo", "C": "competitor"}
+    TITLE = {"ES": "Edit success (ES)", "RR": "Permissive reversion (RR)",
+             "RRs": "Strict $RR^s$ (secondary)"}
+
+    with plt.rc_context(W5_RC):
+        fig, ax = plt.subplots(figsize=(7.0, 2.30), constrained_layout=True)
+        BW, STEP, GW = 0.15, 0.175, 1.32
+        centers = [0.0, GW, 2 * GW]
+        bars_drawn = 0
+        for gc, metric in zip(centers, ("ES", "RR", "RRs")):
+            for i, arm in enumerate(arms):
+                st = STYLE[arm]
+                ax.bar(gc + (i - 2) * STEP, levels[metric][arm], BW,
+                       facecolor=_w5_tint(st["ec"], .40),
+                       edgecolor=st["ec"], linewidth=1.3,
+                       hatch=st["hatch"], zorder=3)
+                bars_drawn += 1
+            for arm, dx in (("N", -2), ("T", -1)):
+                value = levels[metric][arm]
+                ax.text(gc + dx * STEP, value + .013,
+                        f"{value:.3f}".lstrip("0"), ha="center",
+                        fontsize=6.8, color="black")
+            point, ci, _p = (float(tn[metric][0]),
+                             [float(v) for v in tn[metric][1]],
+                             float(tn[metric][2]))
+            x_n, x_t = gc - 2 * STEP, gc - 1 * STEP
+            y_b = max(levels[metric]["N"], levels[metric]["T"]) + .075
+            ax.plot([x_n, x_n, x_t, x_t],
+                    [y_b, y_b + .015, y_b + .015, y_b],
+                    color="black", lw=0.8, zorder=5)
+            sig = ci[0] > 0 or ci[1] < 0
+            xm = (x_n + x_t) / 2
+            ax.text(xm, y_b + .072,
+                    "T\u2212N " + f"{point:+.3f}".replace("0.", "."),
+                    ha="center", fontsize=7.0, color="black",
+                    fontweight="bold" if sig else "normal")
+            ax.text(xm, y_b + .028,
+                    (f"[{ci[0]:+.3f}, {ci[1]:+.3f}]".replace("0.", ".")
+                     .replace("+.000", ".000")),
+                    ha="center", fontsize=5.8, color=W5_INK2)
+            ax.text(gc, -0.104, TITLE[metric], ha="center", fontsize=8,
+                    fontweight="bold", color="black", clip_on=False)
+
+        rec.invariant(
+            "fifteen level bars, no intervals",
+            bars_drawn == 15 and len(ax.patches) >= 15
+            and not ax.containers is None
+            and not any(line.get_linestyle() == "-" and
+                        len(line.get_xdata()) == 2 and
+                        line.get_xdata()[0] == line.get_xdata()[1]
+                        for line in ax.get_lines()),
+            "five arms x three endpoints drawn as plain bars; marginal_B3 "
+            "records points only",
+        )
+
+        ax.set_xticks([gc + (i - 2) * STEP for gc in centers
+                       for i in range(5)], arms * 3, fontsize=7.5)
+        ax.set_ylim(0, 0.80)
+        ax.set_xlim(-0.55, 2 * GW + 0.55)
+        ax.set_yticks([0, .2, .4, .6, .8])
+        ax.set_ylabel("Level at $B_3$", fontsize=8)
+        ax.spines[["top", "right"]].set_visible(False)
+        ax.tick_params(axis="x", length=0, pad=1)
+        hs = [mpatches.Patch(facecolor=_w5_tint(STYLE[a]["ec"], .40),
+                             edgecolor=STYLE[a]["ec"], linewidth=1.2,
+                             hatch=STYLE[a]["hatch"],
+                             label=f"{a} \u00b7 {NAME[a]}") for a in arms]
+        ax.legend(handles=hs, loc="upper right", bbox_to_anchor=(1.0, 1.02),
+                  ncol=1, fontsize=6.8, frameon=True, fancybox=False,
+                  edgecolor="black", framealpha=1.0, borderpad=0.45,
+                  handlelength=1.3, handletextpad=0.5, labelspacing=0.3)
+        _save(fig, "fig_arms")
+        plt.close(fig)
+
+    caption = """
+Figure 3 (five arms): arm-wise levels at B3 on the two primary endpoints
+and the secondary strict displacement, with the paired T-N contrast
+bracketed per endpoint (bold where its 95% CI excludes zero; the strict
+interval touches zero).  Levels are points -- no interval is recorded for
+levels; every paired contrast with its CI and unadjusted p is in Table 2.
+"""
+    _write_caption("fig_arms", caption)
+    rec.write()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -1430,7 +1924,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--only",
-        choices=("all", "fig0", "fig1", "fig2", "fig3"),
+        choices=("all", "fig0", "fig1", "fig2", "fig3",
+                 "teaser", "drop", "arms"),
         default="all",
         help="render one figure or the full batch",
     )
@@ -1444,6 +1939,9 @@ def main() -> None:
         "fig1": fig1_capability,
         "fig2": fig2_mechanism,
         "fig3": fig3_rq3,
+        "teaser": fig_teaser,
+        "drop": fig_drop,
+        "arms": fig_arms,
     }
     selected: Iterable[str] = targets if args.only == "all" else [args.only]
     for target in selected:

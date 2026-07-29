@@ -1,0 +1,5 @@
+Figure 2 (drop chart): direct-answer ES at zero thinking versus after a
+native chain, per fixed checkpoint.  Levels are points (no interval is
+recorded for levels); the red arrows mark the two checkpoints whose paired
+drop CI excludes zero, with the drop and its 95% CI printed beside them.
+The remaining cells' drops and intervals are in Table 1.

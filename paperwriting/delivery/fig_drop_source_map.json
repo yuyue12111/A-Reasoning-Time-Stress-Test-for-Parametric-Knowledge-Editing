@@ -1,0 +1,193 @@
+{
+  "artifact": "fig_drop",
+  "numeric_source": "paperwriting/results.json",
+  "status": "PASS",
+  "entries": [
+    {
+      "json_path": "capability.families.R1-Distill-Qwen.es_b0",
+      "raw_value": [
+        0.582,
+        0.5,
+        0.555,
+        0.595
+      ],
+      "expected_from_fable_spec": [
+        0.582,
+        0.5,
+        0.555,
+        0.595
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Qwen.es_b3",
+      "raw_value": [
+        0.607,
+        0.53,
+        0.515,
+        0.495
+      ],
+      "expected_from_fable_spec": [
+        0.607,
+        0.53,
+        0.515,
+        0.495
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Qwen.es_drop",
+      "raw_value": [
+        -0.026,
+        -0.03,
+        0.04,
+        0.106
+      ],
+      "expected_from_fable_spec": [
+        -0.026,
+        -0.03,
+        0.04,
+        0.106
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Qwen.es_drop_ci",
+      "raw_value": [
+        [
+          -0.097,
+          0.051
+        ],
+        [
+          -0.11,
+          0.05
+        ],
+        [
+          -0.03,
+          0.11
+        ],
+        [
+          0.03,
+          0.182
+        ]
+      ],
+      "expected_from_fable_spec": [
+        [
+          -0.097,
+          0.051
+        ],
+        [
+          -0.11,
+          0.05
+        ],
+        [
+          -0.03,
+          0.11
+        ],
+        [
+          0.03,
+          0.182
+        ]
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama.es_b0",
+      "raw_value": [
+        0.625,
+        0.61
+      ],
+      "expected_from_fable_spec": [
+        0.625,
+        0.61
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama.es_b3",
+      "raw_value": [
+        0.61,
+        0.503
+      ],
+      "expected_from_fable_spec": [
+        0.61,
+        0.503
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama.es_drop",
+      "raw_value": [
+        0.015,
+        0.107
+      ],
+      "expected_from_fable_spec": [
+        0.015,
+        0.107
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "capability.families.R1-Distill-Llama.es_drop_ci",
+      "raw_value": [
+        [
+          -0.06,
+          0.095
+        ],
+        [
+          0.032,
+          0.182
+        ]
+      ],
+      "expected_from_fable_spec": [
+        [
+          -0.06,
+          0.095
+        ],
+        [
+          0.032,
+          0.182
+        ]
+      ],
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "visual",
+      "status": "MATCH"
+    }
+  ],
+  "invariants": [
+    {
+      "name": "arrows mark exactly the cells whose paired CI excludes zero",
+      "status": "PASS",
+      "detail": "2 arrows for 2 excluding cells (Qwen-32B and Llama-70B by the recorded intervals)"
+    },
+    {
+      "name": "levels carry no intervals",
+      "status": "PASS",
+      "detail": "no whisker artists exist; es_b0/es_b3 are recorded as points only"
+    }
+  ],
+  "mismatches": [],
+  "failures": []
+}

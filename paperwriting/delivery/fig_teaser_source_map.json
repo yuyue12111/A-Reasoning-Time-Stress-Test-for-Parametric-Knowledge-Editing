@@ -1,0 +1,95 @@
+{
+  "artifact": "fig_teaser",
+  "numeric_source": "paperwriting/results.json",
+  "status": "PASS",
+  "entries": [
+    {
+      "json_path": "teaser_case.old_at_frac",
+      "raw_value": 0.041,
+      "expected_from_fable_spec": 0.041,
+      "rendered_value": null,
+      "display_transform": "identity",
+      "role": "caption",
+      "status": "MATCH"
+    },
+    {
+      "json_path": "results 2/probe/r1qwen32b_ROME_cf200_r7of8.jsonl:52",
+      "raw_value": "located in the country of **Bulgaria**",
+      "expected_from_fable_spec": null,
+      "rendered_value": "located in the country of **Bulgaria**",
+      "display_transform": "verbatim excerpt (markdown ** rendered as bold)",
+      "role": "quote",
+      "status": "SOURCE_ONLY"
+    },
+    {
+      "json_path": "results 2/probe/r1qwen32b_ROME_cf200_r7of8.jsonl:57",
+      "raw_value": "Oseberg sounds like it could be a Scandinavian name, maybe Norwegian? I think Norway has some significant oil fields",
+      "expected_from_fable_spec": null,
+      "rendered_value": "Oseberg sounds like it could be a Scandinavian name, maybe Norwegian? I think Norway has some significant oil fields",
+      "display_transform": "verbatim excerpt (markdown ** rendered as bold)",
+      "role": "quote",
+      "status": "SOURCE_ONLY"
+    },
+    {
+      "json_path": "results 2/probe/r1qwen32b_ROME_cf200_r7of8.jsonl:57",
+      "raw_value": "located in Norway, specifically on the Norwegian",
+      "expected_from_fable_spec": null,
+      "rendered_value": "located in Norway, specifically on the Norwegian",
+      "display_transform": "verbatim excerpt (markdown ** rendered as bold)",
+      "role": "quote",
+      "status": "SOURCE_ONLY"
+    },
+    {
+      "json_path": "results 2/probe/r1qwen32b_ROME_cf200sup_r7of8.jsonl:57",
+      "raw_value": "maybe Norwegian? I think there are some oil fields in the North Sea",
+      "expected_from_fable_spec": null,
+      "rendered_value": "maybe Norwegian? I think there are some oil fields in the North Sea",
+      "display_transform": "verbatim excerpt (markdown ** rendered as bold)",
+      "role": "quote",
+      "status": "SOURCE_ONLY"
+    },
+    {
+      "json_path": "results 2/probe/r1qwen32b_ROME_cf200sup_r7of8.jsonl:57",
+      "raw_value": "located in the country of Bulgaria",
+      "expected_from_fable_spec": null,
+      "rendered_value": "located in the country of Bulgaria",
+      "display_transform": "verbatim excerpt (markdown ** rendered as bold)",
+      "role": "quote",
+      "status": "SOURCE_ONLY"
+    }
+  ],
+  "invariants": [
+    {
+      "name": "records are the teaser case at the right budgets",
+      "status": "PASS",
+      "detail": "case_id/budget fields of the three retained rows"
+    },
+    {
+      "name": "verbatim quote n_b0_answer",
+      "status": "PASS",
+      "detail": "rendered span is a substring of the retained text (n_b0_answer)"
+    },
+    {
+      "name": "verbatim quote n_b3_chain",
+      "status": "PASS",
+      "detail": "rendered span is a substring of the retained text (n_b3_chain)"
+    },
+    {
+      "name": "verbatim quote n_b3_answer",
+      "status": "PASS",
+      "detail": "rendered span is a substring of the retained text (n_b3_answer)"
+    },
+    {
+      "name": "verbatim quote t_b3_chain",
+      "status": "PASS",
+      "detail": "rendered span is a substring of the retained text (t_b3_chain)"
+    },
+    {
+      "name": "verbatim quote t_b3_answer",
+      "status": "PASS",
+      "detail": "rendered span is a substring of the retained text (t_b3_answer)"
+    }
+  ],
+  "mismatches": [],
+  "failures": []
+}

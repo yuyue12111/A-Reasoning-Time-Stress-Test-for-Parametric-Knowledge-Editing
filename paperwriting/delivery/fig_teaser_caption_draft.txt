@@ -1,0 +1,6 @@
+Figure 1 (teaser): one recorded Qwen-32B case, verbatim.  The ROME-edited
+model passes direct-answer validation at zero thinking, reverts to the old
+value after its own native chain (the old value first appears 4%
+of the way into the chain), and answers with the edited value again when
+old-answer first tokens are penalized inside the think span only.
+Illustrative recorded case; Sections 3-5 give the population picture.

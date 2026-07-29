@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="254.16pt" height="252pt" viewBox="0 0 254.16 252" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <title>fig_teaser</title>
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title>fig_teaser</dc:title>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>anonymized-generator.py</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 252
+L 254.16 252
+L 254.16 0
+L 0 0
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 21.51 29.4912
+L 246.312 29.4912
+Q 248.2992 29.4912 248.2992 27.504
+L 248.2992 7.31232
+Q 248.2992 5.32512 246.312 5.32512
+L 21.51 5.32512
+Q 19.5228 5.32512 19.5228 7.31232
+L 19.5228 27.504
+Q 19.5228 29.4912 21.51 29.4912
+z
+" clip-path="url(#pd96307924d)" style="fill: #6f7680; fill-opacity: 0.06; stroke: #6f7680; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 12.3192 46.95696
+C 13.702605 46.95696 15.029536 46.412107 16.007752 45.442397
+C 16.985967 44.472688 17.5356 43.157296 17.5356 41.78592
+C 17.5356 40.414544 16.985967 39.099152 16.007752 38.129443
+C 15.029536 37.159733 13.702605 36.61488 12.3192 36.61488
+C 10.935795 36.61488 9.608864 37.159733 8.630648 38.129443
+C 7.652433 39.099152 7.1028 40.414544 7.1028 41.78592
+C 7.1028 43.157296 7.652433 44.472688 8.630648 45.442397
+C 9.608864 46.412107 10.935795 46.95696 12.3192 46.95696
+z
+" clip-path="url(#pd96307924d)" style="fill: #2e6fbf"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 21.51 61.00992
+L 246.312 61.00992
+Q 248.2992 61.00992 248.2992 59.02272
+L 248.2992 31.44384
+Q 248.2992 29.45664 246.312 29.45664
+L 21.51 29.45664
+Q 19.5228 29.45664 19.5228 31.44384
+L 19.5228 59.02272
+Q 19.5228 61.00992 21.51 61.00992
+z
+" clip-path="url(#pd96307924d)" style="fill: #2e6fbf; fill-opacity: 0.09; stroke: #2e6fbf; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 26.478 45
+L 83.61 45
+Q 85.1004 45 85.1004 43.5096
+L 85.1004 33.16752
+Q 85.1004 31.67712 83.61 31.67712
+L 26.478 31.67712
+Q 24.9876 31.67712 24.9876 33.16752
+L 24.9876 43.5096
+Q 24.9876 45 26.478 45
+z
+" clip-path="url(#pd96307924d)" style="fill: #2e6fbf"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 12.3192 91.77264
+C 13.702605 91.77264 15.029536 91.227787 16.007752 90.258077
+C 16.985967 89.288368 17.5356 87.972976 17.5356 86.6016
+C 17.5356 85.230224 16.985967 83.914832 16.007752 82.945123
+C 15.029536 81.975413 13.702605 81.43056 12.3192 81.43056
+C 10.935795 81.43056 9.608864 81.975413 8.630648 82.945123
+C 7.652433 83.914832 7.1028 85.230224 7.1028 86.6016
+C 7.1028 87.972976 7.652433 89.288368 8.630648 90.258077
+C 9.608864 91.227787 10.935795 91.77264 12.3192 91.77264
+z
+" clip-path="url(#pd96307924d)" style="fill: #d65442"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 21.51 135.86688
+L 246.312 135.86688
+Q 248.2992 135.86688 248.2992 133.87968
+L 248.2992 63.45504
+Q 248.2992 61.46784 246.312 61.46784
+L 21.51 61.46784
+Q 19.5228 61.46784 19.5228 63.45504
+L 19.5228 133.87968
+Q 19.5228 135.86688 21.51 135.86688
+z
+" clip-path="url(#pd96307924d)" style="fill: #d65442; fill-opacity: 0.09; stroke: #d65442; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 26.478 77.99616
+L 83.61 77.99616
+Q 85.1004 77.99616 85.1004 76.50576
+L 85.1004 66.16368
+Q 85.1004 64.67328 83.61 64.67328
+L 26.478 64.67328
+Q 24.9876 64.67328 24.9876 66.16368
+L 24.9876 76.50576
+Q 24.9876 77.99616 26.478 77.99616
+z
+" clip-path="url(#pd96307924d)" style="fill: #d65442"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 12.3192 154.3176
+C 13.702605 154.3176 15.029536 153.772747 16.007752 152.803037
+C 16.985967 151.833328 17.5356 150.517936 17.5356 149.14656
+C 17.5356 147.775184 16.985967 146.459792 16.007752 145.490083
+C 15.029536 144.520373 13.702605 143.97552 12.3192 143.97552
+C 10.935795 143.97552 9.608864 144.520373 8.630648 145.490083
+C 7.652433 146.459792 7.1028 147.775184 7.1028 149.14656
+C 7.1028 150.517936 7.652433 151.833328 8.630648 152.803037
+C 9.608864 153.772747 10.935795 154.3176 12.3192 154.3176
+z
+" clip-path="url(#pd96307924d)" style="fill: #2e6fbf"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 21.51 212.20128
+L 246.312 212.20128
+Q 248.2992 212.20128 248.2992 210.21408
+L 248.2992 137.32704
+Q 248.2992 135.33984 246.312 135.33984
+L 21.51 135.33984
+Q 19.5228 135.33984 19.5228 137.32704
+L 19.5228 210.21408
+Q 19.5228 212.20128 21.51 212.20128
+z
+" clip-path="url(#pd96307924d)" style="fill: #2e6fbf; fill-opacity: 0.09; stroke: #2e6fbf; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 26.478 152.36064
+L 105.4692 152.36064
+Q 106.9596 152.36064 106.9596 150.87024
+L 106.9596 140.52816
+Q 106.9596 139.03776 105.4692 139.03776
+L 26.478 139.03776
+Q 24.9876 139.03776 24.9876 140.52816
+L 24.9876 150.87024
+Q 24.9876 152.36064 26.478 152.36064
+z
+" clip-path="url(#pd96307924d)" style="fill: #2e6fbf"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 114.4323 25.28784
+L 139.2723 25.28784
+" clip-path="url(#pd96307924d)" style="fill: none; stroke: #d65442; stroke-width: 0.9; stroke-linecap: square"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="27.72" y="16.00968" transform="rotate(-0 27.72 16.00968)">ROME edit</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #6b7280" x="62.8425" y="16.00968" transform="rotate(-0 62.8425 16.00968)"> · one CounterFact request</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="27.72" y="26.35176" transform="rotate(-0 27.72 26.35176)">(Oseberg oil field, located in):</text>
+   </g>
+   <g id="text_4">
+    <text style="font-weight: 700; font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #d65442" x="114.4323" y="26.35176" transform="rotate(-0 114.4323 26.35176)">Norway</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="142.2531" y="26.35176" transform="rotate(-0 142.2531 26.35176)"> →  </text>
+   </g>
+   <g id="text_6">
+    <text style="font-weight: 700; font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #2e6fbf" x="153.0531" y="26.35176" transform="rotate(-0 153.0531 26.35176)">Bulgaria</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="12.3192" y="43.43592" transform="rotate(-0 12.3192 43.43592)">1</text>
+   </g>
+   <g id="text_8">
+    <!-- $B_0$ · zero thinking -->
+    <g style="fill: #ffffff" transform="translate(30.799 39.96356)">
+     <text>
+      <tspan x="0" y="-0.515625" style="font-style: italic; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">B</tspan>
+      <tspan x="3.971497" y="0.459375" style="font-size: 4.55px; font-family: 'STIXGeneral'; fill: #ffffff">0</tspan>
+      <tspan x="6.538997" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff"> </tspan>
+      <tspan x="8.163997" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">·</tspan>
+      <tspan x="9.788997" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff"> </tspan>
+      <tspan x="11.413997" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">z</tspan>
+      <tspan x="14.299998" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">e</tspan>
+      <tspan x="17.186" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">r</tspan>
+      <tspan x="20.072001" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">o</tspan>
+      <tspan x="23.322001" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff"> </tspan>
+      <tspan x="24.947001" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">t</tspan>
+      <tspan x="27.111506" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">h</tspan>
+      <tspan x="30.725505" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">i</tspan>
+      <tspan x="32.532512" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">n</tspan>
+      <tspan x="36.14651" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">k</tspan>
+      <tspan x="39.760508" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">i</tspan>
+      <tspan x="41.567515" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">n</tspan>
+      <tspan x="45.181514" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">g</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_9">
+    <!-- edit passes $\checkmark$ -->
+    <g style="fill: #2e6fbf" transform="translate(88.578 39.9912)">
+     <text>
+      <tspan x="0" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">e</tspan>
+      <tspan x="3.017792" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">d</tspan>
+      <tspan x="6.796829" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">i</tspan>
+      <tspan x="8.686356" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">t</tspan>
+      <tspan x="10.949707" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf"> </tspan>
+      <tspan x="12.648911" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">p</tspan>
+      <tspan x="16.427948" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">a</tspan>
+      <tspan x="19.82637" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">s</tspan>
+      <tspan x="22.470337" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">s</tspan>
+      <tspan x="25.114304" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">e</tspan>
+      <tspan x="28.132095" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">s</tspan>
+      <tspan x="30.776062" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf"> </tspan>
+      <tspan x="32.475266" y="-0.1875" style="font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">✓</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #6b7280" x="27.72" y="52.1532" transform="rotate(-0 27.72 52.1532)">A: </text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="36.36" y="52.1532" transform="rotate(-0 36.36 52.1532)">“Oseberg oil field is located in the country of </text>
+   </g>
+   <g id="text_12">
+    <text style="font-weight: 700; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #2e6fbf" x="161.01" y="52.1532" transform="rotate(-0 161.01 52.1532)">Bulgaria</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="187.6275" y="52.1532" transform="rotate(-0 187.6275 52.1532)">.”</text>
+   </g>
+   <g id="text_14">
+    <text style="font-weight: 700; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="12.3192" y="88.2516" transform="rotate(-0 12.3192 88.2516)">2</text>
+   </g>
+   <g id="text_15">
+    <!-- $B_3$ · native chain -->
+    <g style="fill: #ffffff" transform="translate(32.424 72.95972)">
+     <text>
+      <tspan x="0" y="-0.515625" style="font-style: italic; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">B</tspan>
+      <tspan x="3.971497" y="0.459375" style="font-size: 4.55px; font-family: 'STIXGeneral'; fill: #ffffff">3</tspan>
+      <tspan x="6.538997" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff"> </tspan>
+      <tspan x="8.163997" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">·</tspan>
+      <tspan x="9.788997" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff"> </tspan>
+      <tspan x="11.413997" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">n</tspan>
+      <tspan x="15.027995" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">a</tspan>
+      <tspan x="18.277995" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">t</tspan>
+      <tspan x="20.4425" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">i</tspan>
+      <tspan x="22.249507" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">v</tspan>
+      <tspan x="25.499507" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">e</tspan>
+      <tspan x="28.385508" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff"> </tspan>
+      <tspan x="30.010508" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">c</tspan>
+      <tspan x="32.89651" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">h</tspan>
+      <tspan x="36.510508" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">a</tspan>
+      <tspan x="39.760508" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">i</tspan>
+      <tspan x="41.567515" y="-0.515625" style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral'; fill: #ffffff">n</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_16">
+    <!-- edit undone $\times$ -->
+    <g style="fill: #d65442" transform="translate(88.578 72.98736)">
+     <text>
+      <tspan x="0" y="-0.296875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #d65442">e</tspan>
+      <tspan x="3.017792" y="-0.296875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #d65442">d</tspan>
+      <tspan x="6.796829" y="-0.296875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #d65442">i</tspan>
+      <tspan x="8.686356" y="-0.296875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #d65442">t</tspan>
+      <tspan x="10.949707" y="-0.296875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #d65442"> </tspan>
+      <tspan x="12.648911" y="-0.296875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #d65442">u</tspan>
+      <tspan x="16.427948" y="-0.296875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #d65442">n</tspan>
+      <tspan x="20.206985" y="-0.296875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #d65442">d</tspan>
+      <tspan x="23.986023" y="-0.296875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #d65442">o</tspan>
+      <tspan x="27.384445" y="-0.296875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #d65442">n</tspan>
+      <tspan x="31.163483" y="-0.296875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #d65442">e</tspan>
+      <tspan x="34.181274" y="-0.296875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #d65442"> </tspan>
+      <tspan x="35.880478" y="-0.296875" style="font-size: 6.8px; font-family: 'STIXGeneral'; fill: #d65442">×</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #6b7280" x="27.72" y="85.14936" transform="rotate(-0 27.72 85.14936)">⟨think⟩ </text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="50.09625" y="85.14936" transform="rotate(-0 50.09625 85.14936)">“Oseberg sounds like it could be a Scandinavian</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="32.1912" y="94.99896" transform="rotate(-0 32.1912 94.99896)">name, maybe </text>
+   </g>
+   <g id="text_20">
+    <text style="font-weight: 700; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #d65442" x="68.7312" y="94.99896" transform="rotate(-0 68.7312 94.99896)">Norwegian</text>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="103.05495" y="94.99896" transform="rotate(-0 103.05495 94.99896)">? I think </text>
+   </g>
+   <g id="text_22">
+    <text style="font-weight: 700; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #d65442" x="127.5912" y="94.99896" transform="rotate(-0 127.5912 94.99896)">Norway</text>
+   </g>
+   <g id="text_23">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="151.74495" y="94.99896" transform="rotate(-0 151.74495 94.99896)"> has some</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="32.1912" y="104.84856" transform="rotate(-0 32.1912 104.84856)">significant oil fields…” </text>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #6b7280" x="98.4312" y="104.84856" transform="rotate(-0 98.4312 104.84856)">⟨/think⟩</text>
+   </g>
+   <g id="text_26">
+    <text style="font-style: italic; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #6b7280" x="121.52745" y="104.84856" transform="rotate(-0 121.52745 104.84856)">  — old value at 4% of the chain</text>
+   </g>
+   <g id="text_27">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #6b7280" x="27.72" y="117.16056" transform="rotate(-0 27.72 117.16056)">A: </text>
+   </g>
+   <g id="text_28">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="36.36" y="117.16056" transform="rotate(-0 36.36 117.16056)">“Oseberg oil field is located in </text>
+   </g>
+   <g id="text_29">
+    <text style="font-weight: 700; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #d65442" x="121.21875" y="117.16056" transform="rotate(-0 121.21875 117.16056)">Norway</text>
+   </g>
+   <g id="text_30">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="145.3725" y="117.16056" transform="rotate(-0 145.3725 117.16056)">, specifically</text>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="32.1912" y="127.01016" transform="rotate(-0 32.1912 127.01016)">on the </text>
+   </g>
+   <g id="text_32">
+    <text style="font-weight: 700; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #d65442" x="50.24745" y="127.01016" transform="rotate(-0 50.24745 127.01016)">Norwegian</text>
+   </g>
+   <g id="text_33">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="84.5712" y="127.01016" transform="rotate(-0 84.5712 127.01016)">…”</text>
+   </g>
+   <g id="text_34">
+    <text style="font-weight: 700; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="12.3192" y="150.79656" transform="rotate(-0 12.3192 150.79656)">3</text>
+   </g>
+   <g id="text_35">
+    <text style="font-weight: 700; font-size: 6.5px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="65.9736" y="147.3242" transform="rotate(-0 65.9736 147.3242)">+ think-span suppression</text>
+   </g>
+   <g id="text_36">
+    <!-- edit restored $\checkmark$ -->
+    <g style="fill: #2e6fbf" transform="translate(109.1952 147.35184)">
+     <text>
+      <tspan x="0" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">e</tspan>
+      <tspan x="3.017792" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">d</tspan>
+      <tspan x="6.796829" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">i</tspan>
+      <tspan x="8.686356" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">t</tspan>
+      <tspan x="10.949707" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf"> </tspan>
+      <tspan x="12.648911" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">r</tspan>
+      <tspan x="15.666702" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">e</tspan>
+      <tspan x="18.684494" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">s</tspan>
+      <tspan x="21.328461" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">t</tspan>
+      <tspan x="23.591812" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">o</tspan>
+      <tspan x="26.990234" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">r</tspan>
+      <tspan x="30.008026" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">e</tspan>
+      <tspan x="33.025818" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">d</tspan>
+      <tspan x="36.804855" y="-0.1875" style="font-weight: 700; font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf"> </tspan>
+      <tspan x="38.504059" y="-0.1875" style="font-size: 6.8px; font-family: 'STIXGeneral'; fill: #2e6fbf">✓</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_37">
+    <text style="font-style: italic; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #6b7280" x="27.72" y="159.51384" transform="rotate(-0 27.72 159.51384)">old-answer first tokens penalized in the think span</text>
+   </g>
+   <g id="text_38">
+    <text style="font-style: italic; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #6b7280" x="27.72" y="168.37848" transform="rotate(-0 27.72 168.37848)">only; answer logits untouched</text>
+   </g>
+   <g id="text_39">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #6b7280" x="27.72" y="179.70552" transform="rotate(-0 27.72 179.70552)">⟨think⟩ </text>
+   </g>
+   <g id="text_40">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="50.09625" y="179.70552" transform="rotate(-0 50.09625 179.70552)">“…maybe </text>
+   </g>
+   <g id="text_41">
+    <text style="font-weight: 700; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #d65442" x="79.43625" y="179.70552" transform="rotate(-0 79.43625 179.70552)">Norwegian</text>
+   </g>
+   <g id="text_42">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="113.76" y="179.70552" transform="rotate(-0 113.76 179.70552)">? I think </text>
+   </g>
+   <g id="text_43">
+    <text style="font-weight: 700; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #2e6fbf" x="138.29625" y="179.70552" transform="rotate(-0 138.29625 179.70552)">there are some</text>
+   </g>
+   <g id="text_44">
+    <text style="font-weight: 700; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #2e6fbf" x="32.1912" y="189.55512" transform="rotate(-0 32.1912 189.55512)">oil fields in the North Sea</text>
+   </g>
+   <g id="text_45">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="112.0887" y="189.55512" transform="rotate(-0 112.0887 189.55512)">…” </text>
+   </g>
+   <g id="text_46">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #6b7280" x="123.6087" y="189.55512" transform="rotate(-0 123.6087 189.55512)">⟨/think⟩</text>
+   </g>
+   <g id="text_47">
+    <text style="font-style: italic; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #6b7280" x="146.70495" y="189.55512" transform="rotate(-0 146.70495 189.55512)">  — the commitment deflects</text>
+   </g>
+   <g id="text_48">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #6b7280" x="27.72" y="201.86712" transform="rotate(-0 27.72 201.86712)">A: </text>
+   </g>
+   <g id="text_49">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="36.36" y="201.86712" transform="rotate(-0 36.36 201.86712)">“Oseberg oil field is located in the country of </text>
+   </g>
+   <g id="text_50">
+    <text style="font-weight: 700; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #2e6fbf" x="161.01" y="201.86712" transform="rotate(-0 161.01 201.86712)">Bulgaria</text>
+   </g>
+   <g id="text_51">
+    <text style="font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="187.6275" y="201.86712" transform="rotate(-0 187.6275 201.86712)">.”</text>
+   </g>
+   <g id="patch_12">
+    <path d="M 12.3192 49.692472
+Q 12.3192 63.701272 12.3192 76.703841
+" style="fill: none; stroke: #6b7280; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 13.9192 73.503841
+L 12.3192 76.703841
+L 10.7192 73.503841
+z
+" style="fill: #6b7280; stroke: #6b7280; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 12.3192 95.000783
+Q 12.3192 118.364229 12.3192 140.721445
+" style="fill: none; stroke: #6b7280; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 13.9192 137.521445
+L 12.3192 140.721445
+L 10.7192 137.521445
+z
+" style="fill: #6b7280; stroke: #6b7280; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="text_52">
+    <text style="font-style: italic; font-size: 6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #6b7280" x="21.51" y="234.90576" transform="rotate(-0 21.51 234.90576)">Verbatim excerpts from one recorded Qwen-32B case;</text>
+   </g>
+   <g id="text_53">
+    <text style="font-style: italic; font-size: 6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #6b7280" x="21.51" y="243.27792" transform="rotate(-0 21.51 243.27792)">the same weights answer all three ways.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pd96307924d">
+   <rect x="2.88" y="2.88" width="248.4" height="246.24"/>
+  </clipPath>
+ </defs>
+</svg>
