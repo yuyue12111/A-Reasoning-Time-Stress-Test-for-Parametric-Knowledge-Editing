@@ -1460,6 +1460,40 @@ def _w5_tint(color: str, alpha: float = 0.40):
     return mcolors.to_rgba(color, alpha)
 
 
+def _assert_vertical_clearance(
+    fig: plt.Figure,
+    pairs: list[tuple[str, Any, Any]],
+    minimum_px: float = 1.5,
+) -> None:
+    """Fail closed when two rendered artists collide vertically.
+
+    W6-2: both W5 figures shipped with overlapping ink -- the five-arm group
+    titles walked up into the tick labels when the canvas shrank, and the
+    teaser's stage boxes overlapped because ``FancyBboxPatch`` pads outward by
+    a constant that exceeded the gaps the layout left for it.  Neither is
+    visible to a numeric gate, so the geometry asserts itself here: an artist
+    pair whose measured extents touch raises instead of rendering.
+    """
+
+    from matplotlib.backends.backend_agg import FigureCanvasAgg
+
+    FigureCanvasAgg(fig)
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    failures = []
+    for label, upper, lower in pairs:
+        upper_box = upper.get_window_extent(renderer)
+        lower_box = lower.get_window_extent(renderer)
+        gap = upper_box.y0 - lower_box.y1
+        if gap < minimum_px:
+            failures.append(f"{label}: {gap:+.2f}px (need >= {minimum_px})")
+    if failures:
+        raise RuntimeError(
+            "vertical clearance violated in rendered figure: "
+            + "; ".join(failures)
+        )
+
+
 def _load_probe_line(src: str) -> dict[str, Any]:
     """Read 'path:lineno' from a retained probe jsonl (1-indexed line)."""
     path_str, _, lineno = src.rpartition(":")
@@ -1543,12 +1577,23 @@ def fig_teaser(results: dict[str, Any]) -> None:
                 x += bb.width / (FW * fig.dpi)
             return x
 
+        stage_boxes = []
+
         def rbox(y0, h, edge, fill_alpha=0.09):
-            ax.add_patch(mpatches.FancyBboxPatch(
+            # W6-2: pad 0.008 -> 0.005.  FancyBboxPatch grows the drawn box by
+            # pad*FW inches on every side (mutation_aspect makes it isotropic),
+            # so at 0.008 each edge reached 2.76px beyond its nominal y while
+            # the layout left only 3.7-4.7px between boxes -- the borders drew
+            # through one another.  The box extents below are set from the
+            # measured text extents; _assert_vertical_clearance enforces both.
+            patch = mpatches.FancyBboxPatch(
                 (0.075, y0), 0.905, h,
-                boxstyle="round,pad=0.008", linewidth=1.0, edgecolor=edge,
+                boxstyle="round,pad=0.005", linewidth=1.0, edgecolor=edge,
                 facecolor=mcolors.to_rgba(edge, fill_alpha),
-                mutation_aspect=FW / FH))
+                mutation_aspect=FW / FH)
+            ax.add_patch(patch)
+            stage_boxes.append(patch)
+            return patch
 
         def chip(x, y, w, text, color):
             ax.add_patch(mpatches.FancyBboxPatch(
@@ -1571,19 +1616,19 @@ def fig_teaser(results: dict[str, Any]) -> None:
         IT = dict(color=W5_INK2, style="italic")
 
         # header: the edit
-        rbox(0.900, 0.082, W5_NGRAY, 0.06)
-        rich(0.10, 0.968, [("ROME edit", dict(color=W5_INK,
+        rbox(0.8955, 0.0865, W5_NGRAY, 0.06)
+        rich(0.10, 0.978, [("ROME edit", dict(color=W5_INK,
                                               fontweight="bold")),
                            (" \u00b7 one CounterFact request", G)], size=7.0)
-        x = rich(0.10, 0.926,
+        x = rich(0.10, 0.936,
                  [("(Oseberg oil field, located in):", P)], size=7.0)
-        x2 = rich(x + 0.022, 0.926, [("Norway", R)], size=7.0)
-        ax.plot([x + 0.022, x2], [0.909, 0.909], color=W5_RED, lw=0.9)
-        rich(x2 + 0.012, 0.926, [(" \u2192  ", P), ("Bulgaria", B)], size=7.0)
+        x2 = rich(x + 0.022, 0.936, [("Norway", R)], size=7.0)
+        ax.plot([x + 0.022, x2], [0.919, 0.919], color=W5_RED, lw=0.9)
+        rich(x2 + 0.012, 0.936, [(" \u2192  ", P), ("Bulgaria", B)], size=7.0)
 
         # row 1: B0
         stepno(0.842, 1, W5_BLUE)
-        rbox(0.772, 0.112, W5_BLUE)
+        rbox(0.780, 0.0946, W5_BLUE)
         chip(0.095, 0.856, 0.230, "$B_0$ \u00b7 zero thinking", W5_BLUE)
         rich(0.345, 0.870, [("edit passes $\\checkmark$", B)], size=6.8)
         rich(0.10, 0.820,
@@ -1593,7 +1638,7 @@ def fig_teaser(results: dict[str, Any]) -> None:
 
         # row 2: B3
         stepno(0.660, 2, W5_RED)
-        rbox(0.468, 0.286, W5_RED)
+        rbox(0.476, 0.278, W5_RED)
         chip(0.095, 0.722, 0.230, "$B_3$ \u00b7 native chain", W5_RED)
         rich(0.345, 0.736, [("edit undone $\\times$", R)], size=6.8)
         rich(0.10, 0.686,
@@ -1613,7 +1658,7 @@ def fig_teaser(results: dict[str, Any]) -> None:
 
         # row 3: T
         stepno(0.406, 3, W5_BLUE)
-        rbox(0.158, 0.296, W5_BLUE)
+        rbox(0.158, 0.292, W5_BLUE)
         chip(0.095, 0.420, 0.318, "+ think-span suppression", W5_BLUE)
         rich(0.428, 0.434, [("edit restored $\\checkmark$", B)], size=6.8)
         rich(0.10, 0.384,
@@ -1643,6 +1688,13 @@ def fig_teaser(results: dict[str, Any]) -> None:
              size=6.0)
         rich(0.075, 0.042,
              [("the same weights answer all three ways.", IT)], size=6.0)
+
+        ordered = sorted(stage_boxes,
+                         key=lambda p: -p.get_bbox().y1)
+        _assert_vertical_clearance(fig, [
+            (f"stage box {i} over {i + 1}", ordered[i], ordered[i + 1])
+            for i in range(len(ordered) - 1)
+        ])
 
         _save(fig, "fig_teaser")
         plt.close(fig)
@@ -1871,8 +1923,16 @@ def fig_arms(results: dict[str, Any]) -> None:
                     (f"[{ci[0]:+.3f}, {ci[1]:+.3f}]".replace("0.", ".")
                      .replace("+.000", ".000")),
                     ha="center", fontsize=5.8, color=W5_INK2)
-            ax.text(gc, -0.104, TITLE[metric], ha="center", fontsize=8,
-                    fontweight="bold", color="black", clip_on=False)
+            # W6-2: placed in offset points below the axis, not in data
+            # coordinates.  A data-coordinate offset scales with the figure
+            # height, so shrinking the figure walked this title up into the
+            # x tick labels; points do not move when the canvas does.
+            ax.annotate(TITLE[metric], xy=(gc, 0),
+                        xycoords=("data", "axes fraction"),
+                        xytext=(0, -10.5), textcoords="offset points",
+                        ha="center", va="top", fontsize=8,
+                        fontweight="bold", color="black",
+                        annotation_clip=False)
 
         rec.invariant(
             "fifteen level bars, no intervals",
@@ -1902,6 +1962,17 @@ def fig_arms(results: dict[str, Any]) -> None:
                   ncol=1, fontsize=6.8, frameon=True, fancybox=False,
                   edgecolor="black", framealpha=1.0, borderpad=0.45,
                   handlelength=1.3, handletextpad=0.5, labelspacing=0.3)
+
+        titles = [child for child in ax.texts
+                  if child.get_text() in TITLE.values()]
+        ticks = [label for label in ax.get_xticklabels() if label.get_text()]
+        lowest_tick = min(ticks, key=lambda label: label.get_position()[1])
+        _assert_vertical_clearance(
+            fig,
+            [(f"tick labels over group title {i}", lowest_tick, title)
+             for i, title in enumerate(titles)],
+        )
+
         _save(fig, "fig_arms")
         plt.close(fig)
 

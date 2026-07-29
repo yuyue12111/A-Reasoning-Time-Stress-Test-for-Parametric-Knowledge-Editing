@@ -31,15 +31,15 @@ z
   </g>
   <g id="axes_1">
    <g id="patch_2">
-    <path d="M 21.51 23.7312
-L 246.312 23.7312
-Q 248.2992 23.7312 248.2992 21.744
-L 248.2992 6.27552
-Q 248.2992 4.28832 246.312 4.28832
-L 21.51 4.28832
-Q 19.5228 4.28832 19.5228 6.27552
-L 19.5228 21.744
-Q 19.5228 23.7312 21.51 23.7312
+    <path d="M 21.51 23.83488
+L 246.312 23.83488
+Q 247.554 23.83488 247.554 22.59288
+L 247.554 6.27552
+Q 247.554 5.03352 246.312 5.03352
+L 21.51 5.03352
+Q 20.268 5.03352 20.268 6.27552
+L 20.268 22.59288
+Q 20.268 23.83488 21.51 23.83488
 z
 " clip-path="url(#p06633f7e98)" style="fill: #6f7680; fill-opacity: 0.06; stroke: #6f7680; stroke-linejoin: miter"/>
    </g>
@@ -57,15 +57,15 @@ z
 " clip-path="url(#p06633f7e98)" style="fill: #2e6fbf"/>
    </g>
    <g id="patch_4">
-    <path d="M 21.51 47.87712
-L 246.312 47.87712
-Q 248.2992 47.87712 248.2992 45.88992
-L 248.2992 24.76224
-Q 248.2992 22.77504 246.312 22.77504
-L 21.51 22.77504
-Q 19.5228 22.77504 19.5228 24.76224
-L 19.5228 45.88992
-Q 19.5228 47.87712 21.51 47.87712
+    <path d="M 21.51 45.6228
+L 246.312 45.6228
+Q 247.554 45.6228 247.554 44.3808
+L 247.554 26.535456
+Q 247.554 25.293456 246.312 25.293456
+L 21.51 25.293456
+Q 20.268 25.293456 20.268 26.535456
+L 20.268 44.3808
+Q 20.268 45.6228 21.51 45.6228
 z
 " clip-path="url(#p06633f7e98)" style="fill: #2e6fbf; fill-opacity: 0.09; stroke: #2e6fbf; stroke-linejoin: miter"/>
    </g>
@@ -96,15 +96,15 @@ z
 " clip-path="url(#p06633f7e98)" style="fill: #d65442"/>
    </g>
    <g id="patch_7">
-    <path d="M 21.51 105.22368
-L 246.312 105.22368
-Q 248.2992 105.22368 248.2992 103.23648
-L 248.2992 49.28544
-Q 248.2992 47.29824 246.312 47.29824
-L 21.51 47.29824
-Q 19.5228 47.29824 19.5228 49.28544
-L 19.5228 103.23648
-Q 19.5228 105.22368 21.51 105.22368
+    <path d="M 21.51 102.96936
+L 246.312 102.96936
+Q 247.554 102.96936 247.554 101.72736
+L 247.554 49.28544
+Q 247.554 48.04344 246.312 48.04344
+L 21.51 48.04344
+Q 20.268 48.04344 20.268 49.28544
+L 20.268 101.72736
+Q 20.268 102.96936 21.51 102.96936
 z
 " clip-path="url(#p06633f7e98)" style="fill: #d65442; fill-opacity: 0.09; stroke: #d65442; stroke-linejoin: miter"/>
    </g>
@@ -135,15 +135,15 @@ z
 " clip-path="url(#p06633f7e98)" style="fill: #2e6fbf"/>
    </g>
    <g id="patch_10">
-    <path d="M 21.51 163.70208
-L 246.312 163.70208
-Q 248.2992 163.70208 248.2992 161.71488
-L 248.2992 105.87744
-Q 248.2992 103.89024 246.312 103.89024
-L 21.51 103.89024
-Q 19.5228 103.89024 19.5228 105.87744
-L 19.5228 161.71488
-Q 19.5228 163.70208 21.51 163.70208
+    <path d="M 21.51 162.95688
+L 246.312 162.95688
+Q 247.554 162.95688 247.554 161.71488
+L 247.554 106.632
+Q 247.554 105.39 246.312 105.39
+L 21.51 105.39
+Q 20.268 105.39 20.268 106.632
+L 20.268 161.71488
+Q 20.268 162.95688 21.51 162.95688
 z
 " clip-path="url(#p06633f7e98)" style="fill: #2e6fbf; fill-opacity: 0.09; stroke: #2e6fbf; stroke-linejoin: miter"/>
    </g>
@@ -161,27 +161,27 @@ z
 " clip-path="url(#p06633f7e98)" style="fill: #2e6fbf"/>
    </g>
    <g id="line2d_1">
-    <path d="M 114.4323 20.04624
-L 139.2723 20.04624
+    <path d="M 114.4323 18.15984
+L 139.2723 18.15984
 " clip-path="url(#p06633f7e98)" style="fill: none; stroke: #d65442; stroke-width: 0.9; stroke-linecap: square"/>
    </g>
    <g id="text_1">
-    <text style="font-weight: 700; font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="27.72" y="14.16648" transform="rotate(-0 27.72 14.16648)">ROME edit</text>
+    <text style="font-weight: 700; font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="27.72" y="12.28008" transform="rotate(-0 27.72 12.28008)">ROME edit</text>
    </g>
    <g id="text_2">
-    <text style="font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #6b7280" x="62.8425" y="14.16648" transform="rotate(-0 62.8425 14.16648)"> · one CounterFact request</text>
+    <text style="font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #6b7280" x="62.8425" y="12.28008" transform="rotate(-0 62.8425 12.28008)"> · one CounterFact request</text>
    </g>
    <g id="text_3">
-    <text style="font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="27.72" y="22.08936" transform="rotate(-0 27.72 22.08936)">(Oseberg oil field, located in):</text>
+    <text style="font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="27.72" y="20.20296" transform="rotate(-0 27.72 20.20296)">(Oseberg oil field, located in):</text>
    </g>
    <g id="text_4">
-    <text style="font-weight: 700; font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #d65442" x="114.4323" y="22.08936" transform="rotate(-0 114.4323 22.08936)">Norway</text>
+    <text style="font-weight: 700; font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #d65442" x="114.4323" y="20.20296" transform="rotate(-0 114.4323 20.20296)">Norway</text>
    </g>
    <g id="text_5">
-    <text style="font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="142.2531" y="22.08936" transform="rotate(-0 142.2531 22.08936)"> →  </text>
+    <text style="font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #1f2937" x="142.2531" y="20.20296" transform="rotate(-0 142.2531 20.20296)"> →  </text>
    </g>
    <g id="text_6">
-    <text style="font-weight: 700; font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #2e6fbf" x="153.0531" y="22.08936" transform="rotate(-0 153.0531 22.08936)">Bulgaria</text>
+    <text style="font-weight: 700; font-size: 7px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: start; fill: #2e6fbf" x="153.0531" y="20.20296" transform="rotate(-0 153.0531 20.20296)">Bulgaria</text>
    </g>
    <g id="text_7">
     <text style="font-weight: 700; font-size: 6.6px; font-family: 'STIXGeneral', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="12.3192" y="34.33512" transform="rotate(-0 12.3192 34.33512)">1</text>
