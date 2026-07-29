@@ -29,3 +29,4 @@
 | 21 | E | `ALLOWED_TEX_ENVIRONMENTS` 增 `figure`（单栏） | 全宽森林+全宽主图使正文溢出 7 页预算（实测 9 页）；森林改单栏纵排三面板后合规 | 森林 = 单栏 figure[t!]，源位 §5 preamble（§4 区禁图不可再前移） |
 | 22 | E1 | **偏离砍序**：E1 主图（fig0_protocol）从正文撤下，砍序终档（E4 回退）未执行 | 实测：E4 回退净省 ~140 词 < 缺口 341 词，且牺牲 strict 面板正文在场；撤 fig0（~170 词）+ 定向微削闭合缺口、科学损伤最小。fig0 三格式产物保留（paperwriting/ + manuscript/），供 supplement 7/31 收录 | 计划 session 复审点：若不同意此取舍，备选=恢复 fig0 并执行 E4 回退 + 再削正文 ~200 词 |
 | 23 | C6/挤压 | （非门）§5.2 择控句删 `the abstract's arm-wise levels are not an artifact of that choice` 从句（required string `there the reading does not turn on…` 原词面保留） | 版面闭合所需微削之一；无门锚 | 语义由保留的 required 句 + `; the strict endpoint does` 承载 |
+| 24 | W5-V1 | `APPROVED_EXACT_POINTERS` 增 `/teaser_case/old_at_frac`；results.json 增 `teaser_case` 块（M03 重述） | teaser caption 唯一数字 "4%" 须可 RJ 绑定；块内全部字段逐字/逐值复制自 delivery/mainfig_case_candidates.json（值源=留存 jsonl），无新计算 | `_derivation`/`_criterion` 已内嵌；渲染器（V2）对 src_* 三行做逐字断言 |

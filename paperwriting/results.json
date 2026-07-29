@@ -1116,8 +1116,11 @@
    },
    "claim_ceiling": "合法结论：在严格同协议 MEMIT-14B 上，think-only o_old suppression 相比同关系强竞争者使 B3 strict ES +10.0pp[4.0,16.0]、loose RR −9.8pp[−17.0,−2.7]，支持修复跨编辑器转移。必须同报 RRs null；C−N 只是与 0 相容而非等价认证；本次不是完整五臂复制。",
    "fresh_n_es_drop": {
-    "point": 0.060,
-    "ci": [-0.020, 0.140],
+    "point": 0.06,
+    "ci": [
+     -0.02,
+     0.14
+    ],
     "_derivation": "Structured restatement of the es_drop term already recorded as a string in _baseline_discrepancy.fresh_X2_N ('es_drop .060[-.020,.140]'); W2-5/P20 per the M03 procedure. No new computation, no new run."
    },
    "_baseline_discrepancy": {
@@ -1455,7 +1458,7 @@
      "equivalence": "NOT_TESTED; no prospectively specified margin"
     },
     "T_minus_N": "descriptive/non-gating",
-     "artifact_refresh": "COMPLETE: results/x3_para_crossarm_v2.json; sha256=ba2b3caaf365b56dc7cfb62a71d836f4fe6c56bc549f4e6e5fb2e0dcac4746ee"
+    "artifact_refresh": "COMPLETE: results/x3_para_crossarm_v2.json; sha256=ba2b3caaf365b56dc7cfb62a71d836f4fe6c56bc549f4e6e5fb2e0dcac4746ee"
    },
    "claim_ceiling": "合法结论：在同协议 ROME-32B 上，把既有 think-only o_old suppressor 主动应用到 CounterFact 的两个 paraphrase probes 后，相比同关系强竞争者，B3 strict lexical paraphrase success 提高 5.5pp [2.0,9.25]；C-N 与 0 相容且 T-N 同向。不得写 passive paraphrase portability、语义 committed-old 显著下降、通用改写鲁棒性或 sequence-level 覆盖；次级 old-only 比较因门后仅 110 cases 且 CI 含 0，只作 directional/null。X3 按 prereg add-only，不进入 abstract。"
   },
@@ -3269,7 +3272,7 @@
     "negation_only": 1
    },
    "paper_caliber_note": "★关键口径:4 个 subject-restatement 假阳来自 extract_reverted 的 clr_in_cot(未去主体);paper 的 CLR(metrics.score)先过 _without_subject 再判 → 这类假阳在 paper 口径下基本不存在。paper 口径估计:n≈33,genuine 28,真极性假阳(否定式/引用)= 2 → **假阳率 ≈6%(Wilson ~[1.7%,20%])**。",
-    "verdict": "★V1 DONE:CLR 阳性判定 ~94% 为真肯定性回忆(paper 口径);极性假阳(如 'not French')≈6%,= 描述性 CLR 水平值含 ~6% 通胀、非'开箱即中'级缺陷;M1/RQ3 的 CLR 用途(分层/构造性下降)对此不敏感(评审已判免疫)。写作时 CLR 水平值配此验证注脚即可。副产品:再证 _without_subject 清洗的必要性。"
+   "verdict": "★V1 DONE:CLR 阳性判定 ~94% 为真肯定性回忆(paper 口径);极性假阳(如 'not French')≈6%,= 描述性 CLR 水平值含 ~6% 通胀、非'开箱即中'级缺陷;M1/RQ3 的 CLR 用途(分层/构造性下降)对此不敏感(评审已判免疫)。写作时 CLR 水平值配此验证注脚即可。副产品:再证 _without_subject 清洗的必要性。"
   },
   "loc_target_leakage_boundary": {
    "status": "MEASUREMENT_BOUNDARY",
@@ -3978,13 +3981,28 @@
    "edit_intact_at_cloze": "23/23=100%",
    "gap_top_median": 11.51,
    "peak_layer": "hs 索引中位=59 → decoder 层 58(约定 hs[k]=decoder k−1;draft 旧引 56 需改)",
-    "caveats": "无对照/无 CI/近恒真设计(ROME 优化目标即此 logit)→ 按 B23 降级措辞:'编辑安装 sanity',abstract 不承重;'100% intact' 同句必附 n=23。"
-   },
-   "p0_membership_crosswalk": {
-    "status": "BLOCKED_MISSING_PER_ITEM_ARTIFACT",
-    "expected_path": "results/probe/logitlens_cf200_ROME_B3.jsonl",
-    "expected_n": 23,
-    "reason": "Only the aggregate n=23 record and figure are present locally. Without the raw per-item JSONL, membership overlap and item-level selection bias cannot be audited; case IDs are not guessed."
-   }
+   "caveats": "无对照/无 CI/近恒真设计(ROME 优化目标即此 logit)→ 按 B23 降级措辞:'编辑安装 sanity',abstract 不承重;'100% intact' 同句必附 n=23。"
+  },
+  "p0_membership_crosswalk": {
+   "status": "BLOCKED_MISSING_PER_ITEM_ARTIFACT",
+   "expected_path": "results/probe/logitlens_cf200_ROME_B3.jsonl",
+   "expected_n": 23,
+   "reason": "Only the aggregate n=23 record and figure are present locally. Without the raw per-item JSONL, membership overlap and item-level selection bias cannot be audited; case IDs are not guessed."
   }
+ },
+ "teaser_case": {
+  "_note": "W5/D1: Figure-1 teaser 的单案例 M03 结构化重述。全部字段逐字/逐值复制自 paperwriting/delivery/mainfig_case_candidates.json(其值由留存生成物 results 2/probe/*.jsonl 提取);无新计算、无新运行。渲染器逐字比对 src_* 行,失配拒绝出图。",
+  "case_id": "cf_6933",
+  "subject": "Oseberg oil field",
+  "o_old": "Norway",
+  "o_new": "Bulgaria",
+  "prompt": "Oseberg oil field is located in the country of",
+  "old_at_frac": 0.041,
+  "chain_chars": 1619,
+  "src_N_B0": "results 2/probe/r1qwen32b_ROME_cf200_r7of8.jsonl:52",
+  "src_N_B3": "results 2/probe/r1qwen32b_ROME_cf200_r7of8.jsonl:57",
+  "src_T_B3": "results 2/probe/r1qwen32b_ROME_cf200sup_r7of8.jsonl:57",
+  "_criterion": "N@B0 certified (b0ok); N@B3 chain mentions the old value and the answer carries the old value WITHOUT the new one (RRs=1); T@B3 answer holds the new value without the old (ES=1). Scored through cross_arm.per_case, i.e. metrics.py with subject scrubbing, word-boundary matching and curated aliases.",
+  "_derivation": "M03: promoted from delivery/mainfig_case_candidates.json so the teaser caption's '4%' can carry an RJ pointer (/teaser_case/old_at_frac); scores were computed through cross_arm.per_case (metrics.py) as the _criterion records."
+ }
 }

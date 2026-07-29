@@ -88,6 +88,10 @@ PENDING_ABSTRACT_BODY_BINDINGS: dict[str, dict[str, str]] = {}
 # Exact scalar paths must not accidentally approve a same-prefix sibling.
 APPROVED_EXACT_POINTERS = frozenset(
     {
+        # W5/D1: the Figure-1 teaser's single caption number (old value at 4%
+        # of the chain), an M03 restatement promoted from the recorded case
+        # candidates file.
+        "/teaser_case/old_at_frac",
         "/capability/ci_level",
         "/metric_validation/n",
         "/metric_validation/n_attempted",
