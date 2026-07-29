@@ -50,30 +50,30 @@ APPROVED_REFS_SHA256 = (
     "f47c4ec7ed83e158591f003d568fdab286ad0c3609c6dfbf0cf0922983f69eeb"
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
-    "Section 3": "57ff39b8835a1587ef7eacf580926ba12ecd8b94865da4d8156f0800d82fdc60",
+    "Section 3": "badd4e5c4ce9bdc8bd62b016aacc2484844be2a00cc42d53d7446440a80fe823",
     "Section 4": "182e6e2118081164eaff41c7df3536369d83d8f3efa1c0a0b7af891dce95c119",
-    "Section 5": "1eb180662abbf0be65f5c3d2ed96a88f0dda50f02a19d773a806755d85280c5c",
-    "Section 1": "dbb9900c53e0decf6b994f16a3977ad895bec4a764be41fca4a1c0f79ac31111",
+    "Section 5": "9c09b8507fd139e8cc372103a331decb5d4c337160fcf3ac0458213e5e27dca6",
+    "Section 1": "45e20c131c9b7f848976fcc69de19bafcfe434c2b973b2c1081b1ba586504d7e",
     "Section 2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Section 6": "a8602fd48b1cfaf5876e3d04efc7a0567c639944e7e906963b7003ce44884514",
     "Section 7": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Ethical Statement": "7c27178fa8e3df265d432105bc74d3b4fa47fe1dca8094a9695dc90cb4b8dbf2",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
-    "Section 3": "3451c9ef1bccd0a2b09f4adb0da02ab82c046eefb5125103a1dd3db63b6b58f0",
+    "Section 3": "ef8d2d6119f81b37329379f10e6c35b490b15d600576ef838e701b6f62a63a93",
     "Section 4": "fb483ffe7d75b2b7babc49a22ba813078bdcfc41f3d4cf6e1fd1e87e8eec9bae",
-    "Section 5": "9a07d873e9543db1bcf6f1c15d3aa7a9c519d2de5214a5dfd89e2c58a0df508f",
-    "Section 1": "6eab5a4f2857d234ea942e325f40b9929a9547482ac2ec54e1c5576a506474c3",
+    "Section 5": "4bfcdda952dcfc39819b8ec192824d3a69e2fdff60b1d0c23bda1eeffc4407d1",
+    "Section 1": "1fb005a805fe780150f824727ce7db7b7627c06f09c845a9306a0c17e899482d",
     "Section 2": "1500f448aa3ff10f807c658227fa3b9e9c617d07e5f117c7f8a31e211e32793c",
     "Section 6": "98f0061bb776dfa771597aaf0102a3fa6f3450b9ab69b20bd8c70d39ff140926",
     "Section 7": "4850e4c48f05ed61c444bc672813c4fc3f7af0013afa3e8137a7fc909f20ad1f",
     "Ethical Statement": "7be82c0bce18ca086ce80905a6b17dcc17a17ce88f8a987ffe84736f9a30060e",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
-    "Section 3": "0789684672c56d9c2afff91969b90f2ae79dd3a4c0d14405d94a30a5ba872e83",
+    "Section 3": "ddeda678f65c3379bc3c1e9c3547cdfffec22c562acc4b615e1cfd9ec1475411",
     "Section 4": "7d2810d3f174db0089a4c2b5202c72ab152b2012e7db506dcc130392d7da140b",
-    "Section 5": "ef1e6c589ffb4d80389e87098717dd65fa3118c9fff66fc52882f5fb2cf1c784",
-    "Section 1": "a291bdf38878b9ba1dd4d6046cf447309660ceb790c044fcdb165d7eb2a92d1a",
+    "Section 5": "b7966a01b05b49c8bcb0fee2823df1d375c6d94beea7441bb06cd34a6d061699",
+    "Section 1": "f4b14d97481d37b5c506a43136c37ed1ed877aa4a7d7503f7f517a51c1cae086",
     "Section 2": "52e3af0b742109b7619d0acd374402f96215378713f56c7e85562cebffc1d650",
     "Section 6": "de429d806cc007476fdcb604321a42149609bad34e475c55de7183c98fda3c64",
     "Section 7": "e9e1811076f9bbf6e89abb2974cb1f075e9764e015515755dd0bee67902d04cf",
@@ -427,6 +427,13 @@ ALLOWED_TEX_COMMANDS = frozenset(
         "paragraph",
         "parbox",
         "multicolumn",
+        "cdot",
+        "cmidrule",
+        "dagger",
+        "ddagger",
+        "hfill",
+        "itshape",
+        "to",
         "pdfinfo",
         "ref",
         "rm",
@@ -477,6 +484,13 @@ BODY_ALLOWED_TEX_COMMANDS = frozenset(
         "paragraph",
         "parbox",
         "multicolumn",
+        "cdot",
+        "cmidrule",
+        "dagger",
+        "ddagger",
+        "hfill",
+        "itshape",
+        "to",
         "ref",
         "section",
         "small",
@@ -897,8 +911,14 @@ def mask_nonclaim_numbers(code: str) -> str:
     # an authored number.  Only the two structural arguments are masked, so any
     # value inside the cell body is still scanned.
     code = re.sub(
-        r"\\multicolumn\{\d+\}\{[^{}]*\}",
+        r"\\multicolumn\{\d+\}\{(?:[^{}]|\{[^{}]*\})*\}",
         lambda m: "\\multicolumn{SPAN}{ALIGN}",
+        code,
+    )
+    # W5: \cmidrule(r){1-6} carries column indices, table structure only.
+    code = re.sub(
+        r"\\cmidrule(?:\([lr]*\))?\{\d+-\d+\}",
+        "CMIDRULE",
         code,
     )
     # A dimension-looking token outside that command surface is visible prose.
@@ -2146,15 +2166,13 @@ NARRATIVE_LOAD_CEILINGS: dict[str, tuple[float, int]] = {
 
 
 def check_forest_shipping_gate(main_path: Path, errors: list[str]) -> None:
-    """Enforce supplement.tex's own rule about the five-arm forest.
+    """No five-arm figure may ship without a strict-displacement quantity.
 
-    supplement.tex says the forest may not ship until it carries a
-    strict-displacement panel, because a two-panel version hides the endpoint the
-    manuscript deliberately reports at primary prominence.  Nothing enforced it:
-    the check lived in plots.py as an invariant that recorded PASS to certify the
-    figure was *not* shippable, and SourceMap.write raises only on FAIL.  A rule
-    about shipping belongs where shipping is decided, so it lives here and reads
-    the figure's own source map.
+    The obligation began as supplement.tex's rule about the forest (a
+    two-panel version would hide the endpoint the manuscript deliberately
+    reports beside the primary ones) and transferred to fig_arms when W5
+    replaced the forest: whichever five-arm artifact the .tex includes, its
+    source map must show the figure actually read a strict (RRs) quantity.
     """
     repo = Path(__file__).resolve().parent.parent
     shipped = []
@@ -2163,15 +2181,26 @@ def check_forest_shipping_gate(main_path: Path, errors: list[str]) -> None:
         if not path.exists():
             continue
         text = strip_tex_comments(path.read_text(encoding="utf-8"))
-        if re.search(r"\\includegraphics[^{}]*\{[^{}]*fig3[^{}]*\}", text):
+        if re.search(
+            r"\\includegraphics[^{}]*\{[^{}]*(?:fig3|fig_arms)[^{}]*\}", text
+        ):
             shipped.append(candidate)
     if not shipped:
         return
 
-    source_map = repo / "paperwriting" / "delivery" / "fig3_rq3_source_map.json"
+    text_all = "".join(
+        (repo / "paperwriting" / "manuscript" / c).read_text(encoding="utf-8")
+        for c in shipped
+    )
+    map_name = (
+        "fig_arms_source_map.json"
+        if "fig_arms" in text_all
+        else "fig3_rq3_source_map.json"
+    )
+    source_map = repo / "paperwriting" / "delivery" / map_name
     if not source_map.exists():
         errors.append(
-            f"{', '.join(shipped)} ships the five-arm forest but its source map is missing"
+            f"{', '.join(shipped)} ships a five-arm figure but its source map is missing"
         )
         return
     # Substring-matching the file would pass on incidental text: the raw value of
@@ -2180,16 +2209,16 @@ def check_forest_shipping_gate(main_path: Path, errors: list[str]) -> None:
     try:
         entries = json.loads(source_map.read_text(encoding="utf-8")).get("entries", [])
     except json.JSONDecodeError as exc:
-        errors.append(f"fig3 source map is unreadable: {exc}")
+        errors.append(f"five-arm figure source map is unreadable: {exc}")
         return
     plotted_strict = any(
         str(entry.get("json_path", "")).rsplit(".", 1)[-1] == "RRs" for entry in entries
     )
     if not plotted_strict:
         errors.append(
-            f"{', '.join(shipped)} ships the five-arm forest while its source map "
-            "records no strict-displacement quantity; supplement.tex blocks that "
-            "figure until it carries the strict panel"
+            f"{', '.join(shipped)} ships a five-arm figure while its source map "
+            "records no strict-displacement quantity; the figure may not ship "
+            "without its strict panel"
         )
 
 

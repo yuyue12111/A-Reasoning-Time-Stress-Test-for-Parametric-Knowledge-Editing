@@ -30,3 +30,7 @@
 | 22 | E1 | **偏离砍序**：E1 主图（fig0_protocol）从正文撤下，砍序终档（E4 回退）未执行 | 实测：E4 回退净省 ~140 词 < 缺口 341 词，且牺牲 strict 面板正文在场；撤 fig0（~170 词）+ 定向微削闭合缺口、科学损伤最小。fig0 三格式产物保留（paperwriting/ + manuscript/），供 supplement 7/31 收录 | 计划 session 复审点：若不同意此取舍，备选=恢复 fig0 并执行 E4 回退 + 再削正文 ~200 词 |
 | 23 | C6/挤压 | （非门）§5.2 择控句删 `the abstract's arm-wise levels are not an artifact of that choice` 从句（required string `there the reading does not turn on…` 原词面保留） | 版面闭合所需微削之一；无门锚 | 语义由保留的 required 句 + `; the strict endpoint does` 承载 |
 | 24 | W5-V1 | `APPROVED_EXACT_POINTERS` 增 `/teaser_case/old_at_frac`；results.json 增 `teaser_case` 块（M03 重述） | teaser caption 唯一数字 "4%" 须可 RJ 绑定；块内全部字段逐字/逐值复制自 delivery/mainfig_case_candidates.json（值源=留存 jsonl），无新计算 | `_derivation`/`_criterion` 已内嵌；渲染器（V2）对 src_* 三行做逐字断言 |
+| 25 | W5-V3 | `\multicolumn` 掩码正则放宽到容纳一层内嵌括号（`{@{}l}`）；新增 `\cmidrule(r){1-6}` 掩码 | Table 2 使用 booktabs 分块结构；掩码只吃结构参数、单元格数值照扫 | 结构性掩码，无数值逃逸面 |
+| 26 | W5-V3 | TeX 命令白名单（两处）增 `cdot/cmidrule/dagger/ddagger/hfill/itshape/to` | Table 2 排版所需；全部为纯排版/数学符号命令，无渲染内容差异风险 | — |
+| 27 | W5-V3 | **偏离 W5 计划**：Table 2 撤销 CLR 列 | results.json `_bonus_RECORRECTED`（:1830）终裁：CLR .545 为无 b0ok 门口径，与同排 gated RR/RRs 分母异构；stale 门明令禁裸 .545——列上表即违裁决 | CLR 维持"正文报告"现状（T 臂 .263 + 配对对照在 §5.3；caption 保 manipulation-check 句）；此项请计划 session 追认 |
+| 28 | W5-V4 | `check_forest_shipping_gate` 扩展：触发词 fig3→(fig3\|fig_arms)，source map 按在版文件选取 | 森林退役、五臂组柱接棒；strict 面板必须随图出场的义务平移到 fig_arms | fig_arms source map 含 19 条目（RRs 叶多条）✓ 门现绿；形状测试改为 2×table* + 2×figure* + 1×figure |

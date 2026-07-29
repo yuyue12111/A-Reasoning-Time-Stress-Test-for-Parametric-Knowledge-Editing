@@ -52,13 +52,12 @@ def assert_rejected(main_path: Path, *diagnostics: str) -> str:
 def test_canonical_manuscript_passes(candidate_main: Path) -> None:
     completed = run_checker(candidate_main)
     assert completed.returncode == 0, completed.stdout + completed.stderr
-    # W4 counts: C7-A11 added the .107 caption comparison (S3 124->125); C4
-    # moved the X1 decomposition to the supplement (S4 49->39); C1 deleted
-    # fn11's worked example, C5-R1 the third .48, and E4 moved the battery
-    # contrast rows into the forest figure's source map (S5 164->104).
+    # W5 counts: the dense Table 2 binds the battery levels, all six paired
+    # contrasts, the transfers, the guard rows, and the gap-robustness rows
+    # in Section 5 (104->220); Sections 3-4 are unchanged from W4.
     assert "Section 3 RJ ledger (125 occurrences)" in completed.stdout
     assert "Section 4 RJ ledger (39 occurrences)" in completed.stdout
-    assert "Section 5 RJ ledger (104 occurrences)" in completed.stdout
+    assert "Section 5 RJ ledger (220 occurrences)" in completed.stdout
 
 
 def test_frozen_abstract_mutation_is_rejected(candidate_main: Path) -> None:
@@ -643,21 +642,23 @@ def test_section4_starred_subsections_are_rejected(
 def test_reviewed_table_environment_shape_is_frozen(
     candidate_main: Path,
 ) -> None:
-    # W4/E4: the battery table narrowed to a single column (levels only) and
-    # the forest ships as a single-column figure, so the reviewed shape is one
-    # full-width table (Table 1), one single-column table, and one
-    # single-column figure; widening the battery back is still a change the
-    # source snapshot must catch.
+    # W5: the reviewed shape is two full-width tables (Table 1 and the dense
+    # Table 2), two full-width figures (drop chart, five-arm bars), and one
+    # single-column figure (the teaser); narrowing the dense table is still a
+    # change the source snapshot must catch.
     text = candidate_main.read_text(encoding="utf-8")
     assert text.count(r"\begin{table*}[t]") == 1
-    assert text.count(r"\begin{table}[t!]") == 1
+    assert text.count(r"\begin{table*}[t!]") == 1
+    assert text.count(r"\begin{table}[") == 0
+    assert text.count(r"\begin{figure*}[t]") == 1
+    assert text.count(r"\begin{figure*}[t!]") == 1
     assert text.count(r"\begin{figure}[t!]") == 1
     mutate(
         candidate_main,
-        "\\begin{table}[t!]\n\\centering\n\\small\n\\begin{tabular}{@{}llrrrr@{}}",
-        "\\begin{table*}[t!]\n\\centering\n\\small\n\\begin{tabular}{@{}llrrrr@{}}",
+        "\\begin{table*}[t!]\n\\centering\n\\small",
+        "\\begin{table}[t!]\n\\centering\n\\small",
     )
-    mutate(candidate_main, "\\label{tab:battery}\n\\end{table}", "\\label{tab:battery}\n\\end{table*}")
+    mutate(candidate_main, "\\label{tab:battery}\n\\end{table*}", "\\label{tab:battery}\n\\end{table}")
     assert_rejected(
         candidate_main,
         "Section 5 TeX source structure differs from the reviewed snapshot",
