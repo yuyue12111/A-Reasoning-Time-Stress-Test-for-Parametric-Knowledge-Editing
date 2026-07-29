@@ -1527,7 +1527,7 @@ def fig_teaser(results: dict[str, Any]) -> None:
         )
 
     with plt.rc_context(W5_RC):
-        FW, FH = 3.45, 2.78
+        FW, FH = 3.45, 2.62
         fig = plt.figure(figsize=(FW, FH))
         ax = fig.add_axes([0, 0, 1, 1])
         ax.set_xlim(0, 1)
@@ -1694,8 +1694,10 @@ def fig_drop(results: dict[str, Any]) -> None:
                        expected=[[-0.06, 0.095], [0.032, 0.182]]),
     }
 
+    # W6: single-column native render (3.45in = columnwidth) so the body can
+    # carry it at width=\columnwidth with 1:1 printed font sizes.
     with plt.rc_context(W5_RC):
-        fig = plt.figure(figsize=(7.0, 2.00), constrained_layout=True)
+        fig = plt.figure(figsize=(3.45, 1.72), constrained_layout=True)
         gs = fig.add_gridspec(1, 2, width_ratios=[2.0, 1.05], wspace=0.05)
         axes = {"Qwen": fig.add_subplot(gs[0, 0])}
         axes["Llama"] = fig.add_subplot(gs[0, 1], sharey=axes["Qwen"])
@@ -1728,18 +1730,18 @@ def fig_drop(results: dict[str, Any]) -> None:
                             connectionstyle="arc3,rad=-0.38"),
                         zorder=6)
                     drawn_arrows += 1
-                    ax.text(x + .13, max(b0, b3) + .118,
+                    ax.text(x + .13, max(b0, b3) + .128,
                             f"{drop:.3f}".lstrip("0"), ha="center",
-                            fontsize=9.5, fontweight="bold", color=W5_RED)
-                    ax.text(x + .13, max(b0, b3) + .068,
+                            fontsize=8.0, fontweight="bold", color=W5_RED)
+                    ax.text(x + .13, max(b0, b3) + .066,
                             f"[{lo:.3f}, {hi:.3f}]".replace("0.", "."),
-                            ha="center", fontsize=5.6, color=W5_INK2)
+                            ha="center", fontsize=4.9, color=W5_INK2)
             ax.set_xticks(range(len(data["labels"])), data["labels"])
             ax.set_xlim(-0.62, len(data["labels"]) - 0.38)
             ax.set_ylim(0, 0.84)
             ax.set_yticks([0, .2, .4, .6, .8])
-            ax.set_title(f"{name} (R1-distill)", fontsize=9,
-                         fontweight="bold", pad=5)
+            ax.set_title(f"{name} (R1-distill)", fontsize=8,
+                         fontweight="bold", pad=3)
             ax.tick_params(axis="x", length=0)
             ax.spines[["top", "right"]].set_visible(False)
 
@@ -1763,11 +1765,11 @@ def fig_drop(results: dict[str, Any]) -> None:
                              edgecolor=W5_RED, linewidth=1.2,
                              label="$B_3$ \u00b7 native chain")]
         axes["Qwen"].legend(handles=hs, loc="lower left",
-                            bbox_to_anchor=(0.005, 0.015), fontsize=7,
+                            bbox_to_anchor=(0.005, 0.015), fontsize=5.8,
                             frameon=True, fancybox=False, edgecolor="black",
-                            framealpha=1.0, borderpad=0.5, handlelength=1.3,
-                            handletextpad=0.5, labelspacing=0.35)
-        axes["Qwen"].set_ylabel("Generative edit success (ES)", fontsize=8)
+                            framealpha=1.0, borderpad=0.35, handlelength=1.1,
+                            handletextpad=0.4, labelspacing=0.3)
+        axes["Qwen"].set_ylabel("Generative ES", fontsize=7.5)
         plt.setp(axes["Llama"].get_yticklabels(), visible=False)
         axes["Llama"].tick_params(axis="y", length=0)
 
@@ -1834,7 +1836,7 @@ def fig_arms(results: dict[str, Any]) -> None:
              "RRs": "Strict $RR^s$ (secondary)"}
 
     with plt.rc_context(W5_RC):
-        fig, ax = plt.subplots(figsize=(7.0, 1.62), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(7.0, 1.46), constrained_layout=True)
         BW, STEP, GW = 0.15, 0.175, 1.32
         centers = [0.0, GW, 2 * GW]
         bars_drawn = 0

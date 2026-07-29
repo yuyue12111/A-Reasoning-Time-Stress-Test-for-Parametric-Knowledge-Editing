@@ -50,33 +50,33 @@ APPROVED_REFS_SHA256 = (
     "f47c4ec7ed83e158591f003d568fdab286ad0c3609c6dfbf0cf0922983f69eeb"
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
-    "Section 3": "4728462889e36125a395892e408c84c362170d27d7b7658cc768a876d71ce760",
-    "Section 4": "5b30ef0b0f286488a3c33980abc857b11af71a96671d045ab0118d070a5720dc",
-    "Section 5": "4ac4923164e0b5e7b28267712685c46dbb595e31f0b8eff06f539d6bd89d8698",
-    "Section 1": "dbb9900c53e0decf6b994f16a3977ad895bec4a764be41fca4a1c0f79ac31111",
+    "Section 3": "5fc7b03e455b5da2163db9186c28d69414901f648f61225c98eb5fd0774cb446",
+    "Section 4": "cc322302206494cb2a2b69bb09ef5f4e3dee25c37bcc38de29cfdecb6c53863c",
+    "Section 5": "0cbbe190decfab1619b63f05ca5abbfa73a105fd5264d5cbe85c12b7abfc88ac",
+    "Section 1": "d800c4dd10a36cd01a7671a76cb68ec6af2090efd3c0ed79fa350617023936ff",
     "Section 2": "bbd7ea5f71ea3bf0dcc2e44c067340c88b872fa28e55c0652e5b16367e7fb963",
-    "Section 6": "05a6061974bb5a4c9ef82bc32c3744dd92eef8662afab4559580386f9f27ecc9",
+    "Section 6": "2d8ac5f1a235ebc2e55a04f7a801ee4636349da3cd3e7462720ae1d14a4024d0",
     "Section 7": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Ethical Statement": "7c27178fa8e3df265d432105bc74d3b4fa47fe1dca8094a9695dc90cb4b8dbf2",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
-    "Section 3": "11b152beade4cf5b060561624cfbf06626f28e5d084254b4b610c421b08cd904",
-    "Section 4": "3ba46f6de1daf5732b6bdda714f1dd58aec614923d63f5ca3cda5256d6cdf152",
-    "Section 5": "dc92f51532bf217af746e1468db5f3989f33382e93d2c2cee76749b82fb7c2ca",
-    "Section 1": "881bf6063ff4cb2752a4faf4d0c48cb52048a0ba45a927f4f562f353c372300c",
-    "Section 2": "7bb876a990d0f98c6e25a3f842c9b4c88034f64d9301eaab8c73a95c391cff4d",
-    "Section 6": "e908074025e981678b5346440fd30ab443813e22e9554a8f719cb25dfa4f5a25",
-    "Section 7": "4850e4c48f05ed61c444bc672813c4fc3f7af0013afa3e8137a7fc909f20ad1f",
+    "Section 3": "bf511ccc965dd3802042c3684ff4f6d8439f81ade8ba2837bd2a7af117ba2a7a",
+    "Section 4": "115a802f1cc7d4ed6ef31fbccbf6bfb781bb8a80d3939da50b00b33297f873b6",
+    "Section 5": "fdc9305ce2b88b9a90f07443bf4e7d816202df1f64b6c3afa454da3865bc4869",
+    "Section 1": "b38443719d7d67433a31bb5436cb44e59fa963ebed35b39b4b2edbb9eb08f172",
+    "Section 2": "bc362f417b6a2a855b9b46a0a95eeb1b290c53cd75b366d088134d4b01de32c2",
+    "Section 6": "639b4b5e07100df66f94f8be15f6332a8a96be7192b350f86854824468d650a5",
+    "Section 7": "e0208eca1afdcdde75fd8237e141b316b538ab9b996298f1c57286cda07e3d62",
     "Ethical Statement": "7be82c0bce18ca086ce80905a6b17dcc17a17ce88f8a987ffe84736f9a30060e",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
-    "Section 3": "fa83a185a7e4e02d046e390ea09109f86f6b5639e655ed71fa648780d3e65548",
-    "Section 4": "a2eb49c733fc4cab54badda1287b59661053b9e391c12eb5fc241502e2510095",
-    "Section 5": "ca414bf548de1157d8f60f222b21b071ef1b0f2999e874d8d318b5db87c63d12",
-    "Section 1": "dde3b42492cab93235470fec99a7b988cf86731261b56181fdce06c728872dea",
-    "Section 2": "95029b36085d90e541829e97cbef33cd7dbc036fe5de9a2b5d9895e10224ff0b",
-    "Section 6": "32ac66797da1ebcfb28e009401e7eae1ee188584711834132e5813445beec1ba",
-    "Section 7": "e9e1811076f9bbf6e89abb2974cb1f075e9764e015515755dd0bee67902d04cf",
+    "Section 3": "bd8165b29a297fec5b76f42d75a9a148bbc1dd662d0975ccf2d0f5d7fb600150",
+    "Section 4": "3d10fa83217e1206184849806d3a189bcf10296275220cd930fc805288b8e8d9",
+    "Section 5": "488f51965f91f00750b09e79ca4170335c2870ba8c58b80050e460789e930460",
+    "Section 1": "5c34d18b59fd37b8d512a83e9c9c6cf187c893b9a9628fc2974e3e4891b1145e",
+    "Section 2": "785dae7b56c4fcb59128eb993a603176c1fb3dfa227eb79ed2f25a3ad3930079",
+    "Section 6": "b9fa8167de4117f4cda84b6264adf8fcb9a263ae2ba6d3ae1b5b623b61645c75",
+    "Section 7": "586505035ca6c4a8c8448793d582a15d369a394753a92a38e0cf2b0b1e5ab637",
     "Ethical Statement": "33ff3f8c331b9377cb811fe907a3156da992363b47c07191f7c66b9db92d718d",
 }
 
@@ -514,11 +514,14 @@ M04_TARGET = (
     "ordered trend across checkpoints."
 )
 
+# W6: reworded for the fig:gap page budget; every M12 element survives --
+# shared teacher+recipe, idiosyncrasy disfavored, recipe-specificity not
+# excluded, no equality established -- and the sentence now points at the
+# Section 6 copy that carries the every-cell scope clause.
 M12_TARGET = (
-    "The similarity across the two tested backbone lineages disfavors a "
-    "single-lineage idiosyncrasy, though not recipe-specificity: both share "
-    "an R1 teacher and distillation recipe, and the comparison does not "
-    "establish equality across lineages."
+    "Both lineages share an R1 teacher and distillation recipe, so their "
+    "agreement disfavors a single-lineage idiosyncrasy without excluding "
+    "recipe-specificity or establishing equality across lineages"
 )
 
 BANNED_PATTERNS = {

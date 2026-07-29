@@ -57,7 +57,10 @@ def test_canonical_manuscript_passes(candidate_main: Path) -> None:
     # in Section 5 (104->220); Sections 3-4 are unchanged from W4.
     # V5 cut ladder: level rows and gap-robustness rows left Table 2, prose
     # numbers were table-pointered (S3 125->118, S5 220->162).
-    assert "Section 3 RJ ledger (118 occurrences)" in completed.stdout
+    # W6: the drop chart returned to the body with its caption's ci-level
+    # binding (S3 118->119), and fn2's duplicate route-census numbers
+    # (41/33/.813, reported in Section 4) were deduplicated out (119->116).
+    assert "Section 3 RJ ledger (116 occurrences)" in completed.stdout
     assert "Section 4 RJ ledger (39 occurrences)" in completed.stdout
     assert "Section 5 RJ ledger (162 occurrences)" in completed.stdout
 
@@ -645,16 +648,16 @@ def test_reviewed_table_environment_shape_is_frozen(
     candidate_main: Path,
 ) -> None:
     # W5: the reviewed shape is two full-width tables (Table 1 and the dense
-    # Table 2), two full-width figures (drop chart, five-arm bars), and one
-    # single-column figure (the teaser); narrowing the dense table is still a
-    # change the source snapshot must catch.
+    # Table 2), one full-width figure (five-arm bars), and two single-column
+    # figures (the teaser, and the W6 column-native drop chart); narrowing the
+    # dense table is still a change the source snapshot must catch.
     text = candidate_main.read_text(encoding="utf-8")
     assert text.count(r"\begin{table*}[t]") == 1
     assert text.count(r"\begin{table*}[t!]") == 1
     assert text.count(r"\begin{table}[") == 0
     assert text.count(r"\begin{figure*}[t]") == 0
     assert text.count(r"\begin{figure*}[t!]") == 1
-    assert text.count(r"\begin{figure}[t!]") == 1
+    assert text.count(r"\begin{figure}[t!]") == 2
     mutate(
         candidate_main,
         "\\begin{table*}[t!]\n\\centering\n\\small",
@@ -1495,10 +1498,11 @@ def test_base_drift_claims_are_scoped_to_where_an_interval_exists() -> None:
     )
     assert "where it carries an interval" not in text, "the hedge was unresolvable"
     # W2-14/A reworded Section 1's scope clause; both sections still say the
-    # controls are the largest Qwen checkpoint's.
+    # controls are the largest Qwen checkpoint's.  W6 merged the budget and
+    # sampling premises into one scoped clause.
     assert (  # Section 1
         "On the largest Qwen checkpoint the same direction appears at a shorter"
-        " think budget" in text
+        " budget and under sampling" in text
     )
     assert "on the largest Qwen checkpoint" in text                  # Section 7
     assert "That paired interval exists at this checkpoint only" in text
@@ -1576,6 +1580,8 @@ def test_each_section1_control_carries_its_own_conclusion() -> None:
         encoding="utf-8"
     )
     assert "neither background drift nor greedy decoding accounts for it" not in text
+    # W6: the conclusion moved from Section 1 to Section 3.3, adjacent to the
+    # sampling premise that licenses it.
     assert "so greedy decoding does not produce it" in text
     # W2-14/A replaced this: "a think span alone" generalised past the one canned
     # thought that was run, and excluded the buffer account Section 4.4 keeps alive.
@@ -1667,7 +1673,7 @@ def test_section1_controls_match_the_figure_and_exclude_the_base() -> None:
     # the two-arms-of-one-run identity.
     assert (
         "On the largest Qwen checkpoint the same direction appears at a shorter"
-        " think budget" in text
+        " budget and under sampling" in text
     )
     assert "two arms of one control run" in text
     assert "A dedicated Qwen-32B control gives" in text
@@ -1675,13 +1681,14 @@ def test_section1_controls_match_the_figure_and_exclude_the_base() -> None:
     assert "so a think span alone does not produce the gap" not in text, (
         "that excludes the content-independent buffer account Section 4.4 keeps alive"
     )
-    # the base is outside the count and explicitly juxtaposed, in the Figure 1
-    # caption (the sole remaining carrier after W4/C1)
+    # the base is outside the count and explicitly juxtaposed.  W6 removed the
+    # Section 3.2 em-dash duplicate of this clause; the carrier is the adjacent
+    # sentence that the checker also pins as a required string.
     assert (
-        "an outcome with a different event definition and denominator that is "
-        "juxtaposed rather than contrasted" in text
+        "This juxtaposition is consistent with an edit-specific pattern, but "
+        "the two quantities differ in event definition and denominator; we "
+        "make no formal contrast" in text
     )
-    assert text.count("juxtaposed rather than contrasted") >= 1
     # the forward pointer to the length-only account survives in Section 3.3
     # body wording after W4/C1
     assert "does not isolate length" in text

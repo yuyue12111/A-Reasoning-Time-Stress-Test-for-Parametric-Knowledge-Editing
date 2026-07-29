@@ -1,0 +1,848 @@
+[
+ {
+  "id": "cc85662b9eea77e2",
+  "section": "Introduction",
+  "zone": "body",
+  "text": "That protocol carries an assumption it never tests that an edit which answers correctly on demand will keep answering correctly wherever the model is actually used."
+ },
+ {
+  "id": "f48c6adf5e81f556",
+  "section": "Introduction",
+  "zone": "body",
+  "text": "Deployed reasoning models do not answer on demand."
+ },
+ {
+  "id": "18e8f52c0a288363",
+  "section": "Introduction",
+  "zone": "body",
+  "text": "So an edit is certified at zero thinking while it is used after reasoning, and standard editing protocols do not measure that distance for one and the same edit."
+ },
+ {
+  "id": "dcfe2288c79ac517",
+  "section": "Introduction",
+  "zone": "body",
+  "text": "Scoring reads generated text rather than teacher-forced logits, and the same test runs at six fixed checkpoints from two lineages distilled under one reasoning recipe."
+ },
+ {
+  "id": "15bd4524a9afe85c",
+  "section": "Introduction",
+  "zone": "body",
+  "text": "Suppressing the old answer's first tokens inside the think span never touching the answer stage raises edit success against a placebo floor (paired +.122 ) and lowers resurfacing against no suppression (arm-wise 19.3 % to 8.5 % ), while the reverse-signed arm moves both endpoints the other way."
+ },
+ {
+  "id": "7803cbf0d89f37e8",
+  "section": "Introduction",
+  "zone": "body",
+  "text": "its strict displacement endpoint does not separate from the untreated baseline in the main battery or under the second editor, though it does in the second-scale run (Section )."
+ },
+ {
+  "id": "70af5a25a3b55765",
+  "section": "Introduction",
+  "zone": "body",
+  "text": "This is a diagnosis of where the failure is steerable, not a deployed defence."
+ },
+ {
+  "id": "f8162d4aba4826a7",
+  "section": "Introduction",
+  "zone": "body",
+  "text": "direct-answer edit success is not enough, and the failure it hides admits a chain-local causal control point."
+ },
+ {
+  "id": "12c273db9d89589f",
+  "section": "Related Work",
+  "zone": "caption",
+  "text": "the edit passes direct-answer validation at zero thinking, reverts after the model's own native chain the old value first appears 4 % of the way in and returns when old-answer first tokens are penalized inside the think span only, answer logits untouched."
+ },
+ {
+  "id": "cd06f40936d3693f",
+  "section": "Related Work",
+  "zone": "caption",
+  "text": "Illustrative, not a statistic (Sections -- )."
+ },
+ {
+  "id": "0769181fdd88f624",
+  "section": "Related Work",
+  "zone": "body",
+  "text": "report that ten such methods degrade on multi-hop and sequential settings and propose Selective Contextual Reasoning, a retrieval alternative that touches no parameters."
+ },
+ {
+  "id": "97f498fc396859af",
+  "section": "Related Work",
+  "zone": "body",
+  "text": "then benchmark editing under realistic autoregressive inference rather than teacher-forced decoding, and find parameter-based editing performs poorly there, including on an R1-distilled checkpoint whose reasoning reflects outdated knowledge and overturns the edit."
+ },
+ {
+  "id": "fdcea43b28be98ff",
+  "section": "Related Work",
+  "zone": "body",
+  "text": "show with ReCoE that edits fail to propagate through the reasoning schemes that depend on them, and analyse the chains to explain why."
+ },
+ {
+  "id": "382683349d080289",
+  "section": "Related Work",
+  "zone": "body",
+  "text": "it establishes that editing looks worse under realistic decoding, not how a single edit behaves as its own thinking budget changes."
+ },
+ {
+  "id": "805f52aaccc1d6fb",
+  "section": "Related Work",
+  "zone": "body",
+  "text": "the conflict there is visual and carries no budget axis our protocol's contrast is one and the same textual edit under the model's own varying thinking budget."
+ },
+ {
+  "id": "821924d6dc9adae0",
+  "section": "Related Work",
+  "zone": "body",
+  "text": "Ours is scoped to the think span and leaves the answer stage untouched, which is what makes it a probe of where the failure is produced rather than a better decoder."
+ },
+ {
+  "id": "b79e97c596ea052d",
+  "section": "Related Work",
+  "zone": "body",
+  "text": "This paper brings together four properties the work above does not address jointly"
+ },
+ {
+  "id": "6a58826aa1beac5d",
+  "section": "Related Work",
+  "zone": "body",
+  "text": "and a signed intervention confined to the think span, moving an answer it never touches."
+ },
+ {
+  "id": "07836a8d0525579d",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "footnote",
+  "text": "The answer-commitment validation panel uses a neutral OLD/NEW/NEITHER final-answer task."
+ },
+ {
+  "id": "d682805123c52e83",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "footnote",
+  "text": "33 were excluded by rate limits."
+ },
+ {
+  "id": "5ca2a8b5f6ea92fc",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "footnote",
+  "text": "Missingness is concentrated among rule-negative rows but does not make the available-case a lower bound"
+ },
+ {
+  "id": "a6dba0b3aba95773",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "footnote",
+  "text": "the route-census panel's judge identities were not recorded, so error independence across panels cannot be assessed and shared-bias risk remains."
+ },
+ {
+  "id": "d820d33b324d6db0",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "footnote",
+  "text": "These fixed seeds do not identify a sampling-seed population."
+ },
+ {
+  "id": "76b3e753df4cd478",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "caption",
+  "text": "drops and intervals are within-case complete-pair estimates and need not equal marginal differences when rows are missing."
+ },
+ {
+  "id": "8395f604d422767d",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "caption",
+  "text": "no interval is recorded for levels."
+ },
+ {
+  "id": "fdf41e15c1a14593",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "Each budget caps the think span 8192 tokens at B_3 and where the model has not closed it, the harness does."
+ },
+ {
+  "id": "463a6828657e1e6d",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "Neighbour-prompt target-value non-leakage is .958 at Qwen-32B after a native chain, and at zero thinking .954 at Qwen-1.5B, .930 at Llama-70B and .835 at Llama-8B the last below the .85 that scan used as its acceptance line, and kept rather than retuned."
+ },
+ {
+  "id": "2d8f759cf7dc65ea",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "We did not record this level for the two middle Qwen checkpoints."
+ },
+ {
+  "id": "c2f35b2a82aaa87c",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "Reversion is undefined where the model never held the old value, so the pool is filtered on that condition, and the filter is what our rates are rates of."
+ },
+ {
+  "id": "846dda21a2c67715",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "So what that one checkpoint knew fixes the pool everywhere, and every level we report is a rate over this pool rather than over CounterFact."
+ },
+ {
+  "id": "b7fad79435d34ace",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "The filter also read a B_3 generation, so its condition coincides with one arm of the headline pair rather than sitting outside both, and a pool chosen for old-value retrieval under thinking would if anything favour the drop we report."
+ },
+ {
+  "id": "94df77111d10d5c7",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "Pool membership was fixed under the matcher as it stood before word-boundary matching and a minimum alias length were added, and the pool was not rebuilt afterwards"
+ },
+ {
+  "id": "7e6d0161a47b026a",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "every rate we report uses the fixed matcher, while membership of the pool does not."
+ },
+ {
+  "id": "43502c2284862d1a",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "Scoring is generative, not logit based"
+ },
+ {
+  "id": "4efeddb299fa2df8",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "These are nested operational endpoints with different error profiles, not mathematical bounds on a latent semantic rate."
+ },
+ {
+  "id": "8e47ffee026e5a26",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "Chain leakage CLR_b records an old-value mention in the chain without claiming semantic commitment."
+ },
+ {
+  "id": "48cbe4aa49a8ef94",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "Locality is only a target-value non-leakage check on the neighbor answer, not a general preservation measure."
+ },
+ {
+  "id": "404c6d85bbccbf10",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "In a separate replication audit, the treated-versus-no-suppression comparison covered 400 B_0 prompt/chain/answer tuples with 0 differences"
+ },
+ {
+  "id": "450dee7663cfdbbd",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "the same-relation-control-versus-no-suppression comparison likewise covered 400 tuples with 0 differences."
+ },
+ {
+  "id": "c6da41fa3d9c9954",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "The cellwise, unadjusted 95 % paired case-bootstrap intervals exclude zero only at the largest tested checkpoint in each family."
+ },
+ {
+  "id": "dad57392e26f871d",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "These cells delimit the headline scope a scope statement, not a post-hoc selection and we do not infer an ordered trend across checkpoints."
+ },
+ {
+  "id": "3aaef1363bedb0d7",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "For the unedited base on the same requests, paired old-answer drift over n=199 cases is -.0201 ,[-.0804,.0402] and does not support a matching base-model drift."
+ },
+ {
+  "id": "e7c055853eabc1f9",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "That paired interval exists at this checkpoint only"
+ },
+ {
+  "id": "b40dd9ea76ac5537",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "the other five carry level differences without intervals, and those are not of one sign."
+ },
+ {
+  "id": "ce84355c8363c09a",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "we make no formal contrast."
+ },
+ {
+  "id": "36af83b0d5fd6f48",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "Both lineages share an R1 teacher and distillation recipe, so their agreement disfavors a single-lineage idiosyncrasy without excluding recipe-specificity or establishing equality across lineages (Section )"
+ },
+ {
+  "id": "807870bc52e30d7f",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "the budget subscripts name protocol tiers rather than a complete ladder."
+ },
+ {
+  "id": "9360671c85275797",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "The B_ 0P arm is a fixed short canned thought, not a length-matched filler"
+ },
+ {
+  "id": "7cb1fb1e615242ba",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "It improves rather than erodes ES relative to B_0 , whereas the B_1 chain reduces it."
+ },
+ {
+  "id": "eafede8e5836d630",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "It distinguishes the empty think wrapper from the tested canned content but does not isolate length"
+ },
+ {
+  "id": "d1c14851225a465f",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "Section revisits the length-only account."
+ },
+ {
+  "id": "854ecd7b27f98e0f",
+  "section": "The Reasoning-Time Evaluation Gap",
+  "zone": "body",
+  "text": "The gap also persists under temperature sampling across three fixed seeds, so greedy decoding does not produce it."
+ },
+ {
+  "id": "775e75f89bae65fc",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "footnote",
+  "text": "no control, no interval, expected because ROME optimizes the target logit at the rewrite prompt, and conditional on the selected reversion sample."
+ },
+ {
+  "id": "3317c43c55f5ad04",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "footnote",
+  "text": "The per-item record, , exists but was never crosswalked to the membership sample, so sample overlap, membership composition and the case-level tally cannot be audited from it, and we place no quantitative weight on this observation downstream."
+ },
+ {
+  "id": "cb90d76f62987f36",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "footnote",
+  "text": "Permissive RR at B_1 is .208 , descriptively similar to .193 at B_3 , but because these estimates come from separate runs with run-specific B_0 gates, we infer neither saturation nor an ordered trend."
+ },
+ {
+  "id": "826a83ffa19b7437",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "footnote",
+  "text": "these are arm-paired stratum totals, not RR denominators."
+ },
+ {
+  "id": "504305543871713d",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "Visible In-Chain Routes From a frozen pool of 101 candidate chains drawn from six checkpoints across both backbone lineages, an answer-only membership gate retained 41 OLD-committed route instances representing 33 unique facts, and assigned the rest 43 NEW and 17 NEITHER."
+ },
+ {
+  "id": "aabb7e996b2411be",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "Within this pool, lexical candidacy is not equivalent to OLD membership by judge majority"
+ },
+ {
+  "id": "dc14d4eb20cb8f07",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "the permissive matcher's precision on its stratified validation sample is reported in Section , and we do not transport that estimate to this pooled census."
+ },
+ {
+  "id": "c8f3c337592ae72f",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "A separate post-hoc crosswalk finds subject-scrubbed CLR in 13/13 majority-OLD items and 18/20 non-OLD candidates, so within it CLR is non-sufficient for OLD commitment."
+ },
+ {
+  "id": "94fc01d87ce6b87b",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "The answer-only membership gate is a distinct task."
+ },
+ {
+  "id": "a79facb5b231db05",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "Conditioning on committed-OLD outcomes, the census describes observed failures rather than a predictor or causal mediator the baseline-CLR split below is a separate contrast and defines the route population promised in Section ."
+ },
+ {
+  "id": "5c5ba5145055269a",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "the stop rule prevented the planned semantic-control arms from running, and we withdraw the planned natural-chain mediation claim."
+ },
+ {
+  "id": "474386010652fe87",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "those diagnostics constrain the vehicle but do not identify a single mechanism, and natural-chain mediation is neither confirmed nor refuted."
+ },
+ {
+  "id": "f875e295f362d6fb",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "The control-point claim in Section does not rely on the vehicle"
+ },
+ {
+  "id": "ab3b8e7f3521681a",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "it intervenes on live chains, does not directly intervene on answer logits, and its controls do not route through replay"
+ },
+ {
+  "id": "67b288fac4c606ed",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "The Length-Only Account At B_3 , old-answer first-token suppression in the think span yields marginal ES .631 against the Qwen-32B B_0 level of .595"
+ },
+ {
+  "id": "29b1b150a2fef416",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "because suppression may alter realized chain length, these levels do not form a length-matched contrast."
+ },
+ {
+  "id": "6ee070b2da7af673",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "The short canned thought yields permissive RR .040 , but an equal-length content-free filler remains untested."
+ },
+ {
+  "id": "56365b0da7bf5c68",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "Section bears on this account without settling it"
+ },
+ {
+  "id": "0f95e744404e89f2",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "at the same nominal budget B_3 , think-span-only suppression of old-answer first tokens improves edit success and lowers permissive reversion against unsuppressed chains, while the strict displacement endpoint does not separate from that baseline."
+ },
+ {
+  "id": "7a88505c565faa4c",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "Because realized chain lengths under suppression were not audited, that contrast constrains a length-only reading rather than eliminating it."
+ },
+ {
+  "id": "51031e1be6636c6a",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "CLR-Stratified Enrichment and a Dose-Limited Boundary Test For T (old-answer first-token suppression) versus N (no suppression), among cases with RR defined under the B_0 gate in both arms, T-minus-N RR within N-arm-CLR strata was -.289 ,[-.444,-.156] for CLR-positive cases with bootstrap p=.0002 , against +.014 ,[.000,.041] with p=.72 for CLR-zero."
+ },
+ {
+  "id": "c48366aae5d13141",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "without an interaction test, this is within-sample enrichment and cannot establish that visible CLR is required or identify mediation."
+ },
+ {
+  "id": "36580b7cb5a36c1a",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "A concept-direction experiment gives a dose-limited boundary test, comparing old-object direction suppression with a shuffled-direction control."
+ },
+ {
+  "id": "c80fd7ca903dbc90",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "On the confirmatory arms the pre-specified primary RR contrast was compatible with zero even though the in-span CLR manipulation check fell, and ES remained null-compatible"
+ },
+ {
+  "id": "915ae938d5737a65",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "against no steering, RR was null-compatible while ES was positive, and the contrast on LocAcc, the pre-registered co-primary harm endpoint, was negative."
+ },
+ {
+  "id": "d19736d34fe3f051",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "Reducing measured old-object expression therefore did not yield detectable confirmatory RR repair here, and does not locate a distinct commitment layer."
+ },
+ {
+  "id": "f2d499f6120c2851",
+  "section": "Visible Routes Back to the Old Answer",
+  "zone": "body",
+  "text": "Section tests whether think-span-only old-answer first-token suppression changes the answer without a direct answer-stage intervention the test behind our chain-local causal control point."
+ },
+ {
+  "id": "fc862f919ab0ca0b",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "footnote",
+  "text": "The zero-penalty point is the no-suppression arm itself"
+ },
+ {
+  "id": "42d0eba4d8d32280",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "footnote",
+  "text": "the five suppressed points come from a smaller separate run and none of the six carries an interval, so we read them as a dose ladder rather than a calibrated dose-response."
+ },
+ {
+  "id": "30a5c9306772ff0b",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "footnote",
+  "text": "Under MEMIT on the Qwen-14B checkpoint the treated arm changed 109 of 200 efficacy rows against no suppression, the competitor 18"
+ },
+ {
+  "id": "d994cfb87f515f79",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "footnote",
+  "text": "This battery has no changed-row audit of its own, so that description is of those two runs and not of this one."
+ },
+ {
+  "id": "bceda12eb9f64441",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "caption",
+  "text": "a paired reversion contrast uses the intersection of the two arms' gate sets, so its denominator is neither arm's n , and paired differences need not equal differences of arm-wise rates."
+ },
+ {
+  "id": "1bf7f35f801f9766",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "caption",
+  "text": "Bold marks intervals excluding zero, and Intervals are unadjusted for multiplicity."
+ },
+ {
+  "id": "2e20241d2c1afbcf",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "caption",
+  "text": "The in-span leakage check is a manipulation check rather than an outcome."
+ },
+ {
+  "id": "1579d9610b9d95e2",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "caption",
+  "text": "the rest are the mean-CI family, never mixed within a contrast."
+ },
+ {
+  "id": "2cbcb179029c2115",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "table",
+  "text": "unadjusted p at recorded resolution) (r) 1-7 Contrast ES [CI] p RR [CI] p RR^s [CI] p T$-$N ^ .138 [.082, .194] .000 -.102 [-.170, -.042] .001 -.051 [-.102, .000] .073 T$-$P .122 [.051, .193] .002 -.095 [-.171, -.029] .010 -.057 [-.114, -.010] .029 T$-$C ^ .121 [.051, .192] .000 -.094 [-.160, -.028] .006 -.057 [-.113, -.009] .032 D$-$N -.217 [-.289, -.144] .000 .086 [.019, .152] .010 .095 [.038, .162] .002 P$-$N .015 [-.046, .081] .709 .000 [-.057, .057] 1.00 -.009 [-.047, .028] .828 C$-$N ^ .015 [-.046, .076] .688 .000 [-.056, .056] 1.00 -.009 [-.047, .028] .828"
+ },
+ {
+  "id": "923d8fb8e6f3f083",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "decoding is otherwise unchanged, and no penalty applies while the answer is written."
+ },
+ {
+  "id": "c68e66cacb2b0409",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "Five arms share one edit, one case set, and one decoding configuration, differing only in which tokens are penalized"
+ },
+ {
+  "id": "0bc699f6560a1fff",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "The treated and untreated arms already existed, so it fixed the comparator and the sign order ahead of the data, not the treated arm."
+ },
+ {
+  "id": "b52c2763164510b7",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "strict lexical displacement is secondary, with its unadjusted bootstrap p reported verbatim."
+ },
+ {
+  "id": "4bf922e27768a6f6",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "At the reported budget the two scopes differ far less, .639 against .670, with the leakage check identical at .268, so what distinguishes think-scoping is where the penalty acts, not how large the difference is."
+ },
+ {
+  "id": "36f536f869612a5c",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "Third, chain leakage is a manipulation check on whether the penalty acted inside the span, not an outcome."
+ },
+ {
+  "id": "a9b874022958ec89",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "This battery has no byte-identity audit of its own the arm-wise B_0 audit there belongs to the MEMIT replication , and arm-wise n differences are harness errors except in the placebo arm, whose extra row is unexplained (Section ) but the paraphrase run of Section , on the same model, editor and suppressor, compared 600 B_0 probe rows across arms with 0 differences."
+ },
+ {
+  "id": "a7621e67fc0f0b3b",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "Every suppressed setting leaves the in-span leakage check below the zero-penalty setting, and across them it declines with penalty strength, reaching .082 at the strongest, while edit success and permissive reversion are not ordered across those settings."
+ },
+ {
+  "id": "a5b0ee2071d24bba",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "The processor fires only on probes for the edited subject and relation, needing the old value's aliases"
+ },
+ {
+  "id": "3a4859d51247d1f6",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "paired edit success rises by +.122 and permissive reversion falls by -.095, and the comparison against no suppression gives a close quantity, both with intervals in Table ."
+ },
+ {
+  "id": "985e826ee8cf1279",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "On both primary endpoints the two differ by less than either interval's width, so there the reading does not turn on which control the treated arm is measured against"
+ },
+ {
+  "id": "032a4a68181dabad",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "Arm-wise, permissive reversion among zero-thinking successes is 19.3 % without suppression and 8.5 % with it."
+ },
+ {
+  "id": "c18962ac9dcc6659",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "The no-suppression arm is the same Qwen-32B run as the largest Qwen cell of Table ."
+ },
+ {
+  "id": "286759c6781ef4ca",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "The four arms the frozen protocol named order as it predicted, a signed ladder rather than a calibrated dose."
+ },
+ {
+  "id": "087a9f1144982b45",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "What the Placebo and Competitor Arms Bound The treated arm separates from both controls on all three endpoints, strict displacement included (Section ), while neither control separates from no suppression on any of the three (Table )."
+ },
+ {
+  "id": "46be65e232506e1e",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "Each control-versus-none contrast is compatible with zero"
+ },
+ {
+  "id": "7424f0090788a438",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "we set no equivalence margin, so these are failures to separate rather than demonstrations of no effect."
+ },
+ {
+  "id": "458171ddf0ec1dca",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "Inside the chain the competitor is not inert."
+ },
+ {
+  "id": "cf301cf1ff1050b6",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "So the competitor perturbs what the chain says, while at the answer level the comparison is compatible with zero."
+ },
+ {
+  "id": "8864f99693929e65",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "That bounds specificity rather than supplying evidence"
+ },
+ {
+  "id": "37dc1daae527b05f",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "The placebo arm is not byte-reproducible from the released shards, which hold one row more than the recorded analysis used."
+ },
+ {
+  "id": "f6c74e130f4568c7",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "Under the reproducible derivation every T-versus-P quantity we report moves in the third decimal and no conclusion changes, while the placebo's in-chain comparison crosses zero under one derivation and not the other, so it carries nothing here."
+ },
+ {
+  "id": "14709d1714b7d323",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "Endpoint Hierarchy and Multiplicity The secondary strict endpoint separates the treated arm from both controls but not from the untreated baseline (Table )."
+ },
+ {
+  "id": "74c242a3cabbeb36",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "It rests on the 118 paired cases clearing the zero-thinking gate in both arms, for which we publish no per-arm event totals, and Table shows it running below permissive reversion in every arm."
+ },
+ {
+  "id": "c601987e529abd62",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "All p values here are unadjusted and we claim no correction."
+ },
+ {
+  "id": "5ed6ebef791b05d7",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "the three differ in endpoint and comparator, accumulating as settings, not replicates of one estimate."
+ },
+ {
+  "id": "f9fb934749971e4f",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "Under ROME on the Qwen-14B checkpoint, against no suppression, paired edit success rises and strict displacement also separates (Table ) a second scale, not a second editor, and strict separation where the Qwen-32B battery had none."
+ },
+ {
+  "id": "cf1c7f6d9ff68c93",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "Under MEMIT on the Qwen-14B checkpoint, against the same-relation competitor, paired edit success rises while strict displacement does not separate (Table )"
+ },
+ {
+  "id": "0cbd79a5a0350fab",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "there the competitor's own strict contrast is .000 ,[.000,.000] against no suppression a floor rather than an equivalence result, so the same null holds there"
+ },
+ {
+  "id": "f7cf84a0bb689c19",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "on edit success it is not a floor (+.015 ,[.000,.035])."
+ },
+ {
+  "id": "d8d3d4392f3205b8",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "That replication's fresh no-suppression arm gave a paired ES drop of +.060 ,[-.020,.140] , which does not itself establish a reasoning-time drop in that cell, so this transfers the intervention and not the gap."
+ },
+ {
+  "id": "46d51144cbaaadb6",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "This is active application to a paraphrase query, not portability to unguarded queries"
+ },
+ {
+  "id": "e34b8260773dd603",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "no row was filtered and no valid-subset re-analysis was run."
+ },
+ {
+  "id": "43b23c329823e538",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "its no-suppression levels come from an independent run."
+ },
+ {
+  "id": "70145d15a12ceef3",
+  "section": "A Chain-Local Causal Control Point",
+  "zone": "body",
+  "text": "We position this as a mechanistic probe and an edit-aware decoding guard, not a deployment-ready fix"
+ },
+ {
+  "id": "5b7fb3d0aa6ae931",
+  "section": "Discussion & Limitations",
+  "zone": "body",
+  "text": "Edit evaluation should carry a reasoning-time arm a direct-answer pass certified every failure this paper reports and the same think-span-only intervention shows the failure sits at a steerable point of the decoding pipeline, not only in the weights (Section )."
+ },
+ {
+  "id": "6e1635386e957dbd",
+  "section": "Discussion & Limitations",
+  "zone": "body",
+  "text": "Our claims are about six fixed checkpoints, not scale"
+ },
+ {
+  "id": "19371bc6c993c5cf",
+  "section": "Discussion & Limitations",
+  "zone": "body",
+  "text": "we report every cell and read the two lineages' agreement as bounding backbone idiosyncrasy rather than recipe-specificity, since both share one teacher and recipe (Section )."
+ },
+ {
+  "id": "4abc9007c6504653",
+  "section": "Discussion & Limitations",
+  "zone": "body",
+  "text": "No judge panel has a human-audited subsample, and where a judge family is recorded it is a single one, so shared judge bias would not surface."
+ },
+ {
+  "id": "8ad4a1302dc43836",
+  "section": "Discussion & Limitations",
+  "zone": "body",
+  "text": "MEMIT enters only through the transfer replication"
+ },
+ {
+  "id": "47756c27fff22515",
+  "section": "Discussion & Limitations",
+  "zone": "body",
+  "text": "a second benchmark, edit family, and non-counterfactual edits are untested."
+ },
+ {
+  "id": "f52edf9c0ad09831",
+  "section": "Discussion & Limitations",
+  "zone": "body",
+  "text": "Locality is narrower still a target-value non-leakage rate, where a refusal or fluent non-answer counts as non-leaking rather than preserved behaviour."
+ },
+ {
+  "id": "c15aa8cb9748caea",
+  "section": "Discussion & Limitations",
+  "zone": "body",
+  "text": "Natural-chain mediation remains unidentified"
+ },
+ {
+  "id": "67bff36364705883",
+  "section": "Discussion & Limitations",
+  "zone": "body",
+  "text": "We report point-equivalence at the tested sets, not equivalence."
+ },
+ {
+  "id": "5bdbbdd3bd7925cb",
+  "section": "Conclusion",
+  "zone": "body",
+  "text": "Evaluating the same edit at zero thinking and after a native chain exposes a gap that direct-answer validation cannot see"
+ },
+ {
+  "id": "42b7cbad0b5a3717",
+  "section": "Conclusion",
+  "zone": "body",
+  "text": "not matched by the unedited base's own rate on the largest Qwen checkpoint, absent there under a fixed canned thought, and present at the largest checkpoint we tested in each of two lineages."
+ },
+ {
+  "id": "fa14abf6f8644a9f",
+  "section": "Conclusion",
+  "zone": "body",
+  "text": "Because think-span-only suppression of the old answer's first tokens moves an answer it never touches (Section ), that failure admits a chain-local causal control point."
+ },
+ {
+  "id": "37d1bf88f05f2991",
+  "section": "Ethical Statement",
+  "zone": "body",
+  "text": "three properties bound this research diagnostic."
+ },
+ {
+  "id": "b6461b9c21f2c4ab",
+  "section": "Ethical Statement",
+  "zone": "body",
+  "text": "It is edited-query gated, firing only on the subject and relation whose edit is defended (Section )"
+ },
+ {
+  "id": "5233a768eee891ba",
+  "section": "Ethical Statement",
+  "zone": "body",
+  "text": "it is no general truth-suppression capability."
+ },
+ {
+  "id": "c7146167ba388b31",
+  "section": "Ethical Statement",
+  "zone": "body",
+  "text": "It steers at inference time, updating no weights and applying no optimization toward concealment."
+ },
+ {
+  "id": "85a9fe512d760b3d",
+  "section": "Ethical Statement",
+  "zone": "body",
+  "text": "And no censused reversion took the associative route that leaves no verbalized trace ( 0 of 41 )."
+ },
+ {
+  "id": "d93f280ad6f0dc25",
+  "section": "Ethical Statement",
+  "zone": "body",
+  "text": "That census is conditioned on reversion and is not a sample of unguarded use, so the zero bounds traceless reversion rather than excluding it, and we do not claim that the absence of such a trace could serve as a monitor."
+ }
+]

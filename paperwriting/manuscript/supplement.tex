@@ -24,7 +24,7 @@
 \maketitle
 
 \section*{Contents}
-This supplement discharges the eight places where the main text defers material,
+This supplement discharges the nine places where the main text defers material,
 and carries the tables the reproducibility checklist points at.  Nothing here
 introduces a quantity that is not already recorded in the frozen results file;
 sections that would require a new computation say so and stop.
@@ -44,7 +44,8 @@ assumptions would be a new computation, which the pre-submission freeze forbids.
 Per-instance route votes are not recorded, so this section reports the aggregate
 only: how many of the 41 gated instances were unanimous, how many split
 two-to-one, how many split three ways, and the raw pairwise agreement behind the
-reported Fleiss' \(\kappa\).
+reported Fleiss' \(\kappa\).  The candidate pool behind the gate had greedy,
+short-budget, and sampled generations represented (moved from the body, W6).
 
 % ---------------------------------------------------------------- S3b
 \section{Sunk Section-3 Regressions}
@@ -90,11 +91,21 @@ co-primary LocAcc harm contrast reported in the body.
 
 % ---------------------------------------------------------------- S11
 \section{Hyperparameters and Run Counts}
-% Supports: checklist items 4.2 (partial), 4.10, 4.13.
+% Supports: checklist items 4.2 (partial), 4.8, 4.10, 4.13.
+% Discharges: "and pinned library versions are in the supplement."
 Per-checkpoint edit layer with how it was fixed --- empirically scanned on two
 checkpoints, set a priori by a fixed relative-depth rule on the others, with
 every conditional fallback sweep left unfired --- suppression penalty, decoding
 settings, seeds, and per-cell run counts.
+
+The compute environment, moved here verbatim from the body's Reproducibility
+paragraph (W6): runs used Hopper-class parts of 141 and 80\,GB HBM and an
+Ada-class part of 24\,GB.  Bfloat16 made the rank-one update diverge to NaN on
+the Hopper-class part, so that part ran in float32 and the other in bfloat16,
+agreeing on a 40-case cross-check.  Library versions are pinned in the released
+lock file, frozen before the runs; every value here is recorded under the
+rq3.environment key of the frozen results file.  OS and per-library name/version
+strings land here with the Task D commitment.
 
 % ---------------------------------------------------------------- W5 gap robustness
 \section{Gap-Robustness Rows}
@@ -120,10 +131,10 @@ or will not reproduce the reported table.
 % Discharges: "fix; the evidence ladder is a supplementary figure."
 The evidence ladder, with the source map that records which results.json pointer
 every plotted quantity came from.  W5 rebuilt the body's visual layer (teaser,
-drop chart, five-arm bars, dense table), so five retired artifacts live here:
-the paired drop chart, the two-panel capability figure, the five-arm forest
-(still carrying its strict-displacement panel), the mechanism figure, and the
-protocol schematic;
+drop chart, five-arm bars, dense table) and the drop chart returned to the body,
+so four retired artifacts live here: the two-panel capability figure, the
+five-arm forest (still carrying its strict-displacement panel), the mechanism
+figure, and the protocol schematic;
 each has a source map or, for the schematic, no numbers at all.  None is
 rendered into this file yet.
 
