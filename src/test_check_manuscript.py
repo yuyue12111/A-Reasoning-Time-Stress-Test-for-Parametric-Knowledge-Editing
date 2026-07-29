@@ -55,9 +55,11 @@ def test_canonical_manuscript_passes(candidate_main: Path) -> None:
     # W5 counts: the dense Table 2 binds the battery levels, all six paired
     # contrasts, the transfers, the guard rows, and the gap-robustness rows
     # in Section 5 (104->220); Sections 3-4 are unchanged from W4.
-    assert "Section 3 RJ ledger (125 occurrences)" in completed.stdout
+    # V5 cut ladder: level rows and gap-robustness rows left Table 2, prose
+    # numbers were table-pointered (S3 125->118, S5 220->162).
+    assert "Section 3 RJ ledger (118 occurrences)" in completed.stdout
     assert "Section 4 RJ ledger (39 occurrences)" in completed.stdout
-    assert "Section 5 RJ ledger (220 occurrences)" in completed.stdout
+    assert "Section 5 RJ ledger (162 occurrences)" in completed.stdout
 
 
 def test_frozen_abstract_mutation_is_rejected(candidate_main: Path) -> None:
@@ -650,7 +652,7 @@ def test_reviewed_table_environment_shape_is_frozen(
     assert text.count(r"\begin{table*}[t]") == 1
     assert text.count(r"\begin{table*}[t!]") == 1
     assert text.count(r"\begin{table}[") == 0
-    assert text.count(r"\begin{figure*}[t]") == 1
+    assert text.count(r"\begin{figure*}[t]") == 0
     assert text.count(r"\begin{figure*}[t!]") == 1
     assert text.count(r"\begin{figure}[t!]") == 1
     mutate(
@@ -1043,9 +1045,10 @@ def test_section5_arrow_must_bind_to_the_battery_arms(
     swap.
     """
     text = candidate_main.read_text(encoding="utf-8")
-    # The arm-wise percent binding, the battery-table row, and the W4/C2
-    # contribution-two binding in Section 1.
-    assert text.count('"pointer":"/rq3/sup_battery/marginal_B3/N/RR"') == 3
+    # The arm-wise percent binding in Section 5 and the W4/C2
+    # contribution-two binding in Section 1 (the Table 2 level rows left the
+    # body in the W5 cut ladder).
+    assert text.count('"pointer":"/rq3/sup_battery/marginal_B3/N/RR"') == 2
     candidate_main.write_text(
         text.replace(
             '"pointer":"/rq3/sup_battery/marginal_B3/N/RR"',
@@ -1163,7 +1166,10 @@ def test_route_census_binds_the_corrected_block(candidate_main: Path) -> None:
 def test_figure_one_is_wired_and_referenced(candidate_main: Path) -> None:
     text = candidate_main.read_text(encoding="utf-8")
     assert r"\includegraphics" in text
-    assert r"Figure~\ref{fig:gap}" in text, "Figure 1 must be cited from the prose"
+    # W5: Figure 1 is the teaser; the five-arm figure keeps the fig:forest
+    # label and is cited from the direction-arm sentence.
+    assert r"Figure~\ref{fig:teaser}" in text, "Figure 1 must be cited from the prose"
+    assert r"Figure~\ref{fig:forest}" in text, "the five-arm figure must be cited"
 
 
 def test_negative_interval_bound_is_not_the_banned_f1_contrast(
@@ -1208,7 +1214,7 @@ def test_genbench_ci_level_is_bound_not_spelled_out(candidate_main: Path) -> Non
     """W2-7/C2: the 90% CI level is a bound field, not an unpointed English word."""
     text = candidate_main.read_text(encoding="utf-8")
     assert "ninety-percent" not in text, "spell-out was the no-pointer workaround"
-    assert r"90\% intervals" in text
+    assert r"90\%" in text  # bound in math form since the W5 genbench trim
     assert '"pointer":"/rq3/genbench_b26_tost/ci_level"' in text
 
     results = json.loads(

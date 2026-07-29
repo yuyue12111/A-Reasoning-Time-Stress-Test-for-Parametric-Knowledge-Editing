@@ -1527,7 +1527,7 @@ def fig_teaser(results: dict[str, Any]) -> None:
         )
 
     with plt.rc_context(W5_RC):
-        FW, FH = 3.45, 3.42
+        FW, FH = 3.45, 2.84
         fig = plt.figure(figsize=(FW, FH))
         ax = fig.add_axes([0, 0, 1, 1])
         ax.set_xlim(0, 1)
@@ -1695,7 +1695,7 @@ def fig_drop(results: dict[str, Any]) -> None:
     }
 
     with plt.rc_context(W5_RC):
-        fig = plt.figure(figsize=(7.0, 2.30), constrained_layout=True)
+        fig = plt.figure(figsize=(7.0, 2.00), constrained_layout=True)
         gs = fig.add_gridspec(1, 2, width_ratios=[2.0, 1.05], wspace=0.05)
         axes = {"Qwen": fig.add_subplot(gs[0, 0])}
         axes["Llama"] = fig.add_subplot(gs[0, 1], sharey=axes["Qwen"])
@@ -1834,7 +1834,7 @@ def fig_arms(results: dict[str, Any]) -> None:
              "RRs": "Strict $RR^s$ (secondary)"}
 
     with plt.rc_context(W5_RC):
-        fig, ax = plt.subplots(figsize=(7.0, 2.30), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(7.0, 1.68), constrained_layout=True)
         BW, STEP, GW = 0.15, 0.175, 1.32
         centers = [0.0, GW, 2 * GW]
         bars_drawn = 0
