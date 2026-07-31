@@ -373,6 +373,59 @@ def _forest_point(
     )
 
 
+def _contrast_bar(
+    ax: plt.Axes,
+    *,
+    y: float,
+    point: float,
+    ci: Sequence[float],
+    color: str,
+    marker: str,
+    filled: bool = True,
+    zorder: int = 4,
+    linewidth: float = 1.35,
+    markersize: float = 5.6,
+    facecolor: str | None = None,
+    height: float = 0.42,
+) -> None:
+    """A contrast drawn in the body's bar language: tinted bar from zero to the
+    point estimate, with the interval overlaid as a capped whisker.
+
+    Same signature as _forest_point so the call sites are a one-word swap, and
+    the unused marker/markersize arguments are accepted rather than removed --
+    the two are interchangeable and the forest form is the better encoding for
+    a contrast, so keeping them swappable keeps that option cheap.
+
+    The whisker is drawn ON TOP of the bar and in the full-strength edge colour,
+    because the bar's length is only the point estimate; a reader who takes the
+    bar for the evidence and ignores the interval is the known failure mode of
+    this chart type, so the interval is given the strongest ink in the mark.
+    """
+    lo, hi = float(ci[0]), float(ci[1])
+    if not lo <= point <= hi:
+        raise ValueError(f"point {point} is outside CI [{lo}, {hi}]")
+    ax.barh(
+        y,
+        point,
+        height=height,
+        left=0.0,
+        facecolor=_w5_tint(color, 0.40 if filled else 0.16),
+        edgecolor=color,
+        linewidth=0.9,
+        hatch=None if filled else "///",
+        zorder=zorder - 1,
+    )
+    ax.hlines(y, lo, hi, color=color, linewidth=linewidth, zorder=zorder + 1)
+    ax.vlines(
+        [lo, hi],
+        y - 0.10,
+        y + 0.10,
+        color=color,
+        linewidth=max(0.9, linewidth * 0.7),
+        zorder=zorder + 1,
+    )
+
+
 def _fig1_data(results: dict[str, Any], rec: SourceMap) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, int]]:
     family_specs = [
         (
@@ -572,27 +625,25 @@ def fig1_capability(results: dict[str, Any]) -> None:
     x_positions = [0.0, 1.5, 3.0, 4.5, 7.0, 8.5]
     ax_a.axvspan(-0.65, 5.15, color=PALE_NEUTRAL, zorder=0)
     ax_a.axvspan(6.35, 9.15, color=PALE_NEUTRAL, zorder=0)
+    estimate_bars = []
     for x, cell in zip(x_positions, checkpoints):
         family_color = QWEN_BLUE if cell["family"] == "Qwen" else LLAMA_ORANGE
         marker = "D" if cell["sig"] else "o"
-        ax_a.plot(
+        # Bar in the body's language; the interval is drawn over it in the
+        # full-strength colour, since the bar length is only the point estimate.
+        estimate_bars.append(ax_a.bar(
             x,
             cell["point"],
-            marker=marker,
-            markersize=6.6 if cell["sig"] else 5.8,
-            markerfacecolor=(
-                family_color
-                if cell["sig"]
-                else mcolors.to_rgba(family_color, 0.35)
-            ),
-            markeredgecolor=family_color,
-            markeredgewidth=1.4 if cell["sig"] else 0.9,
-            linestyle="none",
-            zorder=5,
-        )
+            width=0.56,
+            facecolor=_w5_tint(family_color, 0.42 if cell["sig"] else 0.18),
+            edgecolor=family_color,
+            linewidth=1.1 if cell["sig"] else 0.8,
+            hatch=None if cell["sig"] else "///",
+            zorder=3,
+        ))
         lo, hi = cell["ci"]
-        ax_a.vlines(x, lo, hi, color=family_color, linewidth=1.6, zorder=3)
-        ax_a.hlines([lo, hi], x - 0.14, x + 0.14, color=family_color, linewidth=1.0, zorder=3)
+        ax_a.vlines(x, lo, hi, color=family_color, linewidth=1.3, zorder=5)
+        ax_a.hlines([lo, hi], x - 0.12, x + 0.12, color=family_color, linewidth=1.0, zorder=5)
         if cell["sig"]:
             ax_a.annotate(
                 f"{cell['point']:.3f}",
@@ -655,15 +706,16 @@ def fig1_capability(results: dict[str, Any]) -> None:
     # linestyle="none" or an axhline.  What can actually go wrong is the zip
     # above silently dropping cells when x_positions and checkpoints disagree,
     # so count the markers that reached the axes.
-    drawn = [
-        line for line in ax_a.get_lines()
-        if line.get_marker() not in {"", "None", None} and len(line.get_xdata()) == 1
-    ]
+    # W7: the estimates are bars now.  Collected from the loop rather than read
+    # back off the axes, because ax.patches also holds the two background spans
+    # and the legend swatches -- reading it back counted 10 marks for 6
+    # checkpoints and failed an invariant that was doing its job correctly.
+    drawn = estimate_bars
     rec.invariant(
         "categorical panel A",
         len(x_positions) == len(checkpoints) and len(drawn) == len(checkpoints),
         f"one independent estimate per checkpoint reached the axes "
-        f"({len(drawn)} markers for {len(checkpoints)} checkpoints)",
+        f"({len(drawn)} bars for {len(checkpoints)} checkpoints)",
     )
     _clean_axis(ax_a, grid_axis="y")
     # W4-2: horizontal light-gray gridlines only.
@@ -676,7 +728,7 @@ def fig1_capability(results: dict[str, Any]) -> None:
     ax_b.axhspan(-0.55, 0.48, color=PALE_BAND, zorder=0)
     ax_b.axhline(0.60, color=N_LIGHT, linewidth=0.7)
     for y, row in zip(y_positions, controls):
-        _forest_point(
+        _contrast_bar(
             ax_b,
             y=y,
             point=row["point"],
@@ -1251,7 +1303,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
         ax.axvline(0, color=N_DARK, linewidth=0.8, linestyle=(0, (2, 2)))
         for y, row in zip(y_positions, rows):
             values = row[metric]
-            _forest_point(
+            _contrast_bar(
                 ax,
                 y=y,
                 point=values["point"],
