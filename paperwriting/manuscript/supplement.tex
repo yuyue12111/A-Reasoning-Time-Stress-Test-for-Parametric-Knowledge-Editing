@@ -22,6 +22,12 @@
 \author{}
 \affiliations{Anonymous submission}
 
+% Anonymous-submission metadata hygiene: see main.tex for the rationale.
+
+\pdfsuppressptexinfo=-1
+\pdftrailerid{}
+\pdfinfo{ /Creator () /Producer () }
+
 \begin{document}
 \maketitle
 
@@ -814,10 +820,12 @@ Locality accuracy \(LocAcc\) & co-primary harm    & \textbf{$-$.064 [$-$.119, $-
 \end{tabular}
 \caption{The complete endpoint set of the concept-direction experiment: every
 contrast the frozen results file records, with its \(95\%\) interval.  Bold
-marks the three intervals that exclude zero, and they are the three the body
-names---the leakage manipulation check against the shuffled control, edit
-success against no steering, and the locality harm endpoint against the shuffled
-control.  The confirmatory column is S \(-\) Pshuf, because it is the only
+marks the four intervals that exclude zero: the in-span leakage manipulation
+check in both columns, edit success against no steering, and locality accuracy
+against the shuffled control.  The last of those is a secondary contrast on the
+pre-specified harm metric and is not a confirmatory result; the locality contrast
+the body reports is the one against no steering, which includes zero.  The
+confirmatory column is S \(-\) Pshuf, because it is the only
 comparison that holds the injection strength fixed and varies only whether the
 direction is the case's own; the S \(-\) N column varies steering itself and is
 read as a secondary description.  What a reader should take from the table is

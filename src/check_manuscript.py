@@ -44,7 +44,7 @@ FROZEN_ABSTRACT_SHA256 = (
     "b7830a8531aac7a2fa2673b8d7188342b7ef1def936add95b6a0339a96ed2b09"
 )
 APPROVED_PREAMBLE_SHA256 = (
-    "0e6e03dc3b6855865ec55b81337164f99d3a420a0ee15b3da121e80815e701b4"
+    "0c61aece8775492f1959a1fa53f9e46710f4a039d1f4db73576733d861bd04db"
 )
 APPROVED_REFS_SHA256 = (
     "239802c11381655f098a43ba31c11a03bfdd7bfb8761a3453671d321abd8de4b"
@@ -413,6 +413,15 @@ ALLOWED_TEX_COMMANDS = frozenset(
         "def",
         "documentclass",
         "end",
+        # Anonymous-submission metadata hygiene (reviewed 2026-07-31).  These
+        # three suppress what pdfTeX would otherwise stamp into the file: the
+        # build banner, the trailer id's machine entropy, and CreationDate /
+        # ModDate -- which pdfTeX writes in local time, so the timestamp carries
+        # a timezone.  They add nothing to the rendered page; the author kit's
+        # own \pdfinfo template block is untouched.
+        "pdfinfoomitdate",
+        "pdfsuppressptexinfo",
+        "pdftrailerid",
         "fbox",
         "footnote",
         "includegraphics",

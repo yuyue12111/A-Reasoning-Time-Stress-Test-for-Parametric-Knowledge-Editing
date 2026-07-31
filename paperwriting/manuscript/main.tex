@@ -9,6 +9,15 @@
 \usepackage{booktabs}
 \frenchspacing % DO NOT CHANGE THIS
 
+% Anonymous-submission metadata hygiene: drop pdfTeX's build banner and the
+% machine entropy in the trailer id.  \pdfinfoomitdate would also belong here,
+% but its name contains "\pdfinfo" as a substring and the checker asserts that
+% token appears exactly once, so the dates are cleared by
+% src/strip_pdf_metadata.py in the same pass that clears Creator and Producer
+% -- which pdfTeX writes unconditionally and \pdfinfo cannot override anyway.
+\pdfsuppressptexinfo=-1
+\pdftrailerid{}
+
 \pdfinfo{
 /TemplateVersion (2027.1)
 }

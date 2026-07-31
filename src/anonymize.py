@@ -406,7 +406,12 @@ def stage(out: Path) -> list[Path]:
     # the paper is drawn from, so they stay out.
     for cb in ("percase_caseblock.json", "cap3_caseblock.json",
                "b15_caseblock.json", "b15_caseblock_B3_sensitivity.json",
-               "p0_downstream_crosswalk.json"):
+               "p0_downstream_crosswalk.json",
+               # the rest of the release register: the re-scored analyses the
+               # supplement lists as published, plus the close-out audit it
+               # cites when ruling out a 200-to-199 correction
+               "f3_sampling_recalc.json", "x2_memit14b_crossarm_v2.json",
+               "x3_para_crossarm_v2.json", "cpu_closeout_audit.json"):
         s = REPO / "results 2" / cb
         if s.exists():
             put(s, out / "results" / cb)
