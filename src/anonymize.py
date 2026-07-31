@@ -197,27 +197,74 @@ CJK_RE = re.compile(r"[一-鿿]")
 
 README_TEXT = """# Code and data supplement
 
-Anonymous submission. This bundle supports assessment of the paper's claims; it
-is not a general-purpose release.
+Anonymous submission. This bundle exists so a reviewer can check the paper's
+claims: regenerate every figure and table it prints, read the code that produced
+each number, and see the pre-specified protocols behind the gates it reports.
+
+## Quick start (no GPU, about a minute)
+
+Everything the paper plots and tabulates is regenerable here from the shipped
+results file:
+
+    python3 -m pip install matplotlib numpy scipy
+    python3 src/plots.py --only all          # all seven figures -> paperwriting/
+    python3 src/generate_table_rq2.py        # the route-census table
+
+Both resolve `paperwriting/results.json` relative to the bundle root and write
+back into `paperwriting/`, so they run here unmodified. `src/plots.py` audits
+itself as it draws: each plotted quantity is checked against the frozen figure
+specification and a per-figure source map is written to
+`paperwriting/delivery/`, so a mismatch fails the run rather than producing a
+wrong picture quietly.
+
+## Environment
+
+Built and checked on CPython 3.9 with the versions pinned in `env.lock`
+(a `pip freeze` of the run environment). Only `matplotlib`, `numpy` and `scipy`
+are needed for the quick start above; the rest of `env.lock` is the full
+training-stack pin for the GPU stages, which most of this bundle does not need.
+
+## What can and cannot be re-run here
+
+| Tier | What | Needs |
+|---|---|---|
+| 1 | Regenerate all figures and the table from the reported values | CPU, one minute |
+| 2 | Re-score the shipped generation shards, re-run the analysis code paths and the unit tests | CPU |
+| 3 | Re-run editing and generation end to end | GPU + the public checkpoints |
+
+Tier 3 is not runnable from this archive alone and we do not pretend otherwise:
+it needs the R1-distill checkpoints (downloaded at run time by name, never
+redistributed here) and, for the 32B and 70B cells, multi-GPU hardware. The
+entry point is `src/run_pilot.py --config experiments/<cell>.yaml --editor rome`;
+`experiments/` names every cell the paper reports, so the configuration behind
+any number is readable even where the run is not repeatable on a laptop.
+
+Two upstream corpora are needed by one gate and are not redistributable as our
+split: `src/genbench.py` reads `data/gsm8k_200.jsonl` and `data/math500_100.jsonl`,
+which have to be built from the upstream releases named in `data/LICENSES.md`.
+Every other analysis runs without them.
 
 ## Layout
 
-    src/                    experiment, scoring and analysis code
-    src/vendor_patches/     our patches to the third-party editing library
-    experiments/            run configs: which checkpoint, editor and budget made which cell
-    data/                   alias table and benchmark licences
-    prereg/                 the pre-specified protocols behind the reported gates
+    README.md                  this file
+    LICENSE                    our code and documentation (MIT)
+    PROVENANCE.md              what a re-run reproduces exactly, and what it does not
+    env.lock                   pinned dependency versions
+    src/                       experiment, scoring and analysis code
+    src/vendor_patches/        our patches to the third-party editing library
+    experiments/               run configs and launchers: which checkpoint,
+                               editor and budget produced which reported cell
+    prereg/                    the pre-specified protocols behind the reported gates
+    data/                      alias table, the blind-locked placebo and competitor
+                               donor lists, the checksummed replay manifest, the
+                               per-scale reverted-case lists, the judge validation
+                               sample, and the benchmark licences
+    results/                   the re-scored analysis outputs the supplement's
+                               release register names, the raw per-item replay
+                               judge prompts and votes, and under probe/ the two
+                               generation shards behind the paper's worked case
+                               plus the cloze per-item record
     paperwriting/results.json  every value the paper cites (see note below)
-    PROVENANCE.md           what is and is not pre-result frozen evidence
-    env.lock                pinned dependency versions
-
-## Regenerating the tables and figures
-
-    python src/plots.py --only all
-    python src/generate_table_rq2.py
-
-Both resolve `paperwriting/results.json` relative to the bundle root and write
-back into `paperwriting/`, so they run here unmodified.
 
 ## Where each claim's code lives
 
@@ -231,7 +278,10 @@ back into `paperwriting/`, so they run here unmodified.
 | S5 intervention | signed think-span suppression, and the placebo/competitor arms | `src/suppress.py`, `src/steer.py`, `src/cross_arm.py`, `src/placebo_donor.py` |
 | S5 transfer | second scale, second editor, paraphrase probes | `src/cross_arm_para.py`, `src/x3_para_readability.py` |
 | S5 guard cost | accuracy on the unedited general sets | `src/genbench.py` |
-| Tables/figures | regenerate from the distilled results | `src/plots.py`, `src/generate_table_rq2.py` |
+| Tables/figures | regenerate from the reported values | `src/plots.py`, `src/generate_table_rq2.py` |
+
+The unit tests next to those modules run on CPU with `pytest` and cover the
+scoring rule, the budget controller, the suppressor and the analysis paths.
 
 ## Two things to know before reading the code
 
@@ -240,7 +290,7 @@ engineering notes written during the runs, not documentation prepared for
 release; they were left as written rather than rewritten after the fact, so the
 record stays faithful. Several record failures and corrections candidly -- a
 replay vehicle that did not pass its gate, a contaminated cell that was rebuilt,
-a preregistered window that differed from the one the stored artifacts allowed
+a pre-specified window that differed from the one the stored artifacts allowed
 recomputing. Each of those is also disclosed in the paper or its technical
 supplement; the notes corroborate those disclosures rather than adding new ones.
 
@@ -254,11 +304,16 @@ analysis scripts resolve that path.
 
 ## What is deliberately absent
 
-Manuscript tooling (the consistency checker, the caveat ledger, the abstract
-audits) is not included: it encodes an internal review process and is not
-evidence for any claim. Model weights, generated trajectories and judge outputs
-are not included either -- they exceed the upload limit. The code that produces
-them from a public checkpoint and the public CounterFact benchmark is here.
+Manuscript tooling -- the consistency checker, the caveat ledger, the abstract
+audits -- is not included: it encodes an internal review process and is not
+evidence for any claim. The release scrubbing tool is absent for a sharper
+reason: its pattern table is a list of the identifiers it removes.
+
+Model weights are never redistributed. Generation trajectories are shipped only
+for the worked case the paper walks through, and judge outputs only for the
+replay panel; the full sets are far past the upload limit. `PROVENANCE.md`
+records the one place where a re-run of the released code does not reproduce a
+recorded number, and what the paper does about it.
 """
 
 
