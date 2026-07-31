@@ -1909,17 +1909,17 @@ def fig_arms(results: dict[str, Any]) -> None:
                              [float(v) for v in tn[metric][1]],
                              float(tn[metric][2]))
             x_n, x_t = gc - 2 * STEP, gc - 1 * STEP
-            y_b = max(levels[metric]["N"], levels[metric]["T"]) + .075
+            y_b = max(levels[metric]["N"], levels[metric]["T"]) + .088
             ax.plot([x_n, x_n, x_t, x_t],
                     [y_b, y_b + .015, y_b + .015, y_b],
                     color="black", lw=0.8, zorder=5)
             sig = ci[0] > 0 or ci[1] < 0
             xm = (x_n + x_t) / 2
-            ax.text(xm, y_b + .072,
+            ax.text(xm, y_b + .098,
                     "T\u2212N " + f"{point:+.3f}".replace("0.", "."),
                     ha="center", fontsize=7.0, color="black",
                     fontweight="bold" if sig else "normal")
-            ax.text(xm, y_b + .028,
+            ax.text(xm, y_b + .042,
                     (f"[{ci[0]:+.3f}, {ci[1]:+.3f}]".replace("0.", ".")
                      .replace("+.000", ".000")),
                     ha="center", fontsize=5.8, color=W5_INK2)
@@ -1948,7 +1948,7 @@ def fig_arms(results: dict[str, Any]) -> None:
 
         ax.set_xticks([gc + (i - 2) * STEP for gc in centers
                        for i in range(5)], arms * 3, fontsize=7.5)
-        ax.set_ylim(0, 0.80)
+        ax.set_ylim(0, 0.95)
         ax.set_xlim(-0.55, 2 * GW + 0.55)
         ax.set_yticks([0, .2, .4, .6, .8])
         ax.set_ylabel("Level at $B_3$", fontsize=8)

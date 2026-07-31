@@ -1,10 +1,12 @@
 % Supplementary material.  Compiled standalone; NOT \input by main.tex.
 %
-% W2-8/A2b-1: this skeleton exists so that every "in the supplement" promise in
-% the frozen body has a physical destination on 7/28, three days before the
-% supplement itself is due.  Each section below is named after the promise it
-% discharges, with the body line that makes the promise quoted above it.  A
-% section that ships empty is a broken promise, not a formatting detail.
+% W2-8/A2b-1 -> T2 delivery: each section below is named after the promise it
+% discharges, with the body line that makes the promise quoted above it, and
+% each now carries the tables behind that promise rather than a description of
+% them.  Every quantity is transcribed from paperwriting/results.json; where a
+% section would need a quantity that file does not record, it says so and stops
+% rather than computing one.  A section that ships empty is a broken promise,
+% not a formatting detail.
 %
 % Delivery queue and downgrade rules: paperwriting/delivery/t2_supplement_queue.md
 \documentclass[letterpaper]{article}
@@ -25,120 +27,1480 @@
 
 \section*{Contents}
 This supplement discharges the nine places where the main text defers material,
-and carries the tables the reproducibility checklist points at.  Nothing here
-introduces a quantity that is not already recorded in the frozen results file;
-sections that would require a new computation say so and stop.
+and carries the tables the reproducibility checklist points at.  Sections are
+unnumbered in this template, so they are named here and cross-referred by title
+throughout.  \emph{Judge-Panel Missingness Pattern} and \emph{Route-Panel Vote
+Composition} give the two judge panels' missingness and vote composition;
+\emph{Sunk Section-3 Regressions} gives the two fits the body no longer carries,
+with their unedited-base recall control; \emph{Cloze Installation-Sanity
+Artifact} gives that probe's complete record and the crosswalk declaration that
+leaves it unauditable; \emph{Replay-Gate Table and Vehicle Audit} gives the full
+gate with its vehicle audit; \emph{Concept-Direction Endpoint Set} gives every
+endpoint of that experiment; \emph{Hyperparameters and Run Counts} gives edit,
+decoding and suppression settings, per-cell run counts and the compute
+environment; \emph{Gap-Robustness Rows} gives the four rows cut from the body's
+dense table; \emph{Provenance and Reproducibility Notes} records what a re-run of
+the released code will and will not reproduce; and \emph{Figures} carries the
+four artifacts retired from the body, each with its source-map register.
+Nothing here introduces a quantity that is not already recorded in the frozen
+results file; sections that would require a new computation say so and stop.
 
 % ---------------------------------------------------------------- S2b
 \section{Judge-Panel Missingness Pattern}
 % Discharges: "bound; the missingness pattern is reported in the supplement."
-The validation panel returned votes for 87 of 120 stratified items.  This section
-reports \emph{how} the 33 absences are distributed across the rule-positive and
-rule-negative strata, and the rate-limit mechanism that produced them.  It does
-not report a sensitivity analysis: re-scoring under alternative missingness
-assumptions would be a new computation, which the pre-submission freeze forbids.
+The validation panel returned votes for \(87\) of \(120\) stratified items.  This
+section reports what the frozen record holds about the \(33\) absences --- their
+count, the stratum they concentrate in, the rate-limit mechanism that produced
+them, and the available-case composition they leave behind --- and says plainly
+which part of that pattern the record does not hold.  It does not report a
+sensitivity analysis: re-scoring under alternative missingness assumptions would
+be a new computation, which the pre-submission freeze forbids.
+
+\paragraph{Disposition and mechanism.}
+Table~\ref{tab:s2b-disposition} gives the panel's disposition.  The items were
+drawn stratified on the permissive decontaminated reversion label
+(\texttt{rule\_rr}), so the sample is by construction not a random draw from the
+scored pool.  An item enters the analysed set only when enough of its judge
+calls returned a valid verdict for a panel majority to be formed; the excluded
+items are those whose calls were lost to judge-side rate limiting, not items
+dropped after inspection of their content or their verdict.  The frozen record
+states one fact about where the losses fell: the absent rows are concentrated at
+\(\texttt{rule\_rr}=0\), the negative level of that permissive stratifying
+label.  It does not record their per-stratum counts.
+
+\begin{table}[t]
+\centering
+\begin{tabular}{lr}
+\toprule
+Panel disposition & Items \\
+\midrule
+Stratified items submitted to the panel & 120 \\
+Items returning a usable panel majority & 87 \\
+Items excluded by judge rate limits & 33 \\
+\bottomrule
+\end{tabular}
+\caption{Disposition of the answer-commitment validation panel.  The reader
+should take from this that every statistic in this section, and the
+\(\kappa\) quoted in the main text, is computed on the \(87\) available cases
+only; the \(33\) excluded items carry no judge label at all, so they are absent
+from every cell of Table~\ref{tab:s2b-rules} rather than distributed among
+them.}
+\label{tab:s2b-disposition}
+\end{table}
+
+\paragraph{Composition of the available cases.}
+Table~\ref{tab:s2b-rules} gives the full cross-tabulation of each
+decontaminated rule against the panel majority on those \(87\) available cases,
+together with the agreement statistics those cells generate.  These cells are
+what the strict-rule and permissive-rule precisions quoted in the main text are
+computed from.
+
+\begin{table}[tb]
+\centering
+\begin{tabular}{lrr}
+\toprule
+ & \multicolumn{2}{c}{Panel majority} \\
+\cmidrule(l){2-3}
+Rule label & OLD & non-OLD \\
+\midrule
+\multicolumn{3}{l}{\emph{Strict decontaminated rule} (RRs)} \\
+\quad rule-positive & 23 & 2 \\
+\quad rule-negative & 4 & 58 \\
+\addlinespace
+\multicolumn{3}{l}{\emph{Permissive decontaminated rule} (RR)} \\
+\quad rule-positive & 26 & 28 \\
+\quad rule-negative & 1 & 32 \\
+\bottomrule
+\end{tabular}
+
+\medskip
+
+\begin{tabular}{lrrrr}
+\toprule
+Rule & \(\kappa\) & Agree. & Prec. & Rec. \\
+\midrule
+Strict (RRs) & .836 & .931 & .92 & .85 \\
+Permissive (RR) & .389 & .667 & .48 & .96 \\
+\bottomrule
+\end{tabular}
+\caption{Each decontaminated rule against the panel majority on the \(87\)
+available cases (upper block), and the agreement statistics those cells
+generate (lower block: Cohen's \(\kappa\), raw agreement, precision, recall;
+precision and recall are quoted at the two decimal places the frozen results
+file records).  The reader should take from this that the two rules err in
+opposite directions on the same \(87\) items --- the strict rule misses \(4\)
+items the panel calls OLD, the permissive rule admits \(28\) it does not --- so
+each has both false positives and false negatives, which is why they are
+reported as conservative and permissive operational endpoints and why neither
+is a mathematical bound on a latent semantic reversion rate.  Row and column
+totals are omitted deliberately: the frozen results file records these four
+cells per rule, and any margin would be a quantity computed here rather than
+one being reported.}
+\label{tab:s2b-rules}
+\end{table}
+
+\paragraph{What the missingness does and does not license.}
+Because the excluded rows carry no judge label, the direction of the
+missingness does not make the available-case \(\kappa\) a lower bound on the
+\(\kappa\) the full \(120\) would have produced; it is an available-case
+estimate and we report it as one.  The panel's own reversion rate on this sample
+is \(.31\), and because the sample was stratified on the rule label rather than
+drawn at random, that figure is a property of the sample and not an estimate of
+the reversion rate in the scored pool.  The panel's judges are also drawn from a
+single model family, so bias shared across them would not surface in any cell
+above.
+
+\paragraph{What is not rendered here.}
+The per-stratum counts of the \(33\) absences --- how many fell in the
+rule-positive and how many in the rule-negative stratum --- are not in the
+frozen results file, which records only their total and their direction.  The
+frozen sample file carries the stratum each item was drawn into, but tabulating
+it against the judge-verdict record to recover the split would be a computation
+performed here rather than one being reported, and therefore falls outside the
+pre-submission freeze.  We state the direction the frozen record states and stop
+there.
 
 % ---------------------------------------------------------------- S2c
 \section{Route-Panel Vote Composition}
 % Discharges: "the vote-split composition is in the supplement."
-Per-instance route votes are not recorded, so this section reports the aggregate
-only: how many of the 41 gated instances were unanimous, how many split
-two-to-one, how many split three ways, and the raw pairwise agreement behind the
-reported Fleiss' \(\kappa\).  The candidate pool behind the gate had greedy,
-short-budget, and sampled generations represented (moved from the body, W6).
+Per-instance route ballots are not reproduced in the frozen results file.  What is
+recorded is the aggregate split composition, the raw pairwise agreement behind the
+reported Fleiss' \(\kappa\), and the three fresh votes of the single re-judged
+instance.  Tables~\ref{tab:s2c-votes}--\ref{tab:s2c-marginals} lay out everything
+the file holds.  Recovering which six instances split two-to-one, or which route
+a dissenting judge named, would require re-reading and re-tabulating the frozen
+judge artifacts: that is a new analysis, which the pre-submission freeze forbids.
+
+The route census is a three-judge panel over the \(41\) instances that the
+answer-only membership gate retained, and those \(41\) instances cover \(33\)
+unique facts, so the panels are not independent observations of distinct facts.
+The frozen file states the matching caution for the membership gate: its
+independent unit is the \(101\) chain items, and its \(303\) votes are repeated
+ratings rather than independent samples.  The route-census panel's judge
+identities were not recorded, so error independence across panels cannot be
+assessed and shared-bias risk remains, as the body's judge-instrument footnote
+already says.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lrr}
+\toprule
+ & Route census & Membership gate \\
+\midrule
+Panels                  &      41 &     101 \\
+Unanimous               &      35 &      97 \\
+Split two-to-one        &       6 &       4 \\
+Split three ways        &       0 &       0 \\
+Agreeing judge pairs    & 111/123 & 295/303 \\
+Pairwise agreement      &    .902 &    .974 \\
+Fleiss' \(\kappa\)      &    .813 &    .958 \\
+\bottomrule
+\end{tabular}
+\caption{Vote-split composition of the two three-judge panels.  The route-census
+column is the composition the body defers here: of the \(41\) gated instances,
+\(35\) drew a unanimous route label and \(6\) split two-to-one, and no panel split
+three ways.  ``Agreeing judge pairs'' is the recorded count of agreeing pairs out
+of the three pairs each panel contributes, and the rate below it is the quantity
+the reported Fleiss' \(\kappa\) is measured against.  The membership column is a
+different task on a different population --- the full \(101\)-item candidate pool
+--- and is shown so that the route agreement is read against the gate that
+produced its population, not as a second measurement of the same thing.  The
+reader's take-away is that the route panel's disagreement is entirely
+two-to-one and confined to \(6\) of \(41\) instances; which \(6\) is not
+recoverable from the frozen file.}
+\label{tab:s2c-votes}
+\end{table}
+
+Each unanimous panel contributes three agreeing judge pairs and each two-to-one
+panel contributes one, which is what the recorded \(111/123\) counts.  Because no
+panel split three ways, the classifier's split rule never fired: the frozen file
+records that the route classifier was later hardened so that any panel without a
+two-vote majority requires adjudication rather than falling back to a fixed
+precedence, and records that the change left the existing numbers unchanged and
+had no effect on this taxonomy.
+
+Of the \(41\) panels, \(40\) carry route votes reused unchanged from the frozen
+membership sample under an exact-sequence lock, and \(1\) --- the instance
+b16\textbar{}qwen32b-sample\textbar{}cf\_15156, whose membership verdict changed
+under the re-audit --- was re-judged by three fresh neutral route judges, who
+returned Bridge, Bridge, Bridge.  That is the only instance whose individual
+ballots the frozen file records.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lrr}
+\toprule
+Route & Instances & Share of \(41\) \\
+\midrule
+Bridge              & 27 & .659 \\
+Recall              & 11 & .268 \\
+Reflective-override &  3 & .073 \\
+Associative         &  0 & .000 \\
+\midrule
+Total               & 41 & \\
+\bottomrule
+\end{tabular}
+\caption{Route distribution the vote composition of
+Table~\ref{tab:s2c-votes} resolves to; the counts are the ones the body reports.
+Shares are the proportions recorded in the frozen file and are printed only to
+save the reader the division.  The distribution is conditioned on committed-OLD
+outcomes and is a post-hoc description of observed failures over the frozen
+candidate pool, not a predictor.}
+\label{tab:s2c-routes}
+\end{table}
+
+The candidate pool behind the gate had greedy, short-budget, and sampled
+generations represented; Table~\ref{tab:s2c-pool} gives that composition cell by
+cell, together with the membership verdicts each cell contributed.
+
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{llrrrr}
+\toprule
+Pool cell & Generation &  N & OLD & NEW & NEI. \\
+\midrule
+a3/7b                & greedy      &   5 &  3 &  2 &  0 \\
+a3/14b               & greedy      &  12 &  4 &  8 &  0 \\
+a3/32b               & greedy      &  16 &  6 &  5 &  5 \\
+b16/qwen1.5b-greedy  & greedy      &   5 &  1 &  2 &  2 \\
+b16/llama8b-greedy   & greedy      &  15 &  5 &  6 &  4 \\
+b16/qwen32b-F2B1     & short \(B_1\) &  18 &  9 &  8 &  1 \\
+b16/qwen32b-sample   & sampled     &  14 &  6 &  6 &  2 \\
+b16/llama70b-greedy  & greedy      &  16 &  7 &  6 &  3 \\
+\midrule
+Total                &             & 101 & 41 & 43 & 17 \\
+\bottomrule
+\end{tabular}
+\caption{The candidate pool behind the route census, by source-pool cell, with the
+membership gate's majority verdict in each; ``a3'' and ``b16'' name the
+two frozen judge-artifact groups the results file locks by checksum.  The
+take-away is that the population the route census describes is not
+single-condition: greedy, short-budget and sampled generations are all
+represented, and the Qwen-32B checkpoint enters under all three.  The OLD column
+is the per-cell composition of the \(41\) gated instances and totals to the
+\(41/43/17\) split the body reports over the \(101\)-item pool.  These are
+\emph{candidate} chains, selected for lexical old-value candidacy before any
+judge saw them, so a cell's OLD share is a composition of that candidate pool and
+not a reversion rate; it is not comparable with the per-checkpoint rates in the
+body's main table.  The generation column is read off the recorded cell
+identifiers, which the file designates as each cell's run and decoding
+provenance; it was not separately measured.}
+\label{tab:s2c-pool}
+\end{table*}
+
+A per-cell route breakdown of the corrected \(41\) is not recorded.  The only
+per-cell route counts in the frozen file belong to the superseded 50-row
+denominator that predates the answer-only membership gate; the file marks them
+historical, and they may not be read as a cell-wise decomposition of the
+\(27/11/3/0\) distribution.  Producing that decomposition would be a new
+tabulation, which the pre-submission freeze forbids.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+Judge & OLD & NEW & NEITHER \\
+\midrule
+J1       & 39 & 43 & 19 \\
+J2       & 42 & 43 & 16 \\
+J3       & 41 & 44 & 16 \\
+\midrule
+Majority & 41 & 43 & 17 \\
+\bottomrule
+\end{tabular}
+\caption{Per-judge marginals over the \(101\)-item pool --- for the membership
+gate, which is the panel that has them.  J1--J3 are the frozen judge files' own
+labels, not judge-model identities.  This table is included to make the
+limitation of this section concrete rather than generic: the frozen file records
+what each membership judge returned, and records no counterpart for the route
+census, whose composition is therefore available only in the aggregate form of
+Table~\ref{tab:s2c-votes}.  The row totals are repeated ratings of the same
+\(101\) items, not independent samples.}
+\label{tab:s2c-marginals}
+\end{table}
 
 % ---------------------------------------------------------------- S3b
 \section{Sunk Section-3 Regressions}
 % Supports: reproducibility-checklist regression items.  W4/C3 removed the body
 % sentence that referenced these two sunk regressions, so this section no longer
 % discharges a body promise; the regressions themselves remain reportable here.
-The unedited-base recall control regression, with its coefficient and interval, and
-the case-block fits in matched and controlled form with their case-block intervals.
-Both are supporting outcomes on the Section 3 source pool and checkpoints, not a
-second independent trend line, and neither is re-estimated here.
+These two regressions were written for an earlier draft of Section~3 and were
+cut from the body by the W4/C3 revision; they are recorded here because the
+reproducibility checklist asks for the regression specifications behind the
+released analysis.  Both are fits over the same six fixed checkpoints and the
+same filtered request pool as Section~3, on the two quantities the body already
+reports cell by cell: the paired edit-success drop and the gated reversion rate
+after a chain.  They are supporting outcomes on that one body of data, not a
+second, independent trend line: the body reports every cell, finds paired
+intervals that exclude zero only at the largest tested checkpoint in each
+lineage, and does not read an ordered trend across checkpoints.  Nothing here
+reinstates such a reading, and no conclusion in the body rests on these fits.
+Neither is re-estimated for this supplement; every value below is transcribed
+from the frozen results file.
+
+\paragraph{Specification.}  Each of the two fits regresses a per-case outcome on
+\(\log_{10}\) of the checkpoint's parameter count, controlling chain length and
+absorbing lineage with drop-one indicators, so the reported slope is a
+within-lineage estimate.  It is a slope per unit of \(\log_{10}\) parameter
+count---per tenfold increase---and not a drop at any single checkpoint; the
+per-checkpoint drops are the body's own table and are what to read for any
+cell-level quantity.  The primary interval on each fit is the \(95\%\)
+case-block bootstrap interval recorded with it: the resampling unit is the
+unique case, one edited fact, and a resampled case carries all of its available
+checkpoint rows; \(10{,}000\) resamples were effective for both.  What that
+interval covers is recorded with it and is narrow---sampling uncertainty over
+the tested facts, holding these six checkpoints fixed.  It is not uncertainty
+over models: the six points are four checkpoints on one lineage curve and two on
+the other, and the results file states that a positive interval here supports
+robustness across those facts rather than a model-population claim, an emergence
+threshold, or a causal effect of capability.  The reported \(p\) is the recorded
+one-sided bootstrap tail fraction for a slope no greater than zero; it is
+unadjusted, and no multiplicity adjustment across these outcomes is recorded.
+The edit-success fit is linear in the outcome and the reversion fit is on the
+log-odds scale, so the two slopes do not share a scale and their sizes are not
+comparable to each other.
+
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{@{}llrcrr@{}}
+\toprule
+Outcome & Resampling unit & Slope & \(95\%\) CI & \(p\) & Rows / cases \\
+\midrule
+Edit-success drop (\(B_0\) minus \(B_3\)), linear & unique case  & .1094 & \textbf{[.0417, .1770]} & .0008 & 1194 / 200 \\
+\quad same fit, sensitivity only            & family rows  & .1094 & \textbf{[.0359, .1748]} & ---   & ---        \\
+\addlinespace
+Reversion after a chain, gated, log-odds    & unique case  & .6444 & \textbf{[.1985, 1.1427]} & .0026 & 689 / 189 \\
+\quad same fit, sensitivity only            & family rows  & .6444 & [$-$.1127, 1.3688]       & ---   & ---       \\
+\bottomrule
+\end{tabular}
+\caption{The two Section-3 regressions the body no longer carries.  Both are
+fits over the six fixed checkpoints the body already tabulates cell by cell,
+computed on the same filtered request pool; they are supporting outcomes on
+that same data and not a second, independent trend line, and no claim in the
+body depends on either.  Slopes are per unit of \(\log_{10}\) parameter count
+and are not per-checkpoint drops, so they are not comparable to the cell-level
+drops in the body.  Reversion is gated to edits that had already succeeded at
+\(B_0\), which is why it has fewer rows and fewer cases.  Counts are analysis
+rows and the unique cases they are resampled over.  Each row's interval is the
+\(95\%\) bootstrap interval recorded for that row's own resampling unit---unique
+cases for the primary rows, family rows for the sensitivity rows---and is set in
+bold where it excludes zero.  The sensitivity rows are the identical fit
+resampled by family rows instead of cases, which the results file marks
+sensitivity-only because two lineages cannot support inference to a population of
+models; under that unit the reversion interval no longer excludes zero.  The
+results file records no separate \(p\) or counts for the sensitivity rows, shown
+as ``---''.}
+\label{tab:s3b-sunk}
+\end{table*}
+
+\paragraph{The unedited-base recall control.}  A reader may ask whether the
+association in Table~\ref{tab:s3b-sunk} only tracks how much of the old answer
+the unedited base already produces.  The recorded control adds one measured
+covariate to the edit-success fit: a binary indicator of whether the
+\emph{unedited} base model's answer contains the old value at \(B_0\), scored by
+the same subject-scrubbed matcher used everywhere else.  It runs on five matched
+fixed checkpoints, Qwen-7B being excluded by the frozen scope.  Adding the
+indicator moves the slope from \(.1005\) to \(.0837\), a shift of \(.0168\) and a
+recorded relative attenuation of \(.1672\), and the interval continues to
+exclude zero (Table~\ref{tab:s3b-b15}).  That supports exactly one statement:
+the size association on these checkpoints is not fully explained by this one
+measured binary proxy for base knowledge coverage.  It is not an identified
+share explained, not a causal effect of model capability, and not evidence that
+residual knowledge confounding has been exhausted.  The results file records no
+resample count for these control fits, so we state none; the resampling unit and
+interval level are recorded, and are as in Table~\ref{tab:s3b-sunk}.
+
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{@{}llrcrr@{}}
+\toprule
+Fit & Covariates & Slope & \(95\%\) CI & \(p\) & Rows / cases \\
+\midrule
+\multicolumn{6}{@{}l}{\emph{Primary: unedited-base recall read at \(B_0\)}}\\
+Matched baseline                        & chain length                  & .1005 & \textbf{[.0335, .1684]} & .0021 & 994 / 200 \\
+Controlled                              & \(+\) base \(B_0\) recall     & .0837 & \textbf{[.0158, .1510]} & .0079 & 994 / 200 \\
+\quad controlled, sensitivity only      & \(+\) base \(B_0\) recall     & .0837 & \textbf{[.0130, .1493]} & ---   & ---       \\
+Stratum: base recalled the old answer   & chain length                  & .1103 & \textbf{[.0272, .1950]} & ---   & 693 / 183 \\
+Stratum: base did not                   & chain length                  & .0331 & [$-$.0755, .1464]       & ---   & 301 / 127 \\
+\addlinespace
+\multicolumn{6}{@{}l}{\emph{Recorded as sensitivity only: the same control read at \(B_3\)}}\\
+Matched baseline                        & chain length                  & .1007 & \textbf{[.0338, .1685]} & .0020 & 993 / 200 \\
+Controlled                              & \(+\) base \(B_3\) recall     & .0992 & \textbf{[.0304, .1684]} & .0023 & 993 / 200 \\
+Stratum: base recalled the old answer   & chain length                  & .1268 & \textbf{[.0446, .2083]} & ---   & 696 / 185 \\
+Stratum: base did not                   & chain length                  & .0432 & [$-$.0794, .1682]       & ---   & 297 / 126 \\
+\bottomrule
+\end{tabular}
+\caption{The unedited-base recall control on the edit-success drop, over five
+matched fixed checkpoints.  Slopes are again per unit of \(\log_{10}\) parameter
+count.  The matched baseline is the same specification as the first row of
+Table~\ref{tab:s3b-sunk}---chain length plus drop-one lineage
+indicators---restricted to those five checkpoints, which is why its slope differs
+from that row.  Controlling the binary base-recall indicator attenuates the slope
+but leaves an interval above zero, which rejects full explanation by that one
+measured proxy and nothing wider.  Every row here carries a \(95\%\) bootstrap
+interval, resampled over unique cases except the row marked sensitivity only,
+which is the controlled fit resampled by family rows; intervals are set in bold
+where they exclude zero.  The \(B_3\) panel repeats the whole control with base
+recall read after a chain and is recorded as sensitivity only.  Counts are
+analysis rows and the unique cases they are resampled over.  The two strata are
+descriptive splits, not a test: see the text.  ``---'' marks a quantity the
+results file does not record for that row.}
+\label{tab:s3b-b15}
+\end{table*}
+
+\paragraph{What the strata do not show.}  The two stratum rows in
+Table~\ref{tab:s3b-b15} are separate fits within the base-recall-1 and
+base-recall-0 subsets, each with its own case-block interval.  No contrast
+between them and no interaction term is recorded, so the difference between the
+two stratum slopes is not estimated anywhere in this paper, and the wider
+interval in the smaller stratum is not evidence that the association differs
+there.  Estimating that contrast would be a new analysis, which the
+pre-submission freeze forbids.
+
+\paragraph{One further sunk fit.}  The same family of Section-3 regressions also
+contains a base-subtracted in-chain leakage slope, fitted on the same five
+matched checkpoints over \(993\) rows.  Its primary estimate is
+\(.0522\,[-.0075, .1111]\) and does not exclude zero, which is why in-chain
+leakage is carried nowhere in this paper as a size result.  Its recorded
+one-sided tail fraction is \(.0422\), and the results file notes beside that
+number that it is a one-sided bootstrap tail fraction while the two-sided
+\(95\%\) interval contains zero; the interval is what we read.  This fit is
+described rather than tabulated because no claim in the body rests on it either
+way.  The fits in this section come from three released artifacts under
+\texttt{results/}---\texttt{percase\_\allowbreak caseblock.json},
+\texttt{b15\_\allowbreak caseblock.json} and
+\texttt{cap3\_\allowbreak caseblock.json}---whose SHA-256 digests are recorded
+beside them in the frozen results file.
 
 % ---------------------------------------------------------------- S7
 \section{Cloze Installation-Sanity Artifact}
 % Supports: the Section 4 statement that the per-item record exists but was never crosswalked.
-The per-item logit-lens file is on disk; what does not exist is a crosswalk
-between its case identifiers and the answer-only membership sample, so sample
-overlap between the cloze reversions and the census population is unknown.  This
-section states that precisely, and does not build the crosswalk: doing so would
-be a new analysis, which the pre-submission freeze forbids.
+The main text reports this probe as an installation sanity check and places no
+quantitative weight on it downstream.  This section prints the record behind
+that sentence in full, and then states, in the terms the frozen results file
+itself uses, what about it cannot be audited.
+
+\paragraph{What is recorded.}
+Table~\ref{tab:s7-record} is the complete quantitative aggregate for the probe:
+for the selected Qwen-32B reversions, ROME was reapplied and the new and old
+objects' first-token logits were compared at the original cloze.  The record
+carries those four quantities and no others; beside them it carries only a
+provenance note and a caveat note, so there is no control condition, no
+interval and no per-item tally anywhere in it.  The comparison is close to
+tautological by construction, since ROME optimises the target logit at the
+rewrite prompt, and it is conditional on the reversion sample that was selected
+for the probe.  The reading the record supports is that the edited association
+remains detectable at a cloze probe on those \(23\) items, and nothing beyond
+that.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}lr@{}}
+\toprule
+Recorded quantity & Value \\
+\midrule
+Reversions probed & 23 \\
+Cloze comparison favouring the new object & 23/23 \\
+Median per-item peak logit gap & 11.51 \\
+Peak layer, per-item median (hs index) & 59 \\
+\bottomrule
+\end{tabular}
+\caption{The complete quantitative aggregate for the cloze installation-sanity
+probe (Qwen-32B, ROME), read from the frozen results file at
+\texttt{/rq2\_\allowbreak logitlens/\allowbreak \_authoritative\_\allowbreak
+record}: the four rows are that record's item count, its cloze-comparison
+tally, its median peak-gap statistic and its peak-layer statistic, in that
+order, and the record holds nothing further beyond a provenance note and a
+caveat note.  What a reader should take from the table is only that the edited
+association was detectable at the cloze probe on all \(23\) selected
+reversions: there is no control condition and no interval, ROME optimises the
+very logit that is being read, and the sample is conditional on the reversions
+selected for the probe.  The record does not state the gap's sign convention,
+so \(11.51\) is printed as recorded and no direction is read into it beyond the
+tally in the row above.  The peak layer is recorded as a median over items on
+the hidden-state (hs) index; under the convention recorded next to it,
+\(\mathrm{hs}[k]\) is decoder layer \(k-1\), so hs \(59\) is decoder layer
+\(58\), and the record flags that an earlier draft cited a different layer
+number, which is why the convention is stated here rather than assumed.  No
+inference is drawn from the gap or from the layer anywhere in this paper.}
+\label{tab:s7-record}
+\end{table}
+
+\paragraph{What cannot be audited.}
+The per-item record exists, but it was never crosswalked to the answer-only
+membership sample, and the frozen results file carries that crosswalk as an
+open, unresolved item rather than as a result.  Table~\ref{tab:s7-crosswalk}
+prints that declaration in its recorded fields --- the status token, the
+per-item artifact the crosswalk would read, and the number of items that
+artifact is expected to carry --- together with three fields describing the
+counterpart sample on the membership side, which the declaration itself does
+not name.  The status token records that the per-item file was not present
+where the crosswalk would have been computed; it is not a claim that the file
+was never produced, and the main text's statement that the per-item record
+exists stands.  The recorded reason is that only the aggregate record and the
+figure were available there, and that without the raw per-item file, membership
+overlap and item-level selection bias cannot be audited, and case identifiers
+are not guessed from an aggregate.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}p{0.30\columnwidth}p{0.62\columnwidth}@{}}
+\toprule
+Field & Recorded entry \\
+\midrule
+Status &
+\texttt{BLOCKED\_\allowbreak MISSING\_\allowbreak PER\_ITEM\_\allowbreak
+ARTIFACT} \\
+Per-item artifact &
+\texttt{results/\allowbreak probe/\allowbreak logitlens\_cf200\_\allowbreak
+ROME\_B3.jsonl} \\
+Items it should carry & 23 \\
+Counterpart sample &
+\texttt{results/\allowbreak p0\_membership\_\allowbreak sample.jsonl} \\
+Items in that sample & 101 \\
+Its item-key format & pool, checkpoint and case identifier, joined \\
+\bottomrule
+\end{tabular}
+\caption{The crosswalk declaration as recorded.  The first three rows are read
+from \texttt{/rq2\_\allowbreak logitlens/\allowbreak
+p0\_\allowbreak membership\_\allowbreak crosswalk} and the last three from
+\texttt{/rq2\_\allowbreak taxonomy/\allowbreak p0\_\allowbreak
+membership\_\allowbreak reaudit}; the final row gives the \emph{format} of the
+membership sample's identifiers only, and no identifier from either side is
+printed or inferred.  What a reader should take from the table is that the two
+key spaces have never been joined, so the composition of the probed sample
+relative to the route census is unknown; the table states what is missing and
+is not a partial result.}
+\label{tab:s7-crosswalk}
+\end{table}
+
+The join is not merely unrun: it is under-specified by the two key spaces as
+they stand.  The membership sample keys its items by a joined pool, checkpoint
+and case identifier, whereas the probe's aggregate carries no item keys at all.
+A crosswalk would therefore need, on the probe side, a per-item case
+identifier, the new- and old-object first-token logits that identifier is keyed
+to, and the pool and checkpoint labels that would place each probed item in the
+census frame.  The consequences are the ones the main text states: the overlap
+between the probed reversions and the census population is unknown, the
+membership composition of the probed sample is unknown, and the case-level
+tally cannot be reproduced from the aggregate.  We do not build the crosswalk
+here, and we do not substitute a partial one: doing so would be a new analysis,
+which the pre-submission freeze forbids.
+
+\paragraph{A scan that is not reproduced here.}
+The frozen results file also retains a first-version, single-run layer scan
+from this probe.  That block is marked in the file as superseded by the record
+in Table~\ref{tab:s7-record} and kept for audit only, so it is not reproduced
+here and no reading of a layer trajectory is offered from it.  The
+authoritative record for this probe is the four quantities of
+Table~\ref{tab:s7-record}, and the main text rests on one of them.
 
 % ---------------------------------------------------------------- S1b
 \section{Replay-Gate Table and Vehicle Audit}
 % Discharges: "route through replay; the complete replay-gate table is in the supplement."
 % Discharges: "The vehicle audit in the supplement decomposes the failure into its two prerequisites"
-The full X1 gate table, including the officially recorded 9/18 FAIL, the
-pre-specified requirement of 15, both prerequisite rates, and the stop rule.
-The vehicle audit moved here from the body (W4/C4): fresh-\(B_0\) strict
-direct-answer success held in 14/18 cases, while replayed answers received an
-OLD majority in 12/18 (the replay answer judges had Fleiss' \(\kappa=.9195\),
-distinct from both the membership and the route agreement); a non-rescuing
-post-hoc audit found only 13/18 frozen source answers committed to OLD; and
-separately, only 1/5 F2-sourced cases reproduced fresh-\(B_0\) strict success.
-Every figure above is recorded in the frozen results file under the
-x1\_replay\_gate key.
+The vehicle was a fixed replay: a chain the model itself had produced was
+replayed verbatim in front of the freshly edited model, and the answer that
+followed was scored for which value it committed to.  The protocol was
+DeepSeek-R1-Distill-Qwen-32B in float32, one ROME edit at a time at layer
+\(12\), over \(18\) frozen cases drawn \(10/5/3\) from the main native-chain
+(\(B_3\)) greedy pool, the F2 short-budget (\(B_1\)) greedy pool, and a
+historical sampled pool at seed \(2\).  The case pool and the chains were
+pinned by a checksummed manifest and the stop rule was recorded in the
+accompanying protocol document, both before any replay result existed, which
+is why X1 is the one analysis in this paper we call prospectively specified;
+every other protocol here is pre-specified and recorded before analysis.
+
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{lrrl}
+\toprule
+Quantity & Cases (of \(18\)) & Rate & Wilson 95\% \\
+\midrule
+Pre-specified pass requirement & 15 & \(\ge\).80 & --- \\
+\midrule
+Prerequisite A: fresh-\(B_0\) strict direct-answer success & 14 & --- & --- \\
+Prerequisite B: replayed answer receives a judge OLD majority & 12 & --- & --- \\
+\midrule
+Recorded gate conjunction, A \emph{and} B & 9 & .50 & [.2903, .7097] \\
+\midrule
+Gate status & \multicolumn{3}{l}{\textsc{Fail}; stop rule invoked} \\
+\bottomrule
+\end{tabular}
+\caption{The complete X1 replay-gate table.  A case counted as a success only
+under the conjunction fixed before the run---fresh-\(B_0\) strict edit success
+\emph{and} a majority OLD verdict on the replayed answer---and the recorded
+pass threshold was at least \(15\) of \(18\), a point estimate of \(\ge\).80.
+The officially recorded outcome is \(9/18\), so the gate is \textsc{Fail} and
+the five planned semantic-control arms were never authored or run.  The two
+prerequisite rows are what a reader should take from this table: each falls
+short of \(15\) on its own, so the outcome is not an artifact of conjoining
+them, and it does not hinge on the added fresh-\(B_0\) sanity requirement.
+Dashes mark quantities the frozen results file does not record; computing them
+here would be a new analysis, which the pre-submission freeze forbids.  The
+file also records two further conjunction counts, \texttt{rule\_conjunction\_loose}
+\(=14\) and \texttt{rule\_conjunction\_strict} \(=9\), which pair the same
+fresh-\(B_0\) requirement with the lexical matcher's permissive and strict
+old-value rules in place of the judge majority.  Those are matcher-side
+bookkeeping and not the gate: the threshold was fixed against the judge-side
+conjunction in the row above, so we neither read them against it nor reopen the
+gate.}
+\label{tab:x1-gate}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Source stratum & Cases & Fresh-\(B_0\) strict & Replay OLD majority & Gate success \\
+\midrule
+Main pool, native chain (\(B_3\)), greedy & 10 & 10 & 6 & 6 \\
+F2 pool, short budget (\(B_1\)), greedy & 5 & 1 & 4 & 1 \\
+Historical sampled pool, seed \(2\) & 3 & 3 & 2 & 2 \\
+\midrule
+All & 18 & 14 & 12 & 9 \\
+\bottomrule
+\end{tabular}
+\caption{The gate decomposed by source stratum.  The two prerequisites fall
+short on different strata: fresh-\(B_0\) strict direct-answer success holds in
+only \(1\) of the \(5\) F2-sourced cases but in every case of the other two
+strata, whereas in the main pool it holds everywhere and the OLD-majority
+prerequisite is the short one (\(6\) of \(10\)).  The ``All'' row is the
+officially recorded \(14\), \(12\), and \(9\); the strata are descriptive
+counts that locate the failures and identify no mechanism.}
+\label{tab:x1-source}
+\end{table*}
+
+Table~\ref{tab:x1-gate} gives the gate itself and Table~\ref{tab:x1-source}
+decomposes it by where the frozen cases came from.  Neither prerequisite reaches
+the required \(15\) alone, which is why the vehicle---not the hypothesis it was
+built to test---is what the gate rules on.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lr}
+\toprule
+Replay-answer judge panel & \\
+\midrule
+Judges & 3 \\
+Votes cast & 54 \\
+Unanimous cases & 17/18 \\
+Fleiss' \(\kappa\) & .9195 \\
+\midrule
+Majority verdict OLD & 12 \\
+Majority verdict NEW & 1 \\
+Majority verdict NEITHER & 5 \\
+\bottomrule
+\end{tabular}
+\caption{Agreement on the replayed answers.  Three judges cast \(54\) votes over
+the \(18\) cases and were unanimous on \(17\) of them at Fleiss'
+\(\kappa=.9195\), so judge noise does not explain the failed gate; the cases
+that missed an OLD majority were mostly majority-NEITHER rather than
+majority-NEW.  This panel is a distinct instrument from the answer-only
+membership gate (\(\kappa=.958\)) and the route-census panel
+(\(\kappa=.813\)) reported in the body, and the three values are not
+interchangeable.}
+\label{tab:x1-judges}
+\end{table}
+
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+Source stratum & OLD & NEW & NEITHER \\
+\midrule
+Main pool, \(B_3\) greedy & 6 & 0 & 4 \\
+F2 pool, \(B_1\) greedy & 5 & 0 & 0 \\
+Historical sample, seed \(2\) & 2 & 0 & 1 \\
+\midrule
+All & 13 & 0 & 5 \\
+\bottomrule
+\end{tabular}
+\caption{The non-rescuing post-hoc audit: answer-only membership of the \(18\)
+frozen \emph{source} answers, from the completed P0 crosswalk
+(\texttt{results/p0\_downstream\_crosswalk.json}).  Only \(13\) of \(18\) source
+answers commit to OLD and \(5\) commit to NEITHER, so the pool the vehicle
+replayed was not uniformly committed to the old value.  This audit was recorded
+after the gate and changes nothing about it: the officially recorded \(9/18\)
+\textsc{Fail}, its denominators, and the stop rule stand, no case was filtered,
+no seed swapped, and no stopped arm reopened.  The five non-OLD items are
+\texttt{a3|32b|cf\_19889}, \texttt{a3|32b|cf\_1235},
+\texttt{a3|32b|cf\_14660}, \texttt{a3|32b|cf\_10410}, and
+\texttt{b16|qwen32b-sample|cf\_390}.}
+\label{tab:x1-posthoc}
+\end{table*}
+
+The outcome is not a plumbing failure.  The recorded run-integrity audits all
+pass: the seed-\(2\) sample source reconstructs \(14/14\) historical rows with
+identical case identifiers, chains, and answers; the smoke run completed
+\(4/4\) and the full run \(18/18\), each over \(4\) shards with \(0\) errors;
+no failures are recorded.  What Table~\ref{tab:x1-posthoc} adds is that the
+frozen source pool was itself heterogeneous, which constrains the vehicle
+without identifying a single mechanism for its failure.
+
+The recorded decision is to stop X1: the five arms were not authored or run, and
+no successful-case filtering, seed swap, chain truncation, layer or answer-cap
+tuning, or source expansion was performed.  The claim this section supports is
+the one the body already makes and no more---on this frozen case pool the fixed
+natural-chain replay vehicle failed its own stability gate, so we withdraw the
+planned natural-chain mediation claim; nothing here shows that chain semantics
+can never influence answers, and the control-point result reported in the body
+does not route through replay.
 
 % ---------------------------------------------------------------- S9
 \section{Concept-Direction Endpoint Set}
 % Discharges: "excluding zero; the complete endpoint set is in the supplement."
-All three arms of the concept-direction experiment and every contrast computed on
-them, each with its interval and its unadjusted bootstrap p, including the
-confirmatory arms whose primary RR contrast was compatible with zero and the
-co-primary LocAcc harm contrast reported in the body.
+The concept-direction experiment is a dose-limited boundary test on Qwen-32B.  A
+per-case direction for the old object is extracted by difference in means against
+a set of neutral entities and suppressed inside the think span; the confirmatory
+comparison is against a shuffled-direction control, which injects at the same
+strength in a direction that is not the case's own, and a third arm applies no
+steering at all.  This section prints every endpoint the frozen results file
+records for the experiment: the three arm levels, the eight confirmatory
+contrasts, the pilot ladder that fixed the injection strength, and the two rounds
+of the direction-stability gate.  Nothing here is re-estimated.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Arm & \(n\) & \(ES\) & \(RR\) & \(CLR\) & \(LocAcc\) \\
+\midrule
+S (own direction)     & 144 & .556 & .180 & .417 & .570 \\
+Pshuf (shuffled)      & 144 & .507 & .189 & .465 & .597 \\
+N (no steering)       & 198 & .495 & .193 & .545 & .625 \\
+\bottomrule
+\end{tabular}
+\caption{Arm levels of the concept-direction confirmatory run at \(B_3\).
+\(ES\) is edit success, \(RR\) permissive answer-level reversion, \(CLR\) the
+in-span leakage manipulation check, and \(LocAcc\) the locality harm endpoint.
+The reader should take from this only the ordering that the contrasts in
+Table~\ref{tab:s9-contrasts} quantify: the steered arm has the lowest measured
+in-span old-object expression and the lowest locality accuracy, while its
+reversion level is not distinguishable from the other two arms'.  Levels carry
+no intervals, and the leakage column is computed over all scored rows without
+the zero-thinking success gate, so it is not on the same footing as the gated
+reversion column and the two must not be interchanged.  The two steered arms
+share a denominator smaller than the unsteered arm's; contrasts are paired
+within case and their denominators are neither arm's \(n\).}
+\label{tab:s9-arms}
+\end{table}
+
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{@{}llcc@{}}
+\toprule
+Endpoint & Role & S \(-\) Pshuf (confirmatory) & S \(-\) N \\
+\midrule
+Permissive reversion \(RR\)  & primary            & $-$.024 [$-$.098, .049] & $-$.026 [$-$.092, .040] \\
+Edit success \(ES\)          & primary            & .078 [$-$.016, .172]    & \textbf{.092 [.007, .176]} \\
+In-span leakage \(CLR\)      & manipulation check & \textbf{$-$.078 [$-$.148, $-$.008]} & \textbf{$-$.141 [$-$.218, $-$.070]} \\
+Locality accuracy \(LocAcc\) & co-primary harm    & \textbf{$-$.064 [$-$.119, $-$.008]} & $-$.029 [$-$.094, .036] \\
+\bottomrule
+\end{tabular}
+\caption{The complete endpoint set of the concept-direction experiment: every
+contrast the frozen results file records, with its \(95\%\) interval.  Bold
+marks the three intervals that exclude zero, and they are the three the body
+names---the leakage manipulation check against the shuffled control, edit
+success against no steering, and the locality harm endpoint against the shuffled
+control.  The confirmatory column is S \(-\) Pshuf, because it is the only
+comparison that holds the injection strength fixed and varies only whether the
+direction is the case's own; the S \(-\) N column varies steering itself and is
+read as a secondary description.  What a reader should take from the table is
+that both reversion contrasts are compatible with zero while the in-span
+manipulation check falls: lowering the measured expression of the old object
+inside the chain did not produce a detectable confirmatory repair at the answer
+level.  The positive edit-success difference appears only in the secondary
+column---its confirmatory counterpart includes zero---so it does not carry an
+answer-level repair reading.  Intervals are unadjusted for multiplicity, and no
+equivalence margin was set, so an interval containing zero is a failure to
+separate rather than a demonstration of no effect.}
+\label{tab:s9-contrasts}
+\end{table*}
+
+\paragraph{How the injection strength was fixed.}
+The strength \(\alpha\) was chosen in a pilot before the confirmatory arms ran,
+under a pre-specified harm rule: take the largest strength whose locality cost
+stays inside the recorded harm gate.  Table~\ref{tab:s9-pilot} gives the ladder
+that decision was read off.  Those figures come from a \(30\)-case subset and are
+raw rates that are not conditioned on zero-thinking success, so they are not on
+the same footing as anything in Tables~\ref{tab:s9-arms}
+and~\ref{tab:s9-contrasts} and are reported only as the record of the choice.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\(\alpha\) & \(ES\) & raw \(RR\) & \(LocAcc\) & Degenerate & Error rows \\
+\midrule
+1\% & .381 & .476 & 13/21 & 0 & 1 \\
+2\% & .421 & .211 & 7/18  & 0 & 4 \\
+5\% & .167 & .000 & 2/11  & 0 & 11 \\
+\bottomrule
+\end{tabular}
+\caption{The pilot dose ladder, \(n=30\), at \(B_3\).  \(\alpha=1\%\) was
+selected and carried into the confirmatory arms; the two stronger settings lose
+too much locality accuracy against the unsteered locality baseline of
+\(120/192=.625\), which is itself already the post-edit level rather than an
+unedited one.  The reader should take from this that the ladder is an
+effectiveness-versus-harm trade-off recorded at the time of the choice, not a
+calibrated dose-response: the rows carry no intervals, the reversion column is a
+raw rate on a subset, and the rising error count is part of why the stronger
+settings were rejected.}
+\label{tab:s9-pilot}
+\end{table}
+
+\paragraph{The direction-stability gate.}
+The extraction was gated twice.  Under the first extraction---one neutral entity
+as the subtrahend---the recorded pairwise cosine between a case's directions from
+different templates had a median near \(.3\) and a maximum of \(.48\), so all
+\(200\) rank-by-case checks fell below the recorded threshold of \(.6\) and the
+gate stopped the arm.  Under the standard extraction, with the mean over eight
+neutral entities as the subtrahend, the recorded failure rate is \(17/200=8.5\%\),
+inside the recorded tolerance of \(20\%\), with pairwise cosine medians of
+\(.66\) to \(.70\) and a minimum of \(.535\); the recorded cosine between the
+extracted direction and the new object is \(.03\) to \(.06\), so the direction
+carries little of the new value.  The frozen file records the first failure as an
+artifact of the single-neutral subtrahend rather than evidence that no direction
+exists.  The confirmatory arms above ran under the second extraction.
+
+\paragraph{What this set does and does not license.}
+The legitimate reading is the body's: on this checkpoint, with this editor and
+this crude extraction, reducing the measured old-object expression inside the
+chain did not yield a detectable confirmatory repair of answer-level reversion,
+and it did cost locality against its own control.  It is not evidence that no
+concept-level intervention could repair the answer, it does not locate a distinct
+answer-commitment stage, and it is a single-checkpoint, single-editor result
+whose extraction the frozen file itself calls crude.  No further contrast is
+recorded for this experiment, and computing one here would be a new analysis,
+which the pre-submission freeze forbids.
 
 % ---------------------------------------------------------------- S11
 \section{Hyperparameters and Run Counts}
 % Supports: checklist items 4.2 (partial), 4.8, 4.10, 4.13.
 % Discharges: "and pinned library versions are in the supplement."
-Per-checkpoint edit layer with how it was fixed --- empirically scanned on two
-checkpoints, set a priori by a fixed relative-depth rule on the others, with
-every conditional fallback sweep left unfired --- suppression penalty, decoding
-settings, seeds, and per-cell run counts.
+This section gives the edit, decoding and suppression settings behind every
+reported cell, how each was fixed, the per-cell run counts, and the compute
+environment.  Every value is transcribed from the frozen results file.
 
-The compute environment, moved here verbatim from the body's Reproducibility
-paragraph (W6): runs used Hopper-class parts of 141 and 80\,GB HBM and an
-Ada-class part of 24\,GB.  Bfloat16 made the rank-one update diverge to NaN on
-the Hopper-class part, so that part ran in float32 and the other in bfloat16,
-agreeing on a 40-case cross-check.  Library versions are pinned in the released
-lock file, frozen before the runs; every value here is recorded under the
-rq3.environment key of the frozen results file.  OS and per-library name/version
-strings land here with the Task D commitment.
+\paragraph{Edit hyperparameters.}
+Table~\ref{tab:s11-edit} gives the per-checkpoint edit layer and the rule that
+fixed it.  Two checkpoints were scanned empirically, under the recorded acceptance rule:
+among layers meeting a locality floor of \(.85\), take the one with the highest
+generative zero-thinking edit success.  The remaining
+four were set a priori by a fixed relative-depth rule at \(.18\) of the stack,
+with no per-checkpoint search; the conditional fallback sweeps that rule provided
+for were never fired, so no layer in this table was selected on an outcome.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}llrrl@{}}
+\toprule
+Lineage & Checkpoint & Layer & Clamp & How fixed \\
+\midrule
+Qwen  & 1.5B &  5 & 4 & relative depth \\
+Qwen  & 7B   &  5 & 4 & scanned \\
+Qwen  & 14B  &  9 & 4 & relative depth \\
+Qwen  & 32B  & 12 & 4 & relative depth \\
+Llama & 8B   &  6 & 2 & scanned \\
+Llama & 70B  & 14 & 4 & relative depth \\
+\bottomrule
+\end{tabular}
+\caption{ROME edit layer per fixed checkpoint.  The take-away is that only the
+two scanned checkpoints had their layer chosen against measured edit success,
+under a recorded locality floor of \(.85\); the other four
+inherit a fixed relative-depth rule of \(.18\) and were not searched, so a
+reader should not read the table as six independently tuned cells.  The clamp
+column is the norm-constraint factor: it is the package default on five
+checkpoints and was reduced on Llama-8B, the checkpoint whose recorded locality
+is the lowest of the six.  The Qwen-32B edit's optimisation readout is
+additionally recorded at layer \(63\).}
+\label{tab:s11-edit}
+\end{table}
+
+\paragraph{Request pool, decoding and budgets.}
+Table~\ref{tab:s11-decode} gives the pool construction and the decoding
+settings.  One pool is fixed once and reused at all six checkpoints, so the six
+cells are not independent request samples.  Its prefilter was run with a
+7B Qwen checkpoint as the filter model at the long budget, and was never
+run at zero thinking, so the pool is enriched for requests whose old value the
+filter model produced after a chain.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\
+\midrule
+Candidate frame                 & 600 requests \\
+Survivors of the prefilter      & 248 \\
+Sampled into the pool           & 200 \\
+Pool shuffle seed               & 42 \\
+Checkpoints sharing the pool    & 6 \\
+Filter model / budget           & Qwen-7B at \(B_3\) \\
+Prefilter ever run at \(B_0\)   & no \\
+\addlinespace
+Think-budget cap, \(B_1\)       & 256 tokens \\
+Think-budget cap, \(B_3\)       & 8192 tokens \\
+Main decoding                   & greedy \\
+Sampling control                & temperature \(0.6\), seeds \(\{0,1,2\}\) \\
+Suppression penalty             & 8 \\
+Suppression scope               & think span \\
+Bootstrap                       & 10{,}000 resamples, seed 42 \\
+\bottomrule
+\end{tabular}
+\caption{Pool construction and decoding settings.  What a reader should take
+from this is the scope limit the pool imposes: one filtered request pool, fixed
+by a single checkpoint at the long budget and reused at all six, so cross-cell
+comparisons share their requests and the pool is not a random sample of the
+benchmark.  The general-capability guard runs use a larger think cap and a
+separate answer cap, recorded with those runs rather than here.}
+\label{tab:s11-decode}
+\end{table}
+
+\paragraph{Per-cell run counts.}
+Table~\ref{tab:s11-counts} gives the number of analysed cases behind every cell
+the paper reports.  Each row is one run of one arm at one checkpoint; no cell
+pools runs, and no reported estimate averages across runs.
+
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{@{}llllrl@{}}
+\toprule
+Block & Model & Editor & Arm or cell & Cases & Note \\
+\midrule
+Capability, six cells & Qwen-1.5B  & ROME  & single arm & 196 & \\
+                      & Qwen-7B    & ROME  & single arm & 200 & \\
+                      & Qwen-14B   & ROME  & single arm & 200 & \\
+                      & Qwen-32B   & ROME  & single arm & 198 & \(200\) attempted rows at \(B_0\) \\
+                      & Llama-8B   & ROME  & single arm & 200 & \\
+                      & Llama-70B  & ROME  & single arm & 187 & headline; \(200\) unfiltered \\
+\addlinespace
+Five-arm battery      & Qwen-32B   & ROME  & N & 198 & no suppression \\
+                      &            &       & T & 198 & old answer \\
+                      &            &       & D & 196 & new answer \\
+                      &            &       & P & 199 & placebo \\
+                      &            &       & C & 200 & strong competitor \\
+\addlinespace
+Penalty ladder        & Qwen-32B   & ROME  & five suppressed settings & 100 & separate smaller run \\
+Scope ablation        & Qwen-32B   & ROME  & think vs.\ all & 100 & same run \\
+\addlinespace
+Controls              & Qwen-32B   & ROME  & \(B_0/B_{0P}/B_1\) & 200 & one control run \\
+                      & Qwen-32B   & ROME  & sampling, three seeds & 199 & \(597\) of \(600\) seed pairs \\
+                      & Qwen-32B   & ROME  & greedy control & 200 & \\
+                      & Qwen-32B   & none  & unedited base & 199 & paired interval \\
+\addlinespace
+Transfers             & Qwen-14B   & ROME  & T vs.\ N & 200 & \\
+                      & Qwen-14B   & MEMIT & N, T, C & 200 each & \(32\) shards, \(0\) errors \\
+                      & Qwen-32B   & ROME  & N, T, C, paraphrase probes & 200 each & \(400\) probe rows per arm \\
+\addlinespace
+Guard cost            & Qwen-32B   & ROME  & GSM8K, on vs.\ off & 1319 & unedited queries \\
+                      & Qwen-32B   & ROME  & MATH-500, on vs.\ off & 500 & unedited queries \\
+\bottomrule
+\end{tabular}
+\caption{Analysed cases per reported cell.  The take-away is where the
+denominators differ and why: the capability cells lose rows to harness errors
+and, on Llama-70B only, to a recorded early-stop filter whose unfiltered
+sensitivity the body also reports; the battery arms differ by a few rows from
+harness errors, except the placebo arm, whose extra row is unexplained and is
+the subject of \emph{Provenance and Reproducibility Notes}; and the penalty
+ladder and scope
+ablation come from a smaller separate run, so their levels are not
+interchangeable with the battery's.  Reversion endpoints are additionally
+conditioned on zero-thinking success, so their denominators are smaller again
+and are recorded with the estimates rather than here.}
+\label{tab:s11-counts}
+\end{table*}
+
+\paragraph{Penalty strength and scope.}
+Table~\ref{tab:s11-sweep} gives the full penalty ladder and
+Table~\ref{tab:s11-scope} the scope ablation at both budgets.  The reported arms
+use penalty \(8\); the frozen protocol recorded that value unchanged from the
+run the treated arm was first executed at, and the ladder is a robustness check
+recorded afterwards, not the record of a selection rule.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Penalty & \(CLR\) & \(ES\) & \(RR\) & \(RR^s\) \\
+\midrule
+0 (no suppression) & .545 & .495 & .193 & --- \\
+2                  & .444 & .596 & .138 & .069 \\
+4                  & .384 & .606 & .155 & .069 \\
+8                  & .268 & .639 & .105 & .018 \\
+12                 & .146 & .688 & .069 & .017 \\
+16                 & .082 & .660 & .069 & .000 \\
+\bottomrule
+\end{tabular}
+\caption{The penalty ladder at \(B_3\).  The zero-penalty row is the
+no-suppression arm itself and is the only row from the \(200\)-case run; the
+five suppressed rows come from a smaller \(100\)-case run, and none of the six
+carries an interval, so the reader should take this as a signed ladder rather
+than a calibrated dose-response.  In-span leakage declines with penalty strength
+across every suppressed setting, while edit success and permissive reversion are
+not ordered across them.  Locality is flat at \(.957\)--\(.959\) throughout, so
+the ladder does not trade the guard's locality away.  The leakage column is
+computed over all scored rows without the zero-thinking gate and is not on the
+same footing as the gated reversion columns; the strict endpoint is not recorded
+for the zero-penalty row.}
+\label{tab:s11-sweep}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Scope & \(ES_{B_0}\) & \(ES_{B_3}\) & \(CLR\) & \(RR\) & \(RR^s\) \\
+\midrule
+think span only & .580 & .639 & .268 & .105 & .018 \\
+think and answer & .727 & .670 & .268 & .113 & .028 \\
+\bottomrule
+\end{tabular}
+\caption{The scope ablation at penalty \(8\), \(n=100\).  Both budget levels are
+shown because the separation between the two scopes is not the same at each: at
+zero thinking, extending the penalty into the answer span raises edit success
+by a large margin, whereas at the reported budget the two scopes differ far
+less and their leakage is identical.  The reader should take from this that the
+preference for think-only scoping is interpretive rather than a claim of larger
+effect---penalising the answer span pushes the scored text directly, which
+forfeits the clean-probe property---and that the reported arms are the
+think-only ones.}
+\label{tab:s11-scope}
+\end{table}
+
+\paragraph{Repeated runs of the same zero-thinking level.}
+Three independent runs of the same Qwen-32B protocol recorded a zero-thinking
+edit-success level: \(.595\) in the run the capability cell and the battery are
+read from, and \(.625\) in each of the canned-thought control run and the greedy
+control of the sampling study.  The body uses the lowest of the three as the
+comparison base for the suppressed arm's level of \(.631\), which is the
+conservative choice among them; the three are independent re-runs of one
+protocol, not repeated measurements combined into an estimate, and no interval
+is recorded across them.
+
+\paragraph{A secondary transfer endpoint, in full.}
+The paraphrase transfer run carries a secondary old-value comparison that the
+body reports in one word.  Its recorded value is
+\(-.0138\,[-.0420, .0137]\) with unadjusted \(p=.450\), on \(110\) gated cases
+against a pre-specified floor of \(140\); the frozen file records its status as
+directional under a low gate count.  It is reported here in full so that the
+secondary endpoint is as legible as the primary one, and it supports nothing:
+its interval contains zero and its gate count fell below the recorded floor.
+
+\paragraph{Compute environment and pinned versions.}
+Runs used Hopper-class parts of \(141\) and \(80\)\,GB HBM and an Ada-class part
+of \(24\)\,GB; both Hopper-class parts produced reported numbers.  Bfloat16 made
+the rank-one update diverge to NaN on the Hopper-class part, so that part ran in
+float32 and the other in bfloat16, agreeing on a \(40\)-case cross-check.
+Library versions are pinned in the released lock file, which was frozen on
+2026-06-10.  That date precedes the reported GPU runs and the file was written
+on different hardware, so it records the pinned versions rather than a runtime
+snapshot of any reported run, and we cite it only as the former.  The judge
+model's version string is not recorded anywhere in the workspace and is reported
+as unavailable rather than reconstructed.  Operating-system and per-library
+name/version strings ship with the released code rather than here.
 
 % ---------------------------------------------------------------- W5 gap robustness
 \section{Gap-Robustness Rows}
 % Discharges: "the intervention's transfers, and its guard cost; the gap-robustness rows are in the supplement."
-The four rows moved out of the dense body table by the W5 cut ladder: the
-short-budget chain (\(B_0\to B_1\)) paired ES drop of .130 [.060, .205];
-the canned thought (\(B_0\to B_{0P}\)) at \(-.090\) [\(-.150\),
-\(-.030\)]; sampled chains over three fixed seeds at .117 [.067, .169]; and
-the unedited base's \(\Delta P(o_{\mathrm{old}})\) of \(-.020\)
-[\(-.080\), .040], an outcome with a different event definition and
-denominator that is juxtaposed rather than contrasted.  Every value is
-recorded in the frozen results file.
+Four rows were moved out of the body's dense table by the W5 cut ladder.  They
+are the controls on the reasoning-time gap itself rather than on the
+intervention: a shorter chain, a fixed canned thought in place of a chain,
+sampled chains in place of greedy ones, and the unedited base on the same
+requests.  Table~\ref{tab:s8-rows} gives all four;
+Tables~\ref{tab:s8-arms},~\ref{tab:s8-sampling} and~\ref{tab:s8-base} give the
+arm levels, the sampling detail and the six-checkpoint base drift behind three
+of them.
+
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{@{}lllc@{}}
+\toprule
+Row & Comparison & Cases & Paired change [95\% CI] \\
+\midrule
+Short-budget chain   & \(B_0 \to B_1\), \(256\)-token cap & 200 & \textbf{.130 [.060, .205]} \\
+Canned thought       & \(B_0 \to B_{0P}\), fixed short canned span & 200 & \textbf{$-$.090 [$-$.150, $-$.030]} \\
+Sampled chains       & \(B_0 \to B_3\), three fixed seeds & 199 & \textbf{.117 [.067, .169]} \\
+Unedited base        & \(\Delta P(o_{\mathrm{old}})\), \(B_0 \to B_3\) & 199 & $-$.0201 [$-$.0804, .0402] \\
+\bottomrule
+\end{tabular}
+\caption{The four gap-robustness rows, all on Qwen-32B.  Bold marks the three
+intervals that exclude zero.  The first three are paired edit-success changes on
+edited models and are read in the same direction as the body's headline: a
+positive value is edit success lost after thinking.  The canned-thought row is
+negative, meaning edit success is \emph{higher} with the canned span than with
+none, which is why the informative comparison is between the canned arm and the
+real chain rather than between the empty wrapper and either.  The fourth row is
+not a paired edit-success change at all: it is the unedited base's own change in
+producing the old answer, with a different event definition and denominator, and
+it is juxtaposed rather than contrasted---no difference between it and any row
+above is computed anywhere in this paper.  The sampled row rests on \(199\) of
+\(200\) cases and \(597\) of \(600\) same-seed pairs, and three fixed seeds do
+not identify a seed population.}
+\label{tab:s8-rows}
+\end{table*}
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+Arm & \(n\) & \(ES\) & \(RR\) & \(RR^s\) & \(CLR\) & \(Loc\) \\
+\midrule
+\(B_0\)   & 200 & .625 & .000 & .000 & .000 & .970 \\
+\(B_{0P}\)& 200 & .715 & .040 & .016 & .000 & .980 \\
+\(B_1\)   & 200 & .495 & .208 & .088 & .465 & .965 \\
+\bottomrule
+\end{tabular}
+\caption{Arm levels of the canned-thought control run, all three arms from one
+run and read against that run's own zero-thinking arm.  The take-away is that
+reversion tracks reasoning content rather than the presence of a think wrapper:
+the canned arm is a non-empty span with no reasoning content and its permissive
+reversion is near the zero-thinking floor, while the real \(256\)-token chain
+carries the bulk of the movement.  The strict endpoint is shown beside the
+permissive one throughout, and it moves the same way.  In-span leakage is exactly
+zero in both non-chain arms, which is the scoring sanity check that the matcher
+does not fire on a canned span.  The zero-thinking reversion of \(.000\) is
+structural under the success gate rather than an estimate.}
+\label{tab:s8-arms}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Quantity & Value & Scope \\
+\midrule
+\(ES\) at \(B_0\)        & .586 [.529, .643] & 199 cases \\
+\(ES\) at \(B_3\)        & .469 [.414, .524] & 199 cases \\
+Paired \(ES\) drop       & .117 [.067, .169] & 199 cases \\
+\(RR\), equal-case       & .305 [.242, .372] & 148 cases \\
+\(RR^s\), equal-case     & .095 [.056, .136] & 148 cases \\
+\(RR\), trajectory-weighted & .249 & 87/350 pairs \\
+\(CLR\) at \(B_3\)       & .523 [.464, .581] & 199 cases \\
+\addlinespace
+Greedy control, \(ES\) drop & .110 [.035, .185] & 200 cases \\
+Greedy control, \(RR\)      & .208 [.136, .280] & 200 cases \\
+\addlinespace
+Per-seed \(ES\) drop     & .090 / .171 / .090 & seeds 0/1/2 \\
+\bottomrule
+\end{tabular}
+\caption{The sampling row in full, with the greedy control run beside it.  The
+reader should take from this that the gap survives temperature sampling at a
+magnitude close to the greedy control's, and that the two reversion figures are
+different estimands and not two measurements of one quantity: the equal-case
+figure weights every case once after averaging only its zero-thinking-successful
+seeds, while the trajectory-weighted figure pools seed pairs.  The equal-case
+version is the primary one; the pooled one is a post-hoc weighting sensitivity.
+Per-seed drops are descriptive and carry no intervals, and three fixed seeds do
+not license a claim about a seed population or about sampling being worse than
+greedy decoding.}
+\label{tab:s8-sampling}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}llrl@{}}
+\toprule
+Lineage & Checkpoint & \(\Delta P(o_{\mathrm{old}})\) & Interval \\
+\midrule
+Qwen  & 1.5B & $-$.010 & not recorded \\
+Qwen  & 7B   & .080    & not recorded \\
+Qwen  & 14B  & .010    & not recorded \\
+Qwen  & 32B  & $-$.021 & [$-$.0804, .0402] \\
+Llama & 8B   & .020    & not recorded \\
+Llama & 70B  & .025    & not recorded \\
+\bottomrule
+\end{tabular}
+\caption{The unedited base's own change in producing the old answer from zero
+thinking to a native chain, at all six fixed checkpoints.  The single interval is
+the paired case bootstrap at Qwen-32B, and it is the only one recorded; the other
+five rows are level differences with no interval and are not of one sign---four
+of the six point values are positive.  The reader should therefore take this
+table as the scope statement the body makes and not as a general finding that
+the base does not drift: the edit-specificity juxtaposition in the body is made
+at the one checkpoint where a paired interval exists, and the five point
+differences neither extend it nor contradict it.  All values are on the unedited
+model, so none of them is an edit-success quantity.}
+\label{tab:s8-base}
+\end{table}
 
 % ---------------------------------------------------------------- provenance
 \section{Provenance and Reproducibility Notes}
 % Discharges: "so it carries nothing here.  The released provenance record gives both derivations."
-The placebo arm's two derivations in full, the checks that ruled out a benign
-explanation, and every other respect in which a re-run of the released code will
-or will not reproduce the reported table.
+A released provenance record ships with the code and states what a re-run of
+that code will and will not reproduce exactly.  This section summarises it, and
+prints in full the frozen results file's side of the one quantity on which the
+two derivations disagree.
 
+\paragraph{The placebo arm.}
+When the complete results tree was retrieved from the compute platform and the
+five-arm battery was recomputed from the raw scored shards with the released
+cross-arm script, four arms and every contrast avoiding the placebo arm
+reconciled exactly.  The placebo arm did not: the frozen results file records it
+over one row fewer than the shards hold.  Table~\ref{tab:s10-placebo} gives every
+placebo-arm quantity as the frozen results file records it.  In the recomputed
+derivation, four of the five differences are third-decimal and change no
+statement in the paper; the fifth is the placebo's in-span leakage contrast,
+whose interval reaches zero in the column below and excludes zero in the
+recomputation.  That single qualitative disagreement is the whole reason the body
+attributes nothing to the placebo's in-chain comparison and rests the
+specificity boundary on the competitor arm instead, whose in-chain contrast holds
+under both derivations.  The recomputed column's values are not reprinted here,
+because every number in this supplement is transcribed from the frozen results
+file; both derivations are given, side by side, in the released provenance
+record.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}llr@{}}
+\toprule
+Quantity & Value [95\% CI] & \(p\) \\
+\midrule
+Placebo arm \(n\)      & 199 & \\
+\addlinespace
+\(ES\)                 & .507 & \\
+\(RR\)                 & .210 & \\
+\(RR^s\)               & .113 & \\
+\(CLR\)                & .492 & \\
+\addlinespace
+T \(-\) P, \(ES\)      & .122 [.051, .193]        & .002 \\
+T \(-\) P, \(RR\)      & $-$.095 [$-$.171, $-$.029] & .010 \\
+T \(-\) P, \(RR^s\)    & $-$.057 [$-$.114, $-$.010] & .029 \\
+T \(-\) P, \(CLR\)     & $-$.228 [$-$.294, $-$.162] & .000 \\
+\addlinespace
+P \(-\) N, \(ES\)      & .015 [$-$.046, .081]     & .709 \\
+P \(-\) N, \(RR\)      & .000 [$-$.057, .057]     & 1.00 \\
+P \(-\) N, \(RR^s\)    & $-$.009 [$-$.047, .028]  & .828 \\
+P \(-\) N, \(CLR\)     & $-$.051 [$-$.102, .000]  & .054 \\
+\bottomrule
+\end{tabular}
+\caption{Every placebo-arm quantity as the frozen results file records it; these
+are the values the paper reports.  The last row is the disputed one: its
+interval reaches zero here and excludes zero under the derivation recomputed
+from the released shards, which is why the body states that the placebo's
+in-chain comparison carries nothing and rests the boundary on the competitor.
+No quantity in the paper was altered on the strength of the recomputation, and
+which derivation is authoritative is recorded for adjudication rather than
+settled here.  The reader should take from this that the treated-versus-placebo
+contrasts move only in the third decimal between derivations, so the
+pre-specified primary contrast is unaffected either way.}
+\label{tab:s10-placebo}
+\end{table}
+
+\paragraph{What was ruled out.}
+The released record also states what does not explain the discrepancy.  The
+placebo shards are clean: they carry no duplicate case identifier and no
+degenerate row, and their error rows are excluded by the loader under every
+derivation.  The released cross-arm script exposes no row-dropping option.  No
+second placebo run exists anywhere in the retrieved tree, and no stored artifact
+in it contains the reported values, so they cannot be traced to a preserved
+alternative pass.  The close-out audit that re-scored the other analyses does not
+cover this battery, so it is not the source of a correction either.  Two further
+checks rule out benign readings: the placebo and competitor arms differ on
+in-span leakage, so the loader is reading two distinct shard sets rather than the
+same one twice; and the placebo shards were all written within the same minute
+and contribute equal case counts, so no row was re-run and appended after the
+recorded analysis.  A one-row difference in one arm therefore has no mechanism
+visible in the retrieved artifacts, and the record says so rather than inventing
+one.
+
+\paragraph{A coincidence that is real.}
+Two strict contrasts in the battery share an identical edit-success point
+estimate and interval while carrying different bootstrap \(p\) values.  This is a
+property of the data rather than a transcription error: the placebo and
+competitor arms have the same edit-success level on their paired case
+intersections, so the two margins above them coincide, while the two paired case
+sets differ and therefore so do their resamples.  The same holds for the strict
+endpoint in the MEMIT replication, where the competitor's own strict contrast
+against no suppression is exactly zero with a zero-width interval---a floor
+rather than an equivalence result---so two labelled contrasts there are identical
+at four decimals.
+
+\paragraph{Re-scored analyses.}
+Table~\ref{tab:s10-closeout} lists the analyses that were re-scored under a
+duplicate-safe close-out audit and the released artifact each is reproducible
+from.  The audit recorded no failures.  Its three recorded warnings are carried
+in the relevant sections of this supplement rather than only here: the sampling
+study's three missing seed pairs and its complete-case estimand
+(Table~\ref{tab:s8-sampling}), its retained upstream error rows, and the blocked
+per-item logit-lens crosswalk (Table~\ref{tab:s7-crosswalk}).
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Analysis & Released artifact \\
+\midrule
+Per-case size fits    & \texttt{percase\_\allowbreak caseblock} \\
+Base-recall control   & \texttt{b15\_\allowbreak caseblock} \\
+\quad \(B_3\) sensitivity & recorded separately \\
+Net in-chain leakage  & \texttt{cap3\_\allowbreak caseblock} \\
+Sampling study        & \texttt{f3\_\allowbreak sampling\_\allowbreak recalc} \\
+MEMIT transfer        & \texttt{x2\_\allowbreak memit14b\_\allowbreak crossarm\_v2} \\
+Paraphrase transfer   & \texttt{x3\_\allowbreak para\_\allowbreak crossarm\_v2} \\
+\bottomrule
+\end{tabular}
+\caption{Analyses covered by the duplicate-safe close-out audit, with the
+released artifact each is reproducible from; all are \texttt{.json} files under
+the released \texttt{results/} directory, and the frozen results file records a
+SHA-256 digest beside every one.  The take-away is the audit's own scope
+statement: it covers these six analyses and the membership re-audit, and it does
+not cover the five-arm battery, which is why the placebo discrepancy above is
+recorded rather than resolved.  The re-scores changed no reported value.}
+\label{tab:s10-closeout}
+\end{table}
+
+\paragraph{Other limits on exact reproduction.}
+The general-capability gate uses a \(500\)-problem subset of the MATH benchmark;
+the body cites the benchmark, and the identity of that specific subset, together
+with the exact file used, is recorded in the released provenance record rather
+than attributed in the body.  The pinned library versions and the caveat on
+their lock date are in \emph{Hyperparameters and Run Counts} above.  Every released generation
+shard carries a metadata record holding the absolute path the run used on the
+compute platform; those paths are rewritten during release packaging, by a
+scrubbing tool that is deliberately \emph{not} itself released --- its pattern
+table is a list of the identifiers it removes, so shipping it would reinstate
+them --- and they are outside the reach of the manuscript-side audit,
+which covers only the submitted document and its figures.  Finally, the per-item
+logit-lens artifact named in \emph{Cloze Installation-Sanity Artifact} was not
+available where its
+crosswalk would have been computed, and that crosswalk is declared blocked rather
+than approximated.
+
+\clearpage
 % ---------------------------------------------------------------- S7b / S3c
 \section{Figures}
 % Discharges: "fix; the evidence ladder is a supplementary figure."
-The evidence ladder, with the source map that records which results.json pointer
-every plotted quantity came from.  W5 rebuilt the body's visual layer (teaser,
-drop chart, five-arm bars, dense table) and the drop chart returned to the body,
-so four retired artifacts live here: the two-panel capability figure, the
-five-arm forest (still carrying its strict-displacement panel), the mechanism
-figure, and the protocol schematic;
-each has a source map or, for the schematic, no numbers at all.  None is
-rendered into this file yet.
+Figure~\ref{fig:supp-ladder} is the diagnostic evidence ladder the body defers
+here.  Figures~\ref{fig:supp-protocol}--\ref{fig:supp-forest} are three further
+artifacts retired from the body when the W5 revision rebuilt its visual layer;
+they are reproduced because each was audited against the frozen results file and
+because a reader may prefer a plotted form of a table the body already carries.
+None of them is load-bearing: every quantity plotted in any of the four appears
+in the body or in a table of this supplement.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.86\textwidth]{fig2_mechanism.pdf}
+\caption{The diagnostic evidence ladder.  Panel A is the cloze
+installation-sanity aggregate of Table~\ref{tab:s7-record}: on the \(23\)
+selected Qwen-32B reversions, the edited association remains detectable at a
+first-token cloze probe in \(23/23\) cases, with no control condition and no
+interval.  Panel B is the route census of Tables~\ref{tab:s2c-votes}
+and~\ref{tab:s2c-routes}: an answer-only gate retains \(41\) committed-old
+instances covering \(33\) unique facts from a frozen pool of \(101\) candidate
+chains, with route labels Bridge \(27\), Recall \(11\),
+Reflective-override \(3\), Associative \(0\) at Fleiss' \(\kappa=.813\).  The two
+panels describe different populations and are not a per-item conjunction: no
+instance is claimed to be both cloze-probed and route-labelled.}
+\label{fig:supp-ladder}
+\end{figure*}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig0_protocol.pdf}
+\caption{The protocol schematic: one edit validated at zero thinking, the same
+weights losing the answer after a native chain, and the think-span-only
+suppressor restoring the edited answer.  Every label is protocol notation; no
+panel reproduces a recorded generation and the figure carries no numbers, so
+there is nothing here to read against the tables.}
+\label{fig:supp-protocol}
+\end{figure}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.86\textwidth]{fig1_capability.pdf}
+\caption{The retired two-panel capability figure.  Panel A plots the paired
+edit-success change at each of the six fixed checkpoints on a categorical axis
+with \(95\%\) case-bootstrap intervals and no connecting line; the Qwen-32B and
+Llama-70B intervals exclude zero and the other four include zero, which is the
+scope the body states.  Panel B plots the gap-robustness rows of
+Table~\ref{tab:s8-rows}, with the unedited base shown as a separately labelled
+outcome rather than as a comparison arm.  The body carries the same cells as a
+table and a simpler chart; nothing is plotted here that is not tabulated
+there or in \emph{Gap-Robustness Rows}.}
+\label{fig:supp-capability}
+\end{figure*}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig3_rq3.pdf}
+\caption{The retired five-arm contrast forest, in the three-panel form that
+carries the secondary strict endpoint beside the two primary ones: paired mean
+differences with \(95\%\) bootstrap intervals for edit success, permissive
+reversion, and strict lexical displacement.  The upper group compares each arm
+against no suppression and the lower group tests the treated arm against the
+placebo and the competitor.  A paired reversion contrast uses the intersection
+of the two arms' zero-thinking gate sets, so its denominator is neither arm's
+\(n\) and paired differences need not equal differences of arm-wise rates.  On
+the strict panel the treated arm separates from the placebo and the competitor
+but not from no suppression---the same reading the body's table gives, with
+unadjusted intervals throughout.}
+\label{fig:supp-forest}
+\end{figure}
+
+\paragraph{Source-map register.}
+Table~\ref{tab:s11-figmaps} records, for each figure, the audited source map
+that lists which frozen-results-file pointer every plotted quantity was read
+from.  Those maps are released with the code.  No figure in this supplement
+reads a value from any block the results file marks superseded, and each map's
+recorded invariant checks passed with no mismatch.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}llr@{}}
+\toprule
+Figure & Source map & Pointers \\
+\midrule
+Evidence ladder    & \texttt{fig2\_\allowbreak mechanism} & 16 \\
+Protocol schematic & none recorded & 0 \\
+Capability panels  & \texttt{fig1\_\allowbreak capability} & 21 \\
+Five-arm forest    & \texttt{fig3\_\allowbreak rq3} & 21 \\
+\bottomrule
+\end{tabular}
+\caption{Source-map register for the supplementary figures; each entry names a
+file \texttt{<artifact>\_source\_map.json} released with the code.  Each map names the
+plotted artifact, the frozen results file as its numeric source, one pointer per
+plotted quantity, and the invariant checks that were run against it; all three
+recorded status PASS with no mismatch and no failure.  The take-away is that no
+number in these figures was entered by hand: each was read from a recorded
+pointer, and a reader can check any plotted value against the corresponding table
+in this supplement or in the body.  The protocol schematic has no map because it
+plots no recorded quantity.}
+\label{tab:s11-figmaps}
+\end{table}
 
 % GATE (discharged by W4/E4): the five-arm forest may not ship until it carries
 % the strict-displacement panel; the shipped body figure carries that panel and
-% check_forest_shipping_gate enforces it mechanically.
+% check_forest_shipping_gate enforces it mechanically.  The forest reproduced
+% above is the three-panel form and its source map records strict (RRs)
+% pointers, so the gate holds for this file as well.
 \end{document}
