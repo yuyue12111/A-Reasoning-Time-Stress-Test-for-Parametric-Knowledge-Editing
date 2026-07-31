@@ -303,12 +303,13 @@ def _panel_title(
     *,
     fontsize: float = 10.0,
     wrap: bool = False,
+    letter_dy: float = 0.0,
 ) -> None:
     """Place a compact panel letter beside a left-aligned panel title."""
 
     ax.text(
         -0.08,
-        1.02,
+        1.02 + letter_dy,
         letter,
         transform=ax.transAxes,
         ha="left",
@@ -560,6 +561,8 @@ def fig1_capability(results: dict[str, Any]) -> None:
     # overflow the canvas -- so text tops out at 13.5pt rendered (7.6pt
     # printed) with shortened strings; widening the print is a main.tex
     # decision outside this change.
+    _w5 = plt.rc_context(W5_RC)
+    _w5.__enter__()
     fig = plt.figure(figsize=(7.20, 3.55), constrained_layout=True)
     grid = fig.add_gridspec(1, 2, width_ratios=[1.80, 1.0], wspace=0.08)
     ax_a = fig.add_subplot(grid[0, 0])
@@ -576,20 +579,20 @@ def fig1_capability(results: dict[str, Any]) -> None:
             x,
             cell["point"],
             marker=marker,
-            markersize=11.0 if cell["sig"] else 9.6,
+            markersize=6.6 if cell["sig"] else 5.8,
             markerfacecolor=(
                 family_color
                 if cell["sig"]
                 else mcolors.to_rgba(family_color, 0.35)
             ),
             markeredgecolor=family_color,
-            markeredgewidth=2.5 if cell["sig"] else 1.6,
+            markeredgewidth=1.4 if cell["sig"] else 0.9,
             linestyle="none",
             zorder=5,
         )
         lo, hi = cell["ci"]
-        ax_a.vlines(x, lo, hi, color=family_color, linewidth=3.0, zorder=3)
-        ax_a.hlines([lo, hi], x - 0.14, x + 0.14, color=family_color, linewidth=1.8, zorder=3)
+        ax_a.vlines(x, lo, hi, color=family_color, linewidth=1.6, zorder=3)
+        ax_a.hlines([lo, hi], x - 0.14, x + 0.14, color=family_color, linewidth=1.0, zorder=3)
         if cell["sig"]:
             ax_a.annotate(
                 f"{cell['point']:.3f}",
@@ -600,19 +603,19 @@ def fig1_capability(results: dict[str, Any]) -> None:
                 va="bottom",
                 color=INK_PRIMARY,
                 fontweight="bold",
-                fontsize=12,
+                fontsize=9.2,
             )
-    ax_a.axhline(0, color=INK_PRIMARY, linewidth=2.0, linestyle=(0, (2, 2)))
+    ax_a.axhline(0, color=INK_PRIMARY, linewidth=1.0, linestyle=(0, (2, 2)))
     ax_a.set_xticks(x_positions, [c["label"] for c in checkpoints])
-    ax_a.tick_params(axis="x", labelsize=12.4)
-    ax_a.tick_params(axis="y", labelsize=12.4)
+    ax_a.tick_params(axis="x", labelsize=9.6)
+    ax_a.tick_params(axis="y", labelsize=9.6)
     ax_a.set_xlim(-0.80, 9.30)
     ax_a.set_ylim(-0.135, 0.218)
     ax_a.set_ylabel(
-        r"Paired ES change  ($\mathrm{ES}_{B_0}-\mathrm{ES}_{B_3}$)", fontsize=12.4
+        r"Paired ES change  ($\mathrm{ES}_{B_0}-\mathrm{ES}_{B_3}$)", fontsize=9.6
     )
-    ax_a.set_xlabel("Fixed checkpoint (categorical; no interpolation)", fontsize=12.4)
-    _panel_title(ax_a, "A", "Paired ES drop after a native chain", fontsize=13.5)
+    ax_a.set_xlabel("Fixed checkpoint (categorical; no interpolation)", fontsize=9.6)
+    _panel_title(ax_a, "A", "Paired ES drop after a native chain", fontsize=10.2)
     # W4-2: in-plot family keys -- a small series-colored square plus ink text
     # above each family band, replacing the old backbone captions.
     for x0, name, col in ((0.0, "Qwen", QWEN_BLUE), (6.5, "Llama", LLAMA_ORANGE)):
@@ -633,7 +636,7 @@ def fig1_capability(results: dict[str, Any]) -> None:
             ha="left",
             va="center",
             color=INK_PRIMARY,
-            fontsize=12.4,
+            fontsize=9.6,
             fontweight="bold",
             zorder=6,
         )
@@ -644,7 +647,7 @@ def fig1_capability(results: dict[str, Any]) -> None:
         ha="left",
         va="bottom",
         color=INK_SECONDARY,
-        fontsize=11,
+        fontsize=8.4,
     )
     # W3-3, third attempt.  The first two versions compared literals to literals
     # -- len(checkpoints) is fixed by the label lists in this file, and the
@@ -681,23 +684,24 @@ def fig1_capability(results: dict[str, Any]) -> None:
             color=row["color"],
             marker=row["marker"],
             filled=row["label"] != "Canned thought",
-            linewidth=3.0,
+            linewidth=1.6,
             markersize=10.7,
         )
     labels = [f"{r['label']}\n{r['metric']}" for r in controls]
     ax_b.set_yticks(y_positions, labels)
-    ax_b.tick_params(axis="y", length=0, pad=4, labelsize=11.5)
-    ax_b.tick_params(axis="x", labelsize=12.4)
-    ax_b.axvline(0, color=INK_PRIMARY, linewidth=2.0, linestyle=(0, (2, 2)))
+    ax_b.tick_params(axis="y", length=0, pad=4, labelsize=8.8)
+    ax_b.tick_params(axis="x", labelsize=9.6)
+    ax_b.axvline(0, color=INK_PRIMARY, linewidth=1.0, linestyle=(0, (2, 2)))
     ax_b.set_xlim(-0.182, 0.225)
     ax_b.set_ylim(-0.62, 3.88)
-    ax_b.set_xlabel("Paired probability change (95% CI)", fontsize=12.4)
+    ax_b.set_xlabel("Paired probability change (95% CI)", fontsize=9.6)
     _panel_title(
         ax_b,
         "B",
         "Qwen-32B budget and decoding conditions",
-        fontsize=12.4,
+        fontsize=9.6,
         wrap=True,
+        letter_dy=0.062,
     )
     ax_b.text(
         -0.175,
@@ -706,7 +710,7 @@ def fig1_capability(results: dict[str, Any]) -> None:
         ha="left",
         va="top",
         color=INK_PRIMARY,
-        fontsize=11.5,
+        fontsize=8.8,
         fontweight="bold",
         bbox={"facecolor": PALE_NEUTRAL, "edgecolor": "none", "pad": 0.2},
         zorder=6,
@@ -718,7 +722,7 @@ def fig1_capability(results: dict[str, Any]) -> None:
         ha="left",
         va="top",
         color=INK_PRIMARY,
-        fontsize=11.5,
+        fontsize=8.8,
         fontweight="bold",
         bbox={"facecolor": PALE_BAND, "edgecolor": "none", "pad": 0.2},
         zorder=6,
@@ -745,6 +749,7 @@ $\Delta P(o_\mathrm{{old}})=-0.020$ [-0.080, 0.040] over 199 paired cases.
 Panel A and the F2 rows use greedy decoding; the sampling row uses temperature
 0.6 and three fixed seeds. §5 shows this failure admits a chain-local causal control point.
 """
+    _w5.__exit__(None, None, None)
     _save(fig, "fig1_capability")
     plt.close(fig)
     _write_caption("fig1_capability", caption)
@@ -1203,6 +1208,13 @@ def fig3_rq3(results: dict[str, Any]) -> None:
     # W4/E4+cut: single-column stacked layout -- the full-width variant did not
     # fit the 7-page body budget, and dropping the figure (the sanctioned
     # fallback) would have cost the strict panel its place in the body.
+    # W7: the body ships teaser/drop/arms in the W5 house style (STIX serif,
+    # tinted fills, restrained ink).  This figure and fig1_capability were left
+    # at the pre-W5 checkpoint and rendered in the matplotlib default sans, so
+    # the supplement carried two visual languages.  Same data, same geometry,
+    # same audited values -- only the typeface and rule weights move.
+    _w5 = plt.rc_context(W5_RC)
+    _w5.__enter__()
     fig, axes = plt.subplots(
         3,
         1,
@@ -1307,6 +1319,7 @@ appear in the text. Intervals are unadjusted for multiplicity.
 """
     _save(fig, "fig3_rq3")
     plt.close(fig)
+    _w5.__exit__(None, None, None)
     _write_caption("fig3_rq3", caption)
     rec.write()
 
