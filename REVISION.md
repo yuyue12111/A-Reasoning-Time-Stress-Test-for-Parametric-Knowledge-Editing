@@ -100,3 +100,12 @@ D8 过门决策；D8–13 成文；10/12 提交。写作从 D1 并行开始。
 按第 1 节层级组织；协议一张表、惩罚一行公式；图字号可读；Ethics 按 ACL 常规写（数据许可、误用、算力、标注者）。
 必引补齐：MQuAKE、Ju et al. 2024、RippleEdits、Mirage of Model Editing、ThinkEval、CODE、Gao et al. 2026、
 Superficial Editing。定位句：前人证明编辑不向外传播；我们证明推理时未编辑的邻域会向内回流，推翻编辑本身。
+
+## 8 进度快照（随时可安全压缩上下文；最新在上）
+- **2026-09-28**：引擎 v2 全部模块已合并（`src/rt/`：edit_hooks、engine、run、pool、deltas、mom2、targets、
+  analysis、study1、judge、annotate、mech、g0），166 个 CPU 测试通过（`PYTHONPATH=src ~/.venvs/why-rt/bin/python
+  src/rt/tests/run_all.py`）。Study 1 重分析入库（`paperwriting/revision/study1.{json,md}`）。
+  平台运行单 `experiments/rt/RUNSHEET.md`；Study 2 配置八个模型齐全（生成 `study2_*.yaml`、增量 `deltas_s2_*.yaml`）。
+  人工标注包（练习 20 + Study 1 验证 200）已生成于 `results/annot/`（答案键仅在本地）。
+  **下一步（平台）**：G0 → 选池筛选 → 冻结 `prereg-arr.md` → Study 2 增量与生成 → 判官与人工标注。
+  **下一步（本地）**：`src/rt/study2.py`（H1–H3 与次要假设的分析 CLI）；按 `paperwriting/revision/outline.md` 重写全文（ACL 模板）。
