@@ -7,7 +7,21 @@ exactly, and why. This file is pure disclosure: it changes no reported number.
 
 ## 1. The five-arm battery: the placebo arm is not byte-reproducible
 
-**Status: OPEN — needs an adjudication before the code release.**
+**Status: OPEN — which derivation is correct has not been determined.**
+
+To be clear about what is and is not open, because the label alone invites the
+wrong reading. What is open is the *provenance* question: we do not know whether
+the recorded analysis or the retrieved shards are right, and every benign
+explanation we could test has been ruled out (below). That question does not
+block the release, and it does not sit under any claim in the paper. The
+manuscript declines to choose: it states that the placebo arm is not
+byte-reproducible from the released shards, that every T-versus-P quantity moves
+only in the third decimal so no conclusion changes, and that the placebo's
+in-chain comparison crosses zero under one derivation and not the other "so it
+carries nothing here." The single quantity the two derivations disagree on is
+therefore load-bearing for nothing. No reported number was changed on the
+strength of the recomputation; both columns are given below, and this section is
+the record the manuscript's sentence points at.
 
 On 2026-07-26 the complete `results/` tree was retrieved from the compute platform
 and the five-arm battery was recomputed from the raw scored shards with the released

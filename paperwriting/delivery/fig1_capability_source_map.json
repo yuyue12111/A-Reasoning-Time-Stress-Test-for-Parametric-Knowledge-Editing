@@ -389,7 +389,7 @@
     {
       "name": "categorical panel A",
       "status": "PASS",
-      "detail": "one independent estimate per checkpoint reached the axes (6 markers for 6 checkpoints)"
+      "detail": "one independent estimate per checkpoint reached the axes (6 bars for 6 checkpoints)"
     }
   ],
   "mismatches": [],

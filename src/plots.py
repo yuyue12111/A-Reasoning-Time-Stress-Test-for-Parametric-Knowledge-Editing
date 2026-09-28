@@ -303,12 +303,13 @@ def _panel_title(
     *,
     fontsize: float = 10.0,
     wrap: bool = False,
+    letter_dy: float = 0.0,
 ) -> None:
     """Place a compact panel letter beside a left-aligned panel title."""
 
     ax.text(
         -0.08,
-        1.02,
+        1.02 + letter_dy,
         letter,
         transform=ax.transAxes,
         ha="left",
@@ -368,6 +369,59 @@ def _forest_point(
         markeredgecolor=color,
         markeredgewidth=1.0,
         linestyle="none",
+        zorder=zorder + 1,
+    )
+
+
+def _contrast_bar(
+    ax: plt.Axes,
+    *,
+    y: float,
+    point: float,
+    ci: Sequence[float],
+    color: str,
+    marker: str,
+    filled: bool = True,
+    zorder: int = 4,
+    linewidth: float = 1.35,
+    markersize: float = 5.6,
+    facecolor: str | None = None,
+    height: float = 0.42,
+) -> None:
+    """A contrast drawn in the body's bar language: tinted bar from zero to the
+    point estimate, with the interval overlaid as a capped whisker.
+
+    Same signature as _forest_point so the call sites are a one-word swap, and
+    the unused marker/markersize arguments are accepted rather than removed --
+    the two are interchangeable and the forest form is the better encoding for
+    a contrast, so keeping them swappable keeps that option cheap.
+
+    The whisker is drawn ON TOP of the bar and in the full-strength edge colour,
+    because the bar's length is only the point estimate; a reader who takes the
+    bar for the evidence and ignores the interval is the known failure mode of
+    this chart type, so the interval is given the strongest ink in the mark.
+    """
+    lo, hi = float(ci[0]), float(ci[1])
+    if not lo <= point <= hi:
+        raise ValueError(f"point {point} is outside CI [{lo}, {hi}]")
+    ax.barh(
+        y,
+        point,
+        height=height,
+        left=0.0,
+        facecolor=_w5_tint(color, 0.40 if filled else 0.16),
+        edgecolor=color,
+        linewidth=0.9,
+        hatch=None if filled else "///",
+        zorder=zorder - 1,
+    )
+    ax.hlines(y, lo, hi, color=color, linewidth=linewidth, zorder=zorder + 1)
+    ax.vlines(
+        [lo, hi],
+        y - 0.10,
+        y + 0.10,
+        color=color,
+        linewidth=max(0.9, linewidth * 0.7),
         zorder=zorder + 1,
     )
 
@@ -560,6 +614,8 @@ def fig1_capability(results: dict[str, Any]) -> None:
     # overflow the canvas -- so text tops out at 13.5pt rendered (7.6pt
     # printed) with shortened strings; widening the print is a main.tex
     # decision outside this change.
+    _w5 = plt.rc_context(W5_RC)
+    _w5.__enter__()
     fig = plt.figure(figsize=(7.20, 3.55), constrained_layout=True)
     grid = fig.add_gridspec(1, 2, width_ratios=[1.80, 1.0], wspace=0.08)
     ax_a = fig.add_subplot(grid[0, 0])
@@ -569,27 +625,25 @@ def fig1_capability(results: dict[str, Any]) -> None:
     x_positions = [0.0, 1.5, 3.0, 4.5, 7.0, 8.5]
     ax_a.axvspan(-0.65, 5.15, color=PALE_NEUTRAL, zorder=0)
     ax_a.axvspan(6.35, 9.15, color=PALE_NEUTRAL, zorder=0)
+    estimate_bars = []
     for x, cell in zip(x_positions, checkpoints):
         family_color = QWEN_BLUE if cell["family"] == "Qwen" else LLAMA_ORANGE
         marker = "D" if cell["sig"] else "o"
-        ax_a.plot(
+        # Bar in the body's language; the interval is drawn over it in the
+        # full-strength colour, since the bar length is only the point estimate.
+        estimate_bars.append(ax_a.bar(
             x,
             cell["point"],
-            marker=marker,
-            markersize=11.0 if cell["sig"] else 9.6,
-            markerfacecolor=(
-                family_color
-                if cell["sig"]
-                else mcolors.to_rgba(family_color, 0.35)
-            ),
-            markeredgecolor=family_color,
-            markeredgewidth=2.5 if cell["sig"] else 1.6,
-            linestyle="none",
-            zorder=5,
-        )
+            width=0.56,
+            facecolor=_w5_tint(family_color, 0.42 if cell["sig"] else 0.18),
+            edgecolor=family_color,
+            linewidth=1.1 if cell["sig"] else 0.8,
+            hatch=None if cell["sig"] else "///",
+            zorder=3,
+        ))
         lo, hi = cell["ci"]
-        ax_a.vlines(x, lo, hi, color=family_color, linewidth=3.0, zorder=3)
-        ax_a.hlines([lo, hi], x - 0.14, x + 0.14, color=family_color, linewidth=1.8, zorder=3)
+        ax_a.vlines(x, lo, hi, color=family_color, linewidth=1.3, zorder=5)
+        ax_a.hlines([lo, hi], x - 0.12, x + 0.12, color=family_color, linewidth=1.0, zorder=5)
         if cell["sig"]:
             ax_a.annotate(
                 f"{cell['point']:.3f}",
@@ -600,19 +654,19 @@ def fig1_capability(results: dict[str, Any]) -> None:
                 va="bottom",
                 color=INK_PRIMARY,
                 fontweight="bold",
-                fontsize=12,
+                fontsize=9.2,
             )
-    ax_a.axhline(0, color=INK_PRIMARY, linewidth=2.0, linestyle=(0, (2, 2)))
+    ax_a.axhline(0, color=INK_PRIMARY, linewidth=1.0, linestyle=(0, (2, 2)))
     ax_a.set_xticks(x_positions, [c["label"] for c in checkpoints])
-    ax_a.tick_params(axis="x", labelsize=12.4)
-    ax_a.tick_params(axis="y", labelsize=12.4)
+    ax_a.tick_params(axis="x", labelsize=9.6)
+    ax_a.tick_params(axis="y", labelsize=9.6)
     ax_a.set_xlim(-0.80, 9.30)
     ax_a.set_ylim(-0.135, 0.218)
     ax_a.set_ylabel(
-        r"Paired ES change  ($\mathrm{ES}_{B_0}-\mathrm{ES}_{B_3}$)", fontsize=12.4
+        r"Paired ES change  ($\mathrm{ES}_{B_0}-\mathrm{ES}_{B_3}$)", fontsize=9.6
     )
-    ax_a.set_xlabel("Fixed checkpoint (categorical; no interpolation)", fontsize=12.4)
-    _panel_title(ax_a, "A", "Paired ES drop after a native chain", fontsize=13.5)
+    ax_a.set_xlabel("Fixed checkpoint (categorical; no interpolation)", fontsize=9.6)
+    _panel_title(ax_a, "A", "Paired ES drop after a native chain", fontsize=10.2)
     # W4-2: in-plot family keys -- a small series-colored square plus ink text
     # above each family band, replacing the old backbone captions.
     for x0, name, col in ((0.0, "Qwen", QWEN_BLUE), (6.5, "Llama", LLAMA_ORANGE)):
@@ -633,7 +687,7 @@ def fig1_capability(results: dict[str, Any]) -> None:
             ha="left",
             va="center",
             color=INK_PRIMARY,
-            fontsize=12.4,
+            fontsize=9.6,
             fontweight="bold",
             zorder=6,
         )
@@ -644,7 +698,7 @@ def fig1_capability(results: dict[str, Any]) -> None:
         ha="left",
         va="bottom",
         color=INK_SECONDARY,
-        fontsize=11,
+        fontsize=8.4,
     )
     # W3-3, third attempt.  The first two versions compared literals to literals
     # -- len(checkpoints) is fixed by the label lists in this file, and the
@@ -652,15 +706,16 @@ def fig1_capability(results: dict[str, Any]) -> None:
     # linestyle="none" or an axhline.  What can actually go wrong is the zip
     # above silently dropping cells when x_positions and checkpoints disagree,
     # so count the markers that reached the axes.
-    drawn = [
-        line for line in ax_a.get_lines()
-        if line.get_marker() not in {"", "None", None} and len(line.get_xdata()) == 1
-    ]
+    # W7: the estimates are bars now.  Collected from the loop rather than read
+    # back off the axes, because ax.patches also holds the two background spans
+    # and the legend swatches -- reading it back counted 10 marks for 6
+    # checkpoints and failed an invariant that was doing its job correctly.
+    drawn = estimate_bars
     rec.invariant(
         "categorical panel A",
         len(x_positions) == len(checkpoints) and len(drawn) == len(checkpoints),
         f"one independent estimate per checkpoint reached the axes "
-        f"({len(drawn)} markers for {len(checkpoints)} checkpoints)",
+        f"({len(drawn)} bars for {len(checkpoints)} checkpoints)",
     )
     _clean_axis(ax_a, grid_axis="y")
     # W4-2: horizontal light-gray gridlines only.
@@ -673,7 +728,7 @@ def fig1_capability(results: dict[str, Any]) -> None:
     ax_b.axhspan(-0.55, 0.48, color=PALE_BAND, zorder=0)
     ax_b.axhline(0.60, color=N_LIGHT, linewidth=0.7)
     for y, row in zip(y_positions, controls):
-        _forest_point(
+        _contrast_bar(
             ax_b,
             y=y,
             point=row["point"],
@@ -681,23 +736,24 @@ def fig1_capability(results: dict[str, Any]) -> None:
             color=row["color"],
             marker=row["marker"],
             filled=row["label"] != "Canned thought",
-            linewidth=3.0,
+            linewidth=1.6,
             markersize=10.7,
         )
     labels = [f"{r['label']}\n{r['metric']}" for r in controls]
     ax_b.set_yticks(y_positions, labels)
-    ax_b.tick_params(axis="y", length=0, pad=4, labelsize=11.5)
-    ax_b.tick_params(axis="x", labelsize=12.4)
-    ax_b.axvline(0, color=INK_PRIMARY, linewidth=2.0, linestyle=(0, (2, 2)))
+    ax_b.tick_params(axis="y", length=0, pad=4, labelsize=8.8)
+    ax_b.tick_params(axis="x", labelsize=9.6)
+    ax_b.axvline(0, color=INK_PRIMARY, linewidth=1.0, linestyle=(0, (2, 2)))
     ax_b.set_xlim(-0.182, 0.225)
     ax_b.set_ylim(-0.62, 3.88)
-    ax_b.set_xlabel("Paired probability change (95% CI)", fontsize=12.4)
+    ax_b.set_xlabel("Paired probability change (95% CI)", fontsize=9.6)
     _panel_title(
         ax_b,
         "B",
         "Qwen-32B budget and decoding conditions",
-        fontsize=12.4,
+        fontsize=9.6,
         wrap=True,
+        letter_dy=0.062,
     )
     ax_b.text(
         -0.175,
@@ -706,7 +762,7 @@ def fig1_capability(results: dict[str, Any]) -> None:
         ha="left",
         va="top",
         color=INK_PRIMARY,
-        fontsize=11.5,
+        fontsize=8.8,
         fontweight="bold",
         bbox={"facecolor": PALE_NEUTRAL, "edgecolor": "none", "pad": 0.2},
         zorder=6,
@@ -718,7 +774,7 @@ def fig1_capability(results: dict[str, Any]) -> None:
         ha="left",
         va="top",
         color=INK_PRIMARY,
-        fontsize=11.5,
+        fontsize=8.8,
         fontweight="bold",
         bbox={"facecolor": PALE_BAND, "edgecolor": "none", "pad": 0.2},
         zorder=6,
@@ -745,6 +801,7 @@ $\Delta P(o_\mathrm{{old}})=-0.020$ [-0.080, 0.040] over 199 paired cases.
 Panel A and the F2 rows use greedy decoding; the sampling row uses temperature
 0.6 and three fixed seeds. §5 shows this failure admits a chain-local causal control point.
 """
+    _w5.__exit__(None, None, None)
     _save(fig, "fig1_capability")
     plt.close(fig)
     _write_caption("fig1_capability", caption)
@@ -1203,6 +1260,13 @@ def fig3_rq3(results: dict[str, Any]) -> None:
     # W4/E4+cut: single-column stacked layout -- the full-width variant did not
     # fit the 7-page body budget, and dropping the figure (the sanctioned
     # fallback) would have cost the strict panel its place in the body.
+    # W7: the body ships teaser/drop/arms in the W5 house style (STIX serif,
+    # tinted fills, restrained ink).  This figure and fig1_capability were left
+    # at the pre-W5 checkpoint and rendered in the matplotlib default sans, so
+    # the supplement carried two visual languages.  Same data, same geometry,
+    # same audited values -- only the typeface and rule weights move.
+    _w5 = plt.rc_context(W5_RC)
+    _w5.__enter__()
     fig, axes = plt.subplots(
         3,
         1,
@@ -1239,7 +1303,7 @@ def fig3_rq3(results: dict[str, Any]) -> None:
         ax.axvline(0, color=N_DARK, linewidth=0.8, linestyle=(0, (2, 2)))
         for y, row in zip(y_positions, rows):
             values = row[metric]
-            _forest_point(
+            _contrast_bar(
                 ax,
                 y=y,
                 point=values["point"],
@@ -1307,6 +1371,7 @@ appear in the text. Intervals are unadjusted for multiplicity.
 """
     _save(fig, "fig3_rq3")
     plt.close(fig)
+    _w5.__exit__(None, None, None)
     _write_caption("fig3_rq3", caption)
     rec.write()
 
@@ -1909,17 +1974,17 @@ def fig_arms(results: dict[str, Any]) -> None:
                              [float(v) for v in tn[metric][1]],
                              float(tn[metric][2]))
             x_n, x_t = gc - 2 * STEP, gc - 1 * STEP
-            y_b = max(levels[metric]["N"], levels[metric]["T"]) + .075
+            y_b = max(levels[metric]["N"], levels[metric]["T"]) + .088
             ax.plot([x_n, x_n, x_t, x_t],
                     [y_b, y_b + .015, y_b + .015, y_b],
                     color="black", lw=0.8, zorder=5)
             sig = ci[0] > 0 or ci[1] < 0
             xm = (x_n + x_t) / 2
-            ax.text(xm, y_b + .072,
+            ax.text(xm, y_b + .098,
                     "T\u2212N " + f"{point:+.3f}".replace("0.", "."),
                     ha="center", fontsize=7.0, color="black",
                     fontweight="bold" if sig else "normal")
-            ax.text(xm, y_b + .028,
+            ax.text(xm, y_b + .042,
                     (f"[{ci[0]:+.3f}, {ci[1]:+.3f}]".replace("0.", ".")
                      .replace("+.000", ".000")),
                     ha="center", fontsize=5.8, color=W5_INK2)
@@ -1948,7 +2013,7 @@ def fig_arms(results: dict[str, Any]) -> None:
 
         ax.set_xticks([gc + (i - 2) * STEP for gc in centers
                        for i in range(5)], arms * 3, fontsize=7.5)
-        ax.set_ylim(0, 0.80)
+        ax.set_ylim(0, 0.95)
         ax.set_xlim(-0.55, 2 * GW + 0.55)
         ax.set_yticks([0, .2, .4, .6, .8])
         ax.set_ylabel("Level at $B_3$", fontsize=8)

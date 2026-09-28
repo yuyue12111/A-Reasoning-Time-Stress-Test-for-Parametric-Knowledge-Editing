@@ -32,7 +32,7 @@ FROZEN_ABSTRACT = REPO_ROOT / "paperwriting" / "delivery" / "abstract_v8_candida
 TEMPLATE_DIR = REPO_ROOT / "paperwriting" / "AuthorKit27"
 
 FROZEN_TITLE = (
-    "Direct-Answer Edit Success Is Not Enough: A Reasoning-Time Stress Test "
+    "When Edits Pass but Answers Revert: A Reasoning-Time Stress Test "
     "for Parametric Knowledge Editing"
 )
 # W4/Track F: five reviewer-named edits, each granted in the W4 plan --
@@ -44,38 +44,38 @@ FROZEN_ABSTRACT_SHA256 = (
     "b7830a8531aac7a2fa2673b8d7188342b7ef1def936add95b6a0339a96ed2b09"
 )
 APPROVED_PREAMBLE_SHA256 = (
-    "6d9e90c1d65f8dc77a054e9c01aa69bf42c6663cb535e8a1a31830bdcd041c88"
+    "0c61aece8775492f1959a1fa53f9e46710f4a039d1f4db73576733d861bd04db"
 )
 APPROVED_REFS_SHA256 = (
-    "f47c4ec7ed83e158591f003d568fdab286ad0c3609c6dfbf0cf0922983f69eeb"
+    "239802c11381655f098a43ba31c11a03bfdd7bfb8761a3453671d321abd8de4b"
 )
 APPROVED_SECTION_LEDGER_BINDINGS_SHA256 = {
-    "Section 3": "5fc7b03e455b5da2163db9186c28d69414901f648f61225c98eb5fd0774cb446",
+    "Section 3": "f400797688d32805296c371a0111c799c42d996350b76d2bfa7dc7ba899be9df",
     "Section 4": "cc322302206494cb2a2b69bb09ef5f4e3dee25c37bcc38de29cfdecb6c53863c",
-    "Section 5": "0cbbe190decfab1619b63f05ca5abbfa73a105fd5264d5cbe85c12b7abfc88ac",
-    "Section 1": "d800c4dd10a36cd01a7671a76cb68ec6af2090efd3c0ed79fa350617023936ff",
+    "Section 5": "8cdfaea8fd5cb0752e9cffa88a2b5aa3bbb86d819223759e27cd8a84923b4ede",
+    "Section 1": "2899dc3c1c94afd7c1262cf7f3c64777b1d06f76b4cb0815cc60e930015ea51a",
     "Section 2": "bbd7ea5f71ea3bf0dcc2e44c067340c88b872fa28e55c0652e5b16367e7fb963",
     "Section 6": "2d8ac5f1a235ebc2e55a04f7a801ee4636349da3cd3e7462720ae1d14a4024d0",
     "Section 7": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "Ethical Statement": "7c27178fa8e3df265d432105bc74d3b4fa47fe1dca8094a9695dc90cb4b8dbf2",
 }
 APPROVED_SECTION_VISIBLE_SHA256 = {
-    "Section 3": "bf511ccc965dd3802042c3684ff4f6d8439f81ade8ba2837bd2a7af117ba2a7a",
-    "Section 4": "115a802f1cc7d4ed6ef31fbccbf6bfb781bb8a80d3939da50b00b33297f873b6",
-    "Section 5": "fdc9305ce2b88b9a90f07443bf4e7d816202df1f64b6c3afa454da3865bc4869",
-    "Section 1": "b38443719d7d67433a31bb5436cb44e59fa963ebed35b39b4b2edbb9eb08f172",
-    "Section 2": "bc362f417b6a2a855b9b46a0a95eeb1b290c53cd75b366d088134d4b01de32c2",
-    "Section 6": "639b4b5e07100df66f94f8be15f6332a8a96be7192b350f86854824468d650a5",
+    "Section 3": "54f398d33f3e79dba705a92402857e630e3e2bfd028ad1a6881a1c02d27e7bf3",
+    "Section 4": "5823ba4649c1a0b6bcbcb094868f645a0c6933d4e2ff569c181916da20b3246d",
+    "Section 5": "d5c8c75c1a2936e13944a1682af82e55095667fe5b7b14ca557dd2f91eed7311",
+    "Section 1": "a0d9279a4d1d8fc3de15af45e9daf9198179e3482ce0c3809b30e3c7da6d5aae",
+    "Section 2": "e392ec6affe9087f5e9c51a36cfc4d3c4b347e5ca7bb904a85ca094da9869c85",
+    "Section 6": "de4bc87914fd44fc2d54728234e5451cf5ecd66dac613263c4894d2439b1ed5c",
     "Section 7": "e0208eca1afdcdde75fd8237e141b316b538ab9b996298f1c57286cda07e3d62",
     "Ethical Statement": "7be82c0bce18ca086ce80905a6b17dcc17a17ce88f8a987ffe84736f9a30060e",
 }
 APPROVED_SECTION_SOURCE_SHA256 = {
-    "Section 3": "bd8165b29a297fec5b76f42d75a9a148bbc1dd662d0975ccf2d0f5d7fb600150",
-    "Section 4": "3d10fa83217e1206184849806d3a189bcf10296275220cd930fc805288b8e8d9",
-    "Section 5": "488f51965f91f00750b09e79ca4170335c2870ba8c58b80050e460789e930460",
-    "Section 1": "5c34d18b59fd37b8d512a83e9c9c6cf187c893b9a9628fc2974e3e4891b1145e",
-    "Section 2": "785dae7b56c4fcb59128eb993a603176c1fb3dfa227eb79ed2f25a3ad3930079",
-    "Section 6": "b9fa8167de4117f4cda84b6264adf8fcb9a263ae2ba6d3ae1b5b623b61645c75",
+    "Section 3": "70d69d88163631f971c60d1e0da0c529d9f8843dcb7ebfbe88db829520f8e7d3",
+    "Section 4": "5fe719b2a0c53a5f7b1689cc2240b53508defb9ef4ea208257f970a11347586a",
+    "Section 5": "ae4c8fb048744792597dcc97d8d483d5abd3375f8ef68d6cad79ec6bd25c82ff",
+    "Section 1": "811d149a78dd616165cfefedd4866136b250a4091ab144bb9c782e6706bc6424",
+    "Section 2": "00f85d556c5927e43c6cb9a61f7938573bf9286db93e88ce848f837cfec8b1b2",
+    "Section 6": "ce662e991372e5d0aa44221968257abd7169e6e7b547c117b659ef53c565df90",
     "Section 7": "586505035ca6c4a8c8448793d582a15d369a394753a92a38e0cf2b0b1e5ab637",
     "Ethical Statement": "33ff3f8c331b9377cb811fe907a3156da992363b47c07191f7c66b9db92d718d",
 }
@@ -413,6 +413,15 @@ ALLOWED_TEX_COMMANDS = frozenset(
         "def",
         "documentclass",
         "end",
+        # Anonymous-submission metadata hygiene (reviewed 2026-07-31).  These
+        # three suppress what pdfTeX would otherwise stamp into the file: the
+        # build banner, the trailer id's machine entropy, and CreationDate /
+        # ModDate -- which pdfTeX writes in local time, so the timestamp carries
+        # a timezone.  They add nothing to the rendered page; the author kit's
+        # own \pdfinfo template block is untouched.
+        "pdfinfoomitdate",
+        "pdfsuppressptexinfo",
+        "pdftrailerid",
         "fbox",
         "footnote",
         "includegraphics",
