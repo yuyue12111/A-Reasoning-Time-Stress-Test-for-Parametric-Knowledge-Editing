@@ -82,7 +82,7 @@ B0 逐 case 一致率 ≥85%（Study 1 自身重跑一致率 85–100%）。不�
 - `source/` 只读，改动进 `src/vendor_patches/`。AlphaEdit 的 `cache_c` 每条 case 必须重置。
 - 长任务 ≤2h 粒度、jsonl 追加、按 case_id 续跑；新环境跑通立即 `pip freeze`。
 - 新模型首跑先肉眼看几条生成是人话。
-- BOS：Study 1 的 Qwen 7/14/32B 为无 BOS（6/25 修复前）、1.5B/Llama 为有 BOS；Study 2 全部用有 BOS（规范格式），G0 与机制探针复用 Study 1 链时用无 BOS 对齐。
+- BOS：Study 1 的 Qwen 全部（1.5B 特意设 WHYAAAI_NO_BOS=1 对齐）为无 BOS、Llama 为有 BOS（缺 BOS 会退化）；Study 2 全部用有 BOS（规范格式），G0 与机制探针复用 Study 1 链时用无 BOS 对齐。
 
 ## 6 预算与排期（~200 H200 卡时）
 | 项 | 估计卡时 |
