@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # setup_workspace.sh — 在本地镜像 why-aaai 工作区（macOS/Linux 通用）
-# 用法: bash setup_workspace.sh [目标路径]   默认: /Users/whyu/GitProjects/why-aaai
+# 用法: bash setup_workspace.sh [目标路径]   默认: 本脚本所在的仓库根目录
 set -uo pipefail
 
-ROOT="${1:-/Users/whyu/GitProjects/why-aaai}"
+ROOT="${1:-$(cd "$(dirname "$0")" && pwd)}"   # default: the checkout that holds this script
 mkdir -p "$ROOT/papers" "$ROOT/source" "$ROOT/analysis"
 cd "$ROOT/source"
 
@@ -23,6 +23,15 @@ clone Trustworthy-ML-Lab/ThinkEdit
 clone OPTML-Group/Unlearn-R2MU
 clone princeton-nlp/MQuAKE          # 数据用
 clone kmeng01/memit                 # 参考用
+
+pin() {  # pin <dir> <sha>：浅克隆拿到的是上游最新 HEAD，必须钉回我们全部运行与 vendor 补丁所基于的提交
+  local d="$1" sha="$2"
+  [ -d "$d/.git" ] || { echo "FAILED pin $d (not cloned)"; return; }
+  if [ "$(git -C "$d" rev-parse HEAD)" = "$sha" ]; then echo "ok     $d @ ${sha:0:7}"; return; fi
+  git -C "$d" fetch -q --depth 1 origin "$sha" && git -C "$d" checkout -q "$sha" \
+    && echo "pinned $d @ ${sha:0:7}" || echo "FAILED pin $d @ ${sha:0:7}"
+}
+pin EasyEdit 6a164f976c1b3d596a284e475b1ac98d69219938   # Study 1、src/vendor_patches、engine v2 均基于此提交
 
 cd "$ROOT/papers"
 dl() {  # dl <arxiv_id> <filename>

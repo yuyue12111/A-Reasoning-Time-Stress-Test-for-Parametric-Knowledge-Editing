@@ -68,7 +68,8 @@ CODE_FILES = ["src/rt/deltas.py", "src/rt/edit_hooks.py", "src/rt/mom2.py", "src
               "src/r1_tokenizer.py", "src/vendor_patches/easyedit_qwen2_loader.py",
               "src/vendor_patches/easyedit_mom2_dataset.py",
               "src/vendor_patches/easyedit_mom2_cache_only.py",
-              "src/vendor_patches/easyedit_alphaedit_cache.py"]
+              "src/vendor_patches/easyedit_alphaedit_cache.py",
+              "src/vendor_patches/easyedit_lean_import.py"]
 
 
 class Contamination(RuntimeError):
@@ -527,8 +528,10 @@ def run_shard(editor, cases, spec, out_dir, log_path, rank=0, world=1, header=No
     counts = {"ok": 0, "error": 0, "skipped_existing": 0, "skipped_error": 0}
     templates_logged = False
     with open(log_path, "a") as fh:
+        from vendor_patches.easyedit_lean_import import stubbed
         fh.write(json.dumps({"_meta": True, "run_signature": spec.signature(), "rank": rank,
-                             "world": world, **(header or {})}, ensure_ascii=False,
+                             "world": world, "easyedit_stubbed": stubbed(), **(header or {})},
+                            ensure_ascii=False,
                             default=str) + "\n")
         fh.flush()
         for case in shard(cases, rank, world):
@@ -569,8 +572,19 @@ def _log_templates(fh, editor_name):
 
 
 # ---------------------------------------------------------------- GPU-side setup (EasyEdit)
+def ensure_easyedit_importable():
+    """Stand in for easyeditor's optional extras before its first import; returns what was stubbed.
+
+    See ``vendor_patches.easyedit_lean_import``: ROME/MEMIT/AlphaEdit need none of the multimodal,
+    trainer or metric packages, and a stand-in raises if anything calls it.
+    """
+    from vendor_patches.easyedit_lean_import import apply
+    return apply()
+
+
 def build_hparams(settings, model_path, device, editor):
     """EasyEdit HyperParams from the template yaml plus deltas_models.yaml overrides."""
+    ensure_easyedit_importable()
     import easyeditor
     cls = {"ROME": easyeditor.ROMEHyperParams, "MEMIT": easyeditor.MEMITHyperParams,
            "AlphaEdit": easyeditor.AlphaEditHyperParams}[editor]
@@ -641,6 +655,7 @@ def preflight(hp, editor, family, model_path, npos=None):
 def load_editor(hp, dtype):
     """BaseEditor exactly as edit_loop builds it (patches first), weights in ``dtype``."""
     os.environ["WHYAAAI_DTYPE"] = dtype          # read by the qwen2 loader patch at load time
+    ensure_easyedit_importable()
     from vendor_patches.easyedit_qwen2_loader import apply as apply_qwen_loader_patch
     apply_qwen_loader_patch()
     from vendor_patches.easyedit_mom2_dataset import apply as apply_mom2_dataset_patch
@@ -866,6 +881,7 @@ def cmd_precompute_stats(args):
 def _crosscheck_easyedit(rows, tok, maxlen, batch_tokens, groups, dataset, sample_size):
     """Compare our sampling/tokenization/collation mirrors with EasyEdit's own code on group 0."""
     try:
+        ensure_easyedit_importable()
         from easyeditor.models.rome.tok_dataset import TokenizedDataset, length_collation
         from easyeditor.util.runningstats import FixedRandomSubsetSampler
     except Exception as e:

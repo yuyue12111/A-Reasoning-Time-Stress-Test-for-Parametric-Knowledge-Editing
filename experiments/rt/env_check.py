@@ -57,7 +57,9 @@ MODELS = {  # tag -> directory name as published on the Hub
     "judge_gemma": "gemma-3-27b-it", "judge_mistral": "Mistral-Small-3.1-24B-Instruct-2503",
 }
 G0_MODEL = "r1qwen32b"
-DEFAULT_ROOTS = ["/inspire/hdd/global_public/public_models", "/inspire/hdd/project/ai4education/ky26140/why/models",
+EASYEDIT_PIN = "6a164f976c1b3d596a284e475b1ac98d69219938"   # Study 1, vendor patches, engine v2
+DEFAULT_ROOTS = ["/inspire/hdd/global_public/public_models", "/inspire/hdd/project/ai4education/public/why/models",
+                 "/inspire/hdd/project/ai4education/ky26140/why/models",
                  "/inspire/hdd/project/ai4education/ky26140/why", os.path.expanduser("~/models"),
                  os.environ.get("HF_HOME", os.path.expanduser("~/.cache/huggingface")) + "/hub"]
 URLS = {"pypi": "https://pypi.org/simple/pip/", "pythonhosted": "https://files.pythonhosted.org/",
@@ -176,46 +178,40 @@ def transformers_classes():
 
 
 _EASYEDIT_PROBE = r"""
-import sys, types, json, importlib
-sys.path.insert(0, sys.argv[1])
-missing = []
-class _Meta(type):                     # stand-in classes: any attribute is another stand-in class
-    def __getattr__(cls, name):
-        if name.startswith("__"):
-            raise AttributeError(name)
-        return _make(name)
-    def __getitem__(cls, item):
-        return cls
-    def __or__(cls, other):
-        return cls
-    __ror__ = __or__
-    def __iter__(cls):
-        return iter(())
-def _make(name):
-    return _Meta(name, (), {"__init__": lambda self, *a, **k: None, "__call__": lambda self, *a, **k: self,
-                            "__getattr__": lambda self, n: _make(n)})
-class _Stub(types.ModuleType):
-    __path__ = []
-    def __getattr__(self, name):
-        if name.startswith("__"):
-            raise AttributeError(name)
-        return _make(name)
+import sys, types, json, importlib, importlib.machinery
+root, ee = sys.argv[1], sys.argv[2]
+sys.path[:0] = [root + "/src", ee]
+missing, stubbed = [], []
+def _stub(name):
+    m = types.ModuleType(name); m.__path__ = []
+    m.__spec__ = importlib.machinery.ModuleSpec(name, None, is_package=True)
+    m.__getattr__ = lambda attr: (_ for _ in ()).throw(AttributeError(attr)) if attr.startswith("__") else type(attr, (), {})
+    return m
 for _ in range(80):
     try:
-        mod = importlib.import_module("easyeditor")
-        need = ["BaseEditor", "ROMEHyperParams", "MEMITHyperParams", "AlphaEditHyperParams", "FTHyperParams"]
-        from easyeditor.util import nethook  # noqa
-        print(json.dumps({"ok": not missing, "missing": missing,
-                          "names": {n: hasattr(mod, n) for n in need}}))
+        try:
+            from vendor_patches.easyedit_lean_import import apply
+            stubbed = apply()          # optional extras only; what still fails below is a real need
+        except ModuleNotFoundError:
+            raise
+        except Exception as e:
+            stubbed = [f"lean import unavailable: {e!r}"[:200]]
+        import easyeditor
+        from easyeditor import BaseEditor, ROMEHyperParams, MEMITHyperParams, AlphaEditHyperParams
+        from easyeditor.util import nethook
+        from easyeditor.models.rome import rome_main, layer_stats
+        from easyeditor.models.memit import memit_main
+        from easyeditor.models.alphaedit import AlphaEdit_main
+        print(json.dumps({"ok": not missing, "missing": missing, "stubbed_optional": stubbed}))
         break
     except ModuleNotFoundError as e:
         name = e.name or str(e).split("'")[1]
-        if name in missing or name.startswith("easyeditor"):
+        if name in missing or name.startswith(("easyeditor", "vendor_patches")):
             print(json.dumps({"ok": False, "missing": missing, "fatal": repr(e)})); break
         missing.append(name)
-        for k in [m for m in list(sys.modules) if m == "easyeditor" or m.startswith("easyeditor.")]:
+        for k in [m for m in list(sys.modules) if m.split(".")[0] in ("easyeditor", "vendor_patches")]:
             del sys.modules[k]
-        sys.modules[name] = _Stub(name)
+        sys.modules[name] = _stub(name)
     except Exception as e:
         print(json.dumps({"ok": False, "missing": missing, "fatal": f"{type(e).__name__}: {e}"[:500]})); break
 """
@@ -228,7 +224,8 @@ def easyedit(root):
         rec["hint"] = "run `bash setup_workspace.sh` (clones EasyEdit at the pinned commit; needs GitHub access)"
         return rec
     rec["git"] = run(["git", "-C", path, "rev-parse", "HEAD"], timeout=20)["out"].strip() or None
-    r = run([sys.executable, "-c", _EASYEDIT_PROBE, path], timeout=300)
+    rec["pinned"] = rec["git"] == EASYEDIT_PIN
+    r = run([sys.executable, "-c", _EASYEDIT_PROBE, root, path], timeout=300)
     try:
         rec.update(json.loads(r["out"].strip().splitlines()[-1]))
     except Exception:  # noqa: BLE001
@@ -366,22 +363,34 @@ def verdict(rep):
     for mod in ("torch", "transformers", "tokenizers", "safetensors", "numpy", "yaml", "accelerate"):
         if not pk.get(mod, {}).get("ok"):
             block.append(f"python package missing: {pk.get(mod, {}).get('package', mod)}")
-    for mod in ("torch", "transformers"):
-        if pk.get(mod, {}).get("differs_from_pin"):
-            warn.append(f"{mod} {pk[mod].get('version')} differs from pin {pk[mod].get('pin')} (engine tested on the pin)")
+    if pk.get("torch", {}).get("differs_from_pin"):
+        warn.append(f"torch {pk['torch'].get('version')} differs from pin {PINS['torch']}: keep the image's CUDA build, "
+                    "do NOT pip-install another torch; the CPU tests and --gpu-smoke validate this build")
+    if pk.get("transformers", {}).get("differs_from_pin"):
+        block.append(f"transformers {pk['transformers'].get('version')} != {PINS['transformers']} (prompt/tokenizer "
+                     "behaviour was validated on the pin)")
     t = (rep["gpu"] or {}).get("torch") or {}
     if not t.get("available"):
         block.append("torch sees no CUDA device")
     else:
-        big = [d for d in t.get("devices", []) if d["mem_gb"] >= 130]
-        if not big:
-            block.append("no GPU with >=130 GB (fp32 32B edits need an H200-class card)")
+        mems = [d["mem_gb"] for d in t.get("devices", [])]
+        big = max(mems) if mems else 0
+        rep["node"] = {"gpus": len(mems), "max_gb": big, "total_gb": round(sum(mems), 1),
+                       "fp32_edits_32b": big >= 130, "fp32_edits_upto_8b": big >= 40,
+                       "bf16_32b_cards_per_process": 1 if big >= 100 else 2,
+                       "bf16_70b_cards_per_process": 2 if big >= 100 else 4}
+        if big < 130:
+            warn.append(f"largest GPU {big} GB: fp32 edits of 14B/32B/70B (G0 step 1a, Study-2 deltas) must run on "
+                        "the H200 node; this node can run bf16 generation, pool screening, judges and <=8B fp32 edits")
         if not t.get("matmul_ok", True):
             block.append("GPU matmul produced non-finite values")
     ee = rep["easyedit"]
     if not ee.get("present"):
         block.append("source/EasyEdit missing (setup_workspace.sh)")
-    elif not ee.get("ok"):
+    elif not ee.get("pinned"):
+        block.append(f"source/EasyEdit is at {str(ee.get('git'))[:7]}, must be {EASYEDIT_PIN[:7]} "
+                     "(re-run setup_workspace.sh from this branch; it pins the commit)")
+    if ee.get("present") and not ee.get("ok"):
         block.append("easyeditor import needs: " + ", ".join(ee.get("missing_packages") or [ee.get("fatal", "?")]))
     r = rep["repo"]
     for f, ok in r.get("files", {}).items():
@@ -408,8 +417,8 @@ def verdict(rep):
         block.append(f"CPU test suite failed: {rep['tests'].get('summary')}")
     if rep.get("gpu_smoke") and not rep["gpu_smoke"].get("ok"):
         block.append("GPU smoke of the edit hooks failed")
-    missing_pkgs = sorted({p["package"] for p in rep["packages"] if isinstance(p, dict) and not p.get("ok")}
-                          | set(ee.get("missing_packages") or []))
+    missing_pkgs = sorted({p["package"] for p in rep["packages"] if isinstance(p, dict) and not p.get("ok")
+                           and p["module"] != "torch"} | set(ee.get("missing_packages") or []))
     pip = " ".join(f"{p}=={PINS[p]}" if p in PINS else p for p in missing_pkgs)
     return {"blockers": block, "warnings": warn, "pip_install": f"pip install {pip}" if pip else None}
 

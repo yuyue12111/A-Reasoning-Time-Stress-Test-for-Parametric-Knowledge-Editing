@@ -380,6 +380,8 @@ def verify_with_easyedit(model_config, tokenizer, layer_name, hp):
     path).  Only runs where easyeditor is importable; returns the loaded token count.
     """
     from types import SimpleNamespace
+    from vendor_patches.easyedit_lean_import import apply as ensure_easyedit_importable
+    ensure_easyedit_importable()
     from easyeditor.models.rome import layer_stats as ls
 
     def refuse(*a, **k):
