@@ -28,6 +28,7 @@ engine, more editors and more post-training recipes.
 ## 3 Procedure
 - Engine v2 (`src/rt/`, REVISION.md §4): the edit's rank-1 update is computed by EasyEdit in fp32 and
   applied per batch row by a forward hook; generation is batched bf16. Each request sees only its own edit.
+- BOS as in Study 1: none for Qwen-based R1 models, BOS for Llama-based ones, none for ChatML templates.
 - Budgets: B0 = pre-closed empty think span; B3 = native chain capped at 8,192 tokens (closed by the
   harness if the model does not); B0P = fixed short canned thought; B1 = chain capped at 256 tokens.
   The answer is generated after `</think>` with a 256-token cap. Prompts reuse `src/think_budget.py`.
