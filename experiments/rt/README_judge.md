@@ -103,7 +103,7 @@ wait
 ```
 
 Study 2 (v2 rows, REVISION.md §4 schema) is the same with its shards, e.g.
-`--rows 'results/rt/study2/*.jsonl'`. Split long runs into jobs of at most 2 h with
+`--rows 'results/rt/s2/*.jsonl'`. Split long runs into jobs of at most 2 h with
 `--shard 0/2 --out .../study2_s0.jsonl` and `--shard 1/2 --out .../study2_s1.jsonl`.
 
 Expected runtime (estimate; calibrate with Step 1): a 24-27B model in bf16 HF runs about 10-20
@@ -138,7 +138,7 @@ Build the package from the rows the switch is about (Study 2 efficacy rows; the 
 judged the same rows):
 
 ```bash
-python -m rt.annotate build --rows 'results/rt/study2/*.jsonl' --where editor=ROME \
+python -m rt.annotate build --rows 'results/rt/s2/*.jsonl' --where editor=ROME \
     --n 200 --floor 10 --out-dir results/annot/study2      # add --where filters to pick the condition
 ```
 
