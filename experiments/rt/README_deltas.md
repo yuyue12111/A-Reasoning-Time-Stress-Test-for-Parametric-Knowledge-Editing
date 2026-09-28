@@ -62,12 +62,12 @@ python -m rt.deltas run --config experiments/rt/deltas_g0_r1qwen32b.yaml \
 for r in 0 1 2 3; do python -m rt.deltas run --config experiments/rt/deltas_g0_r1qwen32b.yaml \
   --model-path $M32 --limit 20 --rank $r --world 4 --device $r \
   > results/rt/deltas_logs/g0_smoke_r$r.out 2>&1 & sleep 20; done; wait
-python -m rt.deltas summarize results/rt/deltas_logs/r1qwen32b_ROME_cf_r*of4.jsonl
+python -m rt.deltas summarize results/rt/deltas_logs/g0/r1qwen32b_ROME_cf_r*of4.jsonl
 # full pool; already-written cases are skipped (resume is by file), so the smoke cases are reused
 for r in $(seq 0 7); do python -m rt.deltas run --config experiments/rt/deltas_g0_r1qwen32b.yaml \
   --model-path $M32 --rank $r --world 8 --device $r \
   > results/rt/deltas_logs/g0_r$r.out 2>&1 & sleep 20; done; wait
-python -m rt.deltas summarize results/rt/deltas_logs/r1qwen32b_ROME_cf_r*of8.jsonl
+python -m rt.deltas summarize results/rt/deltas_logs/g0/r1qwen32b_ROME_cf_r*of8.jsonl
 ```
 
 Loads are staggered by 20 s (8 simultaneous 131 GB reads from GPFS have stalled before, RUNBOOK §8).
@@ -136,7 +136,7 @@ for ed in MEMIT AlphaEdit; do
     python -m rt.deltas run --config experiments/rt/deltas_g0_r1qwen32b.yaml --editor $ed \
     --model-path $M32 --limit 20 --rank $r --world 4 --device 0 \
     > results/rt/deltas_logs/smoke_${ed}_r$r.out 2>&1 & sleep 30; done; wait
-  python -m rt.deltas summarize results/rt/deltas_logs/r1qwen32b_${ed}_cf_r*of4.jsonl
+  python -m rt.deltas summarize results/rt/deltas_logs/g0/r1qwen32b_${ed}_cf_r*of4.jsonl
 done
 ```
 

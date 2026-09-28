@@ -35,6 +35,6 @@ models:                                    # model path from $WHYAAAI_MODEL at s
   r1qwen14b: {template: r1, no_bos: true}
   r1qwen32b: {template: r1, no_bos: true}
   r1llama8b: {template: r1, no_bos: false}
-  r1llama70b: {template: r1, no_bos: false, model: {device_map: auto}}
+  r1llama70b: {template: r1, no_bos: false, k: 200, model: {device_map: auto}}   # prereg: first 200
   qwq32b: {template: qwq, no_bos: true}
-  qwen25_32b_instruct: {template: instruct_cot, no_bos: true}
+  qwen2_5_32b_instruct: {template: instruct_cot, no_bos: true}

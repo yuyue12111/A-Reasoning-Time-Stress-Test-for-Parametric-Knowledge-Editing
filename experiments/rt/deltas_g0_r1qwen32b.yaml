@@ -11,7 +11,7 @@ pool: experiments/rt/pools/study1_cf200.jsonl   # Study-1 order (shared with the
 dataset: data/counterfact.jsonl
 models_file: experiments/rt/deltas_models.yaml
 out_root: deltas
-log_dir: results/rt/deltas_logs
+log_dir: results/rt/deltas_logs/g0     # Study-2 logs: deltas_logs/s2 (same delta tree, disjoint case ids)
 dtype: float32
 factor:
   max_rank: 1         # single-request ROME/MEMIT/AlphaEdit updates are rank 1 by construction

@@ -242,7 +242,7 @@ def cmd_qualify(pcfg, tag, allow_missing=False):
         raise RuntimeError(f"{len(missing)} candidates have no screen row (e.g. {missing[:3]}); "
                            f"finish screening or pass --allow-missing")
     aliases = json.load(open(_abs(pcfg.get("aliases", "data/aliases.json"))))
-    k = int(pcfg.get("k", 400))
+    k = int(((pcfg.get("models") or {}).get(tag) or {}).get("k", pcfg.get("k", 400)))   # per-model override (70B: 200)
     manifest, decisions, counts = qualify(cands, answers, aliases, k)
     sha = write_manifest(p["manifest"], [{"case_id": c} for c in manifest])
     with open(p["decisions"], "w") as f:
