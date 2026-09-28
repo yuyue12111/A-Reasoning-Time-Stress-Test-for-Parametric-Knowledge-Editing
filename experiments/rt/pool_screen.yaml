@@ -33,8 +33,8 @@ models:                                    # model path from $WHYAAAI_MODEL at s
   r1qwen1_5b: {template: r1, no_bos: true}
   r1qwen7b: {template: r1, no_bos: true}
   r1qwen14b: {template: r1, no_bos: true}
-  r1qwen32b: {template: r1, no_bos: true}
+  r1qwen32b: {template: r1, no_bos: true, model: {device_map: auto}}   # 4090-48G: 2 cards/process; H200: 1
   r1llama8b: {template: r1, no_bos: false}
   r1llama70b: {template: r1, no_bos: false, k: 200, model: {device_map: auto}}   # prereg: first 200
-  qwq32b: {template: qwq, no_bos: true}
-  qwen2_5_32b_instruct: {template: instruct_cot, no_bos: true}
+  qwq32b: {template: qwq, no_bos: true, model: {device_map: auto}}   # 4090-48G: 2 cards/process; H200: 1
+  qwen2_5_32b_instruct: {template: instruct_cot, no_bos: true, model: {device_map: auto}}   # 4090-48G: 2 cards/process; H200: 1
