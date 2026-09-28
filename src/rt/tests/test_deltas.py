@@ -539,3 +539,22 @@ def test_models_file_encodes_study1_settings():
     assert q32["AlphaEdit"]["overrides"]["P_loc"].startswith(m["r1qwen32b"]["stats_dir"])
     s = deltas.editor_settings(models, "r1qwen32b", "AlphaEdit")
     assert os.path.isabs(s["overrides"]["stats_dir"]) and os.path.isabs(s["overrides"]["P_loc"])
+
+
+def test_load_pool_reads_rt_pool_jsonl_manifest():
+    import hashlib, json, os, tempfile
+    from rt.deltas import load_pool
+    with tempfile.TemporaryDirectory() as d:
+        path = os.path.join(d, "manifest.jsonl")
+        with open(path, "w") as fh:
+            for cid in ("cf_3", "cf_1", "cf_2"):
+                fh.write(json.dumps({"case_id": cid, "s": "x"}) + "\n")
+        ids, meta = load_pool(path)
+        assert ids == ["cf_3", "cf_1", "cf_2"] and meta["n"] == 3
+        with open(path + ".sha256", "w") as fh:
+            fh.write("0" * 64 + "  manifest.jsonl\n")
+        try:
+            load_pool(path)
+        except ValueError:
+            return
+    raise AssertionError("a manifest whose sha256 sidecar disagrees must be rejected")

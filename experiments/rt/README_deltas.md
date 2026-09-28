@@ -39,9 +39,12 @@ CPU RAM per AlphaEdit-32B process: P (5 × 3.06 GB) + `cache_c` (same) + mom2 ca
 
 ## Step 0 · pools (done for G0)
 
-`data/pools/study1_r1qwen32b_ids.json` (committed) holds the Study-1 32B pool: 200 case ids in
-first-seen order over `results 2/probe/r1qwen32b_ROME_cf200_r*of8.jsonl`, with source hashes and
-checks (all ids in CounterFact, efficacy prompts identical).  To regenerate:
+The G0 configs (deltas and generation) both read `experiments/rt/pools/study1_cf200.jsonl`: the
+Study-1 32B pool in Study 1's own run order (seed-42 shuffle, cross-checked against the 14B, 8B,
+sup and samp runs), with a `.sha256` sidecar.  `data/pools/study1_r1qwen32b_ids.json` is the same
+200 ids in first-seen shard order, kept as the `export-pool` audit record (source hashes; every id
+in CounterFact; efficacy prompts identical).  Study-2 pools are the jsonl manifests written by
+`rt.pool qualify`; `rt.deltas` reads them directly.  To regenerate the audit record:
 
 ```bash
 python -m rt.deltas export-pool --name study1_r1qwen32b --out data/pools/study1_r1qwen32b_ids.json \

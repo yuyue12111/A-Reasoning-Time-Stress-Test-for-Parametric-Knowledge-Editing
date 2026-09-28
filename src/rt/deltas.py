@@ -224,9 +224,18 @@ def edited_weight_names(hp):
 
 
 def load_pool(path):
-    """(case_ids, meta) from a pool manifest: JSON {"case_ids": [...]} or a JSON list."""
-    with open(path) as fh:
-        obj = json.load(fh)
+    """(case_ids, meta) from a pool manifest.
+
+    Accepts the jsonl manifests written by ``rt.pool qualify`` (and ``experiments/rt/pools/*.jsonl``;
+    read with ``rt.run.read_ids``, which checks the ``.sha256`` sidecar), a JSON {"case_ids": [...]},
+    or a JSON list.
+    """
+    if path.endswith(".jsonl"):
+        from rt.run import read_ids
+        obj = read_ids(path)
+    else:
+        with open(path) as fh:
+            obj = json.load(fh)
     ids = obj if isinstance(obj, list) else obj["case_ids"]
     if len(ids) != len(set(ids)):
         raise ValueError(f"{path}: duplicate case ids")

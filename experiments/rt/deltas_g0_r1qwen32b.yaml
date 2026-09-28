@@ -7,7 +7,7 @@
 model: r1qwen32b
 editor: ROME
 target_tag: cf
-pool: data/pools/study1_r1qwen32b_ids.json
+pool: experiments/rt/pools/study1_cf200.jsonl   # Study-1 order (shared with the G0 generation config)
 dataset: data/counterfact.jsonl
 models_file: experiments/rt/deltas_models.yaml
 out_root: deltas
