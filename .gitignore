@@ -29,6 +29,7 @@ env/
 mom2_stats/
 stats/
 /deltas/
+/deltas_smoke/
 
 # --- Cleaned datasets: regenerable via `python src/build_dataset.py` (raw via memit download).
 #     aliases.json + sample_records.jsonl + *.prefiltered.jsonl stay tracked (small / pins pilot set). ---

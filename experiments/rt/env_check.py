@@ -205,9 +205,12 @@ for _ in range(80):
         print(json.dumps({"ok": not missing, "missing": missing, "stubbed_optional": stubbed}))
         break
     except ModuleNotFoundError as e:
-        name = e.name or str(e).split("'")[1]
-        if name in missing or name.startswith(("easyeditor", "vendor_patches")):
-            print(json.dumps({"ok": False, "missing": missing, "fatal": repr(e)})); break
+        name = e.name or ""
+        if not name or name in missing or name.startswith(("easyeditor", "vendor_patches")) \
+                or (name != name.lower() and name != "PIL"):   # a class name (e.g. AutoProcessor) is not a package
+            cause = e.__cause__ or e.__context__
+            print(json.dumps({"ok": False, "missing": missing, "fatal": repr(e)[:300],
+                              "cause": repr(cause)[:500] if cause else None})); break
         missing.append(name)
         for k in [m for m in list(sys.modules) if m.split(".")[0] in ("easyeditor", "vendor_patches")]:
             del sys.modules[k]

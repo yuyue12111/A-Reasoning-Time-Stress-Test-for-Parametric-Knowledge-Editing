@@ -5,12 +5,17 @@ drags in timm, torchvision, fairscale, iopath, OpenCV, PyAV, qwen-vl-utils, sent
 LLM-API clients and metric libraries.  ROME, MEMIT and AlphaEdit use none of them, and on an NGC
 image installing the torchvision-based ones can make pip replace the image's CUDA build of torch.
 
-``apply()`` registers a stand-in module for each optional dependency that is not installed.  A
-stand-in satisfies import-time use (attribute access, subclassing, type annotations, ``X[...]``,
+``apply()`` imports easyeditor and stands in only for optional packages that its import chain
+actually fails on.  Before any stand-in exists, transformers and (when installed) torchvision are
+imported, and transformers' processor module is touched, so every installed package runs its own
+optional-dependency probes against the real environment.  (A stand-in created first would make
+``import av`` succeed inside torchvision, whose next call then hits the stand-in: that is how the
+2026-09-28 platform check failed with "Could not import module 'AutoProcessor'".)
+
+A stand-in satisfies import-time use (attribute access, subclassing, type annotations, ``X[...]``,
 ``X | Y``) but raises as soon as anything calls or instantiates it, so an edit path that really
 needed one fails loudly instead of running a no-op.  Installed packages are never shadowed.
-transformers is imported first so its package-availability flags reflect the real environment.
-``stubbed()`` lists what was replaced; rt.deltas records it in every delta's provenance.
+``stubbed()`` lists what was replaced; rt.deltas records it in every delta log header.
 """
 import importlib.machinery
 import importlib.util
@@ -103,16 +108,52 @@ def _installed(name):
         return False
 
 
-def apply(names=OPTIONAL):
-    """Stand in for every name in ``names`` that is not installed; returns the stubbed names."""
-    import transformers  # noqa: F401  (freeze transformers' availability flags first)
-    for name in names:
-        if name not in _STUBBED and not _installed(name):
-            sys.modules[name] = _make_module(name)
-            _STUBBED.append(name)
-    if _STUBBED and not any(isinstance(f, _Finder) for f in sys.meta_path):
+def _stub(name):
+    sys.modules[name] = _make_module(name)
+    _STUBBED.append(name)
+    if not any(isinstance(f, _Finder) for f in sys.meta_path):
         sys.meta_path.insert(0, _Finder())
-    return list(_STUBBED)
+
+
+def _prime():
+    """Let installed packages run their optional-dependency probes before any stand-in exists."""
+    import transformers
+    for mod in ("torchvision",):
+        if _installed(mod):
+            try:
+                importlib.import_module(mod)
+            except Exception:  # noqa: BLE001 - a broken optional package is easyeditor's problem, not ours
+                pass
+    try:
+        getattr(transformers, "AutoProcessor")
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def apply(names=OPTIONAL, target="easyeditor", max_rounds=64):
+    """Import ``target``, standing in only for members of ``names`` its import fails on.
+
+    Returns the stubbed names.  With ``target=None`` every missing name is stubbed eagerly (tests).
+    Any other import failure is raised unchanged.
+    """
+    if target is None:
+        for name in names:
+            if name not in _STUBBED and not _installed(name):
+                _stub(name)
+        return list(_STUBBED)
+    _prime()
+    for _ in range(max_rounds):
+        try:
+            importlib.import_module(target)
+            return list(_STUBBED)
+        except ModuleNotFoundError as e:
+            root = (e.name or "").split(".")[0]
+            if root not in names or root in _STUBBED or _installed(root):
+                raise
+            _stub(root)
+            for key in [k for k in sys.modules if k == target or k.startswith(target + ".")]:
+                del sys.modules[key]
+    raise RuntimeError(f"{target} still fails to import after {max_rounds} stand-ins")
 
 
 def stubbed():
