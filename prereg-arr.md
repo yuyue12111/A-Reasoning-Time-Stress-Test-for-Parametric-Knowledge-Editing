@@ -44,10 +44,15 @@ engine, more editors and more post-training recipes.
 
 ## 4 Endpoints
 - **ES_b**: answer contains the new value and not the old one (lexical, `src/metrics.py`).
-- **Semantic ES / reversion**: two judge families (`src/rt/judge.py`), blind to model, arm and budget;
-  200 items double-annotated by humans. **Switch rule:** if Cohen's κ between the human consensus and the
-  judge majority is ≥ .70, semantic ES and semantic reversion are the primary endpoints; otherwise the
-  lexical ES and strict reversion (old present, new absent) are.
+- **Semantic ES / reversion**: two judge families (google/gemma-3-27b-it, mistralai/Mistral-Small-3.1-24B-
+  Instruct-2503; `src/rt/judge.py`, prompt sha256 `dc4649065540f3a92e08be083520b75c2e7a93697c7289ecf385cc5a8f96771c`)
+  see only the question and the final answer, with the subject name masked; each item is scored under both
+  option orders and the probabilities averaged; the two judges' probabilities are averaged, and an exact
+  NEW/OLD tie counts as unclear. 200 items (budget × lexical cell, floor 10 per stratum) are labelled
+  independently by two annotators under the same written rules. **Switch rule:** if the mean of Cohen's κ
+  between the judge ensemble and each annotator is ≥ .70 for both the binary ES label and the binary
+  reversion label, semantic ES and semantic reversion are the primary endpoints; otherwise the lexical ES
+  and strict reversion (old present, new absent) are.
 - **Retention contrast**: among cases whose base answers old at B0 and whose edit succeeds at B0,
   P(edited loses success at B3) − P(base loses the old answer at B3), paired within case.
 - Secondary: permissive reversion (any old mention among B0 successes), erosion and repair, paraphrase
