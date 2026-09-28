@@ -14,6 +14,7 @@
 #   sup and samp Study-1 runs), so shard r of 8 holds the same 25 cases as in Study 1.
 model_tag: r1qwen32b
 template: r1
+no_bos: true                  # REVISION.md §5: Study 1 32B ran without BOS
 model:
   path: null                  # null -> $WHYAAAI_MODEL
   dtype: bfloat16

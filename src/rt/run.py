@@ -360,8 +360,24 @@ def _check_resume(path, header, expected):
                            f"Use a new run_tag/out_dir or restore the exact config and code.")
 
 
+def apply_bos_policy(cfg):
+    """Let the config, not the shell, decide BOS (REVISION.md §5).
+
+    ``no_bos: true`` sets WHYAAAI_NO_BOS for this process, ``false`` clears it; the prompt builders
+    read that variable, and the resolved value enters every condition's resume hash.  Study 1 ran the
+    Qwen-based R1 models without BOS and the Llama-based ones with it; Study 2 keeps that rule.
+    """
+    if "no_bos" not in cfg:
+        return
+    if cfg["no_bos"]:
+        os.environ["WHYAAAI_NO_BOS"] = "1"
+    else:
+        os.environ.pop("WHYAAAI_NO_BOS", None)
+
+
 def prepare(cfg, rank=0, world=1, config_path=None, only=None, stage=None, run_tag=None, limit=None):
     """Resolve config, cases, conditions and shard state without touching a model."""
+    apply_bos_policy(cfg)
     if cfg.get("template", "r1") not in ("r1", "qwq", "instruct_cot"):
         raise ValueError(f"unknown template {cfg.get('template')!r}")
     cases, src = load_cases(cfg["dataset"])

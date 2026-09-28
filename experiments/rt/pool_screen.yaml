@@ -28,11 +28,13 @@ engine:
   chunk_cases: 200
 
 models:                                    # model path from $WHYAAAI_MODEL at screen time
-  r1qwen1_5b: {template: r1}
-  r1qwen7b: {template: r1}
-  r1qwen14b: {template: r1}
-  r1qwen32b: {template: r1}
-  r1llama8b: {template: r1}
-  r1llama70b: {template: r1, model: {device_map: auto}}
-  qwq32b: {template: qwq}
-  qwen25_32b_instruct: {template: instruct_cot}
+  # no_bos follows Study 1 (REVISION.md §5): Qwen-based R1 without BOS, Llama-based R1 with BOS;
+  # the ChatML templates add no manual BOS either way.
+  r1qwen1_5b: {template: r1, no_bos: true}
+  r1qwen7b: {template: r1, no_bos: true}
+  r1qwen14b: {template: r1, no_bos: true}
+  r1qwen32b: {template: r1, no_bos: true}
+  r1llama8b: {template: r1, no_bos: false}
+  r1llama70b: {template: r1, no_bos: false, model: {device_map: auto}}
+  qwq32b: {template: qwq, no_bos: true}
+  qwen25_32b_instruct: {template: instruct_cot, no_bos: true}

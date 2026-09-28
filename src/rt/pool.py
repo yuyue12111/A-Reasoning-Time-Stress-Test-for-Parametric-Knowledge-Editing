@@ -200,7 +200,10 @@ def screen_config(pcfg, tag):
     m = (pcfg.get("models") or {}).get(tag)
     if m is None:
         raise ValueError(f"model tag {tag!r} not in pool config models")
+    if "no_bos" not in m:
+        raise ValueError(f"pool config model {tag!r} must set no_bos (REVISION.md §5)")
     return {"model_tag": tag, "template": m.get("template", "r1"), "template_system": m.get("template_system"),
+            "no_bos": bool(m["no_bos"]),
             "model": m.get("model") or {}, "module_tmp": m.get("module_tmp", "model.layers.{}.mlp.down_proj"),
             "out_dir": pcfg["screen_dir"], "run_tag": "pool",
             "dataset": {"path": pcfg.get("counterfact", "data/counterfact.jsonl"),

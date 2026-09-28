@@ -123,7 +123,7 @@ def _pool_cfg(d):
             "screen_dir": os.path.join(d, "screen"),
             "used_sources": [os.path.join(d, "old", "*.jsonl")], "used_exclude": [],
             "engine": {"batch_size": 4, "answer_cap": 8, "chunk_cases": 4},
-            "models": {"tiny": {"template": "r1", "model": {"dtype": "float32"}}}}
+            "models": {"tiny": {"template": "r1", "no_bos": True, "model": {"dtype": "float32"}}}}
 
 
 def test_build_screen_qualify_end_to_end():

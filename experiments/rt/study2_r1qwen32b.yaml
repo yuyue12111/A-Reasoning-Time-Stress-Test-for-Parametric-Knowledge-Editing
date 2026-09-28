@@ -8,6 +8,7 @@
 # acts only in the chain phase and B0 has none.
 model_tag: r1qwen32b
 template: r1
+no_bos: true                  # REVISION.md §5: Qwen-based R1 models run without BOS, as in Study 1
 model:
   path: null                  # null -> $WHYAAAI_MODEL
   dtype: bfloat16

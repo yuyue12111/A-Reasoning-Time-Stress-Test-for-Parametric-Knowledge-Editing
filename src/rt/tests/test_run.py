@@ -374,3 +374,27 @@ def test_cli_dry_run_loads_no_model():
         out = buf.getvalue()
         assert "pending=" in out and "base" in out and "ike" in out and "rome_T" not in out
         assert not os.path.exists(os.path.join(d, "out"))
+
+
+def test_bos_policy_comes_from_config():
+    import os
+    from rt.run import apply_bos_policy
+    os.environ.pop("WHYAAAI_NO_BOS", None)
+    apply_bos_policy({"no_bos": True})
+    assert os.environ.get("WHYAAAI_NO_BOS") == "1"
+    apply_bos_policy({"no_bos": False})
+    assert "WHYAAAI_NO_BOS" not in os.environ
+    os.environ["WHYAAAI_NO_BOS"] = "1"
+    apply_bos_policy({})                       # absent key leaves the environment alone
+    assert os.environ.get("WHYAAAI_NO_BOS") == "1"
+    os.environ.pop("WHYAAAI_NO_BOS", None)
+
+
+def test_pool_screen_requires_bos_policy():
+    from rt.pool import screen_config
+    pcfg = {"models": {"m": {"template": "r1"}}, "screen_dir": "x", "pool_dir": "y"}
+    try:
+        screen_config(pcfg, "m")
+    except ValueError:
+        return
+    raise AssertionError("a pool model without no_bos must be rejected")

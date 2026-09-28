@@ -33,12 +33,12 @@ All commands run from the project root on the 8×H200 node.
 
 ## G0 parity gate (R1-Distill-Qwen-32B)
 
-Study 1 32B ran before manual BOS was added to `think_budget._gen`, so G0 runs without BOS.
+BOS is set by each config's `no_bos` key, not by the shell (REVISION.md §5): Qwen-based R1 models run without BOS
+as in Study 1, Llama-based ones with it. `WHYAAAI_NO_BOS` is overwritten at startup.
 
 ```bash
 cd <project root>
 export WHYAAAI_MODEL=<models>/DeepSeek-R1-Distill-Qwen-32B
-export WHYAAAI_NO_BOS=1                       # parity with Study 1 32B (2026-06-23, pre-BOS)
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 mkdir -p logs/rt
 PYTHONPATH=src python -m rt.run --config experiments/rt/study1_g0_r1qwen32b.yaml --rank 0 --world 8 --dry-run
@@ -47,7 +47,6 @@ for r in $(seq 0 7); do
     --config experiments/rt/study1_g0_r1qwen32b.yaml --rank $r --world 8 \
     > logs/rt/g0_r$r.log 2>&1 &
 done; wait
-unset WHYAAAI_NO_BOS
 ```
 
 Outputs: `results/rt/g0/r1qwen32b_g0_{base,rome_N}_r{0..7}of8.jsonl`.
