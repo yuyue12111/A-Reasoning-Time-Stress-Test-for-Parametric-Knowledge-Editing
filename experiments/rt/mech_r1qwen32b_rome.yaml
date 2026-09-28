@@ -8,12 +8,12 @@
 model: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B   # platform: pass the local path with --model
 model_tag: r1qwen32b          # must equal the delta records' model_tag
 editor: ROME
-target_tag: new
+target_tag: cf
 dtype: bfloat16               # fp32 cross-check: --dtype float32 on 2×H200 (see README)
 device_map: auto
 
 # <case_id>.pt delta files written by rt.deltas for this pool (fp32 ROME, layer 12, o_new target).
-deltas: deltas/r1qwen32b/ROME/new
+deltas: deltas/r1qwen32b/ROME/cf
 expect_target: o_new          # each delta's `target` must equal the case's o_new
 
 # Study-1 rows with chains (fields case_id, budget, probe, decode, q, cot, answer).  Local copy

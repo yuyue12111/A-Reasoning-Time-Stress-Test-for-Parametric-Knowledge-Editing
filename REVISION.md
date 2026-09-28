@@ -73,7 +73,7 @@ delta 文件：`{"format":"rt-delta-v1","case_id","model_tag","editor","target",
 行 schema：`case_id, model_tag, editor, target_tag, budget, probe, condition, arm, alpha, decode, seed,
 temperature, q, cot, answer, chain_end∈{think_end,eos,cap,given}, n_chain_tokens, n_answer_tokens, delta_sha`；
 每个分片首行 `_meta` 头（git、代码哈希、配置、环境）。
-**G0 引擎一致性门**：在 Study 1 的 32B 池（200 条）上用 v2 重跑 ROME N 臂 B0/B3：降幅落在 Study 1 的 CI 内、
+**G0 引擎一致性门**：在 Study 1 的 32B 池（200 条）上用 v2 重跑 ROME N 臂 B0/B3（`WHYAAAI_NO_BOS=1`，与 Study 1 的 32B 同设置）：降幅落在 Study 1 的 CI 内、
 B0 逐 case 一致率 ≥85%（Study 1 自身重跑一致率 85–100%）。不过门不跑 Study 2。v2 数字与旧 HF 数字永不混在同一对比。
 
 ## 5 保留的防雷规则
@@ -82,6 +82,7 @@ B0 逐 case 一致率 ≥85%（Study 1 自身重跑一致率 85–100%）。不�
 - `source/` 只读，改动进 `src/vendor_patches/`。AlphaEdit 的 `cache_c` 每条 case 必须重置。
 - 长任务 ≤2h 粒度、jsonl 追加、按 case_id 续跑；新环境跑通立即 `pip freeze`。
 - 新模型首跑先肉眼看几条生成是人话。
+- BOS：Study 1 的 Qwen 7/14/32B 为无 BOS（6/25 修复前）、1.5B/Llama 为有 BOS；Study 2 全部用有 BOS（规范格式），G0 与机制探针复用 Study 1 链时用无 BOS 对齐。
 
 ## 6 预算与排期（~200 H200 卡时）
 | 项 | 估计卡时 |
