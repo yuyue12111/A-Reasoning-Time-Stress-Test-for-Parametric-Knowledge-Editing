@@ -1,0 +1,109 @@
+# Study 2 main run, R1-Distill-Qwen-32B (REVISION.md §3).  Pool: this model's frozen manifest from
+# `rt.pool qualify` (400 cases).  Stage 1 generates everything that does not read another condition's
+# chains; stage 2 (GIVEN conditions) reads rome_N's B3 chains from all eight stage-1 shards, so start
+# it only after every stage-1 rank has finished (it refuses to start while chains are missing).
+#
+# Conditions that change the chain repeat B0 so each shard is scoreable on its own by metrics.score
+# (RR needs B0 in the same file).  Their B0 rows are the rome_N B0 computation again: the arm bias
+# acts only in the chain phase and B0 has none.
+model_tag: r1qwen32b
+template: r1
+model:
+  path: null                  # null -> $WHYAAAI_MODEL
+  dtype: bfloat16
+  device_map: null
+module_tmp: "model.layers.{}.mlp.down_proj"
+out_dir: results/rt/s2
+run_tag: s2
+
+dataset:
+  path: data/counterfact.jsonl
+  manifest: experiments/rt/pools/study2/manifest_r1qwen32b.jsonl
+
+aliases: data/aliases.json
+probes: [efficacy, para0, locality]
+decoding: {greedy: true}
+
+arms:
+  penalty: 8                  # logit penalty on the arm's first-token ids, chain phase only
+  bias_probes: [efficacy]
+  placebo_map: data/placebo_donors.json            # P: frequency/length-matched unrelated word (blind)
+  competitor_map: data/placebo_donors_strong.json  # C: same-relation strong competitor (blind)
+
+engine:
+  batch_size: 32
+  max_batch_tokens: 128000
+  answer_cap: 256
+  chunk_cases: 10
+
+conditions:
+  # ---- stage 1 -------------------------------------------------------------------------------
+  - name: base                # unedited model: retention contrast, native-answer baseline
+    editor: none
+    budgets: [B0, B3]
+  - name: rome_N
+    editor: ROME
+    target_tag: cf
+    deltas_dir: deltas/r1qwen32b/ROME/cf
+    budgets: [B0, B3]
+  - {name: rome_T, editor: ROME, target_tag: cf, deltas_dir: deltas/r1qwen32b/ROME/cf, arm: T,
+     budgets: [B0, B3], probes: [efficacy]}
+  - {name: rome_D, editor: ROME, target_tag: cf, deltas_dir: deltas/r1qwen32b/ROME/cf, arm: D,
+     budgets: [B0, B3], probes: [efficacy]}
+  - {name: rome_P, editor: ROME, target_tag: cf, deltas_dir: deltas/r1qwen32b/ROME/cf, arm: P,
+     budgets: [B0, B3], probes: [efficacy]}
+  - {name: rome_C, editor: ROME, target_tag: cf, deltas_dir: deltas/r1qwen32b/ROME/cf, arm: C,
+     budgets: [B0, B3], probes: [efficacy]}
+  - {name: rome_B0P, editor: ROME, target_tag: cf, deltas_dir: deltas/r1qwen32b/ROME/cf,
+     budgets: [B0, B0P], probes: [efficacy]}
+  - {name: rome_B1, editor: ROME, target_tag: cf, deltas_dir: deltas/r1qwen32b/ROME/cf,
+     budgets: [B0, B1], probes: [efficacy]}
+  - {name: rome_a0.5, editor: ROME, target_tag: cf, deltas_dir: deltas/r1qwen32b/ROME/cf, alpha: 0.5,
+     budgets: [B0, B3], probes: [efficacy]}
+  - {name: rome_a2, editor: ROME, target_tag: cf, deltas_dir: deltas/r1qwen32b/ROME/cf, alpha: 2.0,
+     budgets: [B0, B3], probes: [efficacy]}
+  - {name: rome_a3, editor: ROME, target_tag: cf, deltas_dir: deltas/r1qwen32b/ROME/cf, alpha: 3.0,
+     budgets: [B0, B3], probes: [efficacy]}
+  - name: rome_samp           # reliability: 4 sampled chains per case (B0 samples give the noise floor)
+    editor: ROME
+    target_tag: cf
+    deltas_dir: deltas/r1qwen32b/ROME/cf
+    budgets: [B0, B3]
+    probes: [efficacy]
+    decoding: {greedy: false, sampling: {temperature: 0.6, seeds: [0, 1, 2, 3]}}
+  - name: ike                 # in-context editing, no weight change
+    editor: IKE
+    user_prefix_template: "Fact: {prompt} {o_new}.\n"
+    budgets: [B0, B3]
+  - {name: memit_N, editor: MEMIT, target_tag: cf, deltas_dir: deltas/r1qwen32b/MEMIT/cf, budgets: [B0, B3]}
+  - {name: alphaedit_N, editor: AlphaEdit, target_tag: cf, deltas_dir: deltas/r1qwen32b/AlphaEdit/cf,
+     budgets: [B0, B3]}
+
+  # ---- stage 2: answer phase on a supplied chain (reads rome_N's greedy B3 efficacy chains) ---
+  - name: rome_own            # re-feeding the model's own chain: re-tokenization control
+    stage: 2
+    editor: ROME
+    target_tag: cf
+    deltas_dir: deltas/r1qwen32b/ROME/cf
+    budgets: [B0, GIVEN]
+    probes: [efficacy]
+    given_chain: {source: "results/rt/s2/r1qwen32b_s2_rome_N_r*of8.jsonl", condition: rome_N,
+                  budget: B3, probe: same, transform: own}
+  - name: rome_filler         # length-matched content-free chain (" ." x n tokens)
+    stage: 2
+    editor: ROME
+    target_tag: cf
+    deltas_dir: deltas/r1qwen32b/ROME/cf
+    budgets: [B0, GIVEN]
+    probes: [efficacy]
+    given_chain: {source: "results/rt/s2/r1qwen32b_s2_rome_N_r*of8.jsonl", condition: rome_N,
+                  budget: B3, probe: same, transform: filler, filler_unit: " ."}
+  - name: rome_swap           # another case's chain of nearest token length (seeded derangement)
+    stage: 2
+    editor: ROME
+    target_tag: cf
+    deltas_dir: deltas/r1qwen32b/ROME/cf
+    budgets: [B0, GIVEN]
+    probes: [efficacy]
+    given_chain: {source: "results/rt/s2/r1qwen32b_s2_rome_N_r*of8.jsonl", condition: rome_N,
+                  budget: B3, probe: same, transform: swap, seed: 2027}

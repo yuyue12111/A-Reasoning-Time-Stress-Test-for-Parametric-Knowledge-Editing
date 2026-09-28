@@ -1,0 +1,38 @@
+# Study-2 fresh pool (REVISION.md §3): exclude every historically used case_id, shuffle with seed
+# 2027, take 1600 candidates, screen each model's unedited base at B0, keep the first 400 that pass.
+# `build` must run where the complete history lives (the platform's results/); commit
+# experiments/rt/pools/study2/ afterwards, since the screens verify the candidates file by sha256.
+counterfact: data/counterfact.jsonl
+aliases: data/aliases.json
+seed: 2027
+n_candidates: 1600
+k: 400
+pool_dir: experiments/rt/pools/study2      # candidates, manifests, decisions, summaries (tracked)
+screen_dir: results/rt/pool                # screen shards (gitignored)
+
+used_sources:                              # every jsonl row's case_id counts as used
+  - "results/**/*.jsonl"                   # all AAAI-era runs on the platform
+  - "results 2/**/*.jsonl"                 # local mirror of the same runs, when present
+  - "data/reverted_*.jsonl"
+  - "data/x1_replay_manifest.jsonl"
+  - "data/sj_sample.jsonl"
+  - "data/sample_records.jsonl"
+  - "experiments/rt/pools/study1_*.jsonl"
+used_exclude:
+  - "results/rt/**/*.jsonl"                # engine-v2 outputs (this screen, Study 2) are not history
+
+engine:
+  batch_size: 64
+  max_batch_tokens: 128000
+  answer_cap: 256
+  chunk_cases: 200
+
+models:                                    # model path from $WHYAAAI_MODEL at screen time
+  r1qwen1_5b: {template: r1}
+  r1qwen7b: {template: r1}
+  r1qwen14b: {template: r1}
+  r1qwen32b: {template: r1}
+  r1llama8b: {template: r1}
+  r1llama70b: {template: r1, model: {device_map: auto}}
+  qwq32b: {template: qwq}
+  qwen25_32b_instruct: {template: instruct_cot}
