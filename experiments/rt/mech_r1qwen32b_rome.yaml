@@ -1,0 +1,43 @@
+# Mechanism probes (rt.mech) on the Study-1 R1-Distill-Qwen-32B ROME pool (cf200, greedy B3).
+# What each probe tests and the pre-declared readouts: experiments/rt/README_mech.md.
+# Run from the project root on one H200 (32B bf16 = 64 GB of weights; forward passes only):
+#   PYTHONPATH=src python -m rt.mech run --config experiments/rt/mech_r1qwen32b_rome.yaml \
+#       --model $W/models/DeepSeek-R1-Distill-Qwen-32B
+# Relative paths resolve against the working directory.
+
+model: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B   # platform: pass the local path with --model
+model_tag: r1qwen32b          # must equal the delta records' model_tag
+editor: ROME
+target_tag: new
+dtype: bfloat16               # fp32 cross-check: --dtype float32 on 2×H200 (see README)
+device_map: auto
+
+# <case_id>.pt delta files written by rt.deltas for this pool (fp32 ROME, layer 12, o_new target).
+deltas: deltas/r1qwen32b/ROME/new
+expect_target: o_new          # each delta's `target` must equal the case's o_new
+
+# Study-1 rows with chains (fields case_id, budget, probe, decode, q, cot, answer).  Local copy
+# lives under "results 2/probe/"; override with --rows if the platform keeps them elsewhere.
+rows: "results 2/probe/r1qwen32b_ROME_cf200_r*of8.jsonl"
+probe: efficacy
+decode: greedy
+budgets: [B3]
+
+cases: [data/counterfact.jsonl, data/counterfact.prefiltered.jsonl]   # missing files are skipped; first hit wins
+aliases: data/aliases.json
+routes: results/p0_corrected_taxonomy.json    # optional route-census label per case (row field `route`)
+route_cells: ["32b"]                           # a3 census cell of this pool's greedy B3 chains
+
+# The Study-1 Qwen chains were generated without BOS (runs predate the 6/25 BOS fix; the X1 replay
+# protocol records NO_BOS for the 32B headline), so the teacher-forced context omits it as well.
+bos: false
+
+probes: [trace, gate]
+masks: [none, all, question_only, chain_and_answer_only, answer_only, question_and_answer]
+with_answer: true             # trace also covers the generated answer
+trace_edit: true              # trace the edited model (identical to unedited for one-layer ROME)
+alpha: 1.0
+low: 0.5                      # activation threshold for "low" (a < 0.5) in readout (i)
+gate_batch: null              # masks per forward pass; null = all six in one batch
+
+out: results/rt/mech/r1qwen32b_ROME_cf200_B3_r{rank}of{world}.jsonl
