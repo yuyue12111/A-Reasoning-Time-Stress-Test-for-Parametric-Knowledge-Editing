@@ -93,7 +93,8 @@ B0 逐 case 一致率 ≥85%（Study 1 自身重跑一致率 85–100%）。不�
 | 余量 | ~100 |
 
 D1–2 引擎与分析代码 + 测试；D3 平台上 G0 + 选池 + 冻结预注册；D4–7 Study 2；D5–8 判官/人工标注/机制；
-D8 过门决策；D8–13 成文；10/12 提交。写作从 D1 并行开始。
+D8 过门决策；D8–13 成文；10/12 提交。
+**先证据、后成文（用户决定，2026-09-29）**：全文重写在证据打磨到位之后才开始。没有这些证据支撑，重写也救不了；写作只是把证据讲清楚。此前只维护 `paperwriting/revision/outline.md`（主张层级与审稿意见的逐条对应），不动正文。
 
 ## 7 写作原则
 主张先行，读者读完摘要能复述；每个设计决定一句"为什么"；限定条件集中进 Limitations（ACL 格式强制、不占页）；
@@ -115,4 +116,4 @@ Superficial Editing。定位句：前人证明编辑不向外传播；我们证�
   平台运行单 `experiments/rt/RUNSHEET.md`；Study 2 配置八个模型齐全（生成 `study2_*.yaml`、增量 `deltas_s2_*.yaml`）。
   人工标注包（练习 20 + Study 1 验证 200）已生成于 `results/annot/`（答案键仅在本地）。
   **下一步（平台）**：G0 → 选池筛选 → 冻结 `prereg-arr.md` → Study 2 增量与生成 → 判官与人工标注。
-  **下一步（本地）**：`src/rt/study2.py`（H1–H3 与次要假设的分析 CLI）；按 `paperwriting/revision/outline.md` 重写全文（ACL 模板）。
+  **下一步（本地）**：`src/rt/study2.py`（H1–H3 与次要假设的分析 CLI）；证据到位后按 `paperwriting/revision/outline.md` 重写全文（ACL 模板，见 §6）。
