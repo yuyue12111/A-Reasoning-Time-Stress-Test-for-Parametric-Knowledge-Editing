@@ -73,8 +73,22 @@ delta 文件：`{"format":"rt-delta-v1","case_id","model_tag","editor","target",
 行 schema：`case_id, model_tag, editor, target_tag, budget, probe, condition, arm, alpha, decode, seed,
 temperature, q, cot, answer, chain_end∈{think_end,eos,cap,given}, n_chain_tokens, n_answer_tokens, delta_sha`；
 每个分片首行 `_meta` 头（git、代码哈希、配置、环境）。
-**G0 引擎一致性门**：在 Study 1 的 32B 池（200 条）上用 v2 重跑 ROME N 臂 B0/B3（`WHYAAAI_NO_BOS=1`，与 Study 1 的 32B 同设置）：降幅落在 Study 1 的 CI 内、
-B0 逐 case 一致率 ≥85%（Study 1 自身重跑一致率 85–100%）。不过门不跑 Study 2。v2 数字与旧 HF 数字永不混在同一对比。
+**G0 引擎一致性门**：在 Study 1 的 32B 池（200 条）上用 v2 重跑 ROME N 臂 B0/B3（无 BOS，与 Study 1 的 N 臂同设置）。
+准则 0：完整——Study 1 有配对的 198 条在 v2 里全部有 B0 和 B3（`rt.g0` 不再只在共有子集上判）；
+准则 1：v2 降幅落在 Study 1 预先固定的 CI [.030, .182] 内（全部 198 条算的，不在子集上重算）；
+准则 2：B0 逐 case ES 一致率 ≥85%。更正：85% 这个数其实是 BOS 翻转造成的一致率（N 与 D/P/C 之间 170/200），
+不是重跑噪声；Study 1 的真重跑一致率是 100%。v2 相对 Study 1 同时换了 bf16 生成和严格 fp32 编辑
+（Study 1 很可能跑在 TF32 下），引擎正确也可能过不了准则 2。v2 数字与旧 HF 数字永不混在同一对比。
+base 的 B0 对比不能诊断引擎：Study 1 的 32B base 很可能加了 BOS，v2 的 base 没加。
+**G0 分支（2026-09-29 在读判定之前提交）**。机制正确性已另行证实（批内每行只注入自己的编辑、hook 与直接改权重等价、
+逐 case 按位还原：tiny 模型 + 真实 1.5B），G0 剩下的作用是把 Study 1 和 Study 2 接起来：
+- 全过 → 冻结预注册，开跑 Study 2。
+- 准则 0 不过 → 这是完整性问题，不是引擎结论：用更小的批补跑缺的 case，再判。
+- 准则 1 过、准则 2 不过 → 用 fp32 生成跑 40 条诊断（同时带有/无 BOS 的 base）。一致率 ≥95%：差异来自 bf16 数值，
+  照常跑 Study 2，两项一致率都报告。<95%：在同一台 4090 上用旧 HF 引擎跑同样 40 条，逐条对比新旧引擎，
+  查清之后再决定。
+- 降幅 < .030 → 停下，用 fp32 子集诊断。fp32 也没有缺口 → Study 1 的效应经不起重新生成，不赶 10/12。
+- 降幅 > .182 → 先查长链 OOM 造成的选择性缺行并补跑；数据完整后仍 > .182 → 按准则 2 的 fp32 诊断处理。
 
 ## 5 保留的防雷规则
 - 编辑调用 `sequential_edit=True`，`finally: restore` 不许删（见 CLAUDE.md 防雷清单）。
