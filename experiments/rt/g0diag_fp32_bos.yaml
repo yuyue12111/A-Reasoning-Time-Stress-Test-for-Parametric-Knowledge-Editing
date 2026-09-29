@@ -1,0 +1,42 @@
+# G0 diagnostic (REVISION.md §4 G0 branches; review 2026-09-29): the first 40 Study-1 32B cases at B0,
+# generated in fp32 (Study 1 generated in fp32; v2's G0 run is bf16), with BOS.
+# Two questions, one run each for BOS off and on:
+#   * rome_N vs Study 1's N arm (no BOS) and its D/P/C arms (BOS): how much of the B0 disagreement is
+#     bf16 numerics, and which BOS setting reproduces each Study-1 arm group byte for byte;
+#   * base vs Study 1's unedited base: did Study 1's base run with BOS?  (It sets the retention
+#     contrast pairing, REVISION.md §2.)
+# Launch with --limit 40 --rank 0 --world 1 (Study-1 manifest order).  Never mixed into G0 or Study 2.
+model_tag: r1qwen32b
+template: r1
+no_bos: false
+model:
+  path: null                  # null -> $WHYAAAI_MODEL
+  dtype: float32
+  device_map: null            # --device auto: one process over the visible cards
+module_tmp: "model.layers.{}.mlp.down_proj"
+out_dir: results/rt/g0diag
+run_tag: g0diag_bos
+
+dataset:
+  path: data/counterfact.jsonl
+  manifest: experiments/rt/pools/study1_cf200.jsonl
+
+aliases: data/aliases.json
+probes: [efficacy]
+decoding: {greedy: true}
+
+engine:
+  batch_size: 16
+  max_batch_tokens: 48000
+  answer_cap: 256
+  chunk_cases: 10
+
+conditions:
+  - name: base
+    editor: none
+    budgets: [B0]
+  - name: rome_N
+    editor: ROME
+    target_tag: cf
+    deltas_dir: deltas/r1qwen32b/ROME/cf
+    budgets: [B0]

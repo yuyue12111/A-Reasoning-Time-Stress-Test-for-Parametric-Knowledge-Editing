@@ -102,10 +102,29 @@ def test_qualification_rules():
     assert by["q9"]["qualified"] and not by["q9"]["in_manifest"]
     assert by["q5"]["subject_contains_old"] is False and by["q4"]["old_hit"] is True
     assert counts["n_qualified"] == 3 and counts["n_manifest"] == 2 and counts["complete"]
-    assert counts["excluded_primary"] == {"missing_screen": 1, "subject_contains_old": 2, "old_miss": 2,
-                                          "new_hit": 1}
+    assert counts["excluded_primary"] == {"missing_screen": 1, "used_fact": 0, "subject_contains_old": 2,
+                                          "old_miss": 2, "new_hit": 1}
     assert counts["excluded_any"]["old_miss"] == 2 and counts["excluded_any"]["new_hit"] == 2
     assert by["q6"]["old_hit"] is True and by["q2"]["old_hit"] is False
+
+
+def test_used_facts_and_unknown_group():
+    """Review 2026-09-29: a fact used under another id is excluded; H2b takes old-miss-only cases."""
+    cands = [
+        _case("u1", "Oseberg ship", "Norway", "Italy"),            # qualifies but its fact was used
+        _case("u2", "Bergen", "Norway", "Italy"),                  # names new value: neither group
+        _case("u3", "Voss", "Norway", "Italy"),                    # names neither value -> unknown
+        _case("u4", "Norway House", "Norway", "Italy"),            # subject contains old: neither
+        _case("u5", "Alta", "Norway", "Italy"),                    # qualifies
+        _case("u6", "Moss", "Norway", "Italy"),                    # names neither -> unknown, beyond k
+    ]
+    answers = {"u1": "Norway.", "u2": "Italy.", "u3": "Sweden.", "u4": "Canada.", "u5": "Norway.",
+               "u6": "Denmark."}
+    manifest, dec, counts = P.qualify(cands, answers, {}, k=5, used_facts=["u1"], unknown_k=1)
+    by = {d["case_id"]: d for d in dec}
+    assert manifest == ["u5"] and by["u1"]["reason"] == "used_fact"
+    assert counts["unknown_manifest"] == ["u3"] and counts["n_unknown_group"] == 2
+    assert [c for c in by if by[c]["unknown_group"]] == ["u3", "u6"]
 
 
 def test_subject_scrub_before_matching():

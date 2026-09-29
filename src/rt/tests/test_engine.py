@@ -399,3 +399,50 @@ def test_instruct_cot_template():
         Request({}, q, "B1", chain_bias={tok.eos_token_id: 1e9}),
         Request({}, q, "B1", chain_bias={im_end: -1e9, tok.eos_token_id: -1e9})])
     assert [e["chain_end"] for e in ends] == ["think_end", "eos", "cap"]
+
+
+def test_checkpoint_generation_config_does_not_leak_into_decoding():
+    """M1 (review 2026-09-29): a checkpoint's repetition_penalty / top_k must not act on engine calls."""
+    model, tok = _setup()
+    reqs = lambda: [Request({}, q, "B1") for q in QS[:3]] + \
+        [Request({}, q, "B1", decode="sample", seed=5, temperature=1.0) for q in QS[:3]]
+    kw = dict(answer_cap=12, caps={"B1": 12})
+    clean = Engine(model, tok, **kw).run(reqs())
+    model2, _ = _setup()
+    model2.generation_config.repetition_penalty = 5.0
+    model2.generation_config.top_k = 2
+    model2.generation_config.top_p = 0.3
+    eng = Engine(model2, tok, **kw)
+    dirty = eng.run(reqs())
+    assert [_fields(x) for x in clean] == [_fields(x) for x in dirty]
+    assert eng.generation_config_original.get("repetition_penalty") == 5.0
+    assert model2.generation_config.repetition_penalty in (None, 1.0)   # transformers 5: unset = None
+
+
+def test_sampling_rows_record_top_p_and_top_k():
+    from rt.engine import DEFAULT_TOP_K, DEFAULT_TOP_P
+    model, tok = _setup()
+    o = Engine(model, tok, answer_cap=4).run([Request({}, "q", "B0", decode="sample", seed=1)])[0]
+    assert (o["top_p"], o["top_k"]) == (DEFAULT_TOP_P, DEFAULT_TOP_K) == (0.95, 50)
+    g = Engine(model, tok, answer_cap=4).run([Request({}, "q", "B0")])[0]
+    assert "top_p" not in g and "top_k" not in g
+
+
+def test_tokenizer_round_trip_check():
+    from rt.run import check_tokenizer_round_trip
+    check_tokenizer_round_trip(tiny_tokenizer())
+
+    class SpaceEater:                      # what the broken R1-Llama Metaspace tokenizer does
+        def __init__(self, tok):
+            self.tok = tok
+
+        def __call__(self, text, add_special_tokens=False):
+            return self.tok(text.replace(" ", ""), add_special_tokens=add_special_tokens)
+
+        def decode(self, ids, **kw):
+            return self.tok.decode(ids, **kw)
+    try:
+        check_tokenizer_round_trip(SpaceEater(tiny_tokenizer()))
+    except RuntimeError:
+        return
+    raise AssertionError("a tokenizer that deletes spaces must fail the round trip")

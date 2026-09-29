@@ -1,0 +1,38 @@
+# Study 2, H2b prior-knowledge contrast (prereg-arr.md §5), R1-Distill-Qwen-32B.  The unknown group:
+# base names neither value at B0.  H2b compares its ES drop with the main pool's (known group) rome_N
+# drop.  Same template, BOS, engine and decoding as study2_r1qwen32b.yaml; 8 x 4090-48G layout:
+# 4 processes x 2 cards (--world 4 --device auto).
+model_tag: r1qwen32b
+template: r1
+no_bos: true
+model:
+  path: null
+  dtype: bfloat16
+  device_map: null
+module_tmp: "model.layers.{}.mlp.down_proj"
+out_dir: results/rt/s2
+run_tag: s2h2b
+
+dataset:
+  path: data/counterfact.jsonl
+  manifest: experiments/rt/pools/study2/manifest_r1qwen32b_unknown.jsonl
+
+aliases: data/aliases.json
+probes: [efficacy]
+decoding: {greedy: true}
+
+engine:
+  batch_size: 32
+  max_batch_tokens: 128000
+  answer_cap: 256
+  chunk_cases: 10
+
+conditions:
+  - name: base
+    editor: none
+    budgets: [B0, B3]
+  - name: rome_N
+    editor: ROME
+    target_tag: cf
+    deltas_dir: deltas/r1qwen32b/ROME/cf
+    budgets: [B0, B3]

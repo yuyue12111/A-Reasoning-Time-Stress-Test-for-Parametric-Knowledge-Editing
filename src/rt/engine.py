@@ -62,6 +62,11 @@ BUDGETS = ("B0", "B0P", "B1", "B2", "B3", "GIVEN")
 CHAIN_BUDGETS = ("B1", "B2", "B3")
 ANSWER_CAP = 256
 DEFAULT_TEMPERATURE = 0.6
+# Sampling settings Study 1 actually ran with: think_budget._gen passed only temperature, so top_p came
+# from the R1 checkpoints' generation_config (0.95) and top_k from transformers' default (50).  The
+# engine now passes all three explicitly (neutral_generation_config) and records them per row.
+DEFAULT_TOP_P = 0.95
+DEFAULT_TOP_K = 50
 
 IM_START, IM_END = "<|im_start|>", "<|im_end|>"
 QWQ_CHAIN = IM_START + "user\n{q}" + IM_END + "\n" + IM_START + "assistant\n<think>\n"
@@ -261,6 +266,8 @@ class Request:
     decode: str = "greedy"
     seed: int = None
     temperature: float = None
+    top_p: float = None
+    top_k: int = None
 
     def check(self):
         if self.budget not in BUDGETS:
@@ -268,12 +275,14 @@ class Request:
         if self.decode not in ("greedy", "sample"):
             raise ValueError(f"decode {self.decode!r} must be greedy or sample")
         if self.decode == "greedy":
-            self.seed = self.temperature = None
+            self.seed = self.temperature = self.top_p = self.top_k = None
         else:
             if self.seed is None:
                 raise ValueError("sampling needs an integer seed")
             self.seed = int(self.seed)
             self.temperature = float(DEFAULT_TEMPERATURE if self.temperature is None else self.temperature)
+            self.top_p = float(DEFAULT_TOP_P if self.top_p is None else self.top_p)
+            self.top_k = int(DEFAULT_TOP_K if self.top_k is None else self.top_k)
         if self.budget == "GIVEN" and not isinstance(self.given_chain, str):
             raise ValueError("budget GIVEN needs given_chain (str)")
         self.alpha = float(self.alpha)
@@ -321,6 +330,23 @@ def _split(gen, close, eos):
     return gen, "cap"
 
 
+def neutral_generation_config(model):
+    """Replace the checkpoint's generation_config with transformers' defaults; returns the original.
+
+    ``generate`` applies a checkpoint's generation_config to every call, so Qwen2.5-32B-Instruct's
+    repetition_penalty 1.05 would act under greedy decoding (penalising o_new/o_old in B3 answers
+    after the chain named them) and sampling would inherit top_p/top_k without a record (review
+    2026-09-29, M1).  The engine passes every decoding parameter explicitly instead; the original
+    is kept on the model for provenance.
+    """
+    from transformers import GenerationConfig
+    if getattr(model, "_rt_generation_config_original", None) is None:
+        gc = getattr(model, "generation_config", None)
+        model._rt_generation_config_original = gc.to_diff_dict() if gc is not None else {}
+    model.generation_config = GenerationConfig()
+    return model._rt_generation_config_original
+
+
 class Engine:
     """Runs a list of ``Request``s in length-sorted batches and returns results in request order.
 
@@ -345,6 +371,7 @@ class Engine:
         self.pad_id = int(pad) if pad is not None else self.template.eos[0]
         self.batch_log = []
         self._next_batch = 0
+        self.generation_config_original = neutral_generation_config(model)
 
     def ntok(self, text):
         """Token count without BOS (legacy ``think_budget._ntok``)."""
@@ -391,7 +418,7 @@ class Engine:
         kw = dict(max_new_tokens=max_new, pad_token_id=self.pad_id, eos_token_id=list(stops),
                   do_sample=r0.decode == "sample")
         if r0.decode == "sample":
-            kw["temperature"] = r0.temperature
+            kw.update(temperature=r0.temperature, top_p=r0.top_p, top_k=r0.top_k)
             torch.manual_seed(r0.seed)
         proc = None
         if biases is not None and any(biases):
@@ -407,6 +434,7 @@ class Engine:
         self.batch_log.append({"batch_id": bid, "phase": phase, "n": n, "max_prompt": L,
                                "max_new": max_new, "gen_len": len(gen[0]) if gen else 0,
                                "decode": r0.decode, "seed": r0.seed, "temperature": r0.temperature,
+                               "top_p": r0.top_p, "top_k": r0.top_k,
                                "seconds": round(time.time() - t0, 3)})
         return bid, gen, (proc.steps if proc is not None else None)
 
@@ -441,7 +469,8 @@ class Engine:
         ctx = self.bank if self.bank is not None else contextlib.nullcontext()
         with ctx:
             idx = [i for i, r in enumerate(reqs) if r.budget in CHAIN_BUDGETS]
-            for grp in self._groups(reqs, idx, lambda r: (self.caps[r.budget], r.decode, r.seed, r.temperature)):
+            for grp in self._groups(reqs, idx, lambda r: (self.caps[r.budget], r.decode, r.seed, r.temperature,
+                                                               r.top_p, r.top_k)):
                 cap = self.caps[reqs[grp[0]].budget]
                 items = [(i, T.encode(T.chain(reqs[i].user_prefix + reqs[i].q))) for i in grp]
                 for batch in self._batches(items, cap):
@@ -471,7 +500,7 @@ class Engine:
                     chain[i] = {"cot": cot, "chain_end": None, "n_chain_tokens": 0,
                                 "chain_batch_id": None, "bias_steps": None}
                 items.append((i, T.encode(text)))
-            for grp in self._groups(reqs, range(len(reqs)), lambda r: (r.decode, r.seed, r.temperature)):
+            for grp in self._groups(reqs, range(len(reqs)), lambda r: (r.decode, r.seed, r.temperature, r.top_p, r.top_k)):
                 gset = set(grp)
                 for batch in self._batches([it for it in items if it[0] in gset], self.answer_cap):
                     bid, gen, _ = self._generate(reqs, batch, self.answer_cap, T.answer_stop, "answer")
@@ -483,6 +512,8 @@ class Engine:
                                    temperature=r.temperature, template=T.name, **chain[i],
                                    answer=self.tok.decode(content, skip_special_tokens=True),
                                    n_answer_tokens=len(content), batch_id=bid)
+                        if r.decode == "sample":
+                            out.update(top_p=r.top_p, top_k=r.top_k)
                         if r.user_prefix:
                             out["user_prefix"] = r.user_prefix
                         res[i] = out

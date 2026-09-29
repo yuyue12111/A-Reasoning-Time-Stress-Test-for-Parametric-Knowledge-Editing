@@ -277,10 +277,15 @@ def _resolve_condition(cfg, c, cases):
     if arm not in ARMS:
         raise ValueError(f"{name}: arm {arm!r} not in {ARMS}")
     arms_cfg = cfg.get("arms") or {}
+    samp = (c.get("decoding", cfg.get("decoding")) or {}).get("sampling")
     r = {"name": name, "editor": editor, "target_tag": c.get("target_tag"), "budgets": budgets,
          "probes": probes, "decode": [list(a) for a in decode_arms(c.get("decoding", cfg.get("decoding")))],
          "arm": arm, "alpha": None, "deltas_dir": None, "user_prefix_template": c.get("user_prefix_template"),
          "stage": int(c.get("stage", 1))}
+    if samp:                          # explicit, recorded (engine.neutral_generation_config)
+        from rt.engine import DEFAULT_TOP_K, DEFAULT_TOP_P
+        r["sample_params"] = {"top_p": float(samp.get("top_p", DEFAULT_TOP_P)),
+                              "top_k": int(samp.get("top_k", DEFAULT_TOP_K))}
     if editor in DELTA_EDITORS:
         if not c.get("deltas_dir") or not c.get("target_tag"):
             raise ValueError(f"{name}: editor {editor} needs deltas_dir and target_tag")
@@ -430,7 +435,20 @@ def load_model(cfg, device=None):
         kw["attn_implementation"] = m["attn_implementation"]
     model = AutoModelForCausalLM.from_pretrained(path, **kw).eval()
     tok = fix_r1_tokenizer(AutoTokenizer.from_pretrained(path), path)
+    check_tokenizer_round_trip(tok)
     return model, tok
+
+
+ROUND_TRIP_TEXT = "The mother tongue of Danielle Darrieux is French, and 2 + 2 = 4."
+
+
+def check_tokenizer_round_trip(tok, text=ROUND_TRIP_TEXT):
+    """Encode-decode must return the text unchanged: catches the R1-Llama Metaspace tokenizer that
+    deletes spaces (review 2026-09-29, M4) and any other tokenizer that silently rewrites prompts."""
+    ids = tok(text, add_special_tokens=False)["input_ids"]
+    back = tok.decode(ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)
+    if back != text:
+        raise RuntimeError(f"tokenizer round trip changed the text: {text!r} -> {back!r}")
 
 
 def _model_info(cfg, model, tok, template):
@@ -445,7 +463,10 @@ def _model_info(cfg, model, tok, template):
             "requested": cfg.get("model"), "tokenizer_class": type(tok).__name__, "vocab": len(tok),
             "bos_token_id": tok.bos_token_id, "eos_token_id": tok.eos_token_id,
             "pad_token_id": tok.pad_token_id,
-            "generation_config_eos": getattr(gc, "eos_token_id", None), "template": template.describe()}
+            "generation_config_eos": getattr(gc, "eos_token_id", None), "template": template.describe(),
+            "generation_config_original": getattr(model, "_rt_generation_config_original", None)
+            or (gc.to_diff_dict() if gc is not None else None),
+            "generation_config_used": "transformers defaults; decoding parameters passed per call"}
 
 
 class _RowError(Exception):
@@ -592,7 +613,8 @@ def execute(plan, model, tok, log=print):
                                             alpha=r["alpha"] if r["alpha"] is not None else 1.0,
                                             chain_bias=pay["bias"] if biased else None, given_chain=gtext,
                                             user_prefix=pay["user_prefix"], decode=dec, seed=seed,
-                                            temperature=temp))
+                                            temperature=temp,
+                                            **(r["sample_params"] if dec == "sample" else {})))
                         metas.append((r, case, p, pay, biased, ginfo))
             ctx["deltas"].clear()
             outs, n_log = [], len(engine.batch_log)
@@ -621,6 +643,8 @@ def execute(plan, model, tok, log=print):
                        "n_chain_tokens": o["n_chain_tokens"], "n_answer_tokens": o["n_answer_tokens"],
                        "delta_sha": pay["delta_sha"], "batch_id": o["batch_id"],
                        "chain_batch_id": o["chain_batch_id"], "template": o["template"]}
+                if o["decode"] == "sample":
+                    row.update(top_p=o["top_p"], top_k=o["top_k"])
                 if pay["user_prefix"]:
                     row["user_prefix"] = pay["user_prefix"]
                 if pay["bias_info"]:

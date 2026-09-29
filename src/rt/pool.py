@@ -29,7 +29,7 @@ import re
 import metrics
 from rt.run import _abs, _rel, load_cases, read_ids, run_config, sha256_file, sha256_json
 
-REASONS = ("missing_screen", "subject_contains_old", "old_miss", "new_hit")
+REASONS = ("missing_screen", "used_fact", "subject_contains_old", "old_miss", "new_hit")
 
 
 def write_manifest(path, rows):
@@ -118,14 +118,21 @@ def subject_contains_old(case):
     return bool(metrics._wb(case["o_old"]).search((case.get("s") or "").lower()))
 
 
-def qualify(cands, answers, aliases, k):
+def qualify(cands, answers, aliases, k, used_facts=(), unknown_k=0):
     """Apply the screening rules in candidate order.
 
     ``cands``: case dicts in candidate order; ``answers``: case_id -> base B0 efficacy answer.
+    ``used_facts``: case ids whose fact was used under another id in an earlier run.
     Returns (manifest ids, per-case decisions, counts).  ``reason`` is the first failed rule in
     ``REASONS`` order; ``excluded_any`` counts every failed rule.
+
+    ``unknown_k`` > 0 also selects the H2b prior-knowledge contrast group (prereg-arr.md §5): the
+    first ``unknown_k`` candidates whose base B0 answer names neither value (and whose subject does
+    not contain the old value, and whose fact is unused).  They are returned in
+    ``counts["unknown_manifest"]``; no reasoning-time output is used.
     """
-    decisions, manifest = [], []
+    used_facts = set(used_facts)
+    decisions, manifest, unknown = [], [], []
     primary = {r: 0 for r in REASONS}
     anyc = {r: 0 for r in REASONS}
     for i, c in enumerate(cands):
@@ -138,7 +145,8 @@ def qualify(cands, answers, aliases, k):
             d.update(old_hit=bool(metrics.hit(ans, c["o_old"], aliases)),
                      new_hit=bool(metrics.hit(ans, c["o_new"], aliases)),
                      subject_contains_old=subject_contains_old(c))
-            failed = [r for r, bad in (("subject_contains_old", d["subject_contains_old"]),
+            failed = [r for r, bad in (("used_fact", cid in used_facts),
+                                       ("subject_contains_old", d["subject_contains_old"]),
                                        ("old_miss", not d["old_hit"]), ("new_hit", d["new_hit"])) if bad]
         for r in failed:
             anyc[r] += 1
@@ -149,10 +157,18 @@ def qualify(cands, answers, aliases, k):
         d["in_manifest"] = bool(not failed and len(manifest) < k)
         if d["in_manifest"]:
             manifest.append(cid)
+        if unknown_k:
+            d["unknown_group"] = failed == ["old_miss"]
+            d["in_unknown_manifest"] = bool(d["unknown_group"] and len(unknown) < unknown_k)
+            if d["in_unknown_manifest"]:
+                unknown.append(cid)
         decisions.append(d)
     counts = {"n_candidates": len(cands), "n_screened": sum(1 for c in cands if c["case_id"] in answers),
               "n_qualified": sum(d["qualified"] for d in decisions), "k": k, "n_manifest": len(manifest),
               "complete": len(manifest) == k, "excluded_primary": primary, "excluded_any": anyc}
+    if unknown_k:
+        counts.update(unknown_k=unknown_k, n_unknown_group=sum(d["unknown_group"] for d in decisions),
+                      unknown_manifest=unknown)
     return manifest, decisions, counts
 
 
@@ -242,9 +258,16 @@ def cmd_qualify(pcfg, tag, allow_missing=False):
         raise RuntimeError(f"{len(missing)} candidates have no screen row (e.g. {missing[:3]}); "
                            f"finish screening or pass --allow-missing")
     aliases = json.load(open(_abs(pcfg.get("aliases", "data/aliases.json"))))
-    k = int(((pcfg.get("models") or {}).get(tag) or {}).get("k", pcfg.get("k", 400)))   # per-model override (70B: 200)
-    manifest, decisions, counts = qualify(cands, answers, aliases, k)
+    k = int(((pcfg.get("models") or {}).get(tag) or {}).get("k", pcfg.get("k", 400)))   # per-model override
+    used_facts = sorted((pcfg.get("exclude_facts") or {}))
+    unknown_k = int((pcfg.get("h2b_unknown_k") or {}).get(tag, 0))
+    manifest, decisions, counts = qualify(cands, answers, aliases, k, used_facts, unknown_k)
     sha = write_manifest(p["manifest"], [{"case_id": c} for c in manifest])
+    unknown = counts.pop("unknown_manifest", None)
+    if unknown_k:
+        up = p["manifest"].replace(".jsonl", "_unknown.jsonl")
+        counts.update(unknown_manifest=_rel(up),
+                      unknown_manifest_sha256=write_manifest(up, [{"case_id": c} for c in unknown]))
     with open(p["decisions"], "w") as f:
         for d in decisions:
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
@@ -252,9 +275,11 @@ def cmd_qualify(pcfg, tag, allow_missing=False):
                    candidates=_rel(p["candidates"]), candidates_sha256=sha256_file(p["candidates"]),
                    screen_files=[_rel(f) for f in files], screen_config_sha256=headers[0]["config_sha256"],
                    screen_git=headers[0].get("git"), aliases_sha256=sha256_file(_abs(pcfg.get("aliases", "data/aliases.json"))),
+                   exclude_facts=pcfg.get("exclude_facts") or {},
                    rules="old_hit AND NOT new_hit on the subject-scrubbed base B0 efficacy answer "
-                         "(metrics.hit, aliases.json) AND subject does not contain o_old as a whole word; "
-                         "first k in candidate order")
+                         "(metrics.hit, aliases.json) AND subject does not contain o_old as a whole word "
+                         "AND the fact is not in exclude_facts; first k in candidate order.  H2b unknown "
+                         "group: NOT old_hit AND NOT new_hit, other rules as above, first h2b_unknown_k")
     with open(p["summary"], "w") as f:
         json.dump(summary, f, indent=1, ensure_ascii=False)
     print(f"[pool] {tag}: qualified {counts['n_qualified']}/{counts['n_candidates']}, manifest "
