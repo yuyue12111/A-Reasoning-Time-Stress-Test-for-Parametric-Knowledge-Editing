@@ -659,6 +659,8 @@ def run_config(cfg, rank=0, world=1, model=None, tok=None, config_path=None, onl
 
 
 def main(argv=None):
+    from rt.precision import strict_fp32
+    strict_fp32()                     # TF32 off: fp32 edits, sums and RoPE positions stay exact
     import yaml
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--config", required=True)

@@ -22,12 +22,17 @@ FORMAT = "rt-delta-v1"
 def factor_delta(delta, max_rank=8, tol=1e-4, seed=0):
     """Factor a weight difference ``delta`` (out, in) into float32 ``A`` (r, in), ``B`` (out, r).
 
+    The decomposition runs in ``delta``'s dtype when it is float32 or float64 (rt.deltas passes a
+    float64 CPU copy), otherwise in float32.
+
     The rank is the smallest r whose relative reconstruction error ||delta - B@A|| / ||delta||
     is at most ``tol``, capped at ``max_rank``.  The returned fit record keeps the leading
     singular values and the achieved error, so an update that is not low rank is reported
     (``ok`` false) instead of being silently truncated.
     """
-    d = delta.detach().float()
+    d = delta.detach()
+    if d.dtype not in (torch.float32, torch.float64):
+        d = d.float()
     norm = torch.linalg.norm(d)
     if float(norm) == 0.0:
         raise ValueError("delta is identically zero: the edit did not change this weight")
@@ -46,7 +51,7 @@ def factor_delta(delta, max_rank=8, tol=1e-4, seed=0):
     A, B, r, err = best
     fit = {"rank": r, "rel_err": err, "sigma": [float(x) for x in S.tolist()],
            "ok": err <= tol}
-    return A.contiguous(), B.contiguous(), fit
+    return A.float().contiguous(), B.float().contiguous(), fit
 
 
 def delta_sha(rec):

@@ -349,7 +349,10 @@ def factor_update(delta, w_edit_norm, cfg, weight_dtype=torch.float32):
     u = torch.finfo(weight_dtype).eps / 2
     floor = u * w_edit_norm / dn
     tol = max(float(cfg["tol"]), float(cfg["floor_mult"]) * floor)
-    A, B, fit = factor_delta(delta, max_rank=int(cfg["max_rank"]), tol=tol)
+    # The fit runs in float64 on CPU so that neither GPU precision settings (TF32) nor fp32
+    # rounding in the SVD and the reconstruction can inflate the residual it is judged by.
+    A, B, fit = factor_delta(delta.detach().to("cpu", torch.float64), max_rank=int(cfg["max_rank"]),
+                             tol=tol)
     fit.update(tol=tol, storage_floor=floor, delta_l2=dn)
     return A, B, fit
 
@@ -844,8 +847,8 @@ def cmd_precompute_stats(args):
         print("[stats] nothing to do (final or partial files exist)")
         return
     mine = [g for g in range(len(groups)) if g % args.world == args.rank]
-    torch.backends.cuda.matmul.allow_tf32 = False
-    torch.set_float32_matmul_precision("highest")
+    from rt.precision import require_strict_fp32
+    require_strict_fp32(f"cuda:{args.device}" if torch.cuda.is_available() else "cpu")
     from transformers import AutoModelForCausalLM
     from vendor_patches.easyedit_qwen2_loader import PatchedAutoTokenizer
     tok = PatchedAutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
@@ -920,6 +923,8 @@ def _verify_final(path, layer_name, plan, model_path, config):
 
 def cmd_alphaedit_p(args):
     from rt import mom2
+    from rt.precision import require_strict_fp32
+    require_strict_fp32(args.svd_device)
     models = load_models(_abs(args.models_file))
     spec = models["models"][args.model]
     s = editor_settings(models, args.model, "AlphaEdit")
@@ -992,6 +997,8 @@ def cmd_run(args):
         print(f"[dry] template={settings['template']} overrides={settings['overrides']}")
         print(f"[dry] first cases: {[c['case_id'] for c in mine[:5]]}")
         return
+    from rt.precision import require_strict_fp32
+    precision = require_strict_fp32(f"cuda:{args.device}" if torch.cuda.is_available() else "cpu")
     hp = build_hparams(settings, model_path, args.device, editor_name)
     facts = preflight(hp, editor_name, settings["family"], model_path)
     spec = RunSpec(model_tag=model_tag, editor=editor_name, target_tag=target_tag,
@@ -1005,7 +1012,7 @@ def cmd_run(args):
               "config_sha256": sha256_file(_abs(args.config)), "code_sha256": code_sha256(),
               "pool": pool_meta, "limit": args.limit, "targets_file": cfg.get("targets_file"),
               "model_path": model_path, "runtime_env": runtime_env(),
-              "software": software_provenance(), "preflight": facts,
+              "software": software_provenance(), "preflight": facts, "precision": precision,
               "actual_runtime": model_runtime(ed.model, ed.tok, hp)}
     if targets is not None:
         header["targets_sha256"] = sha256_file(_abs(cfg["targets_file"]))

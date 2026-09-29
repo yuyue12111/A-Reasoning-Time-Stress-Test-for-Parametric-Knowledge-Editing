@@ -1059,6 +1059,8 @@ def cmd_score(args):
 
 
 def main(argv=None):
+    from rt.precision import strict_fp32
+    strict_fp32()                     # TF32 off: fp32 edits, sums and RoPE positions stay exact
     ap = argparse.ArgumentParser(prog="rt.judge", description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
     for name, fn in (("run", cmd_run), ("show", cmd_show), ("selfcheck", cmd_selfcheck)):

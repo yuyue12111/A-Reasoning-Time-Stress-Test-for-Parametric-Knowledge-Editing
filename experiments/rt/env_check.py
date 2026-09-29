@@ -137,6 +137,12 @@ def _torch_cuda():
         info["devices"].append({"name": p.name, "mem_gb": round(p.total_memory / 1e9, 1),
                                 "capability": f"{p.major}.{p.minor}"})
     info["bf16_supported"] = torch.cuda.is_bf16_supported()
+    info["tf32_env"] = {k: os.environ.get(k) for k in ("NVIDIA_TF32_OVERRIDE", "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE")}
+    g = torch.Generator().manual_seed(0)
+    a = torch.randn(512, 512, generator=g, dtype=torch.float64)
+    ref = a @ a
+    got = (a.float().cuda() @ a.float().cuda()).double().cpu()
+    info["fp32_matmul_rel_err_image_default"] = float(torch.linalg.norm(got - ref) / torch.linalg.norm(ref))
     t = time.time()
     x = torch.randn(4096, 4096, device="cuda")
     y = (x @ x).float()
@@ -341,7 +347,11 @@ with EditBank(m, MODULE_TMP) as bank:
     bank.set_batch([e, None])
     out = m.generate(input_ids=ids, max_new_tokens=16, do_sample=False, pad_token_id=0)
     logits = m(input_ids=ids).logits
-print(json.dumps({"ok": bool(torch.isfinite(logits.float()).all()), "rows_differ": bool((out[0] != out[1]).any())}))
+from rt.precision import check_fp32_matmul, strict_fp32
+strict_fp32()
+chk = check_fp32_matmul("cuda")
+print(json.dumps({"ok": bool(torch.isfinite(logits.float()).all()) and chk["ok"],
+                  "rows_differ": bool((out[0] != out[1]).any()), "fp32_after_rt": chk}))
 """
 
 
@@ -419,7 +429,13 @@ def verdict(rep):
     if rep.get("tests") and rep["tests"].get("rc") != 0:
         block.append(f"CPU test suite failed: {rep['tests'].get('summary')}")
     if rep.get("gpu_smoke") and not rep["gpu_smoke"].get("ok"):
-        block.append("GPU smoke of the edit hooks failed")
+        chk = rep["gpu_smoke"].get("fp32_after_rt") or {}
+        block.append("GPU smoke failed" + (f": fp32 matmul still TF32-sized after importing rt "
+                                           f"(rel_err {chk.get('rel_err'):.1e})" if chk and not chk.get("ok") else ""))
+    e = t.get("fp32_matmul_rel_err_image_default")
+    if e is not None and e > 2e-5:
+        warn.append(f"image default runs fp32 matmuls as TF32 (rel_err {e:.1e}); rt entry points switch it off "
+                    "(src/rt/precision.py) -- any other fp32 GPU code must do the same")
     missing_pkgs = sorted({p["package"] for p in rep["packages"] if isinstance(p, dict) and not p.get("ok")
                            and p["module"] != "torch"} | set(ee.get("missing_packages") or []))
     pip = " ".join(f"{p}=={PINS[p]}" if p in PINS else p for p in missing_pkgs)

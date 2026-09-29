@@ -266,6 +266,8 @@ def cmd_qualify(pcfg, tag, allow_missing=False):
 
 
 def main(argv=None):
+    from rt.precision import strict_fp32
+    strict_fp32()                     # TF32 off: fp32 edits, sums and RoPE positions stay exact
     import yaml
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)

@@ -190,6 +190,8 @@ def _sha(path):
 
 
 def main(argv=None):
+    from rt.precision import strict_fp32
+    strict_fp32()                     # TF32 off: fp32 edits, sums and RoPE positions stay exact
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--model", required=True, help="model tag in --models-file")
     ap.add_argument("--models-file", default="experiments/rt/deltas_models.yaml")
