@@ -649,6 +649,18 @@ def given(st, ep):
     return out
 
 
+FORMAT = (("rome_B0P", "B0P"), ("rome_B1", "B1"))
+
+
+def format_budgets(st, ep):
+    """Secondary (32B): paired ES(B0) - ES(B0P) and ES(B0) - ES(B1): does a closed think span holding
+    a canned thought, or a 256-token chain, already cost the edit?  (Format vs content, with the
+    own/filler/swap chains.)"""
+    return {c: st.gate([((FOCUS, MAIN), [need((FOCUS, MAIN, c), "B0", b)])],
+                       lambda k, c=c, b=b: A.es_drop(st.table((FOCUS, MAIN, c), ep=ep, keep=k), "B0", b), ep)
+            for c, b in FORMAT}
+
+
 def repair_comparisons(st, ep):
     out = {}
     for hi, lo in REPAIR_PAIRS:
@@ -691,7 +703,8 @@ def analyse(st, ep):
                                   for t in RECIPES},
         "alpha_dose_32B": alpha_dose(st, ep),
         "sampling_reliability_32B": reliability(st, ep),
-        "given_chain_32B": given(st, ep)}
+        "given_chain_32B": given(st, ep),
+        "format_budgets_32B": format_budgets(st, ep)}
     b32, b70 = h1["r1qwen32b"], h1["r1llama70b"]
     ci_ok = {t: (b["status"] == "ok" and b.get("ci95") is not None and b["ci95"][0] > 0) for t, b in
              (("r1qwen32b", b32), ("r1llama70b", b70))}

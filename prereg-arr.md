@@ -107,8 +107,20 @@ Paired bootstrap over cases (10,000 resamples, seed 42), percentile 95% CI, two-
   retention contrast for Qwen2.5-32B-Instruct and QwQ-32B; ES at B0 and B3 as a function of α and the
   α needed for 80% ES at each budget; per-edit reliability under sampling (share of greedy-B0 successes
   that fail at B3 in at least one of seeds 0–2, against the same statistic on B0 samples as the noise
-  floor; seed 3 reported separately); ES after own chain vs filler
+  floor; seed 3 reported separately); ES(B0) − ES(B0P) and ES(B0) − ES(B1) at 32B (a closed span with
+  a canned thought; a 256-token chain); ES after own chain vs filler
   vs swapped chain; locality at B3.
+- **Analysis conventions** (implemented in `src/rt/study2.py`, frozen with this file). A case missing
+  or excluded (error row, fit error) counts against the 98% completeness rule. A Holm family keeps its
+  size when a member has no estimate; that member enters with p = 1. A hypothesis passes when it is
+  rejected (two-sided, after Holm where applicable) and its point estimate has the predicted sign. The
+  H2b groups are the screen-defined main pool and unknown group; the Study-2 base run's B0 agreement
+  with that definition is reported. Sampling reliability takes the greedy-B0 successes from rome_N.
+  Repair across checkpoints (different pools) uses a two-group bootstrap. The α needed for 80% ES is
+  the smallest grid α whose point estimate reaches .80, with linear interpolation, no CI. Locality:
+  the neighbour answer names o_old and does not name o_new (subject not scrubbed). Degenerate-output
+  filtering (secondary) drops a case if any row the estimate reads is flagged. Under the semantic
+  endpoint, "base answers old" is the judges' OLD label.
 - **Exploratory.** Edit-activation traces and positional gating (`src/rt/mech.py`); plausibility-target
   edits (`src/rt/targets.py`) if run.
 

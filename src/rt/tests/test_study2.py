@@ -228,6 +228,21 @@ def test_h3_signs_holm_and_direction():
         t.close()
 
 
+def test_format_budgets_b0p_and_b1():
+    t = Tree()
+    try:
+        ids = _ids("f", 40)
+        t.manifest("r1qwen32b", ids)
+        rows = ([row(c, "r1qwen32b", "rome_B0P", "B0", "new") for c in ids]
+                + [row(c, "r1qwen32b", "rome_B0P", "B0P", "new" if i < 30 else "old") for i, c in enumerate(ids)])
+        t.shard("r1qwen32b", "rome_B0P", rows)
+        r = S.format_budgets(t.study(), "lexical")
+        assert abs(r["rome_B0P"]["point"] - 0.25) < 1e-12 and r["rome_B0P"]["status"] == "ok"
+        assert r["rome_B1"]["status"] == "not_run"
+    finally:
+        t.close()
+
+
 # ------------------------------------------------------------------------------ reliability
 def test_sampling_reliability_on_seeds_0_2_and_seed_3_apart():
     t = Tree()
