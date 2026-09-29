@@ -326,6 +326,7 @@ def network():
 
 def wiki():
     cands = [os.environ.get("WHYAAAI_WIKI_PARQUET"), os.environ.get("WIKI_EN"),
+             "/inspire/dataset/Wikipedia/20231101/20231101.en",      # platform mount (2026-09-29, 41 parquet)
              "/inspire/dataset/wikipedia/20231101/20231101.en"]
     for c in cands:
         if c and os.path.isdir(c):
