@@ -20,34 +20,40 @@
 5. **机制**（视结果）：编辑在推理链里还"点火"吗（key-miss）？编辑越"合理"越稳吗（先验重申）？
 自然链中介仍不声称；干预是双 oracle 的诊断探针，不是部署防御。
 
-## 2 Study 1 已确定的结果（`src/rt/study1.py` → `paperwriting/revision/study1.{json,md}`；六格与 results.json 逐位一致）
+## 2 Study 1 已确定的结果（`src/rt/study1.py` → `paperwriting/revision/study1.{json,md}`；六格点估计与 results.json 逐位一致，1.5B/14B/8B 的 CI 在第三位小数上不同）
 | 量 | 结果 |
 |---|---|
 | Holm(6 格) ES 降幅 | 70B p=.0036（Holm .022），32B p=.0066（Holm .033）均过；其余四格不过 |
-| 留存对比（base@B0 答旧 ∧ 编辑@B0 成功） | 编辑丢失 − 原生丢失：14B +.195 [.069,.322]，32B +.216 [.091,.341]，70B +.234 [.117,.351] |
-| 名字泄题（主语名含旧值，46/200） | 32B RR .60 vs 其余 .156；排除后 ES 降幅 32B .118，70B .117 仍显著 |
+| 留存对比（base@B0 答旧 ∧ 编辑@B0 成功） | 编辑丢失 − 原生丢失：14B +.195 [.069,.322]，32B +.216 [.091,.341]，70B +.234 [.117,.351]。**待定（审查 9/29）**：Study 1 的 32B base 若加了 BOS，格式一致的配对是有 BOS 的编辑组（D/P/C 组）对有 BOS 的 base：+.151 [.032,.269]，丢失率之比 1.93×（原 2.27×）；由 fp32 诊断 Y 裁定，论文 32B 只写"约 2×" |
+| 名字泄题（主语名含旧值，46/200） | 32B RR .60（仅 10 条）vs 其余 .156；排除后 ES 降幅 32B .118，70B .117 未校正显著，Holm 后 p=.054 |
 | 逐模型资格（各自 base@B0 知道旧值） | 32B .125 [.033,.217]，70B .153 [.076,.229]；小模型在"知道"层内仍≈0 |
 | 侵蚀 / 修复 | 侵蚀 6 格全>0（.128→.207）；修复随规模降（1.5B .153 → 32B .101，70B .085） |
-| 采样可靠性（32B） | B0 通过的编辑 61% 在 3 次推理采样中至少败 1 次；B0 重复采样噪声底 34% |
+| 采样可靠性（32B） | B0 通过的编辑 61% 在 3 次推理采样中至少败 1 次；B0 重复采样噪声底 34%（61% 永远与 34% 一起写） |
+| 先验知识分层（base@B0 是否答出旧值） | 答出组降幅 32B +.125、70B +.153；未答出组 32B +.043、70B −.047（各约 45 条），六格中五格 ≤0 → Study 2 的 H2b |
 | 长度 / 国籍形容词 | 高端无答案变长；demonym 重打分不改结论 |
 | 反面结果（不作证据） | base 的 thinking-to-recall 率 > 编辑回退率（case 构成不同）；"关系类型线索"方向相反（被名字泄题混杂） |
-| 五臂运行环境 | B0 处 T 与 N 逐字节相同 200/200（同一环境）；D/P/C 与 N 仅 12/200 相同、B0 ES 一致 85% → **只有 T−N 是同环境对比**，T−P/T−C/D−N 混入了环境差异；placebo 臂磁盘数据已与 results.json 的 n=199 版本不同，旧版不可重建 |
-结论：**permissive RR 19.3% 退出头条**；头条 = ES 缺口 + 留存对比 + 采样可靠性；Study 1 的因果臂只以 T−N 为主，Study 2 所有臂必须同一次运行。
+| 五臂运行环境（9/29 更正） | 分裂的实质是 BOS：N、T（及 X3 重跑）无 BOS，B0 彼此逐字节相同 200/200；D、P、C 与采样跑有 BOS（`_gen` 自 6/25 起默认加），彼此也 200/200；两组之间 12/200。同环境对比是 T−N 与 D−P、D−C、P−C；T−P、D−N 跨 BOS。干净证据：T−N ES +.138 [.082,.194]（study1.json），D−P ES −.225 [−.291,−.158]，P−C ES = .000（T−P 与 T−C 的 ES 同为 .121；C 不提供新信息）；P−N、C−N 的 CLR 显著（−.056、−.071）是 BOS 假象（只换 BOS 即复现 −.061）。D−P 与"只换 BOS"两个数来自审查报告，成文前在 rt.study1 里补算复核。placebo 臂磁盘数据已与 results.json 的 n=199 版本不同，旧版不可重建。32B ES 缺口无 BOS .106、有 BOS .110 |
+结论：**permissive RR 19.3% 退出头条**；头条 = ES 缺口 + 留存对比 + 采样可靠性；Study 1 的因果证据报 T−N 与 D−P 并交代 BOS 分裂；Study 2 所有臂同一批生成。
 （Holm/CI 以 study1.json 为准：统一按 case_id 排序重采样，与 cross_arm 一致。）
 
 ## 3 Study 2 设计（预注册要点；正式文本 `prereg-arr.md` 在任何 Study-2 delta 计算前冻结）
 - **池**：CounterFact 21,919 条，剔除历史上用过的全部 case_id → seed 2027 洗牌 → 前 1600 为候选 →
   每个模型用自己的未编辑 base 在 B0 筛：旧值命中 ∧ 新值未命中（现行 matcher、去主语）∧ 主语名不含旧值 →
   每模型取前 400 条合格（顺序固定）。不再用任何 B3 输出选池。
-- **模型**：R1-Distill Qwen 1.5B/7B/14B/32B、Llama 8B/70B（70B 视预算 n=200–400）；
+- **模型**：R1-Distill Qwen 1.5B/7B/14B/32B、Llama 8B/70B（70B n=400，9/29 起；n=200 时功效约 2/3）；
   同骨干三种后训练：Qwen2.5-32B-Instruct（无推理训练，提示式 CoT）/ R1-Distill-Qwen-32B / QwQ-32B。
 - **编辑器**：ROME（全部模型）；MEMIT、AlphaEdit（32B）；IKE 上下文编辑（32B，非参数对照）。
 - **条件**：全部模型 B0/B3 × {efficacy, para0, locality}；32B-ROME 另加 B0P、B1、等长无内容填充、
-  跨 case 换链、五臂 N/T/D/P/C（思考段 logit 惩罚 8）、编辑强度 α∈{0.5,1,2,3}、B3 采样 4 seeds。
+  跨 case 换链、五臂 N/T/D/P/C（思考段 logit 惩罚 8；C 只作次要的特异性检查）、编辑强度 α∈{1,2,3}（α=0.5 只跑 B0）、
+  B3 采样 4 seeds（统计量按 seed 0–2）、IKE 只跑 efficacy；H2b 未知组 300 条（base@B0 两值都没答出）跑 base 与 N。
+  Qwen2.5-32B-Instruct / QwQ-32B 放最后，时间允许才跑。MEMIT/AlphaEdit 与 ROME 主跑解耦（统计量就绪后补跑）。
 - **终点**：词汇 ES/RR^s（旧口径）+ 语义 ES/RR（双判官家族盲评 + 200 条人工双标）。
-  预注册切换规则：人判 κ≥.7 → 语义为主终点，否则词汇 strict 为主。另报 locality（邻居答对率 + 新值不泄漏）。
+  预注册切换规则：**在 Study 1 标注包上判**（任何 Study 2 结局之前）：人判 κ≥.7 → 语义为主终点，否则词汇 strict 为主；
+  10/5 AoE 前没有人工 κ → 词汇 strict 为主。Study 2 的 200 条只报 κ。另报 locality（邻居答对率 + 新值不泄漏）。
 - **主假设**：H1 ES 降幅>0（32B、70B；Holm over 6）；H2 留存对比>0（14B、32B、70B；Holm over 6）；
-  H3 32B：T−P ES>0 且 RR<0，D−N ES<0。次要：侵蚀/修复、编辑器、三种后训练、α 剂量、IKE、可靠性。探索：机制。
+  H2b 32B：已知组降幅 − 未知组降幅 > 0（单独一检）；H3 32B：T−P ES>0 且 RR<0，D−P ES<0（Holm over 3）。
+  次要：T−N、D−N、T−C、P−N（带 CI，不作等价主张）、侵蚀/修复、编辑器、三种后训练、α 剂量、IKE、可靠性。探索：机制。
+  （H3 最初在 9/28 写作 D−N，9/29 在任何 Study 2 数据之前改为 D−P：两个对比都以匹配的 placebo 为参照。）
 - **决策门**：G0 引擎一致性（下节）；G2 语义缺口 CI 排零且 κ≥.7；G3 H1+H2 在 32B 过。
   G2 或 G3 不过 → 不赶 10/12，改投 ARR 一月（ACL 2027）。
 
@@ -96,7 +102,14 @@ base 的 B0 对比不能诊断引擎：Study 1 的 32B base 很可能加了 BOS�
 - `source/` 只读，改动进 `src/vendor_patches/`。AlphaEdit 的 `cache_c` 每条 case 必须重置。
 - 长任务 ≤2h 粒度、jsonl 追加、按 case_id 续跑；新环境跑通立即 `pip freeze`。
 - 新模型首跑先肉眼看几条生成是人话。
-- BOS：Study 1 的 Qwen 全部（1.5B 特意设 WHYAAAI_NO_BOS=1 对齐）为无 BOS、Llama 为有 BOS（缺 BOS 会退化）；Study 2 沿用同一规则（Qwen 系无 BOS、Llama 系有 BOS；ChatML 模板无 BOS），使 Study 2 与 Study 1 只差引擎这一处。
+- BOS（9/29 更正）：Study 1 的**头条格**无 BOS（32B N/T 臂；1.5B 特意设 WHYAAAI_NO_BOS=1 对齐），Llama 有 BOS（缺 BOS 会退化）；
+  但 Study 1 的 32B D/P/C 臂与采样跑有 BOS（`_gen` 自 6/25 起默认加），32B base 很可能也有（fp32 诊断 Y 裁定）。
+  Study 2 的规则：Qwen 系无 BOS、Llama 系有 BOS、ChatML 模板无 BOS——理由是对齐 Study 1 的头条格。
+  稳健性：Study 1 的 32B ES 缺口无 BOS .106、有 BOS .110，BOS 不改结论。
+- 生成配置（9/29，审查 M1）：checkpoint 自带的 generation_config 不进入 generate（Qwen2.5-Instruct 的 repetition_penalty
+  1.05 曾会在贪心下生效）；采样参数显式传入并逐行记录（temperature .6 / top_p .95 / top_k 50 = Study 1 的实际设置）。
+- 分词器（审查 M4）：R1-Llama 分词器修复失败直接报错；每个模型加载后做一次编码—解码往返检查。
+- 冻结后到 Study 2 结束，`src/rt/` 不再改动（所有 Study 2 运行共用一个代码哈希）；确需改动走偏差记录。
 
 ## 6 预算与排期（~200 H200 卡时）
 | 项 | 估计卡时 |
