@@ -1000,6 +1000,8 @@ def cmd_run(args):
     from rt.precision import require_strict_fp32
     precision = require_strict_fp32(f"cuda:{args.device}" if torch.cuda.is_available() else "cpu")
     hp = build_hparams(settings, model_path, args.device, editor_name)
+    if args.model_parallel:
+        hp.model_parallel = True
     facts = preflight(hp, editor_name, settings["family"], model_path)
     spec = RunSpec(model_tag=model_tag, editor=editor_name, target_tag=target_tag,
                    module_tmp=hp.rewrite_module_tmp, hparams_sig=hparams_signature(hp, cfg["dtype"]),
@@ -1039,6 +1041,9 @@ def main(argv=None):
     r.add_argument("--limit", type=int, default=None, help="first N pool cases (smoke)")
     r.add_argument("--retry-errors", action="store_true")
     r.add_argument("--dry-run", action="store_true")
+    r.add_argument("--model-parallel", action="store_true",
+                   help="spread one process over the visible GPUs (EasyEdit model_parallel; set "
+                        "WHYAAAI_DEVICE_MAP=balanced), e.g. fp32 32B on 4 x 48 GB cards")
 
     e = sub.add_parser("export-pool", help="case-id manifest from legacy result shards")
     e.add_argument("--shards", required=True, help="glob, e.g. 'results 2/probe/X_r*of8.jsonl'")

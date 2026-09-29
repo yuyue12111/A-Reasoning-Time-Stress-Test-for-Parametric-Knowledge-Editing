@@ -672,8 +672,17 @@ def main(argv=None):
     ap.add_argument("--run-tag", default=None, help="override run_tag (e.g. <tag>_smoke)")
     ap.add_argument("--limit", type=int, default=None, help="first N cases of this shard (smoke)")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--batch-size", type=int, default=None,
+                    help="override engine.batch_size for this card class (not part of the resume hash)")
+    ap.add_argument("--max-batch-tokens", type=int, default=None,
+                    help="override engine.max_batch_tokens for this card class (not part of the resume hash)")
     a = ap.parse_args(argv)
     cfg = yaml.safe_load(open(a.config))
+    eng = cfg.setdefault("engine", {})
+    if a.batch_size:
+        eng["batch_size"] = a.batch_size
+    if a.max_batch_tokens:
+        eng["max_batch_tokens"] = a.max_batch_tokens
     only = a.conditions.split(",") if a.conditions else None
     plan = prepare(cfg, a.rank, a.world, a.config, only, a.stage, a.run_tag, a.limit)
     print(f"[rt.run] {cfg['model_tag']} template={cfg.get('template', 'r1')} cases={len(plan['cases'])} "
