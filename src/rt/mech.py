@@ -526,7 +526,7 @@ def _git():
         return subprocess.check_output(["git", "-C", _ROOT, *a], stderr=subprocess.DEVNULL,
                                        text=True).strip()
     try:
-        return {"git": g("rev-parse", "HEAD"), "git_dirty": bool(g("status", "--porcelain"))}
+        return {"git": g("rev-parse", "HEAD"), "git_dirty": bool(g("status", "--porcelain", "--untracked-files=no"))}
     except Exception:                             # noqa: BLE001
         return {"git": "unknown", "git_dirty": None}
 

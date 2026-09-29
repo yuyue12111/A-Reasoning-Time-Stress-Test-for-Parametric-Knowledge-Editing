@@ -596,7 +596,7 @@ def _git():
     try:
         head = subprocess.run(["git", "-C", ROOT, "rev-parse", "HEAD"], capture_output=True,
                               text=True, timeout=10).stdout.strip() or None
-        dirty = subprocess.run(["git", "-C", ROOT, "status", "--porcelain"], capture_output=True,
+        dirty = subprocess.run(["git", "-C", ROOT, "status", "--porcelain", "--untracked-files=no"], capture_output=True,
                                text=True, timeout=10).stdout.strip()
         return {"head": head, "dirty": bool(dirty)}
     except Exception:

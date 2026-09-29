@@ -23,7 +23,9 @@ engine, more editors and more post-training recipes.
   efficacy prompt at B0 (greedy); a case qualifies if the answer contains the old value, does not
   contain the new value (current matcher, subject scrubbed), and the subject name does not contain the
   old value as a whole word. Each model uses its first 400 qualified cases in candidate order (Llama-70B:
-  first 200). No reasoning-time output is used for selection.
+  first 200). If fewer than that many of the 1,600 candidates qualify for a model, the model uses every
+  qualified case; no further candidates are drawn and the smaller n is reported. No reasoning-time
+  output is used for selection.
 
 ## 3 Procedure
 - Engine v2 (`src/rt/`, REVISION.md §4): the edit's rank-1 update is computed by EasyEdit in fp32 and
@@ -87,6 +89,11 @@ results are reported with and without them, the unfiltered analysis being primar
 Logged in `prereg-arr-deviations.md` with timestamp, reason and whether outcome data had been seen.
 
 ## 9 Freeze record
+The pool procedure (candidates sha256, screen configuration, code) is frozen with this file. A manifest is
+a deterministic output of that procedure on an unedited base, so manifests are not choices: each model's
+manifest sha256 is entered here before that model's first Study-2 delta is computed, and a model whose
+screen finishes later does not hold back the others.
+
 | item | value |
 |---|---|
 | commit | — |

@@ -1,0 +1,17 @@
+# Capacity smoke (REVISION.md §6): can one 8 x 4090-48G node compute the fp32 70B ROME edits that
+# Study 2 needs (282 GB of fp32 weights over 384 GB of cards), and how long does one edit take?
+# Runs the first Study-1 cases (Study-1 pool, never Study 2), so nothing here touches the frozen
+# Study-2 pool.  Outputs are kept apart from every real run (deltas_smoke/, deltas_logs/smoke/).
+model: r1llama70b
+editor: ROME
+target_tag: cf
+pool: experiments/rt/pools/study1_cf200.jsonl
+dataset: data/counterfact.jsonl
+models_file: experiments/rt/deltas_models.yaml
+out_root: deltas_smoke
+log_dir: results/rt/deltas_logs/smoke
+dtype: float32
+factor:
+  max_rank: 1
+  tol: 1.0e-4
+  floor_mult: 8.0

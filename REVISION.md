@@ -102,6 +102,13 @@ D8 过门决策；D8–13 成文；10/12 提交。写作从 D1 并行开始。
 Superficial Editing。定位句：前人证明编辑不向外传播；我们证明推理时未编辑的邻域会向内回流，推翻编辑本身。
 
 ## 8 进度快照（随时可安全压缩上下文；最新在上）
+- **2026-09-29（平台 8×4090-48G）**：B1/B2 金丝雀过；TF32 根因实测确认并修复（`ffaf713`）。
+  r1qwen32b 选池完成：合格 710/1600，manifest 400（sha `dbdd75a9fc3e`，已入库；与 Study 1 零重叠；32 个关系，
+  偏向 P17/P103/P1412 等 base 熟知的关系——论文须报池构成）。G1a（32B fp32 ROME，4 卡模型并行）3/3 通过：
+  中位 22.7 s/条，单卡峰值 36 GB，p_target_after .985。→ 32B 全部 Study-2 编辑可在 4090 上完成。
+  平台缺 HF token（env_report 3/4 均无）→ 下载匿名限速、Gemma 门控必失败；需用户在平台写 token。
+  预注册补两条（仍为草稿）：合格不足 k 时用全部合格；manifest 为确定性产出，可在各模型首个 delta 前逐个登记。
+  在飞：G1b（200 条）→ G2 生成 → G3 判定；其后 70B/Instruct/1.5B 选池与 70B fp32 编辑容量冒烟（决定是否需要 H200）。
 - **2026-09-28**：引擎 v2 全部模块已合并（`src/rt/`：edit_hooks、engine、run、pool、deltas、mom2、targets、
   analysis、study1、judge、annotate、mech、g0），166 个 CPU 测试通过（`PYTHONPATH=src ~/.venvs/why-rt/bin/python
   src/rt/tests/run_all.py`）。Study 1 重分析入库（`paperwriting/revision/study1.{json,md}`）。
