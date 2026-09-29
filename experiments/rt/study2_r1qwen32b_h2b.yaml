@@ -1,7 +1,7 @@
 # Study 2, H2b prior-knowledge contrast (prereg-arr.md §5), R1-Distill-Qwen-32B.  The unknown group:
 # base names neither value at B0.  H2b compares its ES drop with the main pool's (known group) rome_N
 # drop.  Same template, BOS, engine and decoding as study2_r1qwen32b.yaml; 8 x 4090-48G layout:
-# 4 processes x 2 cards (--world 4 --device auto).
+# 2 processes x 4 cards (--world 2 --device auto).
 model_tag: r1qwen32b
 template: r1
 no_bos: true
