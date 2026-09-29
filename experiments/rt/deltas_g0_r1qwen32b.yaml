@@ -1,0 +1,19 @@
+# G0 engine-parity gate (REVISION.md §4): ΔW for the Study-1 R1-Distill-Qwen-32B pool (200 cases),
+# ROME L12, CounterFact targets.  The v2 engine then regenerates the N arm at B0/B3 from these
+# deltas and compares with Study 1.  Launch: experiments/rt/README_deltas.md.
+#
+# The same file drives the MEMIT/AlphaEdit 20-case smoke (--editor MEMIT --limit 20 ...): the
+# Study-1 pool is a known-good, outcome-blind set for "does the edit take at all".
+model: r1qwen32b
+editor: ROME
+target_tag: cf
+pool: experiments/rt/pools/study1_cf200.jsonl   # Study-1 order (shared with the G0 generation config)
+dataset: data/counterfact.jsonl
+models_file: experiments/rt/deltas_models.yaml
+out_root: deltas
+log_dir: results/rt/deltas_logs/g0     # Study-2 logs: deltas_logs/s2 (same delta tree, disjoint case ids)
+dtype: float32
+factor:
+  max_rank: 1         # single-request ROME/MEMIT/AlphaEdit updates are rank 1 by construction
+  tol: 1.0e-4         # relative Frobenius error; raised automatically to 8x the fp32 storage floor
+  floor_mult: 8.0

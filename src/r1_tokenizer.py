@@ -23,14 +23,11 @@ def fix_r1_tokenizer(tok, model_path):
         return tok
     tj = os.path.join(str(model_path), "tokenizer.json")
     if not os.path.exists(tj):
-        print(f"[r1_tokenizer] ⚠ Metaspace 命中但缺 {tj},未修(请确认本地模型目录)")
-        return tok
-    try:
-        from transformers import PreTrainedTokenizerFast
-        ref = PreTrainedTokenizerFast(tokenizer_file=tj).backend_tokenizer  # 正确的 byte-level 组件来源
-        bt.pre_tokenizer = ref.pre_tokenizer
-        bt.decoder = ref.decoder
-        print("[r1_tokenizer] 已把 Metaspace pre_tokenizer/decoder 换成 byte-level(R1-Llama 修复生效)")
-    except Exception as e:
-        print(f"[r1_tokenizer] ⚠ 就地换 pre_tokenizer/decoder 失败:{e!r}(分词器未修)")
+        # 2026-09-29 审查 M4:以前只打印警告并返回会删空格的坏分词器 → 现在直接报错
+        raise RuntimeError(f"[r1_tokenizer] Metaspace 命中但缺 {tj},分词器会删空格;请确认本地模型目录")
+    from transformers import PreTrainedTokenizerFast
+    ref = PreTrainedTokenizerFast(tokenizer_file=tj).backend_tokenizer  # 正确的 byte-level 组件来源
+    bt.pre_tokenizer = ref.pre_tokenizer            # 失败直接抛出,不再静默返回坏分词器
+    bt.decoder = ref.decoder
+    print("[r1_tokenizer] 已把 Metaspace pre_tokenizer/decoder 换成 byte-level(R1-Llama 修复生效)")
     return tok

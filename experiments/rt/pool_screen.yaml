@@ -1,0 +1,45 @@
+# Study-2 fresh pool (REVISION.md §3): exclude every historically used case_id, shuffle with seed
+# 2027, take 1600 candidates, screen each model's unedited base at B0, keep the first 400 that pass.
+# `build` must run where the complete history lives (the platform's results/); commit
+# experiments/rt/pools/study2/ afterwards, since the screens verify the candidates file by sha256.
+counterfact: data/counterfact.jsonl
+aliases: data/aliases.json
+seed: 2027
+n_candidates: 1600
+k: 400
+pool_dir: experiments/rt/pools/study2      # candidates, manifests, decisions, summaries (tracked)
+screen_dir: results/rt/pool                # screen shards (gitignored)
+
+used_sources:                              # every jsonl row's case_id counts as used
+  - "results/**/*.jsonl"                   # all AAAI-era runs on the platform
+  - "results 2/**/*.jsonl"                 # local mirror of the same runs, when present
+  - "data/reverted_*.jsonl"
+  - "data/x1_replay_manifest.jsonl"
+  - "data/sj_sample.jsonl"
+  - "data/sample_records.jsonl"
+  - "experiments/rt/pools/study1_*.jsonl"
+used_exclude:
+  - "results/rt/**/*.jsonl"                # engine-v2 outputs (this screen, Study 2) are not history
+
+exclude_facts:                             # same fact under another case id in an earlier run (review 2026-09-29)
+  cf_4298: "mquake_1366 (Sweyn II of Denmark, P140, Christianity), Llama-8B 2-hop run"
+h2b_unknown_k:                             # H2b prior-knowledge contrast group (prereg-arr.md §5)
+  r1qwen32b: 300
+
+engine:
+  batch_size: 64
+  max_batch_tokens: 128000
+  answer_cap: 256
+  chunk_cases: 200
+
+models:                                    # model path from $WHYAAAI_MODEL at screen time
+  # no_bos follows Study 1 (REVISION.md §5): Qwen-based R1 without BOS, Llama-based R1 with BOS;
+  # the ChatML templates add no manual BOS either way.
+  r1qwen1_5b: {template: r1, no_bos: true}
+  r1qwen7b: {template: r1, no_bos: true}
+  r1qwen14b: {template: r1, no_bos: true}
+  r1qwen32b: {template: r1, no_bos: true, model: {device_map: auto}}   # 4090-48G: 2 cards/process; H200: 1
+  r1llama8b: {template: r1, no_bos: false}
+  r1llama70b: {template: r1, no_bos: false, model: {device_map: auto}}   # k 400 like the others (review 2026-09-29: n=200 had ~2/3 power)
+  qwq32b: {template: qwq, no_bos: true, model: {device_map: auto}}   # 4090-48G: 2 cards/process; H200: 1
+  qwen2_5_32b_instruct: {template: instruct_cot, no_bos: true, model: {device_map: auto}}   # 4090-48G: 2 cards/process; H200: 1
