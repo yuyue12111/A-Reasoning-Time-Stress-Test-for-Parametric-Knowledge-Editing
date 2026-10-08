@@ -1,7 +1,7 @@
 {
  "n_candidates": 1600,
  "n_screened": 1600,
- "n_qualified": 709,
+ "n_qualified": 604,
  "k": 400,
  "n_manifest": 400,
  "complete": true,
@@ -9,33 +9,29 @@
   "missing_screen": 0,
   "used_fact": 1,
   "subject_contains_old": 128,
-  "old_miss": 753,
-  "new_hit": 9
+  "old_miss": 852,
+  "new_hit": 15
  },
  "excluded_any": {
   "missing_screen": 0,
   "used_fact": 1,
   "subject_contains_old": 128,
-  "old_miss": 760,
-  "new_hit": 23
+  "old_miss": 861,
+  "new_hit": 29
  },
- "unknown_k": 300,
- "n_unknown_group": 739,
- "unknown_manifest": "experiments/rt/pools/study2/manifest_r1qwen32b_unknown.jsonl",
- "unknown_manifest_sha256": "0623792062fa9fac1a680831247d11db252ad5a09ee3c5e05dd2c7d2b50d0327",
- "model_tag": "r1qwen32b",
- "manifest": "experiments/rt/pools/study2/manifest_r1qwen32b.jsonl",
- "manifest_sha256": "dea4ca252fc1d37189be3337c706ee2054a9cbc06401471946438d392a97ffa6",
+ "model_tag": "r1qwen14b",
+ "manifest": "experiments/rt/pools/study2/manifest_r1qwen14b.jsonl",
+ "manifest_sha256": "8bcec4e89e2976f3b8d0352b14a88cbac7be3c7ce9b3dbbe0d0179b55c8632ce",
  "candidates": "experiments/rt/pools/study2/candidates.jsonl",
  "candidates_sha256": "0ef6625fe9d5a99d7e11cd3aa9d0cf15f5b1c0a6bcd4d419386bffae36b5ac3e",
  "screen_files": [
-  "results/rt/pool/r1qwen32b_pool_screen_r0of4.jsonl",
-  "results/rt/pool/r1qwen32b_pool_screen_r1of4.jsonl",
-  "results/rt/pool/r1qwen32b_pool_screen_r2of4.jsonl",
-  "results/rt/pool/r1qwen32b_pool_screen_r3of4.jsonl"
+  "results/rt/pool/r1qwen14b_pool_screen_r0of4.jsonl",
+  "results/rt/pool/r1qwen14b_pool_screen_r1of4.jsonl",
+  "results/rt/pool/r1qwen14b_pool_screen_r2of4.jsonl",
+  "results/rt/pool/r1qwen14b_pool_screen_r3of4.jsonl"
  ],
- "screen_config_sha256": "78a469f0d87fd809d2347fb9bf26041d2936a43ce8c1329ef584372e6a3997c6",
- "screen_git": "5995b8887fae3b25d9706278444349cb1bc8768c",
+ "screen_config_sha256": "1e18e99f2c77c763fd6f91fe45b084dda5a20efda63f176d88ca2089a8508ba6",
+ "screen_git": "e54b2f9f061b9464822e0c626a698ddb79d3bc85",
  "aliases_sha256": "4ba2ae95884c40d081e5253eedcee522718f1c10b55750623e303e855e6407e6",
  "exclude_facts": {
   "cf_4298": "mquake_1366 (Sweyn II of Denmark, P140, Christianity), Llama-8B 2-hop run"
