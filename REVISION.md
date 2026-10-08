@@ -130,6 +130,23 @@ D8 过门决策；D8–13 成文；10/12 提交。
 Superficial Editing。定位句：前人证明编辑不向外传播；我们证明推理时未编辑的邻域会向内回流，推翻编辑本身。
 
 ## 8 进度快照（随时可安全压缩上下文；最新在上）
+- **2026-10-08 15:40 在飞状态（压缩前快照）**
+  - **冻结**：`90c704b`（registry 条目 1–7；GitHub 推送 03:39:43Z/03:40:36Z）。偏差 D1–D5 见 `prereg-arr-deviations.md`（最新 `7dcafe4`）。
+  - **已核验**：G0@4090 PASS（.131）；G0@H100 PASS（.086，187/198）；fp32 诊断 Y（引擎逐字节复现 Study 1）；
+    D1 32B 主池 400/400、D2 未知组 300/300（本地 summarize 核过，提交 90c704b，p_after .99）。
+  - **待核验**：D3 14B、D4 8B 400、D5 7B 318、D6 1.5B 212（4090 报已完成，日志未同步到本地 `platform_out/deltas_logs/s2/`）。
+  - **4090 在跑**：D70（70B ROME，1 进程×8 卡，~4.5 h，完成放 `xfer/D70_DONE`）→ 小模型生成（抢占式锁 `xfer/LOCK_GS_<tag>`）→ J（mistral；gemma 403 仍在后台重试）。
+    生效单：#6（+补充一/二）、#7（+补充一）。ST/D7/D8 取消（D4）。
+  - **H100 在跑**：H-2（+补充一）：32B 每卡一进程 world 8 `--device cuda --batch-size 16 --max-batch-tokens 40000`：
+    G1''（base,rome_N 三探针）→ G2''（H2b）→ G7'（T/D/P/C）→ G10'（次要 stage 1）→ G11'（stage 2，r*of8）→ 小模型（抢锁）；
+    D70_DONE 出现即插入 G3''（70B eff，4 进程×2 卡，`--max-batch-tokens 34000`）。旧 world-2 半成品已移到 `results/rt/s2_archive_world2/`（不分析）。
+    看门狗：GPU 利用率连续 10 分钟 0% 才判卡死（按行数判会误杀长链分块）。
+  - **吞吐教训**：HF generate 受 CPU 限制，4 卡流水线的 H100 每进程 ≈ 4090（~4.5 链/分）；多进程单卡更快。
+  - **沟通协议**：执行员只写回报文件（块首行 `## <项> <✓|✗|⏸> <时间>`）；用户同步后说"已同步"。
+    本地位置：4090 → `../../platform_out/`（report_4090.md、deltas_logs/、summarize_*.json）；H100 → `../../reports/report_h100.md`（结果待同步）。
+  - **下一步（leader）**：① 看 G1'' 启动 30 分钟后的行数估速度，必要时再砍；② 每批结果到本地后跑
+    `PYTHONPATH=src python -m rt.study2 --results <本地 s2 结果目录> --out paperwriting/revision/study2.json --delta-logs <deltas_logs/s2> <deltas_logs/s2_h2b>`；
+    ③ 把 Study 2 数字交给写作 session（10/7 起按"只用 Study 1"在重写，需留 Study 2 一节）。
 - **2026-10-08（唯一实验日）**：平台 9/29 后空转 9 天；7 个模型选池已完成（32B 400 + 未知组 300、70B 400、14B 400、8B 400、
   7B 318、1.5B 212，回传在平台 platform_out/pools_study2/，**待同步到本地后冻结**）；E70：70B fp32 编辑在 8×4090 可行（31–52 s/条）；
   ST（32B 协方差）因两个队列并发 OOM 失败；Gemma 403。新增 8×H100-80G（**离线**），4090 可上网。
