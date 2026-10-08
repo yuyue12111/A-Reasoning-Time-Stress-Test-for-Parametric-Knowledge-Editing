@@ -1,8 +1,9 @@
 # Pre-registration · Study 2 (ARR revision)
 
 **Status: DRAFT.** Frozen when the freeze entry of `prereg-arr-registry.md` (append-only) records this
-file's SHA-256, the commit, the analysis code's SHA-256 and a third-party timestamp (OSF registration),
-before the first Study-2 delta is computed. After freezing, this file never changes: deviations go to
+file's SHA-256, the commit, the analysis code's SHA-256 and a third-party timestamp, before the first
+Study-2 delta is computed. The third-party timestamp is GitHub's server record of the push of the
+freeze commit; an OSF registration of the same file is added when available. After freezing, this file never changes: deviations go to
 `prereg-arr-deviations.md` (§8) and pool manifests are registered in the registry (§9).
 
 ## 1 Purpose
@@ -62,6 +63,15 @@ engine, more editors and more post-training recipes.
   (N). H2b group: unedited base and N at B0/B3, efficacy probe. All other models: unedited base and N
   at B0/B3. Qwen2.5-32B-Instruct and QwQ-32B run last, after everything else; their results are
   reported if they run.
+- **Run order (fixed 2026-10-08; one day of platform time).** Conditions run in this order and any
+  condition that has not run is reported as not run: (1) R1-Distill-Qwen-32B base and N, three probes;
+  (2) the 32B H2b group; (3) Llama-70B base and N, three probes; (4) the 32B arms T/D/P/C; (5) 14B, 8B,
+  7B, 1.5B base and N; (6) MEMIT at 32B; (7) the remaining 32B conditions (B0P, B1, α, IKE, sampling,
+  own/filler/swap); (8) AlphaEdit; (9) Qwen2.5-32B-Instruct and QwQ-32B.
+- **Hardware (fixed 2026-10-08).** Edits are fp32 with TF32 off: 32B, 14B, 8B, 7B and 1.5B on 8×RTX 4090
+  (48 GB), Llama-70B on 8×H100 (80 GB). Generation is bf16 on the H100 node for every model, so every
+  within-model contrast shares hardware. Before Study-2 generation, the G0 rerun is repeated on the H100
+  node with the same criteria (§7); if it fails there, Study-2 generation moves to the 4090 node.
 
 ## 4 Endpoints
 - **ES_b**: answer contains the new value and not the old one (lexical, `src/metrics.py`).
