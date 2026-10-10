@@ -1,4 +1,13 @@
-# Pre-registration addendum · H4, fact salience (DRAFT, not frozen)
+# Pre-registration addendum · H4, fact salience (DRAFT, not frozen; NOT TO BE FROZEN AS WRITTEN)
+
+> **Status 2026-10-10.** A red team found this draft unfit to freeze. See `paperwriting/revision/narrative/panel_2026-10-10.md`. The problems:
+> - W1 and W3 share most of their facts with the pool that generated H4.
+> - D mostly measures how fragile the model's own answers are, not loss of the edit.
+> - There are no stop or no-peek rules.
+> - The W2 configs are missing.
+> - The 14B smoke rows are misreported.
+>
+> The estimand will be redesigned after the paper's framing is decided.
 
 Parent: `prereg-arr.md` (frozen 2026-10-08, registry entry 1). This addendum adds one hypothesis and three
 worlds. Every hypothesis in the parent stays as registered.
