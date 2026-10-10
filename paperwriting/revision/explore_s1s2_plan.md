@@ -46,3 +46,24 @@ resamples, seed 42, percentile 95% CI; independent groups are resampled within e
 - If E2–E5 locate the shrinkage in an identifiable subpopulation, that is the next paper's
   hypothesis. It would then need confirming in a new pre-registered run, not claimed from this
   analysis.
+
+## Addendum: added after E0–E5 were seen (2026-10-10)
+
+- **E5b.** E5 found that the residual first-token log-probability of o_old after the edit predicts
+  erosion in S2. Two follow-up tests use the G0 delta logs (the same deltas for G0-4090 and
+  G0-H100):
+  1. Does the predictor replicate on the Study 1 cases?
+  2. Does its distribution explain the erosion gap? Apply S2's erosion rate in each quartile of
+     the pooled predictor to the Study 1 cases' quartile shares, then compare the predicted
+     erosion with the observed one.
+  Both were chosen after seeing E5, so both are exploratory.
+- **E6, fact salience** (added after E5b). Study 1's pool was selected by the unedited Qwen-7B
+  naming o_old at B3. The Study 2 screen files record, for every candidate, whether each smaller
+  model's base names o_old at B0. Within S2, compare cases the 7B knows with cases it does not,
+  and cases known by all four small models (1.5B, 7B, 14B, 8B) with the rest. Measures: ES drop,
+  erosion among cases with ES@B0, and retention contrast. Composition is the 7B-known share in S2
+  versus in S1, where it is measured from Study 1's 7B base rows at B0 and B3. Exploratory.
+- **E6b, salience on the Study 1 cases** (added after E6). The same split, high (3–4 of the 4
+  small distills know the fact at B0, or 3 of 3 for 14B) versus low, on Study 1's 14B, 32B and 70B,
+  and on the two G0 reruns. Salience is measured from Study 1's own base runs of 1.5B, 7B, 14B and
+  Llama-8B. Exploratory.
