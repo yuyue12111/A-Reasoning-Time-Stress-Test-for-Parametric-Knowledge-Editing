@@ -1,0 +1,165 @@
+# Engine v2 · per-model editor hyperparameters for `python -m rt.deltas` (REVISION.md §3-§4).
+#
+# Every entry = an EasyEdit template yaml (read-only, under source/EasyEdit/hparams) + overrides that
+# rt.deltas.build_hparams sets on the loaded HyperParams (same mechanism as run_pilot/edit_loop).
+# Fields not overridden keep the template value; for all three qwen2.5-7b templates these are:
+#   ROME      v_num_grad_steps 25, v_lr 0.5, v_weight_decay 1e-3, clamp_norm_factor 4,
+#             kl_factor 0.0625, mom2_adjustment false (ROME needs no mom2 statistics),
+#             context_template_length_params [[5,10],[10,10]], fact_token subject_last
+#   MEMIT     same v_* / clamp 4 / kl, mom2_adjustment true, mom2_update_weight 15000
+#   AlphaEdit same as MEMIT + nullspace_threshold 2e-2, L2 1
+#   all       mom2_dataset wikipedia, mom2_n_samples 100000, mom2_dtype float32
+# rewrite_module_tmp is "model.layers.{}.mlp.down_proj" in all three templates, which is the MLP
+# output projection of both Qwen2 and Llama; rt.deltas.preflight refuses anything else, and the
+# mom2 statistics are the inputs of that same module.
+#
+# Rules shared by every model:
+#   * v_loss_layer = n_layers - 1 (the templates' 27 is only right for the 28-layer 7B);
+#   * weights in fp32 for the edit (REVISION §4: "ΔW 仍在 fp32 下由 EasyEdit 计算"), enforced by
+#     rt.deltas.load_editor; generation later runs bf16 through EditBank;
+#   * stats_dir per model (EasyEdit names the file by the model path's last component only, so a
+#     shared directory could mix models with the same basename).
+#   * model_parallel: true means one process spans several GPUs (device_map from EasyEdit, override
+#     with WHYAAAI_DEVICE_MAP=balanced); see README_deltas.md for the GPU layout.
+#
+# `verify:` marks a setting that is a principled starting point but not yet validated on this
+# model; the named smoke check must pass before the full run (README_deltas.md, step 3).
+
+common:
+  rewrite_module_tmp: "model.layers.{}.mlp.down_proj"
+  dtype: float32
+
+models:
+  # ---------------- R1-Distill-Qwen (Study 1 layers; each passed the B0 edit-success check there)
+  r1qwen1_5b:
+    hf_id: deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+    family: qwen2
+    n_layers: 28
+    stats_dir: data/stats_r1qwen1_5b
+    editors:
+      ROME:
+        hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+        overrides: {layers: [5], v_loss_layer: 27}      # experiments/probe_qwen1_5b.yaml
+
+  r1qwen7b:
+    hf_id: deepseek-ai/DeepSeek-R1-Distill-Qwen-7B
+    family: qwen2
+    n_layers: 28
+    stats_dir: data/stats_r1qwen                        # Study 1 name (pilot.yaml)
+    editors:
+      ROME:
+        hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+        overrides: {layers: [5], v_loss_layer: 27}      # pilot.yaml; layer scan 5>7>10 (CLAUDE.md)
+
+  r1qwen14b:
+    hf_id: deepseek-ai/DeepSeek-R1-Distill-Qwen-14B
+    family: qwen2
+    n_layers: 48
+    stats_dir: data/stats_r1qwen14b
+    editors:
+      ROME:
+        hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+        overrides: {layers: [9], v_loss_layer: 47}      # probe14b.yaml (48 x 5/28 ~= 9)
+      MEMIT:                                            # Study 1 X2 band (memit14b.yaml); not in
+        hparams: source/EasyEdit/hparams/MEMIT/qwen2.5-7b.yaml   # Study 2 -- kept so the
+        overrides: {layers: [7, 8, 9], v_loss_layer: 47}         # statistics check can rebuild
+        # data/stats_r1qwen14b with precompute-stats and compare (README_deltas.md, step 2x)
+
+  r1qwen32b:
+    hf_id: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+    family: qwen2
+    n_layers: 64
+    stats_dir: data/stats_r1qwen32b
+    editors:
+      ROME:
+        hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+        overrides: {layers: [12], v_loss_layer: 63}     # probe32b.yaml; one H200 in fp32 (G0 pool)
+      # MEMIT / AlphaEdit band [10..14].  Derivation from EasyEdit's qwen2.5-7b yamls:
+      #   * band width: every EasyEdit MEMIT/AlphaEdit yaml for 28-48-layer models edits 5
+      #     contiguous layers (qwen2.5-7b/llama3-8b [4..8], gpt2-xl [13..17]); the width is not
+      #     scaled with depth, so we keep 5 (also bounds the per-case solves and AlphaEdit's
+      #     P / cache_c memory at 5 x 27648^2 fp32 = 15 GB);
+      #   * position: [4..8]/28 covers relative depth 0.14-0.29, i.e. layers 9-18 of 64; the band
+      #     is placed inside that window, centred on the ROME layer 12 that passed B0 edit success
+      #     in Study 1 (in the 7B templates the ROME layer 5 also lies inside [4..8]);
+      #   * continuity: [10..14] is the band Study 1 pre-registered for MEMIT-32B
+      #     (experiments/memit32b.yaml, first attempt), abandoned only for fp32 memory, which the
+      #     bf16 precompute-stats path and 2-GPU model parallelism now remove.
+      # MEMIT and AlphaEdit share the band (as in EasyEdit's qwen2.5-7b yamls) and therefore the
+      # mom2 statistics files.
+      MEMIT:
+        hparams: source/EasyEdit/hparams/MEMIT/qwen2.5-7b.yaml
+        overrides: {layers: [10, 11, 12, 13, 14], v_loss_layer: 63, model_parallel: true}
+        verify: >-
+          20-case smoke on the first 20 cases of the Study-1 pool (README_deltas.md step 3):
+          20/20 ok with rank-1 fits, no NaN losses, and `rt.deltas summarize` median post-edit
+          first-token probability of the target comparable to ROME-32B on the same 20 cases;
+          B0 generative ES and locality follow from the engine before Study 2 starts
+      AlphaEdit:
+        hparams: source/EasyEdit/hparams/AlphaEdit/qwen2.5-7b.yaml
+        overrides:
+          layers: [10, 11, 12, 13, 14]
+          v_loss_layer: 63
+          model_parallel: true
+          P_loc: data/stats_r1qwen32b/alphaedit/null_space_project_L10-14.pt
+        verify: >-
+          as MEMIT, plus the projector sidecar: 0 < null_dim < dim on every layer (threshold
+          2e-2 was tuned on Llama3-8B/GPT-J; null_dim 0 makes every ΔW zero) and few
+          singular values near the threshold
+
+  # ---------------- R1-Distill-Llama (Study 1 layers)
+  r1llama8b:
+    hf_id: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+    family: llama
+    n_layers: 32
+    stats_dir: data/stats_r1llama8b
+    editors:
+      ROME:
+        hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml   # Study 1 borrowed this template
+        overrides: {layers: [6], v_loss_layer: 31, clamp_norm_factor: 2}
+        # probe_llama8b.yaml: clamp 4 collapsed locality (0.67); the {L5,L6,L7} x {c2,c3} scan
+        # chose L6/c2 (Loc ~0.90 at unchanged ES)
+
+  r1llama70b:
+    hf_id: deepseek-ai/DeepSeek-R1-Distill-Llama-70B
+    family: llama
+    n_layers: 80
+    stats_dir: data/stats_r1llama70b
+    editors:
+      ROME:
+        hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+        overrides: {layers: [14], v_loss_layer: 79, model_parallel: true}   # probe_llama70b.yaml
+        # fp32 70B ~ 282 GB: 4 H200 per process (Study 1 ran 2 shards x 4 GPUs)
+
+  # ---------------- same backbone as R1-Distill-Qwen-32B, different post-training (Study 2)
+  # All three post-train the same Qwen2.5-32B base (64 layers, hidden 5120, intermediate 27648),
+  # so the R1-Qwen-32B ROME layer 12 is the natural start; post-training can move where a fact
+  # is recalled, so for these two models the layer is unvalidated.
+  qwq32b:
+    hf_id: Qwen/QwQ-32B
+    family: qwen2
+    n_layers: 64
+    stats_dir: data/stats_qwq32b
+    editors:
+      ROME:
+        hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+        overrides: {layers: [12], v_loss_layer: 63}
+        verify: >-
+          B0 edit success in a 20-case smoke (post-edit first-token probability of the target
+          from `rt.deltas summarize`, then B0 generative ES, comparable to R1-Qwen-32B L12);
+          if clearly lower, scan {10, 12, 16} before Study 2 and record the choice in
+          prereg-arr.md.  The local model directory name must contain "qwen" (EasyEdit routes
+          by substring; e.g. .../Qwen/QwQ-32B)
+
+  qwen2_5_32b_instruct:
+    hf_id: Qwen/Qwen2.5-32B-Instruct
+    family: qwen2
+    n_layers: 64
+    stats_dir: data/stats_qwen2_5_32b_instruct
+    editors:
+      ROME:
+        hparams: source/EasyEdit/hparams/ROME/qwen2.5-7b.yaml
+        overrides: {layers: [12], v_loss_layer: 63}
+        verify: >-
+          B0 edit success in a 20-case smoke, as for qwq32b (EasyEdit takes its 'qwen2'
+          loader branch for this name; the patched loader handles both)

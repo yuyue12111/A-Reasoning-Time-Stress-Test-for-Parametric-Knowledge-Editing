@@ -1,0 +1,274 @@
+{
+ "study1_es_drop": {
+  "point": 0.10606060606060606,
+  "ci95": [
+   0.030303030303030304,
+   0.18181818181818182
+  ],
+  "p": 0.0066,
+  "n": 198,
+  "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+  "es_b0": 0.601010101010101,
+  "es_b1": 0.494949494949495
+ },
+ "study1_ci_used": [
+  0.03,
+  0.182
+ ],
+ "v2_es_drop": {
+  "point": 0.08585858585858586,
+  "ci95": [
+   0.010101010101010102,
+   0.16161616161616163
+  ],
+  "p": 0.0294,
+  "n": 198,
+  "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+  "es_b0": 0.6161616161616161,
+  "es_b1": 0.5303030303030303
+ },
+ "completeness": {
+  "study1_paired": 198,
+  "shared_paired": 198,
+  "missing": [],
+  "min_shared": 198
+ },
+ "criterion_0_complete": true,
+ "criterion_1_drop_inside_study1_ci": true,
+ "b0_es_agreement": {
+  "budget": "B0",
+  "key": "es",
+  "n": 198,
+  "agree": 187,
+  "rate": 0.9444444444444444
+ },
+ "criterion_2_b0_agreement": true,
+ "b3_es_agreement": {
+  "budget": "B3",
+  "key": "es",
+  "n": 198,
+  "agree": 161,
+  "rate": 0.8131313131313131
+ },
+ "b0_answer_parity": {
+  "budget": "B0",
+  "n": 198,
+  "identical_answer": 93,
+  "identical_chain": 198
+ },
+ "v2_rr": {
+  "point": 0.22131147540983606,
+  "ci95": [
+   0.14754098360655737,
+   0.29508196721311475
+  ],
+  "p": 0.0,
+  "n": 122,
+  "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+ },
+ "v2_rr_strict": {
+  "point": 0.07377049180327869,
+  "ci95": [
+   0.03278688524590164,
+   0.12295081967213115
+  ],
+  "p": 0.0002,
+  "n": 122,
+  "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old and not new"
+ },
+ "v2_chain_end": {
+  "think_end": 199,
+  "cap": 1
+ },
+ "base_b0_old_agreement": {
+  "budget": "B0",
+  "key": "old",
+  "n": 200,
+  "agree": 180,
+  "rate": 0.9
+ },
+ "base_note": "not an engine diagnostic: Study 1's unedited base most likely ran with BOS, v2's base without (REVISION.md §5)",
+ "v2_retention_contrast": {
+  "point": 0.20689655172413793,
+  "ci95": [
+   0.06896551724137931,
+   0.3333333333333333
+  ],
+  "p": 0.0018,
+  "n": 87,
+  "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = edited lost ES - base lost o_old",
+  "edited_loss": {
+   "point": 0.3333333333333333,
+   "ci95": [
+    0.2413793103448276,
+    0.4367816091954023
+   ],
+   "p": 0.0,
+   "n": 87,
+   "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = not ES@B3 (edited)"
+  },
+  "base_loss": {
+   "point": 0.12643678160919541,
+   "ci95": [
+    0.05747126436781609,
+    0.20689655172413793
+   ],
+   "p": 0.0002,
+   "n": 87,
+   "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = base answer@B3 does not name o_old"
+  },
+  "table_2x2": {
+   "edited_lost=1,base_lost=1": 1,
+   "edited_lost=1,base_lost=0": 28,
+   "edited_lost=0,base_lost=1": 10,
+   "edited_lost=0,base_lost=0": 48
+  }
+ },
+ "study1_retention_contrast": {
+  "point": 0.2159090909090909,
+  "ci95": [
+   0.09090909090909091,
+   0.3409090909090909
+  ],
+  "p": 0.0022,
+  "n": 88,
+  "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = edited lost ES - base lost o_old",
+  "edited_loss": {
+   "point": 0.38636363636363635,
+   "ci95": [
+    0.2840909090909091,
+    0.48863636363636365
+   ],
+   "p": 0.0,
+   "n": 88,
+   "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = not ES@B3 (edited)"
+  },
+  "base_loss": {
+   "point": 0.17045454545454544,
+   "ci95": [
+    0.10227272727272728,
+    0.25
+   ],
+   "p": 0.0,
+   "n": 88,
+   "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = base answer@B3 does not name o_old"
+  },
+  "table_2x2": {
+   "edited_lost=1,base_lost=1": 6,
+   "edited_lost=1,base_lost=0": 28,
+   "edited_lost=0,base_lost=1": 9,
+   "edited_lost=0,base_lost=0": 45
+  }
+ },
+ "pass": true,
+ "inputs": {
+  "study1": [
+   {
+    "path": "/inspire/hdd/project/ai4education/public/why/why-arr/results/probe/r1qwen32b_ROME_cf200_r0of8.jsonl",
+    "sha256": "b0326e017dc31c6b25c165e6642da22cb27778921d9b1c03e1f0f9efdf9c76ad",
+    "bytes": 527479
+   },
+   {
+    "path": "/inspire/hdd/project/ai4education/public/why/why-arr/results/probe/r1qwen32b_ROME_cf200_r1of8.jsonl",
+    "sha256": "2e51dd5745f1d75ae3ce17d918bd5e7abd9f5edfb36e923d7fe8d3ea0b299060",
+    "bytes": 542706
+   },
+   {
+    "path": "/inspire/hdd/project/ai4education/public/why/why-arr/results/probe/r1qwen32b_ROME_cf200_r2of8.jsonl",
+    "sha256": "bb7de5308cbe59a6793e0026b4acd18e31a91d44aef20b1426b1f7c231ad030d",
+    "bytes": 562473
+   },
+   {
+    "path": "/inspire/hdd/project/ai4education/public/why/why-arr/results/probe/r1qwen32b_ROME_cf200_r3of8.jsonl",
+    "sha256": "932dd30430f8556bae25bd82633561b25f4b8e892df04aef7a398178cdf37b8c",
+    "bytes": 517427
+   },
+   {
+    "path": "/inspire/hdd/project/ai4education/public/why/why-arr/results/probe/r1qwen32b_ROME_cf200_r4of8.jsonl",
+    "sha256": "19a97fac1e3d08498463702db58646a81bfb3283ee936b1a44749b65dc1f6b02",
+    "bytes": 537107
+   },
+   {
+    "path": "/inspire/hdd/project/ai4education/public/why/why-arr/results/probe/r1qwen32b_ROME_cf200_r5of8.jsonl",
+    "sha256": "442117238900fde5e82d6bdf1efd4163563f4b103d6fcdcd7d166b9fe61d2b3f",
+    "bytes": 551358
+   },
+   {
+    "path": "/inspire/hdd/project/ai4education/public/why/why-arr/results/probe/r1qwen32b_ROME_cf200_r6of8.jsonl",
+    "sha256": "18b8da758b303be44caf312e02396ce938142e8000598b20c2d52fa7418f51fc",
+    "bytes": 561123
+   },
+   {
+    "path": "/inspire/hdd/project/ai4education/public/why/why-arr/results/probe/r1qwen32b_ROME_cf200_r7of8.jsonl",
+    "sha256": "4998cbb1ca10a41341d5e89746fb2898157f08bb94993e08e10b0147731e16d4",
+    "bytes": 548342
+   }
+  ],
+  "v2": [
+   {
+    "path": "results/rt/g0/r1qwen32b_g0h100_rome_N_r0of2.jsonl",
+    "sha256": "2ca45c1ae17458ec83b14203b401be1219bf09a4faf60ee2c718de3d900c4779",
+    "bytes": 431204
+   },
+   {
+    "path": "results/rt/g0/r1qwen32b_g0h100_rome_N_r1of2.jsonl",
+    "sha256": "f7bde563363db66e95b897197da72fab9ad21e25a6b1a1d8b2fe4034f98d7e09",
+    "bytes": 493581
+   }
+  ],
+  "study1_base": [
+   {
+    "path": "/inspire/hdd/project/ai4education/public/why/why-arr/results/probe/r1qwen32b_BASE_cf200_r0.jsonl",
+    "sha256": "33c50a61bba92a72a7fd93b38b00a9f0a4f3d5ff3067b92db783133676d11239",
+    "bytes": 78607
+   },
+   {
+    "path": "/inspire/hdd/project/ai4education/public/why/why-arr/results/probe/r1qwen32b_BASE_cf200_r1.jsonl",
+    "sha256": "a72e5b50e68064ad0c90e65169d82f2956cf0baabf7596dfc6711da2918927a7",
+    "bytes": 86489
+   },
+   {
+    "path": "/inspire/hdd/project/ai4education/public/why/why-arr/results/probe/r1qwen32b_BASE_cf200_r2.jsonl",
+    "sha256": "6512700517df293521b2324f6168b8e6a5ec30cd6de6b00cf46e4b6156d373e6",
+    "bytes": 99186
+   },
+   {
+    "path": "/inspire/hdd/project/ai4education/public/why/why-arr/results/probe/r1qwen32b_BASE_cf200_r3.jsonl",
+    "sha256": "7b37f95e1ca733ea1bbd49e78e0c99628ba7ba18a9d7600a3fb700298159a643",
+    "bytes": 83964
+   },
+   {
+    "path": "/inspire/hdd/project/ai4education/public/why/why-arr/results/probe/r1qwen32b_BASE_cf200_r4.jsonl",
+    "sha256": "c2a33655d7893ac494fbc87131833aa3ef4447bb4305ca3251fb0bb9ececf670",
+    "bytes": 102233
+   },
+   {
+    "path": "/inspire/hdd/project/ai4education/public/why/why-arr/results/probe/r1qwen32b_BASE_cf200_r5.jsonl",
+    "sha256": "ca212b7a2ba4f803e88348cc9421433ca624a49f99189718b56c6380b353c86c",
+    "bytes": 94154
+   },
+   {
+    "path": "/inspire/hdd/project/ai4education/public/why/why-arr/results/probe/r1qwen32b_BASE_cf200_r6.jsonl",
+    "sha256": "3be31b38aa15d6eb2e23846821a765d986dc1d6b903baef2a0d704a6005eaa09",
+    "bytes": 91322
+   },
+   {
+    "path": "/inspire/hdd/project/ai4education/public/why/why-arr/results/probe/r1qwen32b_BASE_cf200_r7.jsonl",
+    "sha256": "958eb367298370ed8164bf58e8654e2f9e181469effe5445b38d3a6295a33c9a",
+    "bytes": 83848
+   }
+  ],
+  "v2_base": [
+   {
+    "path": "results/rt/g0/r1qwen32b_g0h100_base_r0of2.jsonl",
+    "sha256": "26bd0e97f8d2260c8613373415a4e89aec6034283fd30bb692385b65b3490a64",
+    "bytes": 457748
+   },
+   {
+    "path": "results/rt/g0/r1qwen32b_g0h100_base_r1of2.jsonl",
+    "sha256": "80dd06d140b1d6976aebd0e29c6db4425cb44981ca730696c9935470e2b7ebca",
+    "bytes": 479432
+   }
+  ]
+ }
+}
