@@ -130,6 +130,14 @@ D8 过门决策；D8–13 成文；10/12 提交。
 Superficial Editing。定位句：前人证明编辑不向外传播；我们证明推理时未编辑的邻域会向内回流，推翻编辑本身。
 
 ## 8 进度快照（随时可安全压缩上下文；最新在上）
+- **2026-10-12 18:40 平台实况更正（D10）+ 只用 H100 的安排（D9，`0be89c6`，推送时间 10:35:18Z）**
+  - **实况**：平台 10/8 后没有停。4090 在 10/8 晚上跑完了 14B/8B/7B/1.5B 生成（GS_*_DONE）。H100 10/12 恢复，按 H-2 队列完成了 H2b（G2''）和 H3 四个臂（G7'），G10' 在跑。我只看过行数；这些数据尚未同步到本地。
+  - **安排**：现在只有 H100。执行单 S3-H 已下发（在对话里）。
+    - Study 3 整套在 H100 上跑：fp32 编辑每进程 2 卡、world 4，先冒烟两条；筛选每进程 1 卡、world 8；扩展 manifest 的 sha 写到 xfer/S3_EXT_MANIFEST.txt，我同步后追加进 registry。
+    - 之后按顺序：G3''（70B，world 8，每进程 2 卡，先冒烟）→ G10' 续跑 → G11'。
+    - 父研究的生成结束点 = 这个队列跑完或 H100 下线，以先到者为准；到时冻结的 rt.study2 只跑一次。在那之前不打开任何父研究的结果。
+  - **代码传输**：git bundle `transfer/s3_code_full.bundle`（sha256 fdbcafa8…，HEAD 0be89c6），由用户上传到 xfer/。
+  - error 行裁决：按意图算通过（不删任何行）。
 - **2026-10-12 Study 3 执行单已写好（在对话里，未入库，按 agent-handoff 偏好）**：S3-A（4090）和 S3-B（H100）。
   - **4090**：A0 代码核对 → `S3_CODE_OK`；A1 W2-fresh 编辑（2 进程 × 4 卡，与 D1 相同）→ `S3_D_FRESH_DONE`；A2 五个模型的扩展筛选（world 与 Study 2 筛选相同）→ qualify → `study3.ext_manifest` → 提交并推送扩展 manifest → `S3_EXT_MANIFEST_DONE`；A3 扩展编辑 → `S3_D_EXT_DONE`。
   - **H100**：B0 代码同步、引擎哈希核对（CODE_HASH_OK）；B1 冒烟（study3_smoke，两个旧事实）；B2 fresh 生成（8 × 1 卡）→ `S3_G_FRESH_DONE`；B3 ext 生成 → `S3_G_EXT_DONE`；B4 `study3.end_entry` → `S3_END`。
