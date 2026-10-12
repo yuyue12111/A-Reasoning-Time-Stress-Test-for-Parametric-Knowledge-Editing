@@ -433,6 +433,30 @@ def main():
                      "high_minus_low_retention": diff(retention_vals(et_, bt_, hi), retention_vals(et_, bt_, lo))}
     out["E6b_salience_in_study1"] = e6b
 
+    # E7 (added 2026-10-12, after E6b): anatomy of lost edits in Study 2, and how much of the Study 1 -> Study 2
+    # retention-contrast gap the familiarity mix accounts for (Study 1 strata standardised to Study 2's mix).
+    e7 = {"anatomy_S2": {}}
+    ret = [c for c in A.paired_cases(E["S2"], "B0", "B3") if "B0" in B["S2"].get(c, {}) and "B3" in B["S2"][c]
+           and B["S2"][c]["B0"]["old"] and E["S2"][c]["B0"]["es"]]
+    for name, keep in (("well_known", lambda c: score(c) >= 3), ("less_familiar", lambda c: score(c) <= 2)):
+        lost = [c for c in ret if keep(c) and not E["S2"][c]["B3"]["es"]]
+        o3 = [E["S2"][c]["B3"] for c in lost]
+        e7["anatomy_S2"][name] = {"n_retention": sum(1 for c in ret if keep(c)), "n_lost": len(lost),
+                                  "both_values": sum(1 for x in o3 if x["new"] and x["old"]),
+                                  "original_only": sum(1 for x in o3 if x["old"] and not x["new"]),
+                                  "neither": sum(1 for x in o3 if not x["old"] and not x["new"])}
+    hl = e6["S2_high_salience_3to4_vs_0to2"]
+    w2 = hl["high"]["n"] / (hl["high"]["n"] + hl["low"]["n"])
+    s2rc = out["runs"]["S2"]["retention_contrast"]["point"]
+    e7["composition"] = {"S2_share_well_known_in_retention_set": w2}
+    for name, key in (("Qwen-32B S1", "S1"), ("Qwen-32B G0-H100", "G0-H100")):
+        v = e6b[name]
+        std = v["high"]["retention_contrast"]["point"] * w2 + v["low"]["retention_contrast"]["point"] * (1 - w2)
+        obs = out["runs"][key]["retention_contrast"]["point"]
+        e7["composition"][name] = {"observed": obs, "standardised_to_S2_mix": std, "S2": s2rc,
+                                   "share_of_gap_explained": (obs - std) / (obs - s2rc)}
+    out["E7_anatomy_and_composition"] = e7
+
     with open(args.out, "w") as fh:
         json.dump(out, fh, indent=1, sort_keys=False)
     write_md(out, args.out[:-5] + ".md")

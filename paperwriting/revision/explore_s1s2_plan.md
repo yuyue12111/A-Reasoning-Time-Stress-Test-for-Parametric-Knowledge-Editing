@@ -67,3 +67,9 @@ resamples, seed 42, percentile 95% CI; independent groups are resampled within e
   small distills know the fact at B0, or 3 of 3 for 14B) versus low, on Study 1's 14B, 32B and 70B,
   and on the two G0 reruns. Salience is measured from Study 1's own base runs of 1.5B, 7B, 14B and
   Llama-8B. Exploratory.
+- **E7, anatomy and composition** (added 2026-10-12, after E6b; exploratory).
+  1. Among lost edits in Study 2's retention set, by stratum: how many final answers name both values, only the
+     original, or neither.
+  2. The Study 1 → Study 2 retention-contrast gap closed by standardising Study 1's 32B strata to Study 2's
+     well-known share. This is done for the original run and for the H100 rerun.
+

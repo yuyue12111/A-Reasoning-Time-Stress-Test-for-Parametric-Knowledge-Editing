@@ -130,6 +130,15 @@ D8 过门决策；D8–13 成文；10/12 提交。
 Superficial Editing。定位句：前人证明编辑不向外传播；我们证明推理时未编辑的邻域会向内回流，推翻编辑本身。
 
 ## 8 进度快照（随时可安全压缩上下文；最新在上）
+- **2026-10-12 Study 3 冻结 + 正文 §1–§5 初稿**
+  - **新论点**：熟知事实上，思考丢约三分之一的编辑（.31–.39），原答案只丢 6–9%；Study 1 三个模型、重跑、Study 2 五组结果一致；两次研究只在不熟事实上分歧（混合比例 + Study 1 选池）。
+  - **Study 3 冻结**：`prereg-arr-addendum-s3.md`，提交 `4b75d08`，GitHub 推送 2026-10-12T06:20:06Z；registry 8（哈希清单坏了）由 9 更正；545e7f0 误标 FREEZE、只含文件移动。
+    - H5 = 熟知事实上的留存对比 > 0（词汇口径）；严格口径决定措辞。
+    - 世界：W2-fresh 309 条 + W2-ext（接下来 1600 条候选中 32B 合格且熟知者，约 250 条，候选已冻结在 `pools/study3/candidates.jsonl`）。
+    - 停止规则截止 2026-12-31；`study3.end_entry` → `study3.confirm`（没有结束条目就拒绝运行）；代码检查复现 +.242 / +.091。
+    - 引擎 code_sha256 与 Study 2 32B 分片表头一致（explore 脚本已移到 `src/explore/`）。偏差 D8 已记录。
+  - **平台待办（算力回来后）**：4090 先做 W2-fresh 编辑 + 五个模型的扩展筛选 → qualify → `study3.ext_manifest` → 把扩展 manifest 的 sha 追加进 registry → 扩展编辑；H100 依次生成 fresh、ext；冒烟只用 `study3_smoke.yaml`。
+  - **写作**：`paperwriting/revision/narrative/draft_v2.md`（摘要 v2、§1–§5、§6 占位）；图在 `narrative/fig/`（hero_sketch、fig2–fig4，是用真实数字画的占位图）。
 - **2026-10-10 晚：叙事面板 + 预注册红队（`paperwriting/revision/narrative/panel_2026-10-10.{md,json}`）**。
   **更正下午的说法**：Study 1 里显著度造成的留存差主要来自 base 对冷门事实的原生答案思考后丢失（−.08～−.26），编辑丢失基本持平（+.01～+.12）；
   Study 1 各模型的高−低差都不显著（p .07–.28）；Study 2 里 31 条丢失的显著编辑中 15 条同时说出新旧两值（严格口径 +.091）；
