@@ -1,0 +1,17 @@
+# Study 3 (prereg-arr-addendum-s3.md §4): ROME deltas for the fresh R1-Distill-Qwen-32B pool, the 309
+# candidates that qualified for 32B in the Study 2 screen but were not drawn into its 400-case manifest.
+# Identical to deltas_s2_r1qwen32b.yaml except `pool` and `log_dir`.  fp32, TF32 off, 4090 node,
+# 4 cards per process (--model-parallel, WHYAAAI_DEVICE_MAP=balanced), as the Study 2 32B edits.
+model: r1qwen32b
+editor: ROME
+target_tag: cf
+pool: experiments/rt/pools/study2/manifest_r1qwen32b_fresh.jsonl
+dataset: data/counterfact.jsonl
+models_file: experiments/rt/deltas_models.yaml
+out_root: deltas
+log_dir: results/rt/deltas_logs/s3fresh
+dtype: float32
+factor:
+  max_rank: 1
+  tol: 1.0e-4
+  floor_mult: 8.0

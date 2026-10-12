@@ -1,0 +1,15 @@
+# Study 3 (prereg-arr-addendum-s3.md §4): ROME deltas for the extension pool (32B-qualified, well-known
+# facts among the next 1600 candidates).  Identical to deltas_s2_r1qwen32b.yaml except `pool` and `log_dir`.
+model: r1qwen32b
+editor: ROME
+target_tag: cf
+pool: experiments/rt/pools/study3/manifest_r1qwen32b_ext.jsonl
+dataset: data/counterfact.jsonl
+models_file: experiments/rt/deltas_models.yaml
+out_root: deltas
+log_dir: results/rt/deltas_logs/s3ext
+dtype: float32
+factor:
+  max_rank: 1
+  tol: 1.0e-4
+  floor_mult: 8.0

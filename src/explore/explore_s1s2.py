@@ -1,6 +1,6 @@
 """Exploratory (post hoc): why the R1-Distill-Qwen-32B effect shrank from Study 1 to Study 2.
 
-    PYTHONPATH=src ~/.venvs/why-rt/bin/python -m rt.explore_s1s2 \\
+    PYTHONPATH=src ~/.venvs/why-rt/bin/python -m explore.explore_s1s2 \\
         [--s1 "<main checkout>/results 2"] [--g0 results/rt/g0] [--g0h100 results/rt/g0h100] \\
         [--s2 results/rt/s2] [--delta-logs results/rt/deltas_logs/s2]
 

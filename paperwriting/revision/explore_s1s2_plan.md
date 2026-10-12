@@ -2,7 +2,7 @@
 
 Status: **exploratory, post hoc.** Written 2026-10-10 after the pre-registered Study 2 analysis of the
 32B worlds (H1 .037 [−.010, .087], H2 +.029 [−.036, .097]; `study2.json`, commit `8967bf5`).
-Nothing here changes the confirmatory verdicts. Code: `src/rt/explore_s1s2.py`; output
+Nothing here changes the confirmatory verdicts. Code: `src/explore/explore_s1s2.py`; output
 `explore_s1s2.{json,md}`. Conventions as in `rt.analysis`: lexical scoring with the subject scrubbed, 10,000 case
 resamples, seed 42, percentile 95% CI; independent groups are resampled within each group.
 

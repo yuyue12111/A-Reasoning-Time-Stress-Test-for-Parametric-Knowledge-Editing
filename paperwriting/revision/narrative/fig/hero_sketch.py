@@ -3,7 +3,7 @@
     <python with matplotlib> paperwriting/revision/narrative/fig/hero_sketch.py
 
 Reads hero_data.json (written by the analysis snippet in REVISION §8, 2026-10-12; loaders of
-src/rt/explore_s1s2.py). Colours: reference categorical slots 1-2 (validated: CVD dE 24.7, normal 33.6).
+src/explore/explore_s1s2.py). Colours: reference categorical slots 1-2 (validated: CVD dE 24.7, normal 33.6).
 Identity is also carried by marker shape (circle = own answer, diamond = edited answer) for print/CVD.
 """
 import json

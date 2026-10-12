@@ -8,6 +8,8 @@
 > - The 14B smoke rows are misreported.
 >
 > The estimand will be redesigned after the paper's framing is decided.
+>
+> **Superseded 2026-10-12 by `prereg-arr-addendum-s3.md` (H5, registry entry 8). This draft was never frozen and is never used.**
 
 Parent: `prereg-arr.md` (frozen 2026-10-08, registry entry 1). This addendum adds one hypothesis and three
 worlds. Every hypothesis in the parent stays as registered.

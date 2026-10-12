@@ -1,0 +1,18 @@
+{
+ "derivation": "positions 1600-3199 of rt.pool.build_candidates(counterfact minus used ids, seed 2027, n=3200); the used-id set reproduces the Study 2 build exactly (ids_sha256 below) and positions 0-1599 equal experiments/rt/pools/study2/candidates.jsonl one for one, so this file is the deterministic continuation of the Study 2 candidate list.",
+ "counterfact": "data/counterfact.jsonl",
+ "counterfact_sha256": "b55d369a0462cec47006e70292b5d166f6202b2fa757b8bc6ca6ec141683c036",
+ "n_cases": 21919,
+ "seed": 2027,
+ "n_candidates": 1600,
+ "offset": 1600,
+ "used": {
+  "n_ids_in_counterfact": 227,
+  "ids_sha256": "fa7d357592c71cf49ac7df0005438067c9e99d601a78e6932a3fd99c92554bf3",
+  "rebuilt_from": "local mirrors of the platform history ('results 2/' = platform results/, plus the data/ and pools/ sources)",
+  "matches": "experiments/rt/pools/study2/candidates_summary.json used.ids_sha256"
+ },
+ "study2_candidates_sha256": "0ef6625fe9d5a99d7e11cd3aa9d0cf15f5b1c0a6bcd4d419386bffae36b5ac3e",
+ "candidates": "experiments/rt/pools/study3/candidates.jsonl",
+ "candidates_sha256": "0e4842af621229a48171d489fd970dabb584070d6f9fd8928852cd117e0d5d97"
+}

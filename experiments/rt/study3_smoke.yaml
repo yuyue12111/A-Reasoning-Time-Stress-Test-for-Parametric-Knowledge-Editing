@@ -1,0 +1,37 @@
+# Study 3 smoke check (prereg-arr-addendum-s3.md §4): identical to study3_r1qwen32b_fresh.yaml except the
+# manifest (the first two cases of the Study 2 32B pool, already seen and already edited), run tag and
+# output directory.  Its rows may be read by eye for well-formed text; they never enter any analysis.
+model_tag: r1qwen32b
+template: r1
+no_bos: true
+model:
+  path: null
+  dtype: bfloat16
+  device_map: null
+module_tmp: "model.layers.{}.mlp.down_proj"
+out_dir: results/rt/s3smoke
+run_tag: s3smoke
+
+dataset:
+  path: data/counterfact.jsonl
+  manifest: experiments/rt/pools/study2/manifest_s3_smoke.jsonl
+
+aliases: data/aliases.json
+probes: [efficacy, para0]
+decoding: {greedy: true}
+
+engine:
+  batch_size: 32
+  max_batch_tokens: 128000
+  answer_cap: 256
+  chunk_cases: 10
+
+conditions:
+  - name: base
+    editor: none
+    budgets: [B0, B3]
+  - name: rome_N
+    editor: ROME
+    target_tag: cf
+    deltas_dir: deltas/r1qwen32b/ROME/cf
+    budgets: [B0, B3]
