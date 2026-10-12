@@ -130,6 +130,11 @@ D8 过门决策；D8–13 成文；10/12 提交。
 Superficial Editing。定位句：前人证明编辑不向外传播；我们证明推理时未编辑的邻域会向内回流，推翻编辑本身。
 
 ## 8 进度快照（随时可安全压缩上下文；最新在上）
+- **2026-10-12 Study 3 执行单已写好（在对话里，未入库，按 agent-handoff 偏好）**：S3-A（4090）和 S3-B（H100）。
+  - **4090**：A0 代码核对 → `S3_CODE_OK`；A1 W2-fresh 编辑（2 进程 × 4 卡，与 D1 相同）→ `S3_D_FRESH_DONE`；A2 五个模型的扩展筛选（world 与 Study 2 筛选相同）→ qualify → `study3.ext_manifest` → 提交并推送扩展 manifest → `S3_EXT_MANIFEST_DONE`；A3 扩展编辑 → `S3_D_EXT_DONE`。
+  - **H100**：B0 代码同步、引擎哈希核对（CODE_HASH_OK）；B1 冒烟（study3_smoke，两个旧事实）；B2 fresh 生成（8 × 1 卡）→ `S3_G_FRESH_DONE`；B3 ext 生成 → `S3_G_EXT_DONE`；B4 `study3.end_entry` → `S3_END`。
+  - 进度只用 `study3.end_entry --out <临时路径>` 计数；执行员从不运行 `study3.confirm`。
+  - **leader 收到 S3_END 后**：同步 → 提交并推送结束条目 → 追加 registry 条目（扩展 manifest 的推送 + 结束条目）→ 只运行一次 `python -m study3.confirm` → 按 §7 结果表定标题和摘要。
 - **2026-10-12 Study 3 冻结 + 正文 §1–§5 初稿**
   - **新论点**：熟知事实上，思考丢约三分之一的编辑（.31–.39），原答案只丢 6–9%；Study 1 三个模型、重跑、Study 2 五组结果一致；两次研究只在不熟事实上分歧（混合比例 + Study 1 选池）。
   - **Study 3 冻结**：`prereg-arr-addendum-s3.md`，提交 `4b75d08`，GitHub 推送 2026-10-12T06:20:06Z；registry 8（哈希清单坏了）由 9 更正；545e7f0 误标 FREEZE、只含文件移动。
