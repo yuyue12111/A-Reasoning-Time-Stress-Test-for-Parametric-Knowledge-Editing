@@ -73,3 +73,18 @@ resamples, seed 42, percentile 95% CI; independent groups are resampled within e
   2. The Study 1 → Study 2 retention-contrast gap closed by standardising Study 1's 32B strata to Study 2's
      well-known share. This is done for the original run and for the H100 rerun.
 
+- **E8, the familiarity account on the registered small-model data** (written 2026-10-13, after the registered parent
+  analysis reported pooled H2 for 14B, 8B, 7B and 1.5B, and before any per-stratum look). This is an out-of-sample check:
+  these models' outcomes played no part in forming the account, although their facts overlap the 32B pool's.
+  - **Familiarity, per model.** The probe set is {1.5B, 7B, 14B, Llama-8B} minus the model itself, and a fact is
+    well-known when every remaining probe knows it (3 of 3).
+  - **Estimands, per model.** Retention contrast in well-known vs less familiar facts, and edited loss and own-answer loss
+    by stratum.
+  - **Prediction from the account.** RC(well-known) > RC(less familiar), driven mainly by a lower own-answer loss on
+    well-known facts.
+  - **What would count against it.** At 14B, where the registered H2 passed (+.127), the excess sitting mainly in less
+    familiar facts.
+  - Exploratory; not part of any registered test.
+  - *Record note.* The E8 prediction was written into this file immediately before the run, but it was committed in the
+    same commit as the results, not before them. Its status is exploratory either way.
+

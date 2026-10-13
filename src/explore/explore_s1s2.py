@@ -136,6 +136,7 @@ def main():
     ap.add_argument("--delta-logs", default=os.path.join(REPO, "results/rt/deltas_logs/s2"))
     ap.add_argument("--g0-delta-logs", default=os.path.join(REPO, "results/rt/deltas_logs/g0"))
     ap.add_argument("--pools", default=os.path.join(REPO, "experiments/rt/pools/study2"))
+    ap.add_argument("--s2-final", dest="s2_final", default=os.path.join(REPO, "results/rt/s2_final"))
     ap.add_argument("--cases", default=os.path.join(main_repo, "data", "counterfact.jsonl"))
     ap.add_argument("--aliases", default=os.path.join(REPO, "data", "aliases.json"))
     ap.add_argument("--out", default=os.path.join(REPO, "paperwriting/revision/explore_s1s2.json"))
@@ -456,6 +457,35 @@ def main():
         e7["composition"][name] = {"observed": obs, "standardised_to_S2_mix": std, "S2": s2rc,
                                    "share_of_gap_explained": (obs - std) / (obs - s2rc)}
     out["E7_anatomy_and_composition"] = e7
+
+    # E8 (2026-10-13): familiarity on the registered small-model worlds (Study 2, run tag s2), if present.
+    e8 = {}
+    s2dir = args.s2_final
+    for tag in ("r1qwen14b", "r1llama8b", "r1qwen7b", "r1qwen1_5b"):
+        ef = sorted(glob.glob(os.path.join(s2dir, f"{tag}_s2_rome_N_r*of8.jsonl")))
+        bf = sorted(glob.glob(os.path.join(s2dir, f"{tag}_s2_base_r*of8.jsonl")))
+        if not ef or not bf:
+            continue
+        er_, _ = load(os.path.join(s2dir, f"{tag}_s2_rome_N_r*of8.jsonl"))
+        br_, _ = load(os.path.join(s2dir, f"{tag}_s2_base_r*of8.jsonl"))
+        Et, Bt = A.case_table(er_, cases, aliases), A.case_table(br_, cases, aliases)
+        probes = [q for q in ("r1qwen1_5b", "r1qwen7b", "r1qwen14b", "r1llama8b") if q != tag]
+        flags = {}
+        for q in probes:
+            with open(os.path.join(args.pools, f"qualify_{q}.jsonl")) as fh:
+                flags[q] = {r["case_id"]: bool(r["old_hit"]) for r in map(json.loads, fh)}
+        wk = lambda c, fl=flags, pr=probes: all(fl[q].get(c, False) for q in pr)
+        parts = {}
+        for name, keep in (("well_known", wk), ("less_familiar", lambda c, w=wk: not w(c))):
+            S = [c for c in A.paired_cases(Et, "B0", "B3") if keep(c) and "B0" in Bt.get(c, {}) and "B3" in Bt[c]
+                 and Bt[c]["B0"]["old"] and Et[c]["B0"]["es"]]
+            el = [1 - Et[c]["B3"]["es"] for c in S]
+            bl = [1 - int(Bt[c]["B3"]["old"]) for c in S]
+            parts[name] = {"n": len(S), "edited_loss": mean(el), "own_loss": mean(bl),
+                           "retention_contrast": est([x - y for x, y in zip(el, bl)]), "_vals": [x - y for x, y in zip(el, bl)]}
+        d = diff(parts["well_known"].pop("_vals"), parts["less_familiar"].pop("_vals"))
+        e8[tag] = dict(parts, well_known_minus_less_familiar=d, probes=probes)
+    out["E8_small_models_familiarity"] = e8
 
     with open(args.out, "w") as fh:
         json.dump(out, fh, indent=1, sort_keys=False)
