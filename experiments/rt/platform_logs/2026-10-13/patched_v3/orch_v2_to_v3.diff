@@ -1,0 +1,656 @@
+--- orch_s3h.v2.py	2026-10-13 13:11:14
++++ v3/orch_s3h.py	2026-10-13 13:15:25
+@@ -4,10 +4,13 @@
+ 执行单 S3-H 全流程自动执行。任何校验失败 -> 写 ⏸ 块到 report_h100.md 并退出（不重试、不硬闯、不删改数据）。
+ §0 裁决: error 行按意图判通过（每个 case 有 valid 行即可）。
+ 补跑阶梯(§1.4): 首跑 40000(70B 34000) -> 续跑 26000 -> 18000。
+-Study 3 与父研究(s2/s2smoke 分片)内容禁读；只看行数/error 行数/GPU/进度行。唯一例外: §6 冒烟
+-(results/rt/s3smoke/, 旧事实) 由 leader 肉眼复核后 touch $SHARE/S3_SMOKE_GO 才进入 §7。§8.1 70B 冒烟只查行数。
++Study 3 与父研究(s2/s2smoke 分片)内容禁读；只看行数/error 行数/GPU/进度行。例外（S3-H v2 修订 3/4）:
++§6 冒烟(results/rt/s3smoke/, 旧事实)在 §3 之前跑；executor agent 或 leader 判英文连贯后 touch $SHARE/S3_SMOKE_GO，
++§3–§5 照常进行，§7 前等 GO。§8.1 70B 冒烟: 代码只计行数；executor agent（非 leader）读 2 个 case 判连贯，把读取记录
++写进 $SHARE/G3_SMOKE_GO，parent2 条目记录该读取。
++单实例: /tmp/why_orch_s3h.lock；第二个实例不碰任何状态直接退出。
+ """
+-import subprocess, time, os, sys, json, glob, re, threading, traceback, signal, fcntl, shlex, hashlib
++import subprocess, time, os, sys, json, glob, re, threading, traceback, signal, fcntl, shlex, hashlib, ast
+ 
+ PROJH = '/inspire/hdd/project/ai4education/public/why/why-arr-h100'
+ POUTH = '/inspire/hdd/project/ai4education/public/why/platform_out_h100'
+@@ -40,8 +43,15 @@
+ D11_ENTRY = f'{POUTH}/parent_end_of_generation.txt'
+ D11_ENTRY_SHA = 'b192435ae7c98b41638b7a49c3fed86d464aa53d9ff123e485dfbd2ebe583b62'   # registry entry 10
+ S3_KEYS = {f'{c}/{p}/{b}' for c in ('base', 'rome_N') for p in ('efficacy', 'para0') for b in ('B0', 'B3')}
+-S3_MARKERS = ('S3_CODE_OK', 'S3_D_SMOKE_OK', 'S3_D_FRESH_DONE', 'S3_EXT_MANIFEST.txt', 'S3_EXT_MANIFEST_DONE',
+-              'S3_D_EXT_DONE', 'S3_SMOKE_GO', 'S3_SMOKE_NOGO', 'S3_G_FRESH_DONE', 'S3_G_EXT_DONE', 'S3_END')
++S3_MARKERS = ('S3_CODE_OK', 'S3_D_SMOKE_OK', 'S3_D_SMOKE_W4_OOM', 'S3_D_FRESH_DONE', 'S3_EXT_MANIFEST.txt',
++              'S3_EXT_MANIFEST_DONE', 'S3_D_EXT_DONE', 'S3_SMOKE_DONE', 'S3_SMOKE_GO', 'S3_SMOKE_NOGO',
++              'S3_G_FRESH_DONE', 'S3_G_EXT_DONE', 'S3_END')
++W2_MARKERS = ('G3_SMOKE_GO', 'G3_SMOKE_NOGO', 'PARENT2_STARTED', 'PARENT2_END')   # second window (D11); never PARENT_END
++ORCH_LOCK = '/tmp/why_orch_s3h.lock'      # node-local single-instance guard
++WD_LOCK_MAX_S = 900                       # longest legitimate watchdog hold is its 120 s restart command
++G3_READING = f'{POUTH}/g3_smoke_reading.txt'
++P2_START = f'{SHARE}/PARENT2_STARTED'
++_ORCH_FH = None
+ RT_PGREP = 'pgrep -af "rt[.](run|pool|deltas)" || true'
+ 
+ def log(msg):
+@@ -145,10 +155,19 @@
+     return names
+ 
+ class _WdLock:
++    """Shared with watchdog.py. Bounded: a lock held longer than WD_LOCK_MAX_S halts (⏸) instead of stalling silently."""
+     def __enter__(self):
+         self.fh = open(WD_LOCK, 'a')
+-        fcntl.flock(self.fh, fcntl.LOCK_EX)
+-        return self
++        t0 = time.time()
++        while True:
++            try:
++                fcntl.flock(self.fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
++                return self
++            except BlockingIOError:
++                if time.time() - t0 > WD_LOCK_MAX_S:
++                    self.fh.close()
++                    halt('WD-LOCK', f'{WD_LOCK} 被占用 >{WD_LOCK_MAX_S}s（看门狗卡住？nvidia-smi 挂起？）；看门狗状态无法更新')
++                time.sleep(2)
+     def __exit__(self, *a):
+         fcntl.flock(self.fh, fcntl.LOCK_UN)
+         self.fh.close()
+@@ -307,6 +326,7 @@
+         gpu_s = ','.join(str(g) for g in gpus)
+         cmd = cmd_tpl.format(rank=r, tokens=tokens, gpus=gpu_s)
+         logp = log_tpl.format(rank=r)
++        rotate(logp)
+         full = (f"cd {PROJH} || exit 1; {ENV_OFF}; unset WHYAAAI_DEVICE_MAP; "
+                 f"nohup env CUDA_VISIBLE_DEVICES={gpu_s} {cmd} > {logp} 2>&1 < /dev/null & echo NEWPID=$!")
+         newpid = launch(full, project, f'rank {r}')
+@@ -320,6 +340,14 @@
+ def marker(name):
+     return os.path.exists(f'{SHARE}/{name}')
+ 
++def rotate(path):
++    """Keep a previous run's log as evidence instead of truncating it with `>`."""
++    if os.path.exists(path):
++        try:
++            os.replace(path, path + f".pre_{time.strftime('%Y%m%d_%H%M%S')}")
++        except OSError:
++            pass
++
+ def touch_marker(name, item):
+     if sh(f'touch {SHARE}/{name}').returncode != 0 or not marker(name):
+         halt(item, f'touch {SHARE}/{name} 失败')
+@@ -344,9 +372,9 @@
+         halt('S3H-§2', f'bundle sha256 mismatch: got {h} expect {BUNDLE_SHA}')
+     names = assert_h100('S3H-§2')
+     if not resume:
+-        stale = [m for m in S3_MARKERS if marker(m)]
++        stale = [m for m in S3_MARKERS + W2_MARKERS if marker(m)] + ([G3_READING] if os.path.exists(G3_READING) else [])
+         if stale:
+-            halt('S3H-§2', f'无 S3_CODE_OK 却已有 Study 3 标记 {stale}（陈旧标记会使阶段被跳过）')
++            halt('S3H-§2', f'无 S3_CODE_OK 却已有 Study 3/第二窗口标记 {stale}（陈旧标记会使阶段被跳过或绕过人工门）')
+         sh('pkill -f "python3? -m [r]t[.](run|pool|deltas)" || true')
+         time.sleep(5)
+         sh('pkill -9 -f "python3? -m [r]t[.](run|pool|deltas)" || true')
+@@ -366,16 +394,21 @@
+     if out:
+         halt('S3H-§2', f'git status dirty: {out[:300]}')
+     if not resume:
+-        if sh(f'git fetch {BUNDLE} claude/paper-review-understanding-8732e6:refs/remotes/bundle/s3', 600).returncode != 0:
+-            halt('S3H-§2', 'git fetch bundle failed')
+-        if sh('git checkout -B claude/paper-review-understanding-8732e6 refs/remotes/bundle/s3', 600).returncode != 0:
+-            halt('S3H-§2', 'git checkout -B failed')
++        g = sh(f'git fetch {BUNDLE} claude/paper-review-understanding-8732e6:refs/remotes/bundle/s3', 600)
++        if g.returncode != 0:
++            halt('S3H-§2', f'git fetch bundle failed rc={g.returncode}: {g.stderr.strip()[-400:]}')
++        g = sh('git checkout -B claude/paper-review-understanding-8732e6 refs/remotes/bundle/s3', 600)
++        if g.returncode != 0:
++            halt('S3H-§2', f'git checkout -B failed rc={g.returncode}: {g.stderr.strip()[-400:]}')
+     head, _ = sh_out('git log -1 --format=%h')
+     if head != EXPECT_HEAD:
+         halt('S3H-§2', f'HEAD={head} expect {EXPECT_HEAD}')
+     if sh(f'git merge-base --is-ancestor {FREEZE_BASE} HEAD').returncode != 0:
+         halt('S3H-§2', 'freeze commit not in history')
+-    diff = sh(f'git diff --stat {FREEZE_BASE} HEAD -- {FROZEN_LIST}').stdout
++    g = sh(f'git diff --stat {FREEZE_BASE} HEAD -- {FROZEN_LIST}')
++    if g.returncode != 0:
++        halt('S3H-§2', f'git diff rc={g.returncode}: {g.stderr.strip()[-400:]}')
++    diff = g.stdout
+     if diff.strip():
+         halt('S3H-§2', f'frozen files changed:\n{diff[:800]}')
+     r = sh(f'{ENV_OFF} && PYTHONPATH=src python3 src/rt/tests/run_all.py > /tmp/t.log 2>&1; echo exit=$?', 3600)
+@@ -423,13 +456,21 @@
+ # ---------------- §3/§5 deltas ----------------
+ 
+ def parse_summarize(txt):
+-    try:
+-        return json.loads(txt)
+-    except Exception:
+-        pass
++    """rt.deltas summarize prints one json.dumps(..., indent=1) object; tolerate stray lines before it."""
++    cands = [txt]
++    i = txt.rfind('\n{')
++    if i >= 0:
++        cands.append(txt[i + 1:])
++    for c in cands:
++        try:
++            d = json.loads(c)
++            if isinstance(d, dict):
++                return d
++        except Exception:
++            pass
+     d = {}
+     for k in ('cases', 'ok', 'errors', 'editor_nan', 'max_rank', 'max_rel_err', 'median_p_target_after'):
+-        m = re.search(rf'{k}\s*[:=]\s*([0-9.eE+-]+)', txt)
++        m = re.search(rf'"?{k}"?\s*[:=]\s*([0-9.eE+-]+)', txt)
+         if m:
+             d[k] = m.group(1)
+     return d if d else None
+@@ -441,11 +482,17 @@
+         return None
+ 
+ def edit_world():
+-    """World chosen by the §3 smoke (D9a), recorded in S3_D_SMOKE_OK; §5 inherits it."""
+-    try:
+-        return 2 if open(f'{SHARE}/S3_D_SMOKE_OK').read().split()[0] == 'world=2' else 4
+-    except Exception:
++    """World chosen by the §3 smoke (D9a), recorded in S3_D_SMOKE_OK; §5 inherits it. Absent -> 4; unreadable -> ⏸."""
++    p = f'{SHARE}/S3_D_SMOKE_OK'
++    if not os.path.exists(p):
+         return 4
++    try:
++        tok = open(p).read().split()[0]
++    except Exception as ex:
++        halt('S3H-§3/§5', f'S3_D_SMOKE_OK 不可读: {type(ex).__name__}: {ex}')
++    if tok not in ('world=2', 'world=4'):
++        halt('S3H-§3/§5', f'S3_D_SMOKE_OK 首字段 {tok!r} 不是 world=2/world=4')
++    return 2 if tok == 'world=2' else 4
+ 
+ def deltas_phase(tag, cfg, expect_n, item, smoke=True, world=4):
+     CUR['phase'] = item; save_cur()
+@@ -461,25 +508,48 @@
+         except FileNotFoundError:
+             return False
+         return ('OutOfMemoryError' in t) or ('CUDA out of memory' in t)
+-    def run_summarize(expect_files=None):
+-        logs = sorted(glob.glob(f'{PROJH}/results/rt/deltas_logs/{sub}/r1qwen32b_ROME_cf_r*of{world}.jsonl'))
+-        if not logs or (expect_files is not None and len(logs) != expect_files):
+-            halt(item, f'summarize 日志数 {len(logs)} (world {world}, 期望 {expect_files})')
+-        r = sh(f"{env} && python3 -m rt.deltas summarize " + ' '.join(shlex.quote(p) for p in logs), 3600)
++    logdir = f'{PROJH}/results/rt/deltas_logs/{sub}'
++    def logs_of(w):
++        return sorted(glob.glob(f'{logdir}/r1qwen32b_ROME_cf_r*of{w}.jsonl'))
++    def run_summarize(expect_files=None, own_only=False):
++        own = logs_of(world)
++        if not own or (expect_files is not None and len(own) != expect_files):
++            halt(item, f'summarize 日志数 {len(own)} (world {world}, 期望 {expect_files})')
++        # D9(a) fallback at world 2: a world-4 smoke case edited before the OOM keeps its delta file, and every world-2
++        # run skips it without writing a row (deltas.py run_shard, skipped_existing), so its only ok row is in r0of4.
++        # The world-4 logs go first: summarize keeps the latest row per case, so world-2 rows replace world-4 error rows.
++        prior = [] if (world != 2 or own_only) else logs_of(4)
++        r = sh(f"{env} && python3 -m rt.deltas summarize " + ' '.join(shlex.quote(p) for p in prior + own), 3600)
+         if r.returncode != 0:
+             halt(item, f'summarize rc={r.returncode}: {r.stderr.strip()[-400:]}')
+         return r.stdout.strip()
++    def done_counts(path):
++        """The `[deltas] done: {...}` counts of a finished rt.deltas run (deltas.py cmd_run), or None."""
++        try:
++            m = re.findall(r"^\[deltas\] done: (\{.*\})\s*$", open(path, errors='replace').read(), re.M)
++            return ast.literal_eval(m[-1]) if m else None
++        except Exception:
++            return None
+     if smoke:
+         def smoke_cmd(w, cards, logp):
+             # --limit cuts the pool before sharding (deltas.py 987-989): 2*w gives rank 0 exactly 2 cases
+             return (f"{env} && CUDA_VISIBLE_DEVICES={cards} python3 -m rt.deltas run --config {cfg} --model-path {M32} "
+                     f"--model-parallel --rank 0 --world {w} --device 0 --limit {2*w} > {logp} 2>&1; echo rc=$?")
+         smoke_log = f'{PROJH}/logs/rt/{lp}_smoke.out'
+-        assert_gpus_free([0, 1], item)
+-        r = sh(smoke_cmd(4, '0,1', smoke_log), 14400)
+-        rc = r.stdout.strip().split('rc=')[-1]
+-        if oom_in(smoke_log):                    # export_case turns an OOM in the edit into an error row, rc 0
+-            rep(f"## {item} smoke-OOM-retry ⏸→run {utc()}", '- 冒烟 OOM -> 按 §3.1 改每进程 4 卡 world 2 再冒烟一次')
++        w4_log = f'{logdir}/r1qwen32b_ROME_cf_r0of4.jsonl'
++        rc = '0'
++        if not marker('S3_D_SMOKE_W4_OOM'):
++            assert_gpus_free([0, 1], item)
++            r = sh(smoke_cmd(4, '0,1', smoke_log), 14400)
++            rc = r.stdout.strip().split('rc=')[-1]
++            # export_case turns an OOM in the edit into an error row with rc 0; an OOM at load exits non-zero.
++            # Persist the outcome: a restart must not re-run world 4 (it would skip the error cases and print no OOM).
++            if oom_in(smoke_log) or oom_in(w4_log):
++                if sh(f"echo 'world4-smoke-OOM {utc()}' > {SHARE}/S3_D_SMOKE_W4_OOM").returncode != 0 \
++                        or not marker('S3_D_SMOKE_W4_OOM'):
++                    halt(item, 'S3_D_SMOKE_W4_OOM 写入失败')
++        if marker('S3_D_SMOKE_W4_OOM'):
++            rep(f"## {item} smoke-OOM-retry ⏸→run {utc()}", '- 冒烟 OOM（已记 S3_D_SMOKE_W4_OOM）-> 按 §3.1 改每进程 4 卡 world 2 再冒烟一次')
+             world = 2
+             smoke_log = f'{PROJH}/logs/rt/{lp}_smoke2.out'
+             assert_gpus_free([0, 1, 2, 3], item)
+@@ -493,10 +563,23 @@
+         d = parse_summarize(s0)
+         if not d:
+             halt(item, f'冒烟 summarize 无法解析: {s0[:400]}')
+-        if not (fnum(d, 'ok') == 2 and fnum(d, 'editor_nan') == 0 and fnum(d, 'max_rel_err') is not None
+-                and fnum(d, 'max_rel_err') < 1e-4 and fnum(d, 'median_p_target_after') is not None
+-                and fnum(d, 'median_p_target_after') >= 0.9):
+-            halt(item, f'冒烟通过条件未满足: {json.dumps(d)[:400]}')
++        qual = (fnum(d, 'editor_nan') == 0 and fnum(d, 'max_rel_err') is not None and fnum(d, 'max_rel_err') < 1e-4
++                and fnum(d, 'median_p_target_after') is not None and fnum(d, 'median_p_target_after') >= 0.9)
++        why = ''
++        if world == 4:
++            ok_n = fnum(d, 'ok') == 2
++        else:
++            # rank 0 of world 2 owns cases 0 and 2; case 0 may already carry a world-4 delta (skipped, no row).
++            # The world-2 run itself must be error-free and account for both cases.
++            cnt = done_counts(smoke_log)
++            o2 = parse_summarize(run_summarize(own_only=True))
++            ok_n = (isinstance(cnt, dict) and cnt.get('error') == 0 and cnt.get('skipped_error') == 0
++                    and cnt.get('ok', 0) + cnt.get('skipped_existing', 0) == 2
++                    and bool(o2) and not o2.get('errors') and fnum(o2, 'editor_nan') == 0
++                    and (fnum(o2, 'ok') or 0) >= 1 and (fnum(d, 'ok') or 0) >= 2)
++            why = f"; world2 冒烟计数 {cnt}; 仅 r*of2: ok={(o2 or {}).get('ok')} errors={(o2 or {}).get('errors')}"
++        if not (ok_n and qual):
++            halt(item, f'冒烟通过条件未满足: {json.dumps(d)[:400]}{why}')
+         if sh(f"echo 'world={world} {utc()}' > {SHARE}/S3_D_SMOKE_OK").returncode != 0:
+             halt(item, 'S3_D_SMOKE_OK 写入失败')
+         rep(f"## {item} smoke ✓ {utc()}", f"- world={world}; summarize: {json.dumps(d)[:300]}")
+@@ -507,6 +590,7 @@
+             gs = gpus_of(rr)
+             gpu_s = ','.join(map(str, gs))
+             logn = f'{lp}_r{rr}{suffix}.out'
++            rotate(f'{PROJH}/logs/rt/{logn}')
+             cmd = (f"cd {PROJH} || exit 1; {ENV_OFF}; export PYTHONPATH=src:source/EasyEdit WHYAAAI_DEVICE_MAP=balanced; "
+                    f"unset WHYAAAI_DTYPE WHYAAAI_MODEL; nohup env CUDA_VISIBLE_DEVICES={gpu_s} python3 -m rt.deltas run "
+                    f"--config {cfg} --model-path {M32} --model-parallel --rank {rr} --world {world} --device 0{extra} "
+@@ -563,6 +647,7 @@
+         assert_gpus_free(list(range(8)), 'S3H-§4')
+         entries = []
+         for r in range(8):
++            rotate(f'{PROJH}/logs/rt/s3screen_{t}_r{r}.out')
+             cmd = (f"cd {PROJH} || exit 1; {ENV_OFF}; nohup env CUDA_VISIBLE_DEVICES={r} WHYAAAI_MODEL={mp} PYTHONPATH=src "
+                    f"python3 -m rt.pool screen --config experiments/rt/pool_screen_s3.yaml --model-tag {t} "
+                    f"--rank {r} --world 8 > logs/rt/s3screen_{t}_r{r}.out 2>&1 < /dev/null & echo NEWPID=$!")
+@@ -686,15 +771,29 @@
+         halt('S3H-§6', 'cp results/rt/s3smoke -> POUTH 失败')
+     rep(f"## S3H-§6 ⏸ {utc()}",
+         f"- 退出码 0; base=8 行, rome_N=8 行, 0 error; answer 字段统计(仅供复核参考): {json.dumps(st)}\n"
+-        f"- results/rt/s3smoke 已拷 POUTH。§7 未启动：待 leader 按 §6 肉眼判定英文连贯，通过 touch {SHARE}/S3_SMOKE_GO，不通过 touch {SHARE}/S3_SMOKE_NOGO")
+-
+-def wait_go(item, go, nogo):
+-    CUR['phase'] = f'{item} wait {os.path.basename(go)}'; save_cur()
+-    while not marker(go):
+-        if marker(nogo):
+-            halt(item, f'leader 判定不通过（{nogo}）')
++        f"- results/rt/s3smoke 已拷 POUTH。按 S3-H v2 第 3 条：§3–§5 照常继续，§7 启动前等待。executor agent（只读 results/rt/s3smoke/）"
++        f"或 leader 判定英文连贯：通过 touch {SHARE}/S3_SMOKE_GO，不通过 touch {SHARE}/S3_SMOKE_NOGO")
++    touch_marker('S3_SMOKE_DONE', 'S3H-§6')
++
++def wait_go(item, go, nogo, who, need_note=False):
++    """Human gate in $SHARE. NOGO halts (and wins over GO). need_note: GO must carry the reader's note (non-empty)."""
++    CUR['phase'] = f'{item} wait {go}'; save_cur()
++    asked = False
++    while True:
++        if marker(nogo):
++            halt(item, f'{who} 判定不通过（{nogo}）')
++        if marker(go):
++            try:
++                has_note = os.path.getsize(f'{SHARE}/{go}') > 0
++            except OSError:
++                has_note = False
++            if has_note or not need_note:
++                break
++            if not asked:
++                rep(f"## {item} ⏸ {utc()}", f"- {SHARE}/{go} 存在但为空：按 S3-H v2 第 4 条须写入读取记录（见上一块），未放行")
++                asked = True
+         time.sleep(300)
+-    rep(f"## {item} ✓ {utc()}", f"- 已见 {SHARE}/{go}（leader 复核通过）")
++    rep(f"## {item} ✓ {utc()}", f"- 已见 {SHARE}/{go}（{who} 判定通过）")
+ 
+ # ---------------- §7 generation ----------------
+ 
+@@ -718,6 +817,8 @@
+ 
+ def gen_phase(kind, expect_n, item, share_flag):
+     CUR['phase'] = item; save_cur()
++    if marker('S3_END'):
++        halt(item, 'S3_END 已存在：addendum §4 登记终点之后不得再生成 Study 3')
+     assert_gpus_free(list(range(8)), item)
+     tpl = (f"WHYAAAI_MODEL={M32} PYTHONPATH=src python3 -m rt.run --config experiments/rt/study3_r1qwen32b_{kind}.yaml "
+            f"--conditions base,rome_N --rank {{rank}} --world 8 --device cuda --batch-size 16 "
+@@ -736,6 +837,8 @@
+         tok = ladder_tokens(RT_LADDER, li)
+         if tok is None:
+             halt(item, f'18000 档续跑后仍未齐: {json.dumps(keys)[:300]}')
++        if marker('S3_END'):
++            halt(item, 'S3_END 已存在（登记终点已收尾）：不再阶梯续跑 Study 3')
+         rep(f"## {item} ladder{tok} ⏸→run {utc()}",
+             f"- progress={json.dumps(keys)[:300]}\n- 按 §1.4 阶梯以 {tok} 续跑全部 8 rank（rt.run 只补缺失键；不读 s3 分片）")
+         assert_gpus_free(list(range(8)), item)
+@@ -774,17 +877,103 @@
+         f"- end_entry stopped-at {ts}; results/rt/s3 与 s3_end_of_generation.json 已拷 POUTH（sha256 逐片核对）; touch S3_END\n- 未运行 study3.confirm（按单留给 leader）")
+ 
+ # ---------------- §8 parent queue (second window, D11) ----------------
++
++def _prefix_sha(path, n):
++    """sha256 of the first n bytes of path (None if the file is shorter)."""
++    h = hashlib.sha256()
++    left = n
++    with open(path, 'rb') as fh:
++        while left > 0:
++            b = fh.read(min(1 << 20, left))
++            if not b:
++                break
++            h.update(b)
++            left -= len(b)
++    return h.hexdigest() if left == 0 else None
++
++def _d11_registered(item):
++    """The registered entry (registry entry 10) and its 120 H100 lines `<sha256>  <PROJH>/results/rt/s2/...`."""
++    try:
++        ok = sha256_file(D11_ENTRY) == D11_ENTRY_SHA
++    except OSError:
++        ok = False
++    if not ok:
++        halt(item, f'登记的 parent_end_of_generation.txt 缺失或已变（应为 {D11_ENTRY_SHA[:12]}…）')
++    reg = []
++    with open(D11_ENTRY) as fh:
++        for line in fh:
++            parts = line.rstrip('\n').split('  ', 1)
++            if len(parts) == 2 and parts[1].startswith(f'{PROJH}/results/rt/s2/'):
++                reg.append((parts[0], parts[1]))
++    if len(reg) != 120:
++        halt(item, f'D11 条目 H100 行数 {len(reg)} != 120')
++    return reg
+ 
+ def registered_parent_intact(item):
+-    """D11: the registered entry and the 120 H100 shards it lists must be unchanged before window 2 writes."""
+-    h, _ = sh_out(f'sha256sum {D11_ENTRY}')
+-    if (h.split() or [''])[0] != D11_ENTRY_SHA:
+-        halt(item, f'登记的 parent_end_of_generation.txt 缺失或已变: {h[:100]}')
+-    r = sh(f"set -o pipefail; grep -F '  {PROJH}/results/rt/s2/' {D11_ENTRY} > /tmp/d11_h100.sha256 && "
+-           f"test $(wc -l < /tmp/d11_h100.sha256) -eq 120 && sha256sum -c --quiet /tmp/d11_h100.sha256", 7200)
+-    if r.returncode != 0:
+-        halt(item, f'PROJH results/rt/s2 与 D11 登记条目不符（第二窗口已开始或分片被改，待 leader）: {(r.stdout + r.stderr)[-300:]}')
++    """D11 guard. Until PARENT2_STARTED exists (written just before G10', the first window-2 writer to registered
++    shards): all 120 registered H100 shards hash to their registered values. Afterwards (G10' appends to 56 of them by
++    design): each still begins with exactly its registered bytes, i.e. window 2 only appended. Bytes only, no row parsed."""
++    reg = _d11_registered(item)
++    if not marker('PARENT2_STARTED'):
++        bad = [p for h, p in reg if not os.path.exists(p) or sha256_file(p) != h]
++        if bad:
++            halt(item, f'PROJH results/rt/s2 与 D11 登记条目不符（第二窗口写入前；待 leader）: {bad[:5]}')
++        return reg
++    try:
++        st = json.load(open(P2_START))
++        sizes = st.get('sizes')
++        if st.get('entry_sha') != D11_ENTRY_SHA or not isinstance(sizes, dict):
++            raise ValueError('entry_sha/sizes 不符')
++    except Exception as ex:
++        halt(item, f'PARENT2_STARTED 不可读或与 D11 条目不符: {type(ex).__name__}: {ex}')
++    if set(sizes) != {p for _, p in reg}:
++        halt(item, 'PARENT2_STARTED 的分片集合与 D11 条目不符')
++    bad = [p for h, p in reg if not os.path.exists(p) or os.path.getsize(p) < sizes[p]
++           or _prefix_sha(p, sizes[p]) != h]
++    if bad:
++        halt(item, f'登记分片的已登记前缀被改（不是只追加；待 leader）: {bad[:5]}')
++    return reg
+ 
++def mark_parent2_started(item):
++    """Record the registered byte sizes immediately before window 2 first appends to registered shards (G10')."""
++    if marker('PARENT2_STARTED'):
++        return
++    reg = registered_parent_intact(item)          # full-hash check (marker absent)
++    rec = {'entry_sha': D11_ENTRY_SHA, 'utc': utc(), 'sizes': {p: os.path.getsize(p) for _, p in reg}}
++    try:
++        with open(P2_START + '.tmp', 'w') as fh:
++            json.dump(rec, fh)
++            fh.flush()
++            os.fsync(fh.fileno())
++        os.replace(P2_START + '.tmp', P2_START)
++    except OSError as ex:
++        halt(item, f'PARENT2_STARTED 写入失败: {ex}')
++    if not marker('PARENT2_STARTED'):
++        halt(item, 'PARENT2_STARTED 写入后不可见')
++    rep(f"## {item} PARENT2_STARTED ✓ {utc()}",
++        f"- 120 个登记分片 sha256 = D11 登记值；登记字节数已记入 {P2_START}（此后续跑只核登记前缀，允许 G10' 追加写）")
++
++def record_g3_reading(files):
++    """S3-H v2 amendment 4: the executor's reading of the 2 smoke cases, for the parent2 entry (written once)."""
++    if os.path.exists(G3_READING):
++        return
++    gp = f'{SHARE}/G3_SMOKE_GO'
++    try:
++        note = ' '.join(open(gp, errors='replace').read().split())[:500]
++        mt = time.strftime('%FT%TZ', time.gmtime(os.path.getmtime(gp)))
++        shards = '; '.join(f'{os.path.basename(p)} sha256={sha256_file(p)}' for p in files)
++        line = (f"G3pp 70B smoke reading (S3-H v2 amendment 4): {shards} (2 cases, second-window outcomes) were read "
++                f"for coherent English (R1-Llama risks: missing spaces, missing BOS) by the executor agent; the leader "
++                f"does not read them. G3_SMOKE_GO mtime {mt}; note: {note}\n")
++        with open(G3_READING + '.tmp', 'w') as fh:
++            fh.write(line)
++            fh.flush()
++            os.fsync(fh.fileno())
++        os.replace(G3_READING + '.tmp', G3_READING)
++    except OSError as ex:
++        halt("S3H-§8 G3'' smoke", f'g3_smoke_reading.txt 写入失败: {ex}')
++    rep(f"## S3H-§8 G3'' smoke reading ✓ {utc()}", f"- 读取记录已写 {G3_READING}（parent2 条目将包含）: {line[:300]}")
++
+ def g3_smoke():
+     CUR['phase'] = 'S8 G3smoke'; save_cur()
+     cfg = 'experiments/rt/study2_r1llama70b_eff.yaml'
+@@ -827,8 +1016,12 @@
+         halt('S3H-§8 G3冒烟', f'行数不符: {per}')
+     rep(f"## S3H-§8 G3'' smoke ⏸ {utc()}",
+         f"- 退出码 0; valid 行 base={per['base'][0]}, rome_N={per['rome_N'][0]}; error 行 base={per['base'][1]}, rome_N={per['rome_N'][1]}\n"
+-        f"- 只计行数，未读文本（70B 为未见的第二窗口父结果；§1.1/D10/D11）。待 leader 裁定：touch {SHARE}/G3_SMOKE_GO 放行，touch {SHARE}/G3_SMOKE_NOGO 停止")
+-    wait_go("S3H-§8 G3'' smoke", 'G3_SMOKE_GO', 'G3_SMOKE_NOGO')
++        f"- orchestrator 只计行数、未读文本。按 S3-H v2 第 4 条：由 executor agent（非 leader；leader 不读这些第二窗口未见父结果）"
++        f"读 {PROJH}/results/rt/s2/r1llama70b_s2smoke_{{base,rome_N}}_r0of8.jsonl 的 2 个 case，判英文连贯（R1-Llama 已知风险：缺空格、缺 BOS）。"
++        f"通过：把读取记录写进 GO，例如 echo \"reader=executor-agent utc=$(date -u +%FT%TZ) verdict=coherent\" > {SHARE}/G3_SMOKE_GO"
++        f"（空文件不放行）；不通过：touch {SHARE}/G3_SMOKE_NOGO。parent2 条目将记录该读取")
++    wait_go("S3H-§8 G3'' smoke", 'G3_SMOKE_GO', 'G3_SMOKE_NOGO', who='executor agent（leader 未读）', need_note=True)
++    record_g3_reading(files)
+ 
+ def g3_formal():
+     CUR['phase'] = 'S8 G3 formal'; save_cur()
+@@ -896,6 +1089,7 @@
+     tpl = (f"WHYAAAI_MODEL={M32} PYTHONPATH=src python3 -m rt.run --config experiments/rt/study2_r1qwen32b.yaml "
+            f"--rank {{rank}} --world 8 --device cuda --batch-size 16 --max-batch-tokens {{tokens}} "
+            f"--conditions {','.join(conds)} --stage 1")
++    mark_parent2_started("S3H-§8 G10'")           # last moment before window 2 appends to registered shards
+     assert_gpus_free(list(range(8)), "S3H-§8 G10'")
+     pids, entries = start_rt_ranks("G10r", 8, tpl, f'{PROJH}/logs/rt/s2_32_sec1_resume_r{{rank}}.log',
+                                    f'{PROJH}/results/rt/s2/r1qwen32b_s2_*_r{{rank}}of8.jsonl')
+@@ -903,7 +1097,7 @@
+     while True:
+         if not wait_all_exit(entries, "G10r", stale_hours=8, item="S3H-§8 G10'"):
+             halt("S3H-§8 G10'", '续跑 8 小时未结束')
+-        bad = rank_incomplete(entries, [f'{PROJH}/results/rt/s2/r1qwen32b_s2_*_r{{rank}}of8.jsonl'])
++        bad = rank_incomplete(entries, [f'{PROJH}/results/rt/s2/r1qwen32b_s2_{c}_r{{rank}}of8.jsonl' for c in conds])
+         if not bad:
+             break
+         tok = ladder_tokens(RT_LADDER, li)
+@@ -928,7 +1122,8 @@
+     while True:
+         if not wait_all_exit(entries, "G11r", stale_hours=10, item="S3H-§8 G11"):
+             halt("S3H-§8 G11", '10 小时未结束')
+-        bad = rank_incomplete(entries, [f'{PROJH}/results/rt/s2/r1qwen32b_s2_*_r{{rank}}of8.jsonl'])
++        bad = rank_incomplete(entries, [f'{PROJH}/results/rt/s2/r1qwen32b_s2_{c}_r{{rank}}of8.jsonl'
++                                        for c in ('rome_own', 'rome_filler', 'rome_swap')])
+         if not bad:
+             break
+         tok = ladder_tokens(RT_LADDER, li)
+@@ -957,18 +1152,21 @@
+             halt(item, f'{p} 已存在，拒绝覆盖')
+     if sha256_file(D11_ENTRY) != D11_ENTRY_SHA:
+         halt(item, '登记的 parent_end_of_generation.txt 已变')
++    if not os.path.exists(G3_READING) or os.path.getsize(G3_READING) == 0:
++        halt(item, f'{G3_READING} 缺失：S3-H v2 第 4 条要求 parent2 条目记录 70B 冒烟的读取')
+     out, _ = sh_out(f"set -o pipefail; sha256sum {PROJH}/results/rt/s2/*.jsonl > {pe}.tmp && "
++                    f"cat {G3_READING} >> {pe}.tmp && "
+                     f"echo \"stopped: second window (D11, supplementary; G3pp, G10p resume, G11p queue complete); "
+                     f"written $(date -u +%FT%TZ)\" >> {pe}.tmp && mv {pe}.tmp {pe} && echo OK", 7200)
+     if 'OK' not in out:
+         halt(item, 'sha256sum results/rt/s2 -> parent2_end_of_generation.txt 失败')
+-    if sh(f'cp -a {PROJH}/results/rt/s2 {snap}', 7200).returncode != 0:
++    if sh(f'mkdir -p {POUTH}/results/rt && cp -a {PROJH}/results/rt/s2 {snap}', 7200).returncode != 0:
+         halt(item, 'cp results/rt/s2 -> POUTH/results/rt/s2_window2 失败')
+     if sha256_file(D11_ENTRY) != D11_ENTRY_SHA:
+         halt(item, '收尾期间登记条目被改')
+     touch_marker('PARENT2_END', item)
+     rep(f"## S3H-§8 PARENT2_END ✓ {utc()}",
+-        "- 第二窗口（D11 补充）结束条目 parent2_end_of_generation.txt 已写（绝对路径 sha256 + stopped 行）; "
++        "- 第二窗口（D11 补充）结束条目 parent2_end_of_generation.txt 已写（绝对路径 sha256 + 70B 冒烟读取记录（修订 4）+ stopped 行）; "
+         "results/rt/s2 已拷 POUTH/results/rt/s2_window2; touch PARENT2_END\n"
+         "- 未改动登记终点: parent_end_of_generation.txt（sha256 复核 = 登记值）、PARENT_END、POUTH/results/rt/s2；未运行 rt.study2")
+ 
+@@ -980,25 +1178,40 @@
+         try:
+             alive = 0
+             try:
+-                out, _ = sh_out('pgrep -cf "rt[.](run|pool|deltas)" || true')
++                out, _ = sh_out('pgrep -cf "rt[.](run|pool|deltas)" || true', 120)
+                 alive = int(out) if out.strip().isdigit() else 0
+             except Exception:
+                 pass
+-            out, _ = sh_out('nvidia-smi --query-gpu=index,utilization.gpu --format=csv,noheader | tr "\\n" " "')
+-            rep(f"## ORCH ⏸ {utc()}",
+-                f"- 阶段: {CUR.get('phase')} | {CUR.get('detail')} | rt 进程 {alive} | {out[:200]}")
++            try:
++                gpu, _ = sh_out('timeout -k 10 60 nvidia-smi --query-gpu=index,utilization.gpu --format=csv,noheader '
++                                '2>/dev/null | tr "\\n" " "', 120)
++            except Exception:
++                gpu = 'nvidia-smi 超时/失败'
++            rep(f"## ORCH heartbeat ✓ {utc()}",
++                f"- 心跳（非停止）: 阶段 {CUR.get('phase')} | {CUR.get('detail')} | rt 进程 {alive} | {(gpu or 'nvidia-smi 无输出')[:200]}")
+         except Exception:
+             pass
+ 
+ # ---------------- main ----------------
+ 
+ def main():
++    global _ORCH_FH
++    _ORCH_FH = open(ORCH_LOCK, 'a')               # kept open for the life of the process; not inherited by children
++    try:
++        fcntl.flock(_ORCH_FH, fcntl.LOCK_EX | fcntl.LOCK_NB)
++    except BlockingIOError:
++        print(f"[{utc()}] another orch_s3h.py holds {ORCH_LOCK}; exiting without touching report/state/watchdog", flush=True)
++        os._exit(2)
++    if marker('S3_CODE_OK'):
++        rt_ps, _ = sh_out(RT_PGREP)
++        if rt_ps:
++            halt('S3H-§2 resume', f'续跑启动时仍有上一轮遗留 rt 进程；看门狗状态未重置（这些 rank 仍受看门狗跟踪），待 leader 裁决: {rt_ps[:300]}')
+     with _WdLock():
+         wd_save({"ranks": [], "note": "reset by orch_s3h at start"})
+     t = threading.Thread(target=hourly, daemon=True)
+     t.start()
+     log('orchestrator started (S3-H)')
+-    rep(f"## S3H-ORCH start ⏸ {utc()}",
++    rep(f"## S3H-ORCH start ✓ {utc()}",
+         "- 夜间自动执行已启动（nohup setsid 等价 tmux detached）：等待 $SHARE/s3_code_full.bundle → §2…§8；任何校验失败写 ⏸ 停止；补跑阶梯 40k→26k→18k（70B 34k→26k→18k）；看门狗 v3 长驻")
+     try:
+         phase_s2(resume=marker('S3_CODE_OK'))
+@@ -1006,47 +1219,62 @@
+         raise
+     except Exception as e:
+         halt('S3H-§2', f'异常 {type(e).__name__}: {e}', traceback.format_exc())
++    if marker('S3_END'):
++        rep(f"## S3H-§3–§7 ✓ {utc()}",
++            f"- 已见 {SHARE}/S3_END（addendum §4 登记终点，s3_finalize 或 leader 收尾）：不再运行任何 Study 3 冒烟/编辑/筛选/生成，直接进入 §8")
++    else:
++        try:
++            # S3-H v2 amendment 3: the generation smoke uses only old Study 2 deltas, so it runs before §3 and its
++            # review overlaps the edits; only §7 waits for S3_SMOKE_GO.
++            if not marker('S3_SMOKE_DONE'):
++                if marker('S3_SMOKE_GO') or marker('S3_SMOKE_NOGO'):
++                    halt('S3H-§6', 'S3_SMOKE_GO/NOGO 已存在但没有 S3_SMOKE_DONE（冒烟未完成即被放行/否决），待 leader')
++                phase_s6()
++                if not wait_gpus_free():
++                    halt('S3H-§6', '冒烟结束后 20 分钟内 8 卡未全部 <1GB')
++        except SystemExit:
++            raise
++        except Exception as e:
++            halt('S3H-§6', f'异常 {type(e).__name__}: {e}', traceback.format_exc())
++        try:
++            if not marker('S3_D_FRESH_DONE'):
++                deltas_phase('s3fresh', 'experiments/rt/deltas_s3_r1qwen32b_fresh.yaml', 309, 'S3H-§3',
++                             smoke=not marker('S3_D_SMOKE_OK'), world=edit_world())
++                touch_marker('S3_D_FRESH_DONE', 'S3H-§3')
++                rep(f"## S3H-§3 ✓ {utc()}", "- cases=309 ok=309 errors 空 editor_nan=0 max_rank=1 max_rel_err<1e-4; summarize 已存 POUTH; touch S3_D_FRESH_DONE")
++        except SystemExit:
++            raise
++        except Exception as e:
++            halt('S3H-§3', f'异常 {type(e).__name__}: {e}', traceback.format_exc())
++        try:
++            ext_n = record_ext_manifest() if marker('S3_EXT_MANIFEST_DONE') else phase_s4()
++        except SystemExit:
++            raise
++        except Exception as e:
++            halt('S3H-§4', f'异常 {type(e).__name__}: {e}', traceback.format_exc())
++        try:
++            if not marker('S3_D_EXT_DONE'):
++                deltas_phase('s3ext', 'experiments/rt/deltas_s3_r1qwen32b_ext.yaml', ext_n, 'S3H-§5', smoke=False,
++                             world=edit_world())
++                touch_marker('S3_D_EXT_DONE', 'S3H-§5')
++                rep(f"## S3H-§5 ✓ {utc()}", f"- cases={ext_n} ok={ext_n} 其余条件同 §3; touch S3_D_EXT_DONE")
++        except SystemExit:
++            raise
++        except Exception as e:
++            halt('S3H-§5', f'异常 {type(e).__name__}: {e}', traceback.format_exc())
++        try:
++            wait_go('S3H-§6', 'S3_SMOKE_GO', 'S3_SMOKE_NOGO', who='executor agent 或 leader（S3-H v2 第 3 条）')
++            if not marker('S3_G_FRESH_DONE'):
++                gen_phase('fresh', 309, 'S3H-§7 fresh', f'{SHARE}/S3_G_FRESH_DONE')
++            if not marker('S3_G_EXT_DONE'):
++                gen_phase('ext', ext_n, 'S3H-§7 ext', f'{SHARE}/S3_G_EXT_DONE')
++            if not marker('S3_END'):
++                s3_finalize()
++        except SystemExit:
++            raise
++        except Exception as e:
++            halt('S3H-§6/7', f'异常 {type(e).__name__}: {e}', traceback.format_exc())
+     try:
+-        if not marker('S3_D_FRESH_DONE'):
+-            deltas_phase('s3fresh', 'experiments/rt/deltas_s3_r1qwen32b_fresh.yaml', 309, 'S3H-§3',
+-                         smoke=not marker('S3_D_SMOKE_OK'), world=edit_world())
+-            touch_marker('S3_D_FRESH_DONE', 'S3H-§3')
+-            rep(f"## S3H-§3 ✓ {utc()}", "- cases=309 ok=309 errors 空 editor_nan=0 max_rank=1 max_rel_err<1e-4; summarize 已存 POUTH; touch S3_D_FRESH_DONE")
+-    except SystemExit:
+-        raise
+-    except Exception as e:
+-        halt('S3H-§3', f'异常 {type(e).__name__}: {e}', traceback.format_exc())
+-    try:
+-        ext_n = record_ext_manifest() if marker('S3_EXT_MANIFEST_DONE') else phase_s4()
+-    except SystemExit:
+-        raise
+-    except Exception as e:
+-        halt('S3H-§4', f'异常 {type(e).__name__}: {e}', traceback.format_exc())
+-    try:
+-        if not marker('S3_D_EXT_DONE'):
+-            deltas_phase('s3ext', 'experiments/rt/deltas_s3_r1qwen32b_ext.yaml', ext_n, 'S3H-§5', smoke=False,
+-                         world=edit_world())
+-            touch_marker('S3_D_EXT_DONE', 'S3H-§5')
+-            rep(f"## S3H-§5 ✓ {utc()}", f"- cases={ext_n} ok={ext_n} 其余条件同 §3; touch S3_D_EXT_DONE")
+-    except SystemExit:
+-        raise
+-    except Exception as e:
+-        halt('S3H-§5', f'异常 {type(e).__name__}: {e}', traceback.format_exc())
+-    try:
+-        if not marker('S3_SMOKE_GO'):
+-            phase_s6()
+-            wait_go('S3H-§6', 'S3_SMOKE_GO', 'S3_SMOKE_NOGO')
+-        if not marker('S3_G_FRESH_DONE'):
+-            gen_phase('fresh', 309, 'S3H-§7 fresh', f'{SHARE}/S3_G_FRESH_DONE')
+-        if not marker('S3_G_EXT_DONE'):
+-            gen_phase('ext', ext_n, 'S3H-§7 ext', f'{SHARE}/S3_G_EXT_DONE')
+-        if not marker('S3_END'):
+-            s3_finalize()
+-    except SystemExit:
+-        raise
+-    except Exception as e:
+-        halt('S3H-§6/7', f'异常 {type(e).__name__}: {e}', traceback.format_exc())
+-    try:
+         registered_parent_intact('S3H-§8')
+         g3_smoke()
+         g3_formal()

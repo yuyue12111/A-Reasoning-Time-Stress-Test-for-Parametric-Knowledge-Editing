@@ -53,3 +53,25 @@ defects in the original `orch_s3h.py`). The candidate fix is `patched_v2/{orch_s
     - The lean-import command from item 1.
     - The sha256 of `parent_end_of_generation.txt`, as in item 5.
     - No `S3_*`, `PARENT2_END` or `*_SMOKE_GO` marker exists in `$SHARE`.
+
+## v3 rulings (2026-10-13, after the second verification round)
+
+Round 2 (`orch_verify_v2_2026-10-13.json`) confirmed 12 more defects in `patched_v2`, fixed in `patched_v3`.
+
+- **(a) Summarize at world 2.** At world 2, summarize reads the r*of4 smoke logs first and then the r*of2 logs. Every
+  manifest case must count as ok exactly once.
+- **(b) The D11 guard after `PARENT2_STARTED`.**
+  - Before G10' first appends, a full hash check of the 120 registered H100 shards runs, and `PARENT2_STARTED` records
+    their registered byte sizes.
+  - From then on, every registered shard must begin with exactly its registered bytes (append-only).
+  - A flipped byte, a truncation, or a change without the marker halts the run. This replaces "a restart after G10'
+    halts".
+- **(c) `G3_SMOKE_GO`.** The file must contain the executor agent's reading note, for example
+  `reader=executor-agent utc=… verdict=coherent`. An empty file does not count. The note is copied into `parent2_end_of_generation.txt`.
+- **Pre-go marker list.** The check also covers `S3_SMOKE_DONE`, `S3_D_SMOKE_W4_OOM`, `G3_SMOKE_GO/NOGO`,
+  `PARENT2_STARTED/END` and `$POUTH/g3_smoke_reading.txt`. None of them may exist.
+- **Pre-committed rule, set before round 3 runs.**
+  - `patched_v3` gets a third, independent verification with a real end-to-end sandbox built from the real code bundle.
+  - **If round 3 confirms any new blocker, the orchestrator is dropped.** The executor agent then runs S3-H v2 by hand,
+    step by step.
+  - Confirmed majors can be patched once more.
