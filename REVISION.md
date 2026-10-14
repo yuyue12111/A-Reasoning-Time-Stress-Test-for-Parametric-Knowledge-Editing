@@ -130,6 +130,11 @@ D8 过门决策；D8–13 成文；10/12 提交。
 Superficial Editing。定位句：前人证明编辑不向外传播；我们证明推理时未编辑的邻域会向内回流，推翻编辑本身。
 
 ## 8 进度快照（随时可安全压缩上下文；最新在上）
+- **2026-10-14 17:05 调研结论落地：计划 `paperwriting/revision/plan_2026-10-14.md`（registry 14），D13 + S3-G 修订 2（registry 15）**
+  - 根因一：词法端点把"承诺新值、只在对比从句提到原值"算作丢失，且随熟悉度上升。复核：H2@14B 在 strict 下 +.127 → +.041 [−.029,.111]；32B 熟知 K 词法 +.242 / first-mention +.121 / strict +.091；15 条"两值都提"约 12 条实为保留。
+  - 根因二：现象已被发表（Gao et al. EMNLP 2026，Qwen3-32B ROME 78.0→24.7；Ren et al. ICML 2026；CODE 预印本）。新论点：思考让模型拿编辑和已知事实重新裁决；按承诺值计分 + 原答案对照；拆解 Gao 的坍塌；真实更新臂；内容 vs 计算；Study 4（Qwen3-14B 思考开关、AlphaEdit、真实更新）。
+  - 执行：Study 3 生成暂停，等 S3b-core（经人工校验的承诺计分）冻结，最迟 10/17 23:59；暂停期间 4090 做 W2-ext 编辑、备份、下载评委与 Qwen3-14B、在已见 Study 2 数据上跑评委（隔离 G10' 与 W2）。
+  - 待用户：两名人工标注者；匿名 OSF；ARR 1 月轮的 service contributor 与 ORCID。
 - **2026-10-14 15:40 4090 回来了，Study 3 改在 4090 上跑（D12，`111ab67`，推送 07:20:45Z；registry 12）**
   - 依据：冻结的 addendum §4 本来就写了"H100 不可用时，整个子世界搬到 4090（每进程 2 卡，`--device auto`）"。D9 作废，只保留 (c)（扩展 manifest 的 sha 先写进 xfer，再由我登记）。
   - 执行单 S3-G：`experiments/rt/platform_logs/2026-10-14/S3-G_sheet.md`（sha 8ccc267b…）。顺序：代码与环境核对 → fresh 编辑（4 卡/进程 × 2）→ 五个模型的扩展筛选（各用 Study 2 时的布局）→ ext manifest → 冒烟 → fresh 生成（2 卡/进程 × 4）→ ext 编辑 → ext 生成 → end entry → `S3_END`。预计 6–8 小时。
