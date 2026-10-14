@@ -130,6 +130,11 @@ D8 过门决策；D8–13 成文；10/12 提交。
 Superficial Editing。定位句：前人证明编辑不向外传播；我们证明推理时未编辑的邻域会向内回流，推翻编辑本身。
 
 ## 8 进度快照（随时可安全压缩上下文；最新在上）
+- **2026-10-14 20:20 8×H200（离线）上线：执行单 H200-A（D14，registry 16，`28aa64b`，bundle sha b3b7df6f…）**
+  - H200 跑父研究第二窗口，顺序 G11'（链移植 own/filler/swap，已注册）→ Llama-70B → G10' 剩余；另跑探索性的 s2x（编辑后模型读未编辑模型的链等四个臂）、s2retest（噪声地板）、mech。全部只用 Study 2 的 32B 池，与 Study 3 无交集。
+  - G10' 在 H100 原分片上只追加；写入前核对 registry 10 哈希，结束后核对前缀哈希（`src/rtx/prefix_check.py`）。
+  - 4090 不变：Study 3 编辑/筛选 → 暂停（等 S3b-core）→ 下载 → 评委（修订 2）。
+  - 第二窗口在 PARENT2_END 前不打开任何行；之后 rt.study2 只跑一次，结果为补充。
 - **2026-10-14 17:05 调研结论落地：计划 `paperwriting/revision/plan_2026-10-14.md`（registry 14），D13 + S3-G 修订 2（registry 15）**
   - 根因一：词法端点把"承诺新值、只在对比从句提到原值"算作丢失，且随熟悉度上升。复核：H2@14B 在 strict 下 +.127 → +.041 [−.029,.111]；32B 熟知 K 词法 +.242 / first-mention +.121 / strict +.091；15 条"两值都提"约 12 条实为保留。
   - 根因二：现象已被发表（Gao et al. EMNLP 2026，Qwen3-32B ROME 78.0→24.7；Ren et al. ICML 2026；CODE 预印本）。新论点：思考让模型拿编辑和已知事实重新裁决；按承诺值计分 + 原答案对照；拆解 Gao 的坍塌；真实更新臂；内容 vs 计算；Study 4（Qwen3-14B 思考开关、AlphaEdit、真实更新）。
