@@ -1,0 +1,38 @@
+# EXPLORATORY (plan_2026-10-14 §3 Tier 2, noise floor): re-generate base and rome_N on the Study 2 32B pool
+# (400 seen facts) on another node and batch layout.  Per-case flips against the registered H100 rows give the
+# floor of "loss" that pure numerical non-determinism produces, by familiarity.  Identical to the stage-1
+# base/rome_N conditions of study2_r1qwen32b.yaml except probes (efficacy only), run tag and out_dir.
+model_tag: r1qwen32b
+template: r1
+no_bos: true
+model:
+  path: null
+  dtype: bfloat16
+  device_map: null
+module_tmp: "model.layers.{}.mlp.down_proj"
+out_dir: results/rt/s2retest
+run_tag: s2retest
+
+dataset:
+  path: data/counterfact.jsonl
+  manifest: experiments/rt/pools/study2/manifest_r1qwen32b.jsonl
+
+aliases: data/aliases.json
+probes: [efficacy]
+decoding: {greedy: true}
+
+engine:
+  batch_size: 32
+  max_batch_tokens: 128000
+  answer_cap: 256
+  chunk_cases: 10
+
+conditions:
+  - name: base
+    editor: none
+    budgets: [B0, B3]
+  - name: rome_N
+    editor: ROME
+    target_tag: cf
+    deltas_dir: deltas/r1qwen32b/ROME/cf
+    budgets: [B0, B3]

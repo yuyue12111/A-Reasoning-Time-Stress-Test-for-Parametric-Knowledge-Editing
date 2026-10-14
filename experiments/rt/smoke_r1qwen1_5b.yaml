@@ -1,0 +1,37 @@
+# Platform canary, generation side: the engine with real ROME deltas (deltas_smoke_r1qwen1_5b.yaml) on
+# R1-Distill-Qwen-1.5B, base and N arm at B0/B3, efficacy only.  Run with --limit 5.  Checks the real
+# tokenizer guards, the hooked edit in bf16 generation and the chain/answer split before G0.
+model_tag: r1qwen1_5b
+template: r1
+no_bos: true
+model:
+  path: null                  # null -> $WHYAAAI_MODEL
+  dtype: bfloat16
+  device_map: null
+module_tmp: "model.layers.{}.mlp.down_proj"
+out_dir: results/rt/smoke
+run_tag: smoke
+
+dataset:
+  path: data/counterfact.jsonl
+  manifest: experiments/rt/pools/study1_cf200.jsonl
+
+aliases: data/aliases.json
+probes: [efficacy]
+decoding: {greedy: true}
+
+engine:
+  batch_size: 8
+  max_batch_tokens: 64000
+  answer_cap: 256
+  chunk_cases: 5
+
+conditions:
+  - name: base
+    editor: none
+    budgets: [B0, B3]
+  - name: rome_N
+    editor: ROME
+    target_tag: cf
+    deltas_dir: deltas_smoke/r1qwen1_5b/ROME/cf
+    budgets: [B0, B3]

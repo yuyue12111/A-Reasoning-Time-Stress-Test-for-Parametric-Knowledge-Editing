@@ -1,0 +1,28 @@
+# Study 3 extension screen (prereg-arr-addendum-s3.md §4).  The candidates are frozen in
+# experiments/rt/pools/study3/candidates.jsonl: the next 1600 ids of the Study 2 seed-2027 shuffle (do NOT run
+# `build` with this config; the file is the deterministic continuation, see candidates_summary.json).
+# Screen the five models below at B0 exactly as in Study 2, then `qualify` each.  Then
+# `python -m study3.ext_manifest` writes manifest_r1qwen32b_ext.jsonl (32B-qualified AND well-known).
+counterfact: data/counterfact.jsonl
+aliases: data/aliases.json
+seed: 2027
+n_candidates: 1600
+k: 1600                                    # keep every qualified case; the rule in study3.ext_manifest selects
+pool_dir: experiments/rt/pools/study3
+screen_dir: results/rt/pool_s3
+
+exclude_facts:                             # as Study 2
+  cf_4298: "mquake_1366 (Sweyn II of Denmark, P140, Christianity), Llama-8B 2-hop run"
+
+engine:
+  batch_size: 64
+  max_batch_tokens: 128000
+  answer_cap: 256
+  chunk_cases: 200
+
+models:                                    # identical entries to pool_screen.yaml
+  r1qwen1_5b: {template: r1, no_bos: true}
+  r1qwen7b: {template: r1, no_bos: true}
+  r1qwen14b: {template: r1, no_bos: true}
+  r1qwen32b: {template: r1, no_bos: true, model: {device_map: auto}}
+  r1llama8b: {template: r1, no_bos: false}

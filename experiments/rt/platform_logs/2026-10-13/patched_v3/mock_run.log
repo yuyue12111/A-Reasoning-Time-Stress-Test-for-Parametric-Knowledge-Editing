@@ -1,0 +1,177 @@
+
+== deltas_phase §3 OOM fallback (v2), pool n=20
+[2026-10-13 13:21:59] REPORT ## S3H-§3 smoke ✓ 2026-10-13 05:21:59
+  [info] v2 deltas no-OOM: outcome=('ok', 4); S3_D_SMOKE_OK=world=4; formal summarize cases/ok=20/20
+[2026-10-13 13:21:59] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:21:59
+[2026-10-13 13:21:59] REPORT ## S3H-§3 ⏸ 2026-10-13 05:21:59
+[2026-10-13 13:21:59] HALT S3H-§3: 冒烟通过条件未满足: {"cases": 1, "ok": 1, "errors": {}, "error_ids": {}, "editor_nan": 0, "max_rank": 1, "max_rel_err": 1e-06, "median_rel_delta": 0.01, "median_p_target_before": 0.0183, "median_p_target_after": 0.9802, "median_gain_target_nats": 3.98, "median_change_o_old_nats": -4.7, "median_wall_s": 1.0}
+  [info] v2 deltas A: w4 case0 ok, case4 OOM: outcome=('halt', 1); S3_D_SMOKE_OK=None; formal summarize cases/ok=None/None; halt: 待裁决：冒烟通过条件未满足: {"cases": 1, "ok": 1, "errors": {}, "error_ids": {}, "editor_nan": 0, "max_rank": 1, "max_rel_err": 1e-06, "median_rel_delta": 0.01, "median_p_ta
+[2026-10-13 13:21:59] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:21:59
+[2026-10-13 13:21:59] REPORT ## S3H-§3 smoke ✓ 2026-10-13 05:21:59
+[2026-10-13 13:21:59] REPORT ## S3H-§3 retry-errors ⏸→run 2026-10-13 05:21:59
+[2026-10-13 13:21:59] REPORT ## S3H-§3 ⏸ 2026-10-13 05:21:59
+[2026-10-13 13:21:59] HALT S3H-§3: retry-errors 后仍未过: {"cases": 19, "ok": 19, "errors": {}, "error_ids": {}, "editor_nan": 0, "max_rank": 1, "max_rel_err": 1e-06, "median_rel_delta": 0.01, "median_p_target_before": 0.0183, "median_p_target_after": 0.9802, "median_gain_target_nats": 3.98, "median_change_o_old_nats": -4.7, "median_wall_s": 1.0}
+  [info] v2 deltas B: w4 case0 OOM, case4 ok: outcome=('halt', 1); S3_D_SMOKE_OK=world=2; formal summarize cases/ok=19/19; halt: 待裁决：retry-errors 后仍未过: {"cases": 19, "ok": 19, "errors": {}, "error_ids": {}, "editor_nan": 0, "max_rank": 1, "max_rel_err": 1e-06, "median_rel_delta": 0.01, "m
+[2026-10-13 13:22:00] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:22:00
+[2026-10-13 13:22:00] REPORT ## S3H-§3 smoke ✓ 2026-10-13 05:22:00
+  [info] v2 deltas full OOM (both w4 cases): outcome=('ok', 2); S3_D_SMOKE_OK=world=2; formal summarize cases/ok=20/20
+[2026-10-13 13:22:00] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:22:00
+[2026-10-13 13:22:00] REPORT ## S3H-§3 smoke ✓ 2026-10-13 05:22:00
+  [info] v2 deltas OOM at model load (w4): outcome=('ok', 2); S3_D_SMOKE_OK=world=2; formal summarize cases/ok=20/20
+[2026-10-13 13:22:00] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:22:00
+[2026-10-13 13:22:00] REPORT ## S3H-§3 ⏸ 2026-10-13 05:22:00
+[2026-10-13 13:22:00] HALT S3H-§3: 冒烟通过条件未满足: {"cases": 1, "ok": 0, "errors": {"extract": 1}, "error_ids": {"extract": ["c002"]}, "editor_nan": 0, "max_rank": null, "max_rel_err": null, "median_rel_delta": null, "median_p_target_before": null, "median_p_target_after": null, "median_gain_target_nats": null, "median_change_o_old_nats": null, "median_wall_s": null}
+  [info] v2 deltas A + non-OOM error on world-2 smoke case2: outcome=('halt', 1); S3_D_SMOKE_OK=None; formal summarize cases/ok=None/None; halt: 待裁决：冒烟通过条件未满足: {"cases": 1, "ok": 0, "errors": {"extract": 1}, "error_ids": {"extract": ["c002"]}, "editor_nan": 0, "max_rank": null, "max_rel_err": null, "medi
+[2026-10-13 13:22:00] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:22:00
+[2026-10-13 13:22:01] REPORT ## S3H-§3 ⏸ 2026-10-13 05:22:01
+[2026-10-13 13:22:01] HALT S3H-§3: 冒烟通过条件未满足: {"cases": 2, "ok": 1, "errors": {"extract": 1}, "error_ids": {"extract": ["c000"]}, "editor_nan": 0, "max_rank": 1, "max_rel_err": 1e-06, "median_rel_delta": 0.01, "median_p_target_before": 0.0183, "median_p_target_after": 0.9802, "median_gain_target_nats": 3.98, "median_change_o_old_nats": -4.7, "median_wall_s": 1.0}
+  [info] v2 deltas B + non-OOM error on world-2 smoke case0: outcome=('halt', 1); S3_D_SMOKE_OK=None; formal summarize cases/ok=None/None; halt: 待裁决：冒烟通过条件未满足: {"cases": 2, "ok": 1, "errors": {"extract": 1}, "error_ids": {"extract": ["c000"]}, "editor_nan": 0, "max_rank": 1, "max_rel_err": 1e-06, "median
+[2026-10-13 13:22:01] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:22:01
+[2026-10-13 13:22:01] REPORT ## S3H-§3 ⏸ 2026-10-13 05:22:01
+[2026-10-13 13:22:01] HALT S3H-§3: 冒烟通过条件未满足: {"cases": 1, "ok": 1, "errors": {}, "error_ids": {}, "editor_nan": 0, "max_rank": 1, "max_rel_err": 1e-06, "median_rel_delta": 0.01, "median_p_target_before": 0.0183, "median_p_target_after": 0.9802, "median_gain_target_nats": 3.98, "median_change_o_old_nats": -4.7, "median_wall_s": 1.0}
+  [info] v2 deltas A + transient formal error -> --retry-errors: outcome=('halt', 1); S3_D_SMOKE_OK=None; formal summarize cases/ok=None/None; halt: 待裁决：冒烟通过条件未满足: {"cases": 1, "ok": 1, "errors": {}, "error_ids": {}, "editor_nan": 0, "max_rank": 1, "max_rel_err": 1e-06, "median_rel_delta": 0.01, "median_p_ta
+[2026-10-13 13:22:01] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:22:01
+[2026-10-13 13:22:01] REPORT ## S3H-§3 ⏸ 2026-10-13 05:22:01
+[2026-10-13 13:22:01] HALT S3H-§3: 4卡 world2 冒烟仍失败 rc=1; tail: [deltas] r1qwen32b ROME cf n=4 shard=2 rank=0/2
+RuntimeError: simulated crash
+[2026-10-13 13:22:01] REPORT ## S3H-§3 ⏸ 2026-10-13 05:22:01
+[2026-10-13 13:22:01] HALT S3H-§3: 冒烟通过条件未满足: {"cases": 2, "ok": 0, "errors": {"edit": 2}, "error_ids": {"edit": ["c000", "c004"]}, "editor_nan": 0, "max_rank": null, "max_rel_err": null, "median_rel_delta": null, "median_p_target_before": null, "median_p_target_after": null, "median_gain_target_nats": null, "median_change_o_old_nats": null, "median_wall_s": null}
+  [info] v2 deltas resume: w4 OOM, world-2 smoke crashed, restart: first=('halt', 1); restart=('halt', 1); S3_D_SMOKE_OK=None; cases/ok=None/None; halt: 待裁决：冒烟通过条件未满足: {"cases": 2, "ok": 0, "errors": {"edit": 2}, "error_ids": {"edit": ["c000", "c004"]}, "editor_nan": 0, "max_rank": null, "max_rel_err": null, "me
+
+== deltas_phase §3 OOM fallback (v3), pool n=20
+[2026-10-13 13:22:01] REPORT ## S3H-§3 smoke ✓ 2026-10-13 05:22:01
+  [PASS] v3 deltas no-OOM -- outcome=('ok', 4); S3_D_SMOKE_OK=world=4; formal summarize cases/ok=20/20
+[2026-10-13 13:22:01] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:22:01
+[2026-10-13 13:22:01] REPORT ## S3H-§3 smoke ✓ 2026-10-13 05:22:01
+  [PASS] v3 deltas A: w4 case0 ok, case4 OOM -- outcome=('ok', 2); S3_D_SMOKE_OK=world=2; formal summarize cases/ok=20/20
+[2026-10-13 13:22:02] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:22:02
+[2026-10-13 13:22:02] REPORT ## S3H-§3 smoke ✓ 2026-10-13 05:22:02
+  [PASS] v3 deltas B: w4 case0 OOM, case4 ok -- outcome=('ok', 2); S3_D_SMOKE_OK=world=2; formal summarize cases/ok=20/20
+[2026-10-13 13:22:02] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:22:02
+[2026-10-13 13:22:02] REPORT ## S3H-§3 smoke ✓ 2026-10-13 05:22:02
+  [PASS] v3 deltas full OOM (both w4 cases) -- outcome=('ok', 2); S3_D_SMOKE_OK=world=2; formal summarize cases/ok=20/20
+[2026-10-13 13:22:02] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:22:02
+[2026-10-13 13:22:03] REPORT ## S3H-§3 smoke ✓ 2026-10-13 05:22:03
+  [PASS] v3 deltas OOM at model load (w4) -- outcome=('ok', 2); S3_D_SMOKE_OK=world=2; formal summarize cases/ok=20/20
+[2026-10-13 13:22:03] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:22:03
+[2026-10-13 13:22:03] REPORT ## S3H-§3 ⏸ 2026-10-13 05:22:03
+[2026-10-13 13:22:03] HALT S3H-§3: 冒烟通过条件未满足: {"cases": 3, "ok": 1, "errors": {"edit": 1, "extract": 1}, "error_ids": {"edit": ["c004"], "extract": ["c002"]}, "editor_nan": 0, "max_rank": 1, "max_rel_err": 1e-06, "median_rel_delta": 0.01, "median_p_target_before": 0.0183, "median_p_target_after": 0.9802, "median_gain_target_nats": 3.98, "median_change_o_old_nats": -4.7, "median_wall_s": 1.0}; world2 冒烟计数 {'ok': 0, 'error': 1, 'skipped_existing': 1, 'skipped_error': 0}; 仅 r*of2: ok=0 errors={'extract': 1}
+  [PASS] v3 deltas A + non-OOM error on world-2 smoke case2 -- outcome=('halt', 1); S3_D_SMOKE_OK=None; formal summarize cases/ok=None/None; halt: 待裁决：冒烟通过条件未满足: {"cases": 3, "ok": 1, "errors": {"edit": 1, "extract": 1}, "error_ids": {"edit": ["c004"], "extract": ["c002"]}, "editor_nan": 0, "max_rank": 1, 
+[2026-10-13 13:22:03] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:22:03
+[2026-10-13 13:22:03] REPORT ## S3H-§3 ⏸ 2026-10-13 05:22:03
+[2026-10-13 13:22:03] HALT S3H-§3: 冒烟通过条件未满足: {"cases": 3, "ok": 2, "errors": {"extract": 1}, "error_ids": {"extract": ["c000"]}, "editor_nan": 0, "max_rank": 1, "max_rel_err": 1e-06, "median_rel_delta": 0.01, "median_p_target_before": 0.0183, "median_p_target_after": 0.9802, "median_gain_target_nats": 3.98, "median_change_o_old_nats": -4.7, "median_wall_s": 1.0}; world2 冒烟计数 {'ok': 1, 'error': 1, 'skipped_existing': 0, 'skipped_error': 0}; 仅 r*of2: ok=1 errors={'extract': 1}
+  [PASS] v3 deltas B + non-OOM error on world-2 smoke case0 -- outcome=('halt', 1); S3_D_SMOKE_OK=None; formal summarize cases/ok=None/None; halt: 待裁决：冒烟通过条件未满足: {"cases": 3, "ok": 2, "errors": {"extract": 1}, "error_ids": {"extract": ["c000"]}, "editor_nan": 0, "max_rank": 1, "max_rel_err": 1e-06, "median
+[2026-10-13 13:22:03] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:22:03
+[2026-10-13 13:22:04] REPORT ## S3H-§3 smoke ✓ 2026-10-13 05:22:04
+[2026-10-13 13:22:04] REPORT ## S3H-§3 retry-errors ⏸→run 2026-10-13 05:22:04
+  [PASS] v3 deltas A + transient formal error -> --retry-errors -- outcome=('ok', 2); S3_D_SMOKE_OK=world=2; formal summarize cases/ok=20/20
+[2026-10-13 13:22:04] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:22:04
+[2026-10-13 13:22:04] REPORT ## S3H-§3 ⏸ 2026-10-13 05:22:04
+[2026-10-13 13:22:04] HALT S3H-§3: 4卡 world2 冒烟仍失败 rc=1; tail: [deltas] r1qwen32b ROME cf n=4 shard=2 rank=0/2
+RuntimeError: simulated crash
+[2026-10-13 13:22:04] REPORT ## S3H-§3 smoke-OOM-retry ⏸→run 2026-10-13 05:22:04
+[2026-10-13 13:22:04] REPORT ## S3H-§3 smoke ✓ 2026-10-13 05:22:04
+  [PASS] v3 deltas resume: w4 OOM, world-2 smoke crashed, restart -- first=('halt', 1); restart=('ok', 2); S3_D_SMOKE_OK=world=2; cases/ok=20/20
+  [PASS] v3 §5 at inherited world 2 -- ('ok', 2) (20, 20)
+[2026-10-13 13:22:04] REPORT ## S3H-§3/§5 ⏸ 2026-10-13 05:22:04
+[2026-10-13 13:22:04] HALT S3H-§3/§5: S3_D_SMOKE_OK 不可读: IndexError: list index out of range
+  [PASS] v3 edit_world halts on an empty S3_D_SMOKE_OK -- ('halt', 1)
+
+== main() control flow (v3, phases stubbed)
+[2026-10-13 13:22:04] orchestrator started (S3-H)
+[2026-10-13 13:22:04] REPORT ## S3H-ORCH start ✓ 2026-10-13 05:22:04
+[2026-10-13 13:22:04] REPORT ## S3H-§3 ✓ 2026-10-13 05:22:04
+[2026-10-13 13:22:04] REPORT ## S3H-§5 ✓ 2026-10-13 05:22:04
+[2026-10-13 13:22:04] REPORT ## S3H-ALL ✓ 2026-10-13 05:22:04
+[2026-10-13 13:22:04] orchestrator DONE
+  [PASS] fresh start order: §2 -> §6 smoke -> §3 -> §4 -> §5 -> wait GO -> §7 -> close-out -> §8 -- ['s2', 's6', 'deltas:s3fresh', 's4', 'deltas:s3ext', 'wait_go:S3_SMOKE_GO', 'gen:fresh:309', 'gen:ext:7', 'finalize', 'registered_parent_intact', 'g3_smoke', 'g3_formal', 'g10_resume', 'g11_run', 'parent2_end']
+[2026-10-13 13:22:04] orchestrator started (S3-H)
+[2026-10-13 13:22:04] REPORT ## S3H-ORCH start ✓ 2026-10-13 05:22:04
+[2026-10-13 13:22:04] REPORT ## S3H-§3–§7 ✓ 2026-10-13 05:22:04
+[2026-10-13 13:22:04] REPORT ## S3H-ALL ✓ 2026-10-13 05:22:04
+[2026-10-13 13:22:04] orchestrator DONE
+  [PASS] S3_END (leader close-out, ext world incomplete) skips all Study 3 work -- ['s2', 'registered_parent_intact', 'g3_smoke', 'g3_formal', 'g10_resume', 'g11_run', 'parent2_end']
+[2026-10-13 13:22:05] orchestrator started (S3-H)
+[2026-10-13 13:22:05] REPORT ## S3H-ORCH start ✓ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] REPORT ## S3H-§6 ⏸ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] HALT S3H-§6: S3_SMOKE_GO/NOGO 已存在但没有 S3_SMOKE_DONE（冒烟未完成即被放行/否决），待 leader
+  [PASS] restart with S3_SMOKE_NOGO but no S3_SMOKE_DONE halts at §6 before §3 -- ('halt', 1) ['s2']
+[2026-10-13 13:22:05] orchestrator started (S3-H)
+[2026-10-13 13:22:05] REPORT ## S3H-ORCH start ✓ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] REPORT ## S3H-§6 ⏸ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] HALT S3H-§6: S3_SMOKE_GO/NOGO 已存在但没有 S3_SMOKE_DONE（冒烟未完成即被放行/否决），待 leader
+  [PASS] S3_SMOKE_GO without S3_SMOKE_DONE halts at §6 -- ('halt', 1) ['s2']
+[2026-10-13 13:22:05] orchestrator started (S3-H)
+[2026-10-13 13:22:05] REPORT ## S3H-ORCH start ✓ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] REPORT ## S3H-§3 ✓ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] REPORT ## S3H-§5 ✓ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] REPORT ## S3H-§6 ⏸ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] HALT S3H-§6: executor agent 或 leader（S3-H v2 第 3 条） 判定不通过（S3_SMOKE_NOGO）
+  [PASS] S3_SMOKE_NOGO touched during edits: §3–§5 finish, halt at the §7 gate -- ('halt', 1) ['s2', 'deltas:s3fresh', 's4', 'deltas:s3ext', 'wait_go:S3_SMOKE_GO']
+[2026-10-13 13:22:05] orchestrator started (S3-H)
+[2026-10-13 13:22:05] REPORT ## S3H-ORCH start ✓ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] REPORT ## S3H-§6 ✓ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] REPORT ## S3H-ALL ✓ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] orchestrator DONE
+  [PASS] resume mid-§7 (fresh done): skips smoke and edits, runs ext then close-out and §8 -- ['s2', 'rec_ext', 'wait_go:S3_SMOKE_GO', 'gen:ext:7', 'finalize', 'registered_parent_intact', 'g3_smoke', 'g3_formal', 'g10_resume', 'g11_run', 'parent2_end']
+[2026-10-13 13:22:05] REPORT ## S3H-§2 ⏸ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] HALT S3H-§2: 无 S3_CODE_OK 却已有 Study 3/第二窗口标记 ['G3_SMOKE_GO']（陈旧标记会使阶段被跳过或绕过人工门）
+  [PASS] fresh start with a leftover G3_SMOKE_GO halts in §2 -- ('halt', 1)
+[2026-10-13 13:22:05] REPORT ## S3H-§2 resume ⏸ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] HALT S3H-§2 resume: 续跑启动时仍有上一轮遗留 rt 进程；看门狗状态未重置（这些 rank 仍受看门狗跟踪），待 leader 裁决: 4242 python3 -m rt.run --config x
+  [PASS] resume with live rt ranks halts and keeps their watchdog entries -- ('halt', 1) ranks_after=8
+[2026-10-13 13:22:05] orchestrator started (S3-H)
+[2026-10-13 13:22:05] REPORT ## S3H-ORCH start ⏸ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] REPORT ## S3H-§2 resume ⏸ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] HALT S3H-§2 resume: 续跑启动时仍有上一轮遗留 rt 进程（非污染信号，待 leader 裁决）: 4242 python3 -m rt.run --config x
+  [info] v2 same scenario: ('halt', 1), ranks after = 0
+  [PASS] second orchestrator instance exits 2 and leaves report/watchdog state untouched -- rc=2 out=[2026-10-13 05:22:05] another orch_s3h.py holds /private/tmp/claude-501/-Users-whyu-GitProjects-why-aaai27--claude-workt
+
+== D11 guard (registered parent shards) across a window-2 restart
+[2026-10-13 13:22:05] REPORT ## S3H-§8 ⏸ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] HALT S3H-§8: PROJH results/rt/s2 与 D11 登记条目不符（第二窗口已开始或分片被改，待 leader）: p/claude-501/-Users-whyu-GitProjects-why-aaai27--claude-worktrees-paper-review-understanding-8732e6/4f22b6c9-5bdd-44bb-8c20-2e3a8b29ad62/scratchpad/s3h_final.BqjdY3/sbx/d11_v2/why/why-arr-h100/results/rt/s2/r1qwen32b_s2_ike_r7of8.jsonl: FAILED
+sha256sum: WARNING: 56 computed checksums did NOT match
+
+  [info] v2: before window 2 ok; restart after G10' appended -> ('halt', 1)
+[2026-10-13 13:22:05] REPORT ## S3H-§8 G10' PARENT2_STARTED ✓ 2026-10-13 05:22:05
+  [PASS] v3 intact before window 2 -- ok
+  [PASS] v3 PARENT2_STARTED written before G10' -- ('ok', None)
+  [PASS] v3 restart after G10' appended to 56 registered shards passes (append-only) -- ok
+[2026-10-13 13:22:05] REPORT ## S3H-§8 ⏸ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] HALT S3H-§8: 登记分片的已登记前缀被改（不是只追加；待 leader）: ['/private/tmp/claude-501/-Users-whyu-GitProjects-why-aaai27--claude-worktrees-paper-review-understanding-8732e6/4f22b6c9-5bdd-44bb-8c20-2e3a8b29ad62/scratchpad/s3h_final.BqjdY3/sbx/d11_v3/why/why-arr-h100/results/rt/s2/r1qwen32b_s2_rome_T_r3of8.jsonl']
+  [PASS] v3 a byte changed inside a registered prefix halts -- ('halt', 1)
+[2026-10-13 13:22:05] REPORT ## S3H-§8 ⏸ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] HALT S3H-§8: 登记分片的已登记前缀被改（不是只追加；待 leader）: ['/private/tmp/claude-501/-Users-whyu-GitProjects-why-aaai27--claude-worktrees-paper-review-understanding-8732e6/4f22b6c9-5bdd-44bb-8c20-2e3a8b29ad62/scratchpad/s3h_final.BqjdY3/sbx/d11_v3/why/why-arr-h100/results/rt/s2/r1qwen32b_s2_ike_r2of8.jsonl']
+  [PASS] v3 a truncated G10' shard halts -- ('halt', 1)
+[2026-10-13 13:22:05] REPORT ## S3H-§8 ⏸ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] HALT S3H-§8: PROJH results/rt/s2 与 D11 登记条目不符（第二窗口写入前；待 leader）: ['/private/tmp/claude-501/-Users-whyu-GitProjects-why-aaai27--claude-worktrees-paper-review-understanding-8732e6/4f22b6c9-5bdd-44bb-8c20-2e3a8b29ad62/scratchpad/s3h_final.BqjdY3/sbx/d11_v3/why/why-arr-h100/results/rt/s2/r1qwen32b_s2_rome_B0P_r0of8.jsonl', '/private/tmp/claude-501/-Users-whyu-GitProjects-why-aaai27--claude-worktrees-paper-review-understanding-8732e6/4f22b6c9-5bdd-44bb-8c20-2e3a8b29ad62/scratchpad/s3h_final.BqjdY3/sbx/d11_v3/why/why-arr-h100/results/rt/s2/r1qwen32b_s2_rome_B0P_r1of8.jsonl', '/private/tmp/claude-501/-Users-whyu-GitProjects-why-aaai27--claude-worktrees-paper-review-understanding-8732e6/4f22b6c9-5bdd-44bb-8c20-2e3a8b29ad62/scratchpad/s3h_final.BqjdY3/sbx/d11_v3/why/why-arr-h100/results/rt/s2/r1qwen32b_s2_rome_B0P_r2of8.jsonl', '/private/tmp/claude-501/-Users-whyu-GitProjects-why-aaai27--claude-worktrees-paper-review-understanding-8732e6/4f22b6c9-5bdd-44bb-8c20-2e3a8b29ad62/scratchpad/s3h_final.BqjdY3/sbx/d11_v3/why/why-arr-h100/results/rt/s2/r1qwen32b_s2_rome_B0P_r3of8.jsonl', '/private/tmp/claude-501/-Users-whyu-GitProjects-why-aaai27--claude-worktrees-paper-review-understanding-8732e6/4f22b6c9-5bdd-44bb-8c20-2e3a8b29ad62/scratchpad/s3h_final.BqjdY3/sbx/d11_v3/why/why-arr-h100/results/rt/s2/r1qwen32b_s2_rome_B0P_r4of8.jsonl']
+  [PASS] v3 without PARENT2_STARTED any change halts (full hash) -- ('halt', 1)
+
+== G3'' smoke reading provenance and parent2 entry (v3)
+[2026-10-13 13:22:05] REPORT ## S3H-§8 G3'' smoke note 2026-10-13 05:22:05
+[2026-10-13 13:22:05] REPORT ## S3H-§8 G3'' smoke ⏸ 2026-10-13 05:22:05
+[2026-10-13 13:22:05] REPORT ## S3H-§8 G3'' smoke ⏸ 2026-10-13 05:22:05
+[2026-10-13 13:22:06] REPORT ## S3H-§8 G3'' smoke ✓ 2026-10-13 05:22:06
+[2026-10-13 13:22:06] REPORT ## S3H-§8 G3'' smoke reading ✓ 2026-10-13 05:22:06
+  [PASS] empty G3_SMOKE_GO is not accepted (one ⏸ prompt), the note is then accepted -- ('ok', None)
+  [PASS] report credits the executor, never "leader 复核通过"
+  [PASS] reading record has shards+sha256, executor-not-leader, GO mtime and the note -- G3pp 70B smoke reading (S3-H v2 amendment 4): r1llama70b_s2smoke_base_r0of8.jsonl sha256=a39bbd46a685c544d6bfcc77c20f15167ccb67b6e493827e5e54188509304364; r1llama70b_s2smoke_rome_N_r0of8.jsonl sha256=
+[2026-10-13 13:22:06] REPORT ## S3H-§8 PARENT2_END ✓ 2026-10-13 05:22:06
+  [PASS] parent2 entry = sha256 lines, then the reading line, then the stopped line -- ('ok', None) tail=['G3pp 70B smoke reading (S3-H v2 amendment 4): r1llama70b_s2smoke_base_r0of8.jsonl sha256=a39bbd46a685c544d6bfcc77c20f15167ccb67b6e493827e5e54188509304364; r1llama70b_s2smoke_rome_N_r0of8.jsonl sha256=a39bbd46a685c544d6bfcc77c20f15167ccb67b6e493827e5e54188509304364 (2 cases, second-window outcomes) were read for coherent English (R1-Llama risks: missing spaces, missing BOS) by the executor agent; the leader does not read them. G3_SMOKE_GO mtime 2026-10-13T05:22:06Z; note: reader=executor-agent utc=2026-10-20T01:02:03Z verdict=coherent (mock)', 'stopped: second window (D11, supplementary; G3pp, G10p resume, G11p queue complete); written 2026-10-13T05:22:06Z']
+[2026-10-13 13:22:06] REPORT ## S3H-§8 第二窗口收尾 ⏸ 2026-10-13 05:22:06
+[2026-10-13 13:22:06] HALT S3H-§8 第二窗口收尾: /private/tmp/claude-501/-Users-whyu-GitProjects-why-aaai27--claude-worktrees-paper-review-understanding-8732e6/4f22b6c9-5bdd-44bb-8c20-2e3a8b29ad62/scratchpad/s3h_final.BqjdY3/sbx/g3_missing/why/platform_out_h100/g3_smoke_reading.txt 缺失：S3-H v2 第 4 条要求 parent2 条目记录 70B 冒烟的读取
+  [PASS] parent2_end halts when the reading record is missing -- ('halt', 1)
+
+== watchdog: shared lock while nvidia-smi hangs; orchestrator lock deadline; heartbeat; hang restart
+[2026-10-13 13:22:14] REPORT ## WD-LOCK ⏸ 2026-10-13 05:22:14
+[2026-10-13 13:22:14] HALT WD-LOCK: /private/tmp/claude-501/-Users-whyu-GitProjects-why-aaai27--claude-worktrees-paper-review-understanding-8732e6/4f22b6c9-5bdd-44bb-8c20-2e3a8b29ad62/scratchpad/s3h_final.BqjdY3/sbx/wd_v2/tmp/why_wd_state.lock 被占用 >6s（看门狗卡住？nvidia-smi 挂起？）；看门狗状态无法更新
+  [PASS] v2 watchdog + v3 orchestrator: lock held by hung nvidia-smi -> bounded ⏸ (WD-LOCK), not a silent stall -- ('halt', 1) after 6.0s
+  [PASS] v3 watchdog: orchestrator gets the shared lock while nvidia-smi hangs -- ('ok', None) after 0.0s
+  [info] v2 hourly with hung nvidia-smi: heartbeat written within 15 s = False
+[2026-10-13 13:22:31] REPORT ## ORCH ⏸ 2026-10-13 05:22:31
+[2026-10-13 13:22:34] REPORT ## ORCH heartbeat ✓ 2026-10-13 05:22:34
+  [PASS] v3 hourly heartbeat is written while nvidia-smi hangs -- ## ORCH heartbeat ✓ 2026-10-13 05:22:34
+- 心跳（非停止）: 阶段 init | started | rt 进程 0 | nvidia-smi 无输出
+  [PASS] v3 watchdog still detects a 0% hang, kills it and restarts with the stored command -- new=(85233, 1, 'running')
+
+SUMMARY: 35/35 checks passed

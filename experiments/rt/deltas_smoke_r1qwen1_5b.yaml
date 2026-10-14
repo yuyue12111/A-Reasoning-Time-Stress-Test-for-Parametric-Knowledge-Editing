@@ -1,0 +1,17 @@
+# Platform canary (REVISION.md §4): a real fp32 ROME edit through EasyEdit on R1-Distill-Qwen-1.5B for
+# the first cases of the Study-1 pool, on one 4090.  Checks the edit path under the platform's torch,
+# transformers and the lean easyeditor import before any H200 time is spent.  Outputs are kept apart
+# from every real run (deltas_smoke/, deltas_logs/smoke/).
+model: r1qwen1_5b
+editor: ROME
+target_tag: cf
+pool: experiments/rt/pools/study1_cf200.jsonl
+dataset: data/counterfact.jsonl
+models_file: experiments/rt/deltas_models.yaml
+out_root: deltas_smoke
+log_dir: results/rt/deltas_logs/smoke
+dtype: float32
+factor:
+  max_rank: 1
+  tol: 1.0e-4
+  floor_mult: 8.0

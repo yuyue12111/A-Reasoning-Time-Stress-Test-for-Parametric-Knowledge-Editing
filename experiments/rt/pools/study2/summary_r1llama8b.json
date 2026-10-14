@@ -1,0 +1,44 @@
+{
+ "n_candidates": 1600,
+ "n_screened": 1600,
+ "n_qualified": 528,
+ "k": 400,
+ "n_manifest": 400,
+ "complete": true,
+ "excluded_primary": {
+  "missing_screen": 0,
+  "used_fact": 1,
+  "subject_contains_old": 128,
+  "old_miss": 929,
+  "new_hit": 14
+ },
+ "excluded_any": {
+  "missing_screen": 0,
+  "used_fact": 1,
+  "subject_contains_old": 128,
+  "old_miss": 937,
+  "new_hit": 34
+ },
+ "model_tag": "r1llama8b",
+ "manifest": "experiments/rt/pools/study2/manifest_r1llama8b.jsonl",
+ "manifest_sha256": "d38efea5f7e995bd669032364bbdcfa705671809833cdff3e79c89b1df2e2584",
+ "candidates": "experiments/rt/pools/study2/candidates.jsonl",
+ "candidates_sha256": "0ef6625fe9d5a99d7e11cd3aa9d0cf15f5b1c0a6bcd4d419386bffae36b5ac3e",
+ "screen_files": [
+  "results/rt/pool/r1llama8b_pool_screen_r0of8.jsonl",
+  "results/rt/pool/r1llama8b_pool_screen_r1of8.jsonl",
+  "results/rt/pool/r1llama8b_pool_screen_r2of8.jsonl",
+  "results/rt/pool/r1llama8b_pool_screen_r3of8.jsonl",
+  "results/rt/pool/r1llama8b_pool_screen_r4of8.jsonl",
+  "results/rt/pool/r1llama8b_pool_screen_r5of8.jsonl",
+  "results/rt/pool/r1llama8b_pool_screen_r6of8.jsonl",
+  "results/rt/pool/r1llama8b_pool_screen_r7of8.jsonl"
+ ],
+ "screen_config_sha256": "de7ced6109854ba633e4270041d85f5875fd787e4efef4fa8189f7543297acb1",
+ "screen_git": "fe8b5e51eb6a0f024b98c859f41166f274494342",
+ "aliases_sha256": "4ba2ae95884c40d081e5253eedcee522718f1c10b55750623e303e855e6407e6",
+ "exclude_facts": {
+  "cf_4298": "mquake_1366 (Sweyn II of Denmark, P140, Christianity), Llama-8B 2-hop run"
+ },
+ "rules": "old_hit AND NOT new_hit on the subject-scrubbed base B0 efficacy answer (metrics.hit, aliases.json) AND subject does not contain o_old as a whole word AND the fact is not in exclude_facts; first k in candidate order.  H2b unknown group: NOT old_hit AND NOT new_hit, other rules as above, first h2b_unknown_k"
+}

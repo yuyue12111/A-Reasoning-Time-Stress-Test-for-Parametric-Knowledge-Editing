@@ -1,0 +1,16 @@
+# Study 2 deltas for r1qwen1_5b (REVISION.md §3, prereg-arr.md §2): this model's frozen pool from
+# `rt.pool qualify`.  ROME by default; for r1qwen32b also run --editor MEMIT and --editor AlphaEdit
+# (statistics first, README_deltas.md step 2).  Launch pattern and GPU layout: README_deltas.md.
+model: r1qwen1_5b
+editor: ROME
+target_tag: cf
+pool: experiments/rt/pools/study2/manifest_r1qwen1_5b.jsonl
+dataset: data/counterfact.jsonl
+models_file: experiments/rt/deltas_models.yaml
+out_root: deltas
+log_dir: results/rt/deltas_logs/s2
+dtype: float32
+factor:
+  max_rank: 1
+  tol: 1.0e-4
+  floor_mult: 8.0

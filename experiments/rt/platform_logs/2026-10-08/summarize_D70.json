@@ -1,0 +1,15 @@
+{
+ "cases": 400,
+ "ok": 400,
+ "errors": {},
+ "error_ids": {},
+ "editor_nan": 0,
+ "max_rank": 1,
+ "max_rel_err": 8.110890814247341e-07,
+ "median_rel_delta": 0.0621,
+ "median_p_target_before": 0.0001,
+ "median_p_target_after": 0.9752,
+ "median_gain_target_nats": 9.5915,
+ "median_change_o_old_nats": -6.4845,
+ "median_wall_s": 33.1685
+}

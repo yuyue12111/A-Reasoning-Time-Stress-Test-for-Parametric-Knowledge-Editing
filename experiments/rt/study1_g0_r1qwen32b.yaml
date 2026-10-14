@@ -1,0 +1,48 @@
+# G0 engine-parity gate (REVISION.md §4) on the Study-1 32B pool: 200 cases, ROME N arm, B0/B3.
+# Pass: the v2 ES drop (B0 - B3) lies inside the Study-1 CI and the per-case B0 agreement with
+# Study 1 is >= 85%.  Fail -> no Study 2.  v2 numbers never enter a comparison with legacy numbers.
+#
+# Parity notes
+# - Study 1 32B (results/probe/r1qwen32b_ROME_cf200_r*of8.jsonl) was generated on 2026-06-23, before
+#   think_budget._gen started adding BOS (commit 107cd73, 2026-06-25): launch G0 with WHYAAAI_NO_BOS=1.
+# - Study 1 generated in fp32 from EasyEdit-merged weights; v2 generates in bf16 with the edit applied
+#   through rt.edit_hooks.EditBank from the fp32 ΔW exported by rt.deltas.  The gate measures the joint
+#   effect of dtype, batching, hooked edits and the deviations listed in src/rt/engine.py.
+# - base (no edit) isolates the engine from the delta pipeline: compare it with
+#   results/probe/r1qwen32b_BASE_cf200_r*.jsonl.
+# - The manifest is the Study-1 order rebuilt with `rt.pool ids-from-shards` (it matches the 14B, 8B,
+#   sup and samp Study-1 runs), so shard r of 8 holds the same 25 cases as in Study 1.
+model_tag: r1qwen32b
+template: r1
+no_bos: true                  # REVISION.md §5: Study 1 32B ran without BOS
+model:
+  path: null                  # null -> $WHYAAAI_MODEL
+  dtype: bfloat16
+  device_map: null            # one GPU per process via CUDA_VISIBLE_DEVICES
+module_tmp: "model.layers.{}.mlp.down_proj"
+out_dir: results/rt/g0
+run_tag: g0
+
+dataset:
+  path: data/counterfact.jsonl
+  manifest: experiments/rt/pools/study1_cf200.jsonl
+
+aliases: data/aliases.json
+probes: [efficacy]
+decoding: {greedy: true}
+
+engine:
+  batch_size: 32
+  max_batch_tokens: 128000    # rows x (longest prompt + max_new); 32B bf16 on one H200 (see README)
+  answer_cap: 256
+  chunk_cases: 13             # rows reach disk after every chunk
+
+conditions:
+  - name: base
+    editor: none
+    budgets: [B0, B3]
+  - name: rome_N
+    editor: ROME
+    target_tag: cf
+    deltas_dir: deltas/r1qwen32b/ROME/cf      # layer 12, qwen2.5-7b hparams with 32B overrides (as Study 1)
+    budgets: [B0, B3]

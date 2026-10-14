@@ -1,0 +1,6806 @@
+{
+ "_meta": {
+  "generator": "src/rt/study1.py",
+  "git_head": "67231a6c2a847bc9d3d383d5c3d7584fc54bfaa7",
+  "git_dirty": false,
+  "code_sha256": {
+   "src/rt/analysis.py": "c94cd6123d4e3dcdb2a7a883669f65699da434033771af410dfd2ed4de13c959",
+   "src/rt/study1.py": "11d3e6c18f2506003707957b2642e8bcbecc8b3a71a8ecc02ed31b4874875505",
+   "src/metrics.py": "024dc94b6af21038cc2518bf6b1076908da6ef03c1978904d1d7bf3ea7631609",
+   "src/cross_arm.py": "b0e4c6c9a68b0fb90f0c50004532c517c67f1056f175db3ad753e4d40891816c",
+   "src/score_pilot.py": "49cdb19bf475d123b7460a6a685fb1b82d77e1e63baf0ecd9713f0859f9172df"
+  },
+  "results_root": "results 2",
+  "reference_inputs": {
+   "cases": {
+    "path": "data/counterfact.jsonl",
+    "sha256": "b55d369a0462cec47006e70292b5d166f6202b2fa757b8bc6ca6ec141683c036"
+   },
+   "aliases": {
+    "path": "data/aliases.json",
+    "sha256": "4ba2ae95884c40d081e5253eedcee522718f1c10b55750623e303e855e6407e6"
+   },
+   "published": {
+    "path": "paperwriting/results.json",
+    "sha256": "f505984e59c67166c1df2fb2769b06375d3c0dbef03e523445a985226adcbe2b"
+   },
+   "esup_crossarm": {
+    "path": "esup_crossarm.json",
+    "sha256": "fded3e5e7932798c8bc6ecffa5feba5d9fc45723b8a8f5ae8fb57616447d4c57"
+   }
+  },
+  "bootstrap": {
+   "n_boot": 10000,
+   "seed": 42,
+   "ci": 0.95,
+   "unit": "case",
+   "ci_rule": "sorted replicate means at int(.025B), int(.975B)",
+   "p_rule": "2*min(#<=0, #>=0)/B, capped at 1",
+   "case_order": "sorted case_id",
+   "conditional_rates": "resample only the cases passing the gate"
+  },
+  "scoring": "metrics.hit on metrics._without_subject(text, s); ES = new and not old",
+  "provenance": "each block's `worlds` names entries of the top-level `worlds` registry (files relative to results_root, with sha256)"
+ },
+ "checkpoints": {
+  "Qwen-1.5B": {
+   "worlds": [
+    "Qwen-1.5B/edited",
+    "Qwen-1.5B/base"
+   ],
+   "n_cases_edited": 196,
+   "n_cases_paired": 196,
+   "ES_B0": {
+    "point": 0.5816326530612245,
+    "ci95": [
+     0.5102040816326531,
+     0.6479591836734694
+    ],
+    "p": 0.0,
+    "n": 196,
+    "denominator": "cases with a row at B0; value = es@B0"
+   },
+   "ES_B3": {
+    "point": 0.6071428571428571,
+    "ci95": [
+     0.5357142857142857,
+     0.673469387755102
+    ],
+    "p": 0.0,
+    "n": 196,
+    "denominator": "cases with a row at B3; value = es@B3"
+   },
+   "ES_drop": {
+    "point": -0.025510204081632654,
+    "ci95": [
+     -0.10204081632653061,
+     0.04591836734693878
+    ],
+    "p": 0.5372,
+    "n": 196,
+    "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+    "es_b0": 0.5816326530612245,
+    "es_b1": 0.6071428571428571
+   },
+   "RR": {
+    "point": 0.06140350877192982,
+    "ci95": [
+     0.017543859649122806,
+     0.10526315789473684
+    ],
+    "p": 0.0018,
+    "n": 114,
+    "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+   },
+   "RRs": {
+    "point": 0.017543859649122806,
+    "ci95": [
+     0.0,
+     0.043859649122807015
+    ],
+    "p": 0.2728,
+    "n": 114,
+    "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old and not new"
+   },
+   "CLR": {
+    "point": 0.20918367346938777,
+    "ci95": [
+     0.15306122448979592,
+     0.2653061224489796
+    ],
+    "p": 0.0,
+    "n": 196,
+    "denominator": "cases with a row at B3; value = chain@B3 names o_old"
+   },
+   "base_old_B0": {
+    "point": 0.5153061224489796,
+    "ci95": [
+     0.44387755102040816,
+     0.5867346938775511
+    ],
+    "p": 0.0,
+    "n": 196,
+    "denominator": "base efficacy rows at B0 whose case is in the edited run (the base run's own denominator, as src/base_probe.py --score); value = base answer names o_old"
+   },
+   "base_old_B3": {
+    "point": 0.5051020408163265,
+    "ci95": [
+     0.4336734693877551,
+     0.576530612244898
+    ],
+    "p": 0.0,
+    "n": 196,
+    "denominator": "base efficacy rows at B3 whose case is in the edited run (the base run's own denominator, as src/base_probe.py --score); value = base answer names o_old"
+   },
+   "erosion": {
+    "point": 0.12755102040816327,
+    "ci95": [
+     0.08163265306122448,
+     0.17346938775510204
+    ],
+    "p": 0.0,
+    "n": 196,
+    "denominator": "cases with rows at B0 and B3; value = ES@B0 and not ES@B3"
+   },
+   "repair": {
+    "point": 0.15306122448979592,
+    "ci95": [
+     0.10204081632653061,
+     0.20408163265306123
+    ],
+    "p": 0.0,
+    "n": 196,
+    "denominator": "cases with rows at B0 and B3; value = not ES@B0 and ES@B3"
+   },
+   "retention_contrast": {
+    "point": -0.017857142857142856,
+    "ci95": [
+     -0.17857142857142858,
+     0.14285714285714285
+    ],
+    "p": 0.8968,
+    "n": 56,
+    "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = edited lost ES - base lost o_old",
+    "edited_loss": {
+     "point": 0.25,
+     "ci95": [
+      0.14285714285714285,
+      0.35714285714285715
+     ],
+     "p": 0.0,
+     "n": 56,
+     "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = not ES@B3 (edited)"
+    },
+    "base_loss": {
+     "point": 0.26785714285714285,
+     "ci95": [
+      0.16071428571428573,
+      0.39285714285714285
+     ],
+     "p": 0.0,
+     "n": 56,
+     "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = base answer@B3 does not name o_old"
+    },
+    "table_2x2": {
+     "edited_lost=1,base_lost=1": 3,
+     "edited_lost=1,base_lost=0": 11,
+     "edited_lost=0,base_lost=1": 12,
+     "edited_lost=0,base_lost=0": 30
+    }
+   },
+   "qualified_ES_drop": {
+    "point": 0.009900990099009901,
+    "ci95": [
+     -0.0891089108910891,
+     0.10891089108910891
+    ],
+    "p": 0.9232,
+    "n": 101,
+    "denominator": "base answer names o_old at B0; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+    "es_b0": 0.5544554455445545,
+    "es_b1": 0.5445544554455446
+   },
+   "knowledge_strata": {
+    "known_B0_B3": {
+     "point": -0.012345679012345678,
+     "ci95": [
+      -0.12345679012345678,
+      0.1111111111111111
+     ],
+     "p": 0.931,
+     "n": 81,
+     "denominator": "base answer names o_old at B0=True, at B3=True; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.5061728395061729,
+     "es_b1": 0.5185185185185185
+    },
+    "known_B3_only": {
+     "point": -0.1111111111111111,
+     "ci95": [
+      -0.2777777777777778,
+      0.0
+     ],
+     "p": 0.2358,
+     "n": 18,
+     "denominator": "base answer names o_old at B0=False, at B3=True; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.4444444444444444,
+     "es_b1": 0.5555555555555556
+    },
+    "known_B0_only": {
+     "point": 0.1,
+     "ci95": [
+      -0.1,
+      0.3
+     ],
+     "p": 0.442,
+     "n": 20,
+     "denominator": "base answer names o_old at B0=True, at B3=False; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.75,
+     "es_b1": 0.65
+    },
+    "unknown": {
+     "point": -0.05194805194805195,
+     "ci95": [
+      -0.18181818181818182,
+      0.07792207792207792
+     ],
+     "p": 0.4874,
+     "n": 77,
+     "denominator": "base answer names o_old at B0=False, at B3=False; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.6493506493506493,
+     "es_b1": 0.7012987012987013
+    }
+   },
+   "name_containment": {
+    "rule": "subject contains o_old as a whole word, case-insensitive (metrics._wb)",
+    "n_contains": 45,
+    "n_paired": 196,
+    "ES_drop_excluding": {
+     "point": -0.019867549668874173,
+     "ci95": [
+      -0.10596026490066225,
+      0.06622516556291391
+     ],
+     "p": 0.692,
+     "n": 151,
+     "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.6754966887417219,
+     "es_b1": 0.695364238410596
+    },
+    "ES_drop_contains": {
+     "point": -0.044444444444444446,
+     "ci95": [
+      -0.2,
+      0.1111111111111111
+     ],
+     "p": 0.6878,
+     "n": 45,
+     "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.26666666666666666,
+     "es_b1": 0.3111111111111111
+    },
+    "RR_excluding": {
+     "point": 0.0196078431372549,
+     "ci95": [
+      0.0,
+      0.049019607843137254
+     ],
+     "p": 0.2668,
+     "n": 102,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+    },
+    "RRs_excluding": {
+     "point": 0.00980392156862745,
+     "ci95": [
+      0.0,
+      0.029411764705882353
+     ],
+     "p": 0.7336,
+     "n": 102,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old and not new"
+    },
+    "RR_contains": {
+     "point": 0.4166666666666667,
+     "ci95": [
+      0.16666666666666666,
+      0.6666666666666666
+     ],
+     "p": 0.0034,
+     "n": 12,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+    },
+    "RR_contains_minus_excluding": {
+     "point": 0.3970588235294118,
+     "ci95": [
+      0.1372549019607843,
+      0.6666666666666666
+     ],
+     "p": 0.0038,
+     "n": [
+      12,
+      102
+     ],
+     "denominator": "cases with ES@B0 and a row at B3, split by name containment; groups resampled separately; value = RR(contains) - RR(rest)"
+    }
+   },
+   "failure_anatomy": {
+    "b1_failures": {
+     "n": 77,
+     "counts": {
+      "both": 11,
+      "old_only": 17,
+      "neither": 49
+     },
+     "shares": {
+      "both": {
+       "point": 0.14285714285714285,
+       "ci95": [
+        0.07792207792207792,
+        0.22077922077922077
+       ],
+       "p": 0.0,
+       "n": 77,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is both"
+      },
+      "old_only": {
+       "point": 0.22077922077922077,
+       "ci95": [
+        0.12987012987012986,
+        0.3116883116883117
+       ],
+       "p": 0.0,
+       "n": 77,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is old_only"
+      },
+      "neither": {
+       "point": 0.6363636363636364,
+       "ci95": [
+        0.5324675324675324,
+        0.7402597402597403
+       ],
+       "p": 0.0,
+       "n": 77,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is neither"
+      }
+     }
+    },
+    "erosion": {
+     "n": 25,
+     "counts": {
+      "both": 5,
+      "old_only": 2,
+      "neither": 18
+     },
+     "shares": {
+      "both": {
+       "point": 0.2,
+       "ci95": [
+        0.04,
+        0.36
+       ],
+       "p": 0.0062,
+       "n": 25,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is both"
+      },
+      "old_only": {
+       "point": 0.08,
+       "ci95": [
+        0.0,
+        0.2
+       ],
+       "p": 0.2432,
+       "n": 25,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is old_only"
+      },
+      "neither": {
+       "point": 0.72,
+       "ci95": [
+        0.52,
+        0.88
+       ],
+       "p": 0.0,
+       "n": 25,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is neither"
+      }
+     }
+    }
+   },
+   "answer_length": {
+    "point": 22.668367346938776,
+    "ci95": [
+     13.877551020408163,
+     31.48469387755102
+    ],
+    "p": 0.0,
+    "n": 196,
+    "denominator": "cases scored at B0 and B3; value = words@B3 - words@B0",
+    "mean_b0": 70.1938775510204,
+    "mean_b1": 92.86224489795919,
+    "median_b0": 54.5,
+    "median_b1": 70.0
+   }
+  },
+  "Qwen-7B": {
+   "worlds": [
+    "Qwen-7B/edited",
+    "Qwen-7B/base"
+   ],
+   "n_cases_edited": 200,
+   "n_cases_paired": 200,
+   "ES_B0": {
+    "point": 0.5,
+    "ci95": [
+     0.43,
+     0.57
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with a row at B0; value = es@B0"
+   },
+   "ES_B3": {
+    "point": 0.53,
+    "ci95": [
+     0.46,
+     0.6
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with a row at B3; value = es@B3"
+   },
+   "ES_drop": {
+    "point": -0.03,
+    "ci95": [
+     -0.11,
+     0.05
+    ],
+    "p": 0.4878,
+    "n": 200,
+    "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+    "es_b0": 0.5,
+    "es_b1": 0.53
+   },
+   "RR": {
+    "point": 0.08,
+    "ci95": [
+     0.03,
+     0.14
+    ],
+    "p": 0.0008,
+    "n": 100,
+    "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+   },
+   "RRs": {
+    "point": 0.05,
+    "ci95": [
+     0.01,
+     0.1
+    ],
+    "p": 0.0122,
+    "n": 100,
+    "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old and not new"
+   },
+   "CLR": {
+    "point": 0.335,
+    "ci95": [
+     0.27,
+     0.4
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with a row at B3; value = chain@B3 names o_old"
+   },
+   "base_old_B0": {
+    "point": 0.59,
+    "ci95": [
+     0.52,
+     0.66
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "base efficacy rows at B0 whose case is in the edited run (the base run's own denominator, as src/base_probe.py --score); value = base answer names o_old"
+   },
+   "base_old_B3": {
+    "point": 0.67,
+    "ci95": [
+     0.605,
+     0.735
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "base efficacy rows at B3 whose case is in the edited run (the base run's own denominator, as src/base_probe.py --score); value = base answer names o_old"
+   },
+   "erosion": {
+    "point": 0.145,
+    "ci95": [
+     0.1,
+     0.195
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with rows at B0 and B3; value = ES@B0 and not ES@B3"
+   },
+   "repair": {
+    "point": 0.175,
+    "ci95": [
+     0.125,
+     0.23
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with rows at B0 and B3; value = not ES@B0 and ES@B3"
+   },
+   "retention_contrast": {
+    "point": 0.1111111111111111,
+    "ci95": [
+     -0.05555555555555555,
+     0.2777777777777778
+    ],
+    "p": 0.2136,
+    "n": 54,
+    "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = edited lost ES - base lost o_old",
+    "edited_loss": {
+     "point": 0.2962962962962963,
+     "ci95": [
+      0.18518518518518517,
+      0.42592592592592593
+     ],
+     "p": 0.0,
+     "n": 54,
+     "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = not ES@B3 (edited)"
+    },
+    "base_loss": {
+     "point": 0.18518518518518517,
+     "ci95": [
+      0.09259259259259259,
+      0.2962962962962963
+     ],
+     "p": 0.0,
+     "n": 54,
+     "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = base answer@B3 does not name o_old"
+    },
+    "table_2x2": {
+     "edited_lost=1,base_lost=1": 3,
+     "edited_lost=1,base_lost=0": 13,
+     "edited_lost=0,base_lost=1": 7,
+     "edited_lost=0,base_lost=0": 31
+    }
+   },
+   "qualified_ES_drop": {
+    "point": -0.01694915254237288,
+    "ci95": [
+     -0.11016949152542373,
+     0.07627118644067797
+    ],
+    "p": 0.8062,
+    "n": 118,
+    "denominator": "base answer names o_old at B0; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+    "es_b0": 0.4576271186440678,
+    "es_b1": 0.4745762711864407
+   },
+   "knowledge_strata": {
+    "known_B0_B3": {
+     "point": -0.020202020202020204,
+     "ci95": [
+      -0.12121212121212122,
+      0.08080808080808081
+     ],
+     "p": 0.7806,
+     "n": 99,
+     "denominator": "base answer names o_old at B0=True, at B3=True; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.4444444444444444,
+     "es_b1": 0.46464646464646464
+    },
+    "known_B3_only": {
+     "point": 0.05714285714285714,
+     "ci95": [
+      -0.14285714285714285,
+      0.2571428571428571
+     ],
+     "p": 0.6786,
+     "n": 35,
+     "denominator": "base answer names o_old at B0=False, at B3=True; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.5714285714285714,
+     "es_b1": 0.5142857142857142
+    },
+    "known_B0_only": {
+     "point": 0.0,
+     "ci95": [
+      -0.2631578947368421,
+      0.2631578947368421
+     ],
+     "p": 1.0,
+     "n": 19,
+     "denominator": "base answer names o_old at B0=True, at B3=False; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.5263157894736842,
+     "es_b1": 0.5263157894736842
+    },
+    "unknown": {
+     "point": -0.1276595744680851,
+     "ci95": [
+      -0.2978723404255319,
+      0.0425531914893617
+     ],
+     "p": 0.1886,
+     "n": 47,
+     "denominator": "base answer names o_old at B0=False, at B3=False; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.5531914893617021,
+     "es_b1": 0.6808510638297872
+    }
+   },
+   "name_containment": {
+    "rule": "subject contains o_old as a whole word, case-insensitive (metrics._wb)",
+    "n_contains": 46,
+    "n_paired": 200,
+    "ES_drop_excluding": {
+     "point": -0.03896103896103896,
+     "ci95": [
+      -0.12987012987012986,
+      0.05194805194805195
+     ],
+     "p": 0.441,
+     "n": 154,
+     "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.538961038961039,
+     "es_b1": 0.577922077922078
+    },
+    "ES_drop_contains": {
+     "point": 0.0,
+     "ci95": [
+      -0.15217391304347827,
+      0.15217391304347827
+     ],
+     "p": 1.0,
+     "n": 46,
+     "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.3695652173913043,
+     "es_b1": 0.3695652173913043
+    },
+    "RR_excluding": {
+     "point": 0.07228915662650602,
+     "ci95": [
+      0.024096385542168676,
+      0.13253012048192772
+     ],
+     "p": 0.0032,
+     "n": 83,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+    },
+    "RRs_excluding": {
+     "point": 0.04819277108433735,
+     "ci95": [
+      0.012048192771084338,
+      0.0963855421686747
+     ],
+     "p": 0.0344,
+     "n": 83,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old and not new"
+    },
+    "RR_contains": {
+     "point": 0.11764705882352941,
+     "ci95": [
+      0.0,
+      0.29411764705882354
+     ],
+     "p": 0.2298,
+     "n": 17,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+    },
+    "RR_contains_minus_excluding": {
+     "point": 0.04535790219702339,
+     "ci95": [
+      -0.0963855421686747,
+      0.23387668320340185
+     ],
+     "p": 0.6926,
+     "n": [
+      17,
+      83
+     ],
+     "denominator": "cases with ES@B0 and a row at B3, split by name containment; groups resampled separately; value = RR(contains) - RR(rest)"
+    }
+   },
+   "failure_anatomy": {
+    "b1_failures": {
+     "n": 94,
+     "counts": {
+      "both": 14,
+      "old_only": 27,
+      "neither": 53
+     },
+     "shares": {
+      "both": {
+       "point": 0.14893617021276595,
+       "ci95": [
+        0.0851063829787234,
+        0.22340425531914893
+       ],
+       "p": 0.0,
+       "n": 94,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is both"
+      },
+      "old_only": {
+       "point": 0.2872340425531915,
+       "ci95": [
+        0.20212765957446807,
+        0.3829787234042553
+       ],
+       "p": 0.0,
+       "n": 94,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is old_only"
+      },
+      "neither": {
+       "point": 0.5638297872340425,
+       "ci95": [
+        0.46808510638297873,
+        0.6595744680851063
+       ],
+       "p": 0.0,
+       "n": 94,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is neither"
+      }
+     }
+    },
+    "erosion": {
+     "n": 29,
+     "counts": {
+      "both": 3,
+      "old_only": 5,
+      "neither": 21
+     },
+     "shares": {
+      "both": {
+       "point": 0.10344827586206896,
+       "ci95": [
+        0.0,
+        0.20689655172413793
+       ],
+       "p": 0.0794,
+       "n": 29,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is both"
+      },
+      "old_only": {
+       "point": 0.1724137931034483,
+       "ci95": [
+        0.034482758620689655,
+        0.3103448275862069
+       ],
+       "p": 0.0064,
+       "n": 29,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is old_only"
+      },
+      "neither": {
+       "point": 0.7241379310344828,
+       "ci95": [
+        0.5517241379310345,
+        0.8620689655172413
+       ],
+       "p": 0.0,
+       "n": 29,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is neither"
+      }
+     }
+    }
+   },
+   "answer_length": {
+    "point": 7.805,
+    "ci95": [
+     -0.24,
+     15.87
+    ],
+    "p": 0.058,
+    "n": 200,
+    "denominator": "cases scored at B0 and B3; value = words@B3 - words@B0",
+    "mean_b0": 59.625,
+    "mean_b1": 67.43,
+    "median_b0": 50.0,
+    "median_b1": 56.0
+   }
+  },
+  "Qwen-14B": {
+   "worlds": [
+    "Qwen-14B/edited",
+    "Qwen-14B/base"
+   ],
+   "n_cases_edited": 200,
+   "n_cases_paired": 200,
+   "ES_B0": {
+    "point": 0.555,
+    "ci95": [
+     0.485,
+     0.625
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with a row at B0; value = es@B0"
+   },
+   "ES_B3": {
+    "point": 0.515,
+    "ci95": [
+     0.445,
+     0.585
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with a row at B3; value = es@B3"
+   },
+   "ES_drop": {
+    "point": 0.04,
+    "ci95": [
+     -0.035,
+     0.11
+    ],
+    "p": 0.3278,
+    "n": 200,
+    "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+    "es_b0": 0.555,
+    "es_b1": 0.515
+   },
+   "RR": {
+    "point": 0.16216216216216217,
+    "ci95": [
+     0.0990990990990991,
+     0.23423423423423423
+    ],
+    "p": 0.0,
+    "n": 111,
+    "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+   },
+   "RRs": {
+    "point": 0.04504504504504504,
+    "ci95": [
+     0.009009009009009009,
+     0.09009009009009009
+    ],
+    "p": 0.012,
+    "n": 111,
+    "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old and not new"
+   },
+   "CLR": {
+    "point": 0.475,
+    "ci95": [
+     0.405,
+     0.545
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with a row at B3; value = chain@B3 names o_old"
+   },
+   "base_old_B0": {
+    "point": 0.76,
+    "ci95": [
+     0.7,
+     0.815
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "base efficacy rows at B0 whose case is in the edited run (the base run's own denominator, as src/base_probe.py --score); value = base answer names o_old"
+   },
+   "base_old_B3": {
+    "point": 0.77,
+    "ci95": [
+     0.71,
+     0.83
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "base efficacy rows at B3 whose case is in the edited run (the base run's own denominator, as src/base_probe.py --score); value = base answer names o_old"
+   },
+   "erosion": {
+    "point": 0.16,
+    "ci95": [
+     0.11,
+     0.21
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with rows at B0 and B3; value = ES@B0 and not ES@B3"
+   },
+   "repair": {
+    "point": 0.12,
+    "ci95": [
+     0.075,
+     0.165
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with rows at B0 and B3; value = not ES@B0 and ES@B3"
+   },
+   "retention_contrast": {
+    "point": 0.19540229885057472,
+    "ci95": [
+     0.06896551724137931,
+     0.3218390804597701
+    ],
+    "p": 0.0038,
+    "n": 87,
+    "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = edited lost ES - base lost o_old",
+    "edited_loss": {
+     "point": 0.3218390804597701,
+     "ci95": [
+      0.22988505747126436,
+      0.41379310344827586
+     ],
+     "p": 0.0,
+     "n": 87,
+     "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = not ES@B3 (edited)"
+    },
+    "base_loss": {
+     "point": 0.12643678160919541,
+     "ci95": [
+      0.05747126436781609,
+      0.19540229885057472
+     ],
+     "p": 0.0,
+     "n": 87,
+     "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = base answer@B3 does not name o_old"
+    },
+    "table_2x2": {
+     "edited_lost=1,base_lost=1": 1,
+     "edited_lost=1,base_lost=0": 27,
+     "edited_lost=0,base_lost=1": 10,
+     "edited_lost=0,base_lost=0": 49
+    }
+   },
+   "qualified_ES_drop": {
+    "point": 0.07236842105263158,
+    "ci95": [
+     -0.013157894736842105,
+     0.15789473684210525
+    ],
+    "p": 0.1078,
+    "n": 152,
+    "denominator": "base answer names o_old at B0; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+    "es_b0": 0.5723684210526315,
+    "es_b1": 0.5
+   },
+   "knowledge_strata": {
+    "known_B0_B3": {
+     "point": 0.09022556390977443,
+     "ci95": [
+      0.0,
+      0.18045112781954886
+     ],
+     "p": 0.0712,
+     "n": 133,
+     "denominator": "base answer names o_old at B0=True, at B3=True; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.5714285714285714,
+     "es_b1": 0.48120300751879697
+    },
+    "known_B3_only": {
+     "point": -0.09523809523809523,
+     "ci95": [
+      -0.3333333333333333,
+      0.14285714285714285
+     ],
+     "p": 0.522,
+     "n": 21,
+     "denominator": "base answer names o_old at B0=False, at B3=True; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.47619047619047616,
+     "es_b1": 0.5714285714285714
+    },
+    "known_B0_only": {
+     "point": -0.05263157894736842,
+     "ci95": [
+      -0.21052631578947367,
+      0.10526315789473684
+     ],
+     "p": 0.7704,
+     "n": 19,
+     "denominator": "base answer names o_old at B0=True, at B3=False; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.5789473684210527,
+     "es_b1": 0.631578947368421
+    },
+    "unknown": {
+     "point": -0.037037037037037035,
+     "ci95": [
+      -0.18518518518518517,
+      0.1111111111111111
+     ],
+     "p": 0.8212,
+     "n": 27,
+     "denominator": "base answer names o_old at B0=False, at B3=False; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.5185185185185185,
+     "es_b1": 0.5555555555555556
+    }
+   },
+   "name_containment": {
+    "rule": "subject contains o_old as a whole word, case-insensitive (metrics._wb)",
+    "n_contains": 46,
+    "n_paired": 200,
+    "ES_drop_excluding": {
+     "point": 0.012987012987012988,
+     "ci95": [
+      -0.07142857142857142,
+      0.09740259740259741
+     ],
+     "p": 0.8174,
+     "n": 154,
+     "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.6233766233766234,
+     "es_b1": 0.6103896103896104
+    },
+    "ES_drop_contains": {
+     "point": 0.13043478260869565,
+     "ci95": [
+      -0.021739130434782608,
+      0.2826086956521739
+     ],
+     "p": 0.103,
+     "n": 46,
+     "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.32608695652173914,
+     "es_b1": 0.1956521739130435
+    },
+    "RR_excluding": {
+     "point": 0.11458333333333333,
+     "ci95": [
+      0.052083333333333336,
+      0.17708333333333334
+     ],
+     "p": 0.0,
+     "n": 96,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+    },
+    "RRs_excluding": {
+     "point": 0.03125,
+     "ci95": [
+      0.0,
+      0.07291666666666667
+     ],
+     "p": 0.0926,
+     "n": 96,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old and not new"
+    },
+    "RR_contains": {
+     "point": 0.4666666666666667,
+     "ci95": [
+      0.2,
+      0.7333333333333333
+     ],
+     "p": 0.0,
+     "n": 15,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+    },
+    "RR_contains_minus_excluding": {
+     "point": 0.35208333333333336,
+     "ci95": [
+      0.09583333333333334,
+      0.6145833333333333
+     ],
+     "p": 0.006,
+     "n": [
+      15,
+      96
+     ],
+     "denominator": "cases with ES@B0 and a row at B3, split by name containment; groups resampled separately; value = RR(contains) - RR(rest)"
+    }
+   },
+   "failure_anatomy": {
+    "b1_failures": {
+     "n": 97,
+     "counts": {
+      "both": 34,
+      "old_only": 22,
+      "neither": 41
+     },
+     "shares": {
+      "both": {
+       "point": 0.35051546391752575,
+       "ci95": [
+        0.25773195876288657,
+        0.44329896907216493
+       ],
+       "p": 0.0,
+       "n": 97,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is both"
+      },
+      "old_only": {
+       "point": 0.2268041237113402,
+       "ci95": [
+        0.14432989690721648,
+        0.30927835051546393
+       ],
+       "p": 0.0,
+       "n": 97,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is old_only"
+      },
+      "neither": {
+       "point": 0.422680412371134,
+       "ci95": [
+        0.32989690721649484,
+        0.5154639175257731
+       ],
+       "p": 0.0,
+       "n": 97,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is neither"
+      }
+     }
+    },
+    "erosion": {
+     "n": 32,
+     "counts": {
+      "both": 13,
+      "old_only": 5,
+      "neither": 14
+     },
+     "shares": {
+      "both": {
+       "point": 0.40625,
+       "ci95": [
+        0.25,
+        0.59375
+       ],
+       "p": 0.0,
+       "n": 32,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is both"
+      },
+      "old_only": {
+       "point": 0.15625,
+       "ci95": [
+        0.03125,
+        0.28125
+       ],
+       "p": 0.0074,
+       "n": 32,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is old_only"
+      },
+      "neither": {
+       "point": 0.4375,
+       "ci95": [
+        0.28125,
+        0.625
+       ],
+       "p": 0.0,
+       "n": 32,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is neither"
+      }
+     }
+    }
+   },
+   "answer_length": {
+    "point": -4.52,
+    "ci95": [
+     -10.475,
+     1.53
+    ],
+    "p": 0.1434,
+    "n": 200,
+    "denominator": "cases scored at B0 and B3; value = words@B3 - words@B0",
+    "mean_b0": 71.83,
+    "mean_b1": 67.31,
+    "median_b0": 60.0,
+    "median_b1": 56.5
+   }
+  },
+  "Qwen-32B": {
+   "worlds": [
+    "Qwen-32B/edited",
+    "Qwen-32B/base"
+   ],
+   "n_cases_edited": 200,
+   "n_cases_paired": 198,
+   "ES_B0": {
+    "point": 0.595,
+    "ci95": [
+     0.525,
+     0.66
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with a row at B0; value = es@B0"
+   },
+   "ES_B3": {
+    "point": 0.494949494949495,
+    "ci95": [
+     0.42424242424242425,
+     0.5656565656565656
+    ],
+    "p": 0.0,
+    "n": 198,
+    "denominator": "cases with a row at B3; value = es@B3"
+   },
+   "ES_drop": {
+    "point": 0.10606060606060606,
+    "ci95": [
+     0.030303030303030304,
+     0.18181818181818182
+    ],
+    "p": 0.0066,
+    "n": 198,
+    "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+    "es_b0": 0.601010101010101,
+    "es_b1": 0.494949494949495
+   },
+   "RR": {
+    "point": 0.19327731092436976,
+    "ci95": [
+     0.12605042016806722,
+     0.2689075630252101
+    ],
+    "p": 0.0,
+    "n": 119,
+    "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+   },
+   "RRs": {
+    "point": 0.09243697478991597,
+    "ci95": [
+     0.04201680672268908,
+     0.15126050420168066
+    ],
+    "p": 0.0,
+    "n": 119,
+    "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old and not new"
+   },
+   "CLR": {
+    "point": 0.5454545454545454,
+    "ci95": [
+     0.4797979797979798,
+     0.6161616161616161
+    ],
+    "p": 0.0,
+    "n": 198,
+    "denominator": "cases with a row at B3; value = chain@B3 names o_old"
+   },
+   "base_old_B0": {
+    "point": 0.765,
+    "ci95": [
+     0.705,
+     0.82
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "base efficacy rows at B0 whose case is in the edited run (the base run's own denominator, as src/base_probe.py --score); value = base answer names o_old"
+   },
+   "base_old_B3": {
+    "point": 0.7437185929648241,
+    "ci95": [
+     0.6834170854271356,
+     0.8040201005025126
+    ],
+    "p": 0.0,
+    "n": 199,
+    "denominator": "base efficacy rows at B3 whose case is in the edited run (the base run's own denominator, as src/base_probe.py --score); value = base answer names o_old"
+   },
+   "erosion": {
+    "point": 0.20707070707070707,
+    "ci95": [
+     0.15151515151515152,
+     0.2676767676767677
+    ],
+    "p": 0.0,
+    "n": 198,
+    "denominator": "cases with rows at B0 and B3; value = ES@B0 and not ES@B3"
+   },
+   "repair": {
+    "point": 0.10101010101010101,
+    "ci95": [
+     0.06060606060606061,
+     0.14646464646464646
+    ],
+    "p": 0.0,
+    "n": 198,
+    "denominator": "cases with rows at B0 and B3; value = not ES@B0 and ES@B3"
+   },
+   "retention_contrast": {
+    "point": 0.2159090909090909,
+    "ci95": [
+     0.09090909090909091,
+     0.3409090909090909
+    ],
+    "p": 0.0022,
+    "n": 88,
+    "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = edited lost ES - base lost o_old",
+    "edited_loss": {
+     "point": 0.38636363636363635,
+     "ci95": [
+      0.2840909090909091,
+      0.48863636363636365
+     ],
+     "p": 0.0,
+     "n": 88,
+     "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = not ES@B3 (edited)"
+    },
+    "base_loss": {
+     "point": 0.17045454545454544,
+     "ci95": [
+      0.10227272727272728,
+      0.25
+     ],
+     "p": 0.0,
+     "n": 88,
+     "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = base answer@B3 does not name o_old"
+    },
+    "table_2x2": {
+     "edited_lost=1,base_lost=1": 6,
+     "edited_lost=1,base_lost=0": 28,
+     "edited_lost=0,base_lost=1": 9,
+     "edited_lost=0,base_lost=0": 45
+    }
+   },
+   "qualified_ES_drop": {
+    "point": 0.125,
+    "ci95": [
+     0.03289473684210526,
+     0.21710526315789475
+    ],
+    "p": 0.0074,
+    "n": 152,
+    "denominator": "base answer names o_old at B0; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+    "es_b0": 0.5789473684210527,
+    "es_b1": 0.45394736842105265
+   },
+   "knowledge_strata": {
+    "known_B0_B3": {
+     "point": 0.10077519379844961,
+     "ci95": [
+      0.0,
+      0.20155038759689922
+     ],
+     "p": 0.0512,
+     "n": 129,
+     "denominator": "base answer names o_old at B0=True, at B3=True; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.5658914728682171,
+     "es_b1": 0.46511627906976744
+    },
+    "known_B3_only": {
+     "point": 0.11764705882352941,
+     "ci95": [
+      -0.11764705882352941,
+      0.35294117647058826
+     ],
+     "p": 0.441,
+     "n": 17,
+     "denominator": "base answer names o_old at B0=False, at B3=True; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.5294117647058824,
+     "es_b1": 0.4117647058823529
+    },
+    "known_B0_only": {
+     "point": 0.2727272727272727,
+     "ci95": [
+      0.09090909090909091,
+      0.45454545454545453
+     ],
+     "p": 0.0024,
+     "n": 22,
+     "denominator": "base answer names o_old at B0=True, at B3=False; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.6818181818181818,
+     "es_b1": 0.4090909090909091
+    },
+    "unknown": {
+     "point": 0.0,
+     "ci95": [
+      -0.20689655172413793,
+      0.1724137931034483
+     ],
+     "p": 1.0,
+     "n": 29,
+     "denominator": "base answer names o_old at B0=False, at B3=False; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.7586206896551724,
+     "es_b1": 0.7586206896551724
+    }
+   },
+   "name_containment": {
+    "rule": "subject contains o_old as a whole word, case-insensitive (metrics._wb)",
+    "n_contains": 46,
+    "n_paired": 198,
+    "ES_drop_excluding": {
+     "point": 0.11842105263157894,
+     "ci95": [
+      0.03289473684210526,
+      0.20394736842105263
+     ],
+     "p": 0.009,
+     "n": 152,
+     "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.7171052631578947,
+     "es_b1": 0.5986842105263158
+    },
+    "ES_drop_contains": {
+     "point": 0.06521739130434782,
+     "ci95": [
+      -0.06521739130434782,
+      0.21739130434782608
+     ],
+     "p": 0.4466,
+     "n": 46,
+     "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.21739130434782608,
+     "es_b1": 0.15217391304347827
+    },
+    "RR_excluding": {
+     "point": 0.1559633027522936,
+     "ci95": [
+      0.09174311926605505,
+      0.22935779816513763
+     ],
+     "p": 0.0,
+     "n": 109,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+    },
+    "RRs_excluding": {
+     "point": 0.07339449541284404,
+     "ci95": [
+      0.027522935779816515,
+      0.12844036697247707
+     ],
+     "p": 0.0004,
+     "n": 109,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old and not new"
+    },
+    "RR_contains": {
+     "point": 0.6,
+     "ci95": [
+      0.3,
+      0.9
+     ],
+     "p": 0.0,
+     "n": 10,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+    },
+    "RR_contains_minus_excluding": {
+     "point": 0.4440366972477064,
+     "ci95": [
+      0.12660550458715597,
+      0.7532110091743119
+     ],
+     "p": 0.0072,
+     "n": [
+      10,
+      109
+     ],
+     "denominator": "cases with ES@B0 and a row at B3, split by name containment; groups resampled separately; value = RR(contains) - RR(rest)"
+    }
+   },
+   "failure_anatomy": {
+    "b1_failures": {
+     "n": 100,
+     "counts": {
+      "both": 38,
+      "old_only": 35,
+      "neither": 27
+     },
+     "shares": {
+      "both": {
+       "point": 0.38,
+       "ci95": [
+        0.29,
+        0.48
+       ],
+       "p": 0.0,
+       "n": 100,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is both"
+      },
+      "old_only": {
+       "point": 0.35,
+       "ci95": [
+        0.26,
+        0.44
+       ],
+       "p": 0.0,
+       "n": 100,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is old_only"
+      },
+      "neither": {
+       "point": 0.27,
+       "ci95": [
+        0.19,
+        0.36
+       ],
+       "p": 0.0,
+       "n": 100,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is neither"
+      }
+     }
+    },
+    "erosion": {
+     "n": 41,
+     "counts": {
+      "both": 12,
+      "old_only": 11,
+      "neither": 18
+     },
+     "shares": {
+      "both": {
+       "point": 0.2926829268292683,
+       "ci95": [
+        0.17073170731707318,
+        0.43902439024390244
+       ],
+       "p": 0.0,
+       "n": 41,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is both"
+      },
+      "old_only": {
+       "point": 0.2682926829268293,
+       "ci95": [
+        0.14634146341463414,
+        0.4146341463414634
+       ],
+       "p": 0.0,
+       "n": 41,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is old_only"
+      },
+      "neither": {
+       "point": 0.43902439024390244,
+       "ci95": [
+        0.2926829268292683,
+        0.5853658536585366
+       ],
+       "p": 0.0,
+       "n": 41,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is neither"
+      }
+     }
+    }
+   },
+   "answer_length": {
+    "point": 2.3636363636363638,
+    "ci95": [
+     -3.9242424242424243,
+     8.651515151515152
+    ],
+    "p": 0.4738,
+    "n": 198,
+    "denominator": "cases scored at B0 and B3; value = words@B3 - words@B0",
+    "mean_b0": 64.73737373737374,
+    "mean_b1": 67.1010101010101,
+    "median_b0": 55.0,
+    "median_b1": 53.5
+   }
+  },
+  "Llama-8B": {
+   "worlds": [
+    "Llama-8B/edited",
+    "Llama-8B/base"
+   ],
+   "n_cases_edited": 200,
+   "n_cases_paired": 200,
+   "ES_B0": {
+    "point": 0.625,
+    "ci95": [
+     0.56,
+     0.69
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with a row at B0; value = es@B0"
+   },
+   "ES_B3": {
+    "point": 0.61,
+    "ci95": [
+     0.54,
+     0.675
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with a row at B3; value = es@B3"
+   },
+   "ES_drop": {
+    "point": 0.015,
+    "ci95": [
+     -0.065,
+     0.095
+    ],
+    "p": 0.7412,
+    "n": 200,
+    "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+    "es_b0": 0.625,
+    "es_b1": 0.61
+   },
+   "RR": {
+    "point": 0.144,
+    "ci95": [
+     0.088,
+     0.208
+    ],
+    "p": 0.0,
+    "n": 125,
+    "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+   },
+   "RRs": {
+    "point": 0.032,
+    "ci95": [
+     0.008,
+     0.064
+    ],
+    "p": 0.036,
+    "n": 125,
+    "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old and not new"
+   },
+   "CLR": {
+    "point": 0.34,
+    "ci95": [
+     0.275,
+     0.405
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with a row at B3; value = chain@B3 names o_old"
+   },
+   "base_old_B0": {
+    "point": 0.655,
+    "ci95": [
+     0.585,
+     0.72
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "base efficacy rows at B0 whose case is in the edited run (the base run's own denominator, as src/base_probe.py --score); value = base answer names o_old"
+   },
+   "base_old_B3": {
+    "point": 0.675,
+    "ci95": [
+     0.61,
+     0.74
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "base efficacy rows at B3 whose case is in the edited run (the base run's own denominator, as src/base_probe.py --score); value = base answer names o_old"
+   },
+   "erosion": {
+    "point": 0.165,
+    "ci95": [
+     0.115,
+     0.22
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with rows at B0 and B3; value = ES@B0 and not ES@B3"
+   },
+   "repair": {
+    "point": 0.15,
+    "ci95": [
+     0.1,
+     0.2
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with rows at B0 and B3; value = not ES@B0 and ES@B3"
+   },
+   "retention_contrast": {
+    "point": 0.07317073170731707,
+    "ci95": [
+     -0.036585365853658534,
+     0.18292682926829268
+    ],
+    "p": 0.2566,
+    "n": 82,
+    "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = edited lost ES - base lost o_old",
+    "edited_loss": {
+     "point": 0.24390243902439024,
+     "ci95": [
+      0.15853658536585366,
+      0.34146341463414637
+     ],
+     "p": 0.0,
+     "n": 82,
+     "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = not ES@B3 (edited)"
+    },
+    "base_loss": {
+     "point": 0.17073170731707318,
+     "ci95": [
+      0.0975609756097561,
+      0.25609756097560976
+     ],
+     "p": 0.0,
+     "n": 82,
+     "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = base answer@B3 does not name o_old"
+    },
+    "table_2x2": {
+     "edited_lost=1,base_lost=1": 5,
+     "edited_lost=1,base_lost=0": 15,
+     "edited_lost=0,base_lost=1": 9,
+     "edited_lost=0,base_lost=0": 53
+    }
+   },
+   "qualified_ES_drop": {
+    "point": 0.022900763358778626,
+    "ci95": [
+     -0.06870229007633588,
+     0.11450381679389313
+    ],
+    "p": 0.6534,
+    "n": 131,
+    "denominator": "base answer names o_old at B0; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+    "es_b0": 0.6259541984732825,
+    "es_b1": 0.6030534351145038
+   },
+   "knowledge_strata": {
+    "known_B0_B3": {
+     "point": 0.00909090909090909,
+     "ci95": [
+      -0.09090909090909091,
+      0.1
+     ],
+     "p": 0.919,
+     "n": 110,
+     "denominator": "base answer names o_old at B0=True, at B3=True; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.6181818181818182,
+     "es_b1": 0.6090909090909091
+    },
+    "known_B3_only": {
+     "point": -0.12,
+     "ci95": [
+      -0.36,
+      0.12
+     ],
+     "p": 0.3934,
+     "n": 25,
+     "denominator": "base answer names o_old at B0=False, at B3=True; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.56,
+     "es_b1": 0.68
+    },
+    "known_B0_only": {
+     "point": 0.09523809523809523,
+     "ci95": [
+      -0.19047619047619047,
+      0.3333333333333333
+     ],
+     "p": 0.5872,
+     "n": 21,
+     "denominator": "base answer names o_old at B0=True, at B3=False; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.6666666666666666,
+     "es_b1": 0.5714285714285714
+    },
+    "unknown": {
+     "point": 0.06818181818181818,
+     "ci95": [
+      -0.11363636363636363,
+      0.25
+     ],
+     "p": 0.5274,
+     "n": 44,
+     "denominator": "base answer names o_old at B0=False, at B3=False; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.6590909090909091,
+     "es_b1": 0.5909090909090909
+    }
+   },
+   "name_containment": {
+    "rule": "subject contains o_old as a whole word, case-insensitive (metrics._wb)",
+    "n_contains": 46,
+    "n_paired": 200,
+    "ES_drop_excluding": {
+     "point": 0.032467532467532464,
+     "ci95": [
+      -0.05844155844155844,
+      0.12337662337662338
+     ],
+     "p": 0.5242,
+     "n": 154,
+     "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.6883116883116883,
+     "es_b1": 0.6558441558441559
+    },
+    "ES_drop_contains": {
+     "point": -0.043478260869565216,
+     "ci95": [
+      -0.1956521739130435,
+      0.10869565217391304
+     ],
+     "p": 0.6668,
+     "n": 46,
+     "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.41304347826086957,
+     "es_b1": 0.45652173913043476
+    },
+    "RR_excluding": {
+     "point": 0.14150943396226415,
+     "ci95": [
+      0.07547169811320754,
+      0.20754716981132076
+     ],
+     "p": 0.0,
+     "n": 106,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+    },
+    "RRs_excluding": {
+     "point": 0.02830188679245283,
+     "ci95": [
+      0.0,
+      0.0660377358490566
+     ],
+     "p": 0.0988,
+     "n": 106,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old and not new"
+    },
+    "RR_contains": {
+     "point": 0.15789473684210525,
+     "ci95": [
+      0.0,
+      0.3157894736842105
+     ],
+     "p": 0.0686,
+     "n": 19,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+    },
+    "RR_contains_minus_excluding": {
+     "point": 0.016385302879841107,
+     "ci95": [
+      -0.1454816285998014,
+      0.2080436941410129
+     ],
+     "p": 0.879,
+     "n": [
+      19,
+      106
+     ],
+     "denominator": "cases with ES@B0 and a row at B3, split by name containment; groups resampled separately; value = RR(contains) - RR(rest)"
+    }
+   },
+   "failure_anatomy": {
+    "b1_failures": {
+     "n": 78,
+     "counts": {
+      "both": 34,
+      "old_only": 11,
+      "neither": 33
+     },
+     "shares": {
+      "both": {
+       "point": 0.4358974358974359,
+       "ci95": [
+        0.3333333333333333,
+        0.5512820512820513
+       ],
+       "p": 0.0,
+       "n": 78,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is both"
+      },
+      "old_only": {
+       "point": 0.14102564102564102,
+       "ci95": [
+        0.0641025641025641,
+        0.21794871794871795
+       ],
+       "p": 0.0,
+       "n": 78,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is old_only"
+      },
+      "neither": {
+       "point": 0.4230769230769231,
+       "ci95": [
+        0.32051282051282054,
+        0.5384615384615384
+       ],
+       "p": 0.0,
+       "n": 78,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is neither"
+      }
+     }
+    },
+    "erosion": {
+     "n": 33,
+     "counts": {
+      "both": 14,
+      "old_only": 4,
+      "neither": 15
+     },
+     "shares": {
+      "both": {
+       "point": 0.42424242424242425,
+       "ci95": [
+        0.2727272727272727,
+        0.6060606060606061
+       ],
+       "p": 0.0,
+       "n": 33,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is both"
+      },
+      "old_only": {
+       "point": 0.12121212121212122,
+       "ci95": [
+        0.030303030303030304,
+        0.24242424242424243
+       ],
+       "p": 0.025,
+       "n": 33,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is old_only"
+      },
+      "neither": {
+       "point": 0.45454545454545453,
+       "ci95": [
+        0.2727272727272727,
+        0.6363636363636364
+       ],
+       "p": 0.0,
+       "n": 33,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is neither"
+      }
+     }
+    }
+   },
+   "answer_length": {
+    "point": -16.245,
+    "ci95": [
+     -24.005,
+     -8.545
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases scored at B0 and B3; value = words@B3 - words@B0",
+    "mean_b0": 87.96,
+    "mean_b1": 71.715,
+    "median_b0": 66.0,
+    "median_b1": 60.5
+   }
+  },
+  "Llama-70B": {
+   "worlds": [
+    "Llama-70B/edited",
+    "Llama-70B/base"
+   ],
+   "n_cases_edited": 200,
+   "n_cases_paired": 200,
+   "ES_B0": {
+    "point": 0.6,
+    "ci95": [
+     0.53,
+     0.665
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with a row at B0; value = es@B0"
+   },
+   "ES_B3": {
+    "point": 0.49,
+    "ci95": [
+     0.42,
+     0.56
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with a row at B3; value = es@B3"
+   },
+   "ES_drop": {
+    "point": 0.11,
+    "ci95": [
+     0.04,
+     0.18
+    ],
+    "p": 0.0036,
+    "n": 200,
+    "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+    "es_b0": 0.6,
+    "es_b1": 0.49
+   },
+   "RR": {
+    "point": 0.16666666666666666,
+    "ci95": [
+     0.1,
+     0.23333333333333334
+    ],
+    "p": 0.0,
+    "n": 120,
+    "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+   },
+   "RRs": {
+    "point": 0.05,
+    "ci95": [
+     0.016666666666666666,
+     0.09166666666666666
+    ],
+    "p": 0.0034,
+    "n": 120,
+    "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old and not new"
+   },
+   "CLR": {
+    "point": 0.495,
+    "ci95": [
+     0.425,
+     0.565
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with a row at B3; value = chain@B3 names o_old"
+   },
+   "base_old_B0": {
+    "point": 0.785,
+    "ci95": [
+     0.725,
+     0.84
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "base efficacy rows at B0 whose case is in the edited run (the base run's own denominator, as src/base_probe.py --score); value = base answer names o_old"
+   },
+   "base_old_B3": {
+    "point": 0.81,
+    "ci95": [
+     0.755,
+     0.865
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "base efficacy rows at B3 whose case is in the edited run (the base run's own denominator, as src/base_probe.py --score); value = base answer names o_old"
+   },
+   "erosion": {
+    "point": 0.195,
+    "ci95": [
+     0.14,
+     0.25
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with rows at B0 and B3; value = ES@B0 and not ES@B3"
+   },
+   "repair": {
+    "point": 0.085,
+    "ci95": [
+     0.05,
+     0.125
+    ],
+    "p": 0.0,
+    "n": 200,
+    "denominator": "cases with rows at B0 and B3; value = not ES@B0 and ES@B3"
+   },
+   "retention_contrast": {
+    "point": 0.23404255319148937,
+    "ci95": [
+     0.11702127659574468,
+     0.35106382978723405
+    ],
+    "p": 0.0,
+    "n": 94,
+    "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = edited lost ES - base lost o_old",
+    "edited_loss": {
+     "point": 0.3404255319148936,
+     "ci95": [
+      0.24468085106382978,
+      0.43617021276595747
+     ],
+     "p": 0.0,
+     "n": 94,
+     "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = not ES@B3 (edited)"
+    },
+    "base_loss": {
+     "point": 0.10638297872340426,
+     "ci95": [
+      0.0425531914893617,
+      0.1702127659574468
+     ],
+     "p": 0.0,
+     "n": 94,
+     "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = base answer@B3 does not name o_old"
+    },
+    "table_2x2": {
+     "edited_lost=1,base_lost=1": 4,
+     "edited_lost=1,base_lost=0": 28,
+     "edited_lost=0,base_lost=1": 6,
+     "edited_lost=0,base_lost=0": 56
+    }
+   },
+   "qualified_ES_drop": {
+    "point": 0.15286624203821655,
+    "ci95": [
+     0.07643312101910828,
+     0.22929936305732485
+    ],
+    "p": 0.0,
+    "n": 157,
+    "denominator": "base answer names o_old at B0; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+    "es_b0": 0.5987261146496815,
+    "es_b1": 0.445859872611465
+   },
+   "knowledge_strata": {
+    "known_B0_B3": {
+     "point": 0.14788732394366197,
+     "ci95": [
+      0.07042253521126761,
+      0.22535211267605634
+     ],
+     "p": 0.0002,
+     "n": 142,
+     "denominator": "base answer names o_old at B0=True, at B3=True; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.5915492957746479,
+     "es_b1": 0.44366197183098594
+    },
+    "known_B3_only": {
+     "point": 0.0,
+     "ci95": [
+      -0.25,
+      0.25
+     ],
+     "p": 1.0,
+     "n": 20,
+     "denominator": "base answer names o_old at B0=False, at B3=True; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.7,
+     "es_b1": 0.7
+    },
+    "known_B0_only": {
+     "point": 0.2,
+     "ci95": [
+      -0.06666666666666667,
+      0.4666666666666667
+     ],
+     "p": 0.2318,
+     "n": 15,
+     "denominator": "base answer names o_old at B0=True, at B3=False; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.6666666666666666,
+     "es_b1": 0.4666666666666667
+    },
+    "unknown": {
+     "point": -0.08695652173913043,
+     "ci95": [
+      -0.34782608695652173,
+      0.17391304347826086
+     ],
+     "p": 0.6304,
+     "n": 23,
+     "denominator": "base answer names o_old at B0=False, at B3=False; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.5217391304347826,
+     "es_b1": 0.6086956521739131
+    }
+   },
+   "name_containment": {
+    "rule": "subject contains o_old as a whole word, case-insensitive (metrics._wb)",
+    "n_contains": 46,
+    "n_paired": 200,
+    "ES_drop_excluding": {
+     "point": 0.11688311688311688,
+     "ci95": [
+      0.032467532467532464,
+      0.2012987012987013
+     ],
+     "p": 0.0104,
+     "n": 154,
+     "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.6688311688311688,
+     "es_b1": 0.551948051948052
+    },
+    "ES_drop_contains": {
+     "point": 0.08695652173913043,
+     "ci95": [
+      -0.021739130434782608,
+      0.21739130434782608
+     ],
+     "p": 0.1948,
+     "n": 46,
+     "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.3695652173913043,
+     "es_b1": 0.2826086956521739
+    },
+    "RR_excluding": {
+     "point": 0.1553398058252427,
+     "ci95": [
+      0.08737864077669903,
+      0.23300970873786409
+     ],
+     "p": 0.0,
+     "n": 103,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+    },
+    "RRs_excluding": {
+     "point": 0.038834951456310676,
+     "ci95": [
+      0.009708737864077669,
+      0.07766990291262135
+     ],
+     "p": 0.0328,
+     "n": 103,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old and not new"
+    },
+    "RR_contains": {
+     "point": 0.23529411764705882,
+     "ci95": [
+      0.058823529411764705,
+      0.47058823529411764
+     ],
+     "p": 0.0202,
+     "n": 17,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+    },
+    "RR_contains_minus_excluding": {
+     "point": 0.07995431182181612,
+     "ci95": [
+      -0.12564249000571104,
+      0.3055396916047972
+     ],
+     "p": 0.4592,
+     "n": [
+      17,
+      103
+     ],
+     "denominator": "cases with ES@B0 and a row at B3, split by name containment; groups resampled separately; value = RR(contains) - RR(rest)"
+    }
+   },
+   "failure_anatomy": {
+    "b1_failures": {
+     "n": 102,
+     "counts": {
+      "both": 50,
+      "old_only": 17,
+      "neither": 35
+     },
+     "shares": {
+      "both": {
+       "point": 0.49019607843137253,
+       "ci95": [
+        0.39215686274509803,
+        0.5882352941176471
+       ],
+       "p": 0.0,
+       "n": 102,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is both"
+      },
+      "old_only": {
+       "point": 0.16666666666666666,
+       "ci95": [
+        0.09803921568627451,
+        0.24509803921568626
+       ],
+       "p": 0.0,
+       "n": 102,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is old_only"
+      },
+      "neither": {
+       "point": 0.3431372549019608,
+       "ci95": [
+        0.2549019607843137,
+        0.4411764705882353
+       ],
+       "p": 0.0,
+       "n": 102,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is neither"
+      }
+     }
+    },
+    "erosion": {
+     "n": 39,
+     "counts": {
+      "both": 14,
+      "old_only": 6,
+      "neither": 19
+     },
+     "shares": {
+      "both": {
+       "point": 0.358974358974359,
+       "ci95": [
+        0.20512820512820512,
+        0.5128205128205128
+       ],
+       "p": 0.0,
+       "n": 39,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is both"
+      },
+      "old_only": {
+       "point": 0.15384615384615385,
+       "ci95": [
+        0.05128205128205128,
+        0.28205128205128205
+       ],
+       "p": 0.003,
+       "n": 39,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is old_only"
+      },
+      "neither": {
+       "point": 0.48717948717948717,
+       "ci95": [
+        0.3333333333333333,
+        0.6410256410256411
+       ],
+       "p": 0.0,
+       "n": 39,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is neither"
+      }
+     }
+    }
+   },
+   "answer_length": {
+    "point": -5.015,
+    "ci95": [
+     -11.825,
+     1.71
+    ],
+    "p": 0.1492,
+    "n": 200,
+    "denominator": "cases scored at B0 and B3; value = words@B3 - words@B0",
+    "mean_b0": 69.69,
+    "mean_b1": 64.675,
+    "median_b0": 61.0,
+    "median_b1": 49.0
+   }
+  },
+  "Llama-70B|drop_degenerate": {
+   "worlds": [
+    "Llama-70B/edited",
+    "Llama-70B/base"
+   ],
+   "n_cases_edited": 187,
+   "n_cases_paired": 187,
+   "ES_B0": {
+    "point": 0.6096256684491979,
+    "ci95": [
+     0.5401069518716578,
+     0.679144385026738
+    ],
+    "p": 0.0,
+    "n": 187,
+    "denominator": "cases with a row at B0; value = es@B0"
+   },
+   "ES_B3": {
+    "point": 0.5026737967914439,
+    "ci95": [
+     0.43315508021390375,
+     0.5721925133689839
+    ],
+    "p": 0.0,
+    "n": 187,
+    "denominator": "cases with a row at B3; value = es@B3"
+   },
+   "ES_drop": {
+    "point": 0.10695187165775401,
+    "ci95": [
+     0.03208556149732621,
+     0.18181818181818182
+    ],
+    "p": 0.0056,
+    "n": 187,
+    "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+    "es_b0": 0.6096256684491979,
+    "es_b1": 0.5026737967914439
+   },
+   "RR": {
+    "point": 0.17543859649122806,
+    "ci95": [
+     0.10526315789473684,
+     0.24561403508771928
+    ],
+    "p": 0.0,
+    "n": 114,
+    "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+   },
+   "RRs": {
+    "point": 0.05263157894736842,
+    "ci95": [
+     0.017543859649122806,
+     0.09649122807017543
+    ],
+    "p": 0.0028,
+    "n": 114,
+    "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old and not new"
+   },
+   "CLR": {
+    "point": 0.5294117647058824,
+    "ci95": [
+     0.45989304812834225,
+     0.5989304812834224
+    ],
+    "p": 0.0,
+    "n": 187,
+    "denominator": "cases with a row at B3; value = chain@B3 names o_old"
+   },
+   "base_old_B0": {
+    "point": 0.7967914438502673,
+    "ci95": [
+     0.7379679144385026,
+     0.8556149732620321
+    ],
+    "p": 0.0,
+    "n": 187,
+    "denominator": "base efficacy rows at B0 whose case is in the edited run (the base run's own denominator, as src/base_probe.py --score); value = base answer names o_old"
+   },
+   "base_old_B3": {
+    "point": 0.8128342245989305,
+    "ci95": [
+     0.7540106951871658,
+     0.8663101604278075
+    ],
+    "p": 0.0,
+    "n": 187,
+    "denominator": "base efficacy rows at B3 whose case is in the edited run (the base run's own denominator, as src/base_probe.py --score); value = base answer names o_old"
+   },
+   "erosion": {
+    "point": 0.1925133689839572,
+    "ci95": [
+     0.13903743315508021,
+     0.25133689839572193
+    ],
+    "p": 0.0,
+    "n": 187,
+    "denominator": "cases with rows at B0 and B3; value = ES@B0 and not ES@B3"
+   },
+   "repair": {
+    "point": 0.0855614973262032,
+    "ci95": [
+     0.0481283422459893,
+     0.12834224598930483
+    ],
+    "p": 0.0,
+    "n": 187,
+    "denominator": "cases with rows at B0 and B3; value = not ES@B0 and ES@B3"
+   },
+   "retention_contrast": {
+    "point": 0.21348314606741572,
+    "ci95": [
+     0.10112359550561797,
+     0.3258426966292135
+    ],
+    "p": 0.0006,
+    "n": 89,
+    "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = edited lost ES - base lost o_old",
+    "edited_loss": {
+     "point": 0.3258426966292135,
+     "ci95": [
+      0.23595505617977527,
+      0.42696629213483145
+     ],
+     "p": 0.0,
+     "n": 89,
+     "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = not ES@B3 (edited)"
+    },
+    "base_loss": {
+     "point": 0.11235955056179775,
+     "ci95": [
+      0.056179775280898875,
+      0.1797752808988764
+     ],
+     "p": 0.0,
+     "n": 89,
+     "denominator": "cases with base answer naming o_old at B0 and edited ES at B0 (edited and base rows at B0 and B3); value = base answer@B3 does not name o_old"
+    },
+    "table_2x2": {
+     "edited_lost=1,base_lost=1": 4,
+     "edited_lost=1,base_lost=0": 25,
+     "edited_lost=0,base_lost=1": 6,
+     "edited_lost=0,base_lost=0": 54
+    }
+   },
+   "qualified_ES_drop": {
+    "point": 0.14093959731543623,
+    "ci95": [
+     0.06040268456375839,
+     0.2214765100671141
+    ],
+    "p": 0.0,
+    "n": 149,
+    "denominator": "base answer names o_old at B0; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+    "es_b0": 0.5973154362416108,
+    "es_b1": 0.4563758389261745
+   },
+   "knowledge_strata": {
+    "known_B0_B3": {
+     "point": 0.13432835820895522,
+     "ci95": [
+      0.05223880597014925,
+      0.21641791044776118
+     ],
+     "p": 0.001,
+     "n": 134,
+     "denominator": "base answer names o_old at B0=True, at B3=True; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.5895522388059702,
+     "es_b1": 0.4552238805970149
+    },
+    "known_B3_only": {
+     "point": 0.0,
+     "ci95": [
+      -0.2777777777777778,
+      0.2777777777777778
+     ],
+     "p": 1.0,
+     "n": 18,
+     "denominator": "base answer names o_old at B0=False, at B3=True; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.7222222222222222,
+     "es_b1": 0.7222222222222222
+    },
+    "known_B0_only": {
+     "point": 0.2,
+     "ci95": [
+      -0.06666666666666667,
+      0.4666666666666667
+     ],
+     "p": 0.2318,
+     "n": 15,
+     "denominator": "base answer names o_old at B0=True, at B3=False; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.6666666666666666,
+     "es_b1": 0.4666666666666667
+    },
+    "unknown": {
+     "point": -0.05,
+     "ci95": [
+      -0.35,
+      0.25
+     ],
+     "p": 0.8766,
+     "n": 20,
+     "denominator": "base answer names o_old at B0=False, at B3=False; cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.6,
+     "es_b1": 0.65
+    }
+   },
+   "name_containment": {
+    "rule": "subject contains o_old as a whole word, case-insensitive (metrics._wb)",
+    "n_contains": 42,
+    "n_paired": 187,
+    "ES_drop_excluding": {
+     "point": 0.1103448275862069,
+     "ci95": [
+      0.020689655172413793,
+      0.2
+     ],
+     "p": 0.0174,
+     "n": 145,
+     "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.6827586206896552,
+     "es_b1": 0.5724137931034483
+    },
+    "ES_drop_contains": {
+     "point": 0.09523809523809523,
+     "ci95": [
+      -0.023809523809523808,
+      0.23809523809523808
+     ],
+     "p": 0.1876,
+     "n": 42,
+     "denominator": "cases with an efficacy row at both B0 and B3; value = ES@B0 - ES@B3",
+     "es_b0": 0.35714285714285715,
+     "es_b1": 0.2619047619047619
+    },
+    "RR_excluding": {
+     "point": 0.16161616161616163,
+     "ci95": [
+      0.09090909090909091,
+      0.23232323232323232
+     ],
+     "p": 0.0,
+     "n": 99,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+    },
+    "RRs_excluding": {
+     "point": 0.04040404040404041,
+     "ci95": [
+      0.010101010101010102,
+      0.08080808080808081
+     ],
+     "p": 0.0398,
+     "n": 99,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old and not new"
+    },
+    "RR_contains": {
+     "point": 0.26666666666666666,
+     "ci95": [
+      0.06666666666666667,
+      0.4666666666666667
+     ],
+     "p": 0.0178,
+     "n": 15,
+     "denominator": "cases with ES@B0 and a row at B3; value = answer@B3 names old"
+    },
+    "RR_contains_minus_excluding": {
+     "point": 0.10505050505050503,
+     "ci95": [
+      -0.11515151515151516,
+      0.35555555555555557
+     ],
+     "p": 0.3868,
+     "n": [
+      15,
+      99
+     ],
+     "denominator": "cases with ES@B0 and a row at B3, split by name containment; groups resampled separately; value = RR(contains) - RR(rest)"
+    }
+   },
+   "failure_anatomy": {
+    "b1_failures": {
+     "n": 93,
+     "counts": {
+      "both": 50,
+      "old_only": 17,
+      "neither": 26
+     },
+     "shares": {
+      "both": {
+       "point": 0.5376344086021505,
+       "ci95": [
+        0.43010752688172044,
+        0.6451612903225806
+       ],
+       "p": 0.0,
+       "n": 93,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is both"
+      },
+      "old_only": {
+       "point": 0.1827956989247312,
+       "ci95": [
+        0.10752688172043011,
+        0.26881720430107525
+       ],
+       "p": 0.0,
+       "n": 93,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is old_only"
+      },
+      "neither": {
+       "point": 0.27956989247311825,
+       "ci95": [
+        0.1935483870967742,
+        0.3655913978494624
+       ],
+       "p": 0.0,
+       "n": 93,
+       "denominator": "b1_failures at B3 (cases scored at B0 and B3); value = answer is neither"
+      }
+     }
+    },
+    "erosion": {
+     "n": 36,
+     "counts": {
+      "both": 14,
+      "old_only": 6,
+      "neither": 16
+     },
+     "shares": {
+      "both": {
+       "point": 0.3888888888888889,
+       "ci95": [
+        0.2222222222222222,
+        0.5555555555555556
+       ],
+       "p": 0.0,
+       "n": 36,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is both"
+      },
+      "old_only": {
+       "point": 0.16666666666666666,
+       "ci95": [
+        0.05555555555555555,
+        0.3055555555555556
+       ],
+       "p": 0.0024,
+       "n": 36,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is old_only"
+      },
+      "neither": {
+       "point": 0.4444444444444444,
+       "ci95": [
+        0.2777777777777778,
+        0.6111111111111112
+       ],
+       "p": 0.0,
+       "n": 36,
+       "denominator": "erosion at B3 (cases scored at B0 and B3); value = answer is neither"
+      }
+     }
+    }
+   },
+   "answer_length": {
+    "point": -5.695187165775401,
+    "ci95": [
+     -12.192513368983958,
+     0.8556149732620321
+    ],
+    "p": 0.0874,
+    "n": 187,
+    "denominator": "cases scored at B0 and B3; value = words@B3 - words@B0",
+    "mean_b0": 63.8235294117647,
+    "mean_b1": 58.1283422459893,
+    "median_b0": 60.0,
+    "median_b1": 48.0
+   },
+   "filter": {
+    "rule": "src/score_pilot.py --drop-degenerate: _is_degenerate on every row (any probe/budget) of the edited shards; all rows of a flagged case dropped",
+    "n_dropped": 13,
+    "dropped_case_ids": [
+     "cf_10436",
+     "cf_12725",
+     "cf_16394",
+     "cf_17428",
+     "cf_1947",
+     "cf_21055",
+     "cf_3656",
+     "cf_367",
+     "cf_4408",
+     "cf_5251",
+     "cf_5837",
+     "cf_6916",
+     "cf_8388"
+    ]
+   }
+  }
+ },
+ "name_containment_pool": {
+  "n_pool": 200,
+  "n_contains": 46,
+  "case_ids": [
+   "cf_11957",
+   "cf_12066",
+   "cf_12222",
+   "cf_12366",
+   "cf_12404",
+   "cf_12856",
+   "cf_13413",
+   "cf_13821",
+   "cf_13923",
+   "cf_1405",
+   "cf_14214",
+   "cf_14454",
+   "cf_14464",
+   "cf_14656",
+   "cf_15514",
+   "cf_15784",
+   "cf_15958",
+   "cf_16744",
+   "cf_18117",
+   "cf_18145",
+   "cf_18601",
+   "cf_18606",
+   "cf_19160",
+   "cf_1917",
+   "cf_1928",
+   "cf_1947",
+   "cf_20065",
+   "cf_20371",
+   "cf_21055",
+   "cf_21364",
+   "cf_21718",
+   "cf_2215",
+   "cf_3656",
+   "cf_3883",
+   "cf_5177",
+   "cf_5251",
+   "cf_5489",
+   "cf_559",
+   "cf_5873",
+   "cf_7492",
+   "cf_7562",
+   "cf_7963",
+   "cf_9017",
+   "cf_9216",
+   "cf_9920",
+   "cf_9979"
+  ],
+  "rule": "subject contains o_old as a whole word, case-insensitive"
+ },
+ "holm_es_drop": {
+  "family": "paired ES drop B0->B3 at the six checkpoints; alpha .05",
+  "70B_unfiltered": {
+   "Llama-70B": {
+    "p": 0.0036,
+    "rank": 1,
+    "m": 6,
+    "threshold": 0.008333333333333333,
+    "p_holm": 0.0216,
+    "reject": true
+   },
+   "Qwen-32B": {
+    "p": 0.0066,
+    "rank": 2,
+    "m": 6,
+    "threshold": 0.01,
+    "p_holm": 0.033,
+    "reject": true
+   },
+   "Qwen-14B": {
+    "p": 0.3278,
+    "rank": 3,
+    "m": 6,
+    "threshold": 0.0125,
+    "p_holm": 1.0,
+    "reject": false
+   },
+   "Qwen-7B": {
+    "p": 0.4878,
+    "rank": 4,
+    "m": 6,
+    "threshold": 0.016666666666666666,
+    "p_holm": 1.0,
+    "reject": false
+   },
+   "Qwen-1.5B": {
+    "p": 0.5372,
+    "rank": 5,
+    "m": 6,
+    "threshold": 0.025,
+    "p_holm": 1.0,
+    "reject": false
+   },
+   "Llama-8B": {
+    "p": 0.7412,
+    "rank": 6,
+    "m": 6,
+    "threshold": 0.05,
+    "p_holm": 1.0,
+    "reject": false
+   }
+  },
+  "70B_filtered": {
+   "Llama-70B": {
+    "p": 0.0056,
+    "rank": 1,
+    "m": 6,
+    "threshold": 0.008333333333333333,
+    "p_holm": 0.0336,
+    "reject": true
+   },
+   "Qwen-32B": {
+    "p": 0.0066,
+    "rank": 2,
+    "m": 6,
+    "threshold": 0.01,
+    "p_holm": 0.0336,
+    "reject": true
+   },
+   "Qwen-14B": {
+    "p": 0.3278,
+    "rank": 3,
+    "m": 6,
+    "threshold": 0.0125,
+    "p_holm": 1.0,
+    "reject": false
+   },
+   "Qwen-7B": {
+    "p": 0.4878,
+    "rank": 4,
+    "m": 6,
+    "threshold": 0.016666666666666666,
+    "p_holm": 1.0,
+    "reject": false
+   },
+   "Qwen-1.5B": {
+    "p": 0.5372,
+    "rank": 5,
+    "m": 6,
+    "threshold": 0.025,
+    "p_holm": 1.0,
+    "reject": false
+   },
+   "Llama-8B": {
+    "p": 0.7412,
+    "rank": 6,
+    "m": 6,
+    "threshold": 0.05,
+    "p_holm": 1.0,
+    "reject": false
+   }
+  },
+  "qualified_70B_unfiltered": {
+   "Llama-70B": {
+    "p": 0.0,
+    "rank": 1,
+    "m": 6,
+    "threshold": 0.008333333333333333,
+    "p_holm": 0.0,
+    "reject": true
+   },
+   "Qwen-32B": {
+    "p": 0.0074,
+    "rank": 2,
+    "m": 6,
+    "threshold": 0.01,
+    "p_holm": 0.037000000000000005,
+    "reject": true
+   },
+   "Qwen-14B": {
+    "p": 0.1078,
+    "rank": 3,
+    "m": 6,
+    "threshold": 0.0125,
+    "p_holm": 0.4312,
+    "reject": false
+   },
+   "Llama-8B": {
+    "p": 0.6534,
+    "rank": 4,
+    "m": 6,
+    "threshold": 0.016666666666666666,
+    "p_holm": 1.0,
+    "reject": false
+   },
+   "Qwen-7B": {
+    "p": 0.8062,
+    "rank": 5,
+    "m": 6,
+    "threshold": 0.025,
+    "p_holm": 1.0,
+    "reject": false
+   },
+   "Qwen-1.5B": {
+    "p": 0.9232,
+    "rank": 6,
+    "m": 6,
+    "threshold": 0.05,
+    "p_holm": 1.0,
+    "reject": false
+   }
+  },
+  "name_excluded_70B_unfiltered": {
+   "Qwen-32B": {
+    "p": 0.009,
+    "rank": 1,
+    "m": 6,
+    "threshold": 0.008333333333333333,
+    "p_holm": 0.05399999999999999,
+    "reject": false
+   },
+   "Llama-70B": {
+    "p": 0.0104,
+    "rank": 2,
+    "m": 6,
+    "threshold": 0.01,
+    "p_holm": 0.05399999999999999,
+    "reject": false
+   },
+   "Qwen-7B": {
+    "p": 0.441,
+    "rank": 3,
+    "m": 6,
+    "threshold": 0.0125,
+    "p_holm": 1.0,
+    "reject": false
+   },
+   "Llama-8B": {
+    "p": 0.5242,
+    "rank": 4,
+    "m": 6,
+    "threshold": 0.016666666666666666,
+    "p_holm": 1.0,
+    "reject": false
+   },
+   "Qwen-1.5B": {
+    "p": 0.692,
+    "rank": 5,
+    "m": 6,
+    "threshold": 0.025,
+    "p_holm": 1.0,
+    "reject": false
+   },
+   "Qwen-14B": {
+    "p": 0.8174,
+    "rank": 6,
+    "m": 6,
+    "threshold": 0.05,
+    "p_holm": 1.0,
+    "reject": false
+   }
+  },
+  "retention_70B_unfiltered": {
+   "Llama-70B": {
+    "p": 0.0,
+    "rank": 1,
+    "m": 6,
+    "threshold": 0.008333333333333333,
+    "p_holm": 0.0,
+    "reject": true
+   },
+   "Qwen-32B": {
+    "p": 0.0022,
+    "rank": 2,
+    "m": 6,
+    "threshold": 0.01,
+    "p_holm": 0.011000000000000001,
+    "reject": true
+   },
+   "Qwen-14B": {
+    "p": 0.0038,
+    "rank": 3,
+    "m": 6,
+    "threshold": 0.0125,
+    "p_holm": 0.0152,
+    "reject": true
+   },
+   "Qwen-7B": {
+    "p": 0.2136,
+    "rank": 4,
+    "m": 6,
+    "threshold": 0.016666666666666666,
+    "p_holm": 0.6408,
+    "reject": false
+   },
+   "Llama-8B": {
+    "p": 0.2566,
+    "rank": 5,
+    "m": 6,
+    "threshold": 0.025,
+    "p_holm": 0.6408,
+    "reject": false
+   },
+   "Qwen-1.5B": {
+    "p": 0.8968,
+    "rank": 6,
+    "m": 6,
+    "threshold": 0.05,
+    "p_holm": 0.8968,
+    "reject": false
+   }
+  }
+ },
+ "flow_differences": {
+  "Qwen-32B - Qwen-1.5B": {
+   "worlds": [
+    "Qwen-32B/edited",
+    "Qwen-1.5B/edited"
+   ],
+   "erosion": {
+    "point": 0.08247422680412371,
+    "ci95": [
+     0.010309278350515464,
+     0.15463917525773196
+    ],
+    "p": 0.0312,
+    "n": 194,
+    "denominator": "cases scored at B0 and B3 in both checkpoints; value = erosion(a) - erosion(b)"
+   },
+   "repair": {
+    "point": -0.05154639175257732,
+    "ci95": [
+     -0.11855670103092783,
+     0.010309278350515464
+    ],
+    "p": 0.1218,
+    "n": 194,
+    "denominator": "cases scored at B0 and B3 in both checkpoints; value = repair(a) - repair(b)"
+   },
+   "es_drop": {
+    "point": 0.13402061855670103,
+    "ci95": [
+     0.02577319587628866,
+     0.23711340206185566
+    ],
+    "p": 0.015,
+    "n": 194,
+    "denominator": "cases scored at B0 and B3 in both checkpoints; value = es_drop(a) - es_drop(b)"
+   }
+  },
+  "Qwen-32B - Qwen-7B": {
+   "worlds": [
+    "Qwen-32B/edited",
+    "Qwen-7B/edited"
+   ],
+   "erosion": {
+    "point": 0.06060606060606061,
+    "ci95": [
+     -0.010101010101010102,
+     0.13636363636363635
+    ],
+    "p": 0.1148,
+    "n": 198,
+    "denominator": "cases scored at B0 and B3 in both checkpoints; value = erosion(a) - erosion(b)"
+   },
+   "repair": {
+    "point": -0.06565656565656566,
+    "ci95": [
+     -0.13636363636363635,
+     0.005050505050505051
+    ],
+    "p": 0.071,
+    "n": 198,
+    "denominator": "cases scored at B0 and B3 in both checkpoints; value = repair(a) - repair(b)"
+   },
+   "es_drop": {
+    "point": 0.12626262626262627,
+    "ci95": [
+     0.020202020202020204,
+     0.23737373737373738
+    ],
+    "p": 0.024,
+    "n": 198,
+    "denominator": "cases scored at B0 and B3 in both checkpoints; value = es_drop(a) - es_drop(b)"
+   }
+  },
+  "Qwen-32B - Qwen-14B": {
+   "worlds": [
+    "Qwen-32B/edited",
+    "Qwen-14B/edited"
+   ],
+   "erosion": {
+    "point": 0.045454545454545456,
+    "ci95": [
+     -0.025252525252525252,
+     0.11616161616161616
+    ],
+    "p": 0.219,
+    "n": 198,
+    "denominator": "cases scored at B0 and B3 in both checkpoints; value = erosion(a) - erosion(b)"
+   },
+   "repair": {
+    "point": -0.020202020202020204,
+    "ci95": [
+     -0.07575757575757576,
+     0.03535353535353535
+    ],
+    "p": 0.5174,
+    "n": 198,
+    "denominator": "cases scored at B0 and B3 in both checkpoints; value = repair(a) - repair(b)"
+   },
+   "es_drop": {
+    "point": 0.06565656565656566,
+    "ci95": [
+     -0.030303030303030304,
+     0.16161616161616163
+    ],
+    "p": 0.1894,
+    "n": 198,
+    "denominator": "cases scored at B0 and B3 in both checkpoints; value = es_drop(a) - es_drop(b)"
+   }
+  },
+  "Llama-70B - Llama-8B": {
+   "worlds": [
+    "Llama-70B/edited",
+    "Llama-8B/edited"
+   ],
+   "erosion": {
+    "point": 0.03,
+    "ci95": [
+     -0.04,
+     0.1
+    ],
+    "p": 0.4474,
+    "n": 200,
+    "denominator": "cases scored at B0 and B3 in both checkpoints; value = erosion(a) - erosion(b)"
+   },
+   "repair": {
+    "point": -0.065,
+    "ci95": [
+     -0.13,
+     0.0
+    ],
+    "p": 0.0646,
+    "n": 200,
+    "denominator": "cases scored at B0 and B3 in both checkpoints; value = repair(a) - repair(b)"
+   },
+   "es_drop": {
+    "point": 0.095,
+    "ci95": [
+     -0.01,
+     0.2
+    ],
+    "p": 0.0898,
+    "n": 200,
+    "denominator": "cases scored at B0 and B3 in both checkpoints; value = es_drop(a) - es_drop(b)"
+   }
+  }
+ },
+ "sampling_reliability": {
+  "worlds": [
+   "Qwen-32B/sampling"
+  ],
+  "temperatures": [
+   0.6
+  ],
+  "primary": {
+   "k": 3,
+   "seeds": [
+    0,
+    1,
+    2
+   ],
+   "n_greedy_b0_success": 125,
+   "n_excluded_incomplete_seeds": 1,
+   "fail_any_b1": {
+    "point": 0.6048387096774194,
+    "ci95": [
+     0.5161290322580645,
+     0.6935483870967742
+    ],
+    "p": 0.0,
+    "n": 124,
+    "denominator": "cases with greedy ES@B0 and all 3 sampled seeds scored at B0 and B3; value = at least one of 3 sampled B3 answers fails ES"
+   },
+   "fail_any_b0_noise_floor": {
+    "point": 0.3387096774193548,
+    "ci95": [
+     0.25806451612903225,
+     0.4274193548387097
+    ],
+    "p": 0.0,
+    "n": 124,
+    "denominator": "cases with greedy ES@B0 and all 3 sampled seeds scored at B0 and B3; value = at least one of 3 sampled B0 answers fails ES"
+   },
+   "excess": {
+    "point": 0.2661290322580645,
+    "ci95": [
+     0.1693548387096774,
+     0.3629032258064516
+    ],
+    "p": 0.0,
+    "n": 124,
+    "denominator": "cases with greedy ES@B0 and all 3 sampled seeds scored at B0 and B3; value = fail_any_b1 - fail_any_b0"
+   },
+   "fail_all_b1": {
+    "point": 0.16129032258064516,
+    "ci95": [
+     0.0967741935483871,
+     0.23387096774193547
+    ],
+    "p": 0.0,
+    "n": 124,
+    "denominator": "cases with greedy ES@B0 and all 3 sampled seeds scored at B0 and B3; value = all 3 sampled B3 answers fail ES"
+   },
+   "old_any_b1": {
+    "point": 0.3870967741935484,
+    "ci95": [
+     0.3064516129032258,
+     0.47580645161290325
+    ],
+    "p": 0.0,
+    "n": 124,
+    "denominator": "cases with greedy ES@B0 and all 3 sampled seeds scored at B0 and B3; value = at least one sampled B3 answer names o_old"
+   },
+   "n_failures_b1_distribution": {
+    "0": 49,
+    "1": 33,
+    "2": 22,
+    "3": 20
+   }
+  },
+  "sensitivity_gate_headline_greedy_B0": {
+   "k": 3,
+   "seeds": [
+    0,
+    1,
+    2
+   ],
+   "n_greedy_b0_success": 119,
+   "n_excluded_incomplete_seeds": 1,
+   "fail_any_b1": {
+    "point": 0.6186440677966102,
+    "ci95": [
+     0.5254237288135594,
+     0.7033898305084746
+    ],
+    "p": 0.0,
+    "n": 118,
+    "denominator": "cases with greedy ES@B0 and all 3 sampled seeds scored at B0 and B3; value = at least one of 3 sampled B3 answers fails ES"
+   },
+   "fail_any_b0_noise_floor": {
+    "point": 0.3135593220338983,
+    "ci95": [
+     0.23728813559322035,
+     0.3983050847457627
+    ],
+    "p": 0.0,
+    "n": 118,
+    "denominator": "cases with greedy ES@B0 and all 3 sampled seeds scored at B0 and B3; value = at least one of 3 sampled B0 answers fails ES"
+   },
+   "excess": {
+    "point": 0.3050847457627119,
+    "ci95": [
+     0.2033898305084746,
+     0.4067796610169492
+    ],
+    "p": 0.0,
+    "n": 118,
+    "denominator": "cases with greedy ES@B0 and all 3 sampled seeds scored at B0 and B3; value = fail_any_b1 - fail_any_b0"
+   },
+   "fail_all_b1": {
+    "point": 0.15254237288135594,
+    "ci95": [
+     0.09322033898305085,
+     0.22033898305084745
+    ],
+    "p": 0.0,
+    "n": 118,
+    "denominator": "cases with greedy ES@B0 and all 3 sampled seeds scored at B0 and B3; value = all 3 sampled B3 answers fail ES"
+   },
+   "old_any_b1": {
+    "point": 0.3813559322033898,
+    "ci95": [
+     0.2966101694915254,
+     0.4745762711864407
+    ],
+    "p": 0.0,
+    "n": 118,
+    "denominator": "cases with greedy ES@B0 and all 3 sampled seeds scored at B0 and B3; value = at least one sampled B3 answer names o_old"
+   },
+   "n_failures_b1_distribution": {
+    "0": 45,
+    "1": 33,
+    "2": 22,
+    "3": 18
+   }
+  },
+  "greedy_B0_agreement_with_headline": {
+   "n": 200,
+   "share_equal_ES": 0.85
+  }
+ },
+ "arm_contrasts": {
+  "worlds": [
+   "Qwen-32B/edited",
+   "Qwen-32B/arm_T",
+   "Qwen-32B/arm_D",
+   "Qwen-32B/arm_P",
+   "Qwen-32B/arm_C"
+  ],
+  "arms": {
+   "N": "no suppression (headline run)",
+   "T": "suppress o_old in the chain",
+   "D": "suppress o_new in the chain",
+   "P": "suppress a placebo token",
+   "C": "suppress a same-relation strong competitor"
+  },
+  "budget": "B3",
+  "gate": "ES@B0 of the same arm",
+  "marginal": {
+   "N": {
+    "ES": 0.494949494949495,
+    "RR": 0.19327731092436976,
+    "RRs": 0.09243697478991597,
+    "CLR": 0.5454545454545454,
+    "n": 198
+   },
+   "T": {
+    "ES": 0.6313131313131313,
+    "RR": 0.0847457627118644,
+    "RRs": 0.0423728813559322,
+    "CLR": 0.26262626262626265,
+    "n": 198
+   },
+   "D": {
+    "ES": 0.28061224489795916,
+    "RR": 0.3089430894308943,
+    "RRs": 0.23577235772357724,
+    "CLR": 0.5867346938775511,
+    "n": 196
+   },
+   "P": {
+    "ES": 0.51,
+    "RR": 0.208,
+    "RRs": 0.112,
+    "CLR": 0.49,
+    "n": 200
+   },
+   "C": {
+    "ES": 0.51,
+    "RR": 0.208,
+    "RRs": 0.112,
+    "CLR": 0.475,
+    "n": 200
+   }
+  },
+  "records_identical_to_cross_arm_per_case": {
+   "N": true,
+   "T": true,
+   "D": true,
+   "P": true,
+   "C": true
+  },
+  "b0_parity": {
+   "rule": "B0 has no chain, so a think-scoped suppressor cannot act there: arms from the same code and environment answer B0 byte-identically",
+   "pairs": {
+    "T-N": {
+     "budget": "B0",
+     "n": 200,
+     "identical_answer": 200,
+     "identical_chain": 200,
+     "same_ES_B0": 200
+    },
+    "D-N": {
+     "budget": "B0",
+     "n": 200,
+     "identical_answer": 12,
+     "identical_chain": 200,
+     "same_ES_B0": 170
+    },
+    "P-N": {
+     "budget": "B0",
+     "n": 200,
+     "identical_answer": 12,
+     "identical_chain": 200,
+     "same_ES_B0": 170
+    },
+    "C-N": {
+     "budget": "B0",
+     "n": 200,
+     "identical_answer": 12,
+     "identical_chain": 200,
+     "same_ES_B0": 170
+    },
+    "P-C": {
+     "budget": "B0",
+     "n": 200,
+     "identical_answer": 200,
+     "identical_chain": 200,
+     "same_ES_B0": 200
+    }
+   }
+  },
+  "contrasts": {
+   "T-N": {
+    "ES": {
+     "point": 0.1378,
+     "ci95": [
+      0.0816,
+      0.1939
+     ],
+     "p": 0.0,
+     "n": 196,
+     "denominator": "cases scored at B3 in both arms; value = ES(T) - ES(N)"
+    },
+    "RR": {
+     "point": -0.1017,
+     "ci95": [
+      -0.1695,
+      -0.0424
+     ],
+     "p": 0.001,
+     "n": 118,
+     "denominator": "cases scored at B3 in both arms and ES@B0 in both arms; value = RR(T) - RR(N)"
+    },
+    "RRs": {
+     "point": -0.0508,
+     "ci95": [
+      -0.1017,
+      0.0
+     ],
+     "p": 0.0732,
+     "n": 118,
+     "denominator": "cases scored at B3 in both arms and ES@B0 in both arms; value = RRs(T) - RRs(N)"
+    },
+    "CLR": {
+     "point": -0.2755,
+     "ci95": [
+      -0.3367,
+      -0.2143
+     ],
+     "p": 0.0,
+     "n": 196,
+     "denominator": "cases scored at B3 in both arms; value = CLR(T) - CLR(N)"
+    }
+   },
+   "T-P": {
+    "ES": {
+     "point": 0.1212,
+     "ci95": [
+      0.0505,
+      0.1919
+     ],
+     "p": 0.0012,
+     "n": 198,
+     "denominator": "cases scored at B3 in both arms; value = ES(T) - ES(P)"
+    },
+    "RR": {
+     "point": -0.0943,
+     "ci95": [
+      -0.1698,
+      -0.0283
+     ],
+     "p": 0.0136,
+     "n": 106,
+     "denominator": "cases scored at B3 in both arms and ES@B0 in both arms; value = RR(T) - RR(P)"
+    },
+    "RRs": {
+     "point": -0.0566,
+     "ci95": [
+      -0.1132,
+      -0.0094
+     ],
+     "p": 0.0324,
+     "n": 106,
+     "denominator": "cases scored at B3 in both arms and ES@B0 in both arms; value = RRs(T) - RRs(P)"
+    },
+    "CLR": {
+     "point": -0.2273,
+     "ci95": [
+      -0.2929,
+      -0.1616
+     ],
+     "p": 0.0,
+     "n": 198,
+     "denominator": "cases scored at B3 in both arms; value = CLR(T) - CLR(P)"
+    }
+   },
+   "T-C": {
+    "ES": {
+     "point": 0.1212,
+     "ci95": [
+      0.0505,
+      0.1919
+     ],
+     "p": 0.0004,
+     "n": 198,
+     "denominator": "cases scored at B3 in both arms; value = ES(T) - ES(C)"
+    },
+    "RR": {
+     "point": -0.0943,
+     "ci95": [
+      -0.1604,
+      -0.0283
+     ],
+     "p": 0.0062,
+     "n": 106,
+     "denominator": "cases scored at B3 in both arms and ES@B0 in both arms; value = RR(T) - RR(C)"
+    },
+    "RRs": {
+     "point": -0.0566,
+     "ci95": [
+      -0.1132,
+      -0.0094
+     ],
+     "p": 0.0324,
+     "n": 106,
+     "denominator": "cases scored at B3 in both arms and ES@B0 in both arms; value = RRs(T) - RRs(C)"
+    },
+    "CLR": {
+     "point": -0.2121,
+     "ci95": [
+      -0.2778,
+      -0.1465
+     ],
+     "p": 0.0,
+     "n": 198,
+     "denominator": "cases scored at B3 in both arms; value = CLR(T) - CLR(C)"
+    }
+   },
+   "D-N": {
+    "ES": {
+     "point": -0.2165,
+     "ci95": [
+      -0.2887,
+      -0.1443
+     ],
+     "p": 0.0,
+     "n": 194,
+     "denominator": "cases scored at B3 in both arms; value = ES(D) - ES(N)"
+    },
+    "RR": {
+     "point": 0.0857,
+     "ci95": [
+      0.019,
+      0.1524
+     ],
+     "p": 0.0102,
+     "n": 105,
+     "denominator": "cases scored at B3 in both arms and ES@B0 in both arms; value = RR(D) - RR(N)"
+    },
+    "RRs": {
+     "point": 0.0952,
+     "ci95": [
+      0.0381,
+      0.1619
+     ],
+     "p": 0.0024,
+     "n": 105,
+     "denominator": "cases scored at B3 in both arms and ES@B0 in both arms; value = RRs(D) - RRs(N)"
+    },
+    "CLR": {
+     "point": 0.0412,
+     "ci95": [
+      -0.0103,
+      0.0979
+     ],
+     "p": 0.1628,
+     "n": 194,
+     "denominator": "cases scored at B3 in both arms; value = CLR(D) - CLR(N)"
+    }
+   },
+   "P-N": {
+    "ES": {
+     "point": 0.0152,
+     "ci95": [
+      -0.0455,
+      0.0808
+     ],
+     "p": 0.704,
+     "n": 198,
+     "denominator": "cases scored at B3 in both arms; value = ES(P) - ES(N)"
+    },
+    "RR": {
+     "point": 0.0,
+     "ci95": [
+      -0.0561,
+      0.0561
+     ],
+     "p": 1.0,
+     "n": 107,
+     "denominator": "cases scored at B3 in both arms and ES@B0 in both arms; value = RR(P) - RR(N)"
+    },
+    "RRs": {
+     "point": -0.0093,
+     "ci95": [
+      -0.0467,
+      0.028
+     ],
+     "p": 0.8282,
+     "n": 107,
+     "denominator": "cases scored at B3 in both arms and ES@B0 in both arms; value = RRs(P) - RRs(N)"
+    },
+    "CLR": {
+     "point": -0.0556,
+     "ci95": [
+      -0.1061,
+      -0.0051
+     ],
+     "p": 0.0366,
+     "n": 198,
+     "denominator": "cases scored at B3 in both arms; value = CLR(P) - CLR(N)"
+    }
+   },
+   "C-N": {
+    "ES": {
+     "point": 0.0152,
+     "ci95": [
+      -0.0455,
+      0.0758
+     ],
+     "p": 0.688,
+     "n": 198,
+     "denominator": "cases scored at B3 in both arms; value = ES(C) - ES(N)"
+    },
+    "RR": {
+     "point": 0.0,
+     "ci95": [
+      -0.0561,
+      0.0561
+     ],
+     "p": 1.0,
+     "n": 107,
+     "denominator": "cases scored at B3 in both arms and ES@B0 in both arms; value = RR(C) - RR(N)"
+    },
+    "RRs": {
+     "point": -0.0093,
+     "ci95": [
+      -0.0467,
+      0.028
+     ],
+     "p": 0.8282,
+     "n": 107,
+     "denominator": "cases scored at B3 in both arms and ES@B0 in both arms; value = RRs(C) - RRs(N)"
+    },
+    "CLR": {
+     "point": -0.0707,
+     "ci95": [
+      -0.1212,
+      -0.0202
+     ],
+     "p": 0.0074,
+     "n": 198,
+     "denominator": "cases scored at B3 in both arms; value = CLR(C) - CLR(N)"
+    }
+   }
+  }
+ },
+ "worlds": {
+  "Qwen-1.5B/edited": {
+   "glob": "probe/r1qwen1_5b_ROME_cf200_r*.jsonl",
+   "labels": {
+    "model_tag": "r1qwen1_5b"
+   },
+   "files": [
+    {
+     "path": "probe/r1qwen1_5b_ROME_cf200_r0of8.jsonl",
+     "sha256": "e461de1c96b0be4bfc91d0fd7a116c9948e42e312147b3c8cb95468543a6c32a",
+     "bytes": 361699,
+     "counts": {
+      "legacy": 84,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen1_5b_ROME_cf200_r1of8.jsonl",
+     "sha256": "1392a4204a5cff637b3b8f039ef655a5fe577539749b4777661b7eba1616f2d4",
+     "bytes": 681782,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen1_5b_ROME_cf200_r2of8.jsonl",
+     "sha256": "1ee66fb728f68e87f3823a0819a95f4ad64c2d7886cb178cec9e8ba78e28437c",
+     "bytes": 261002,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen1_5b_ROME_cf200_r3of8.jsonl",
+     "sha256": "51cc3eaf2b32eae03b41cc3af851b687eb3f32eee158487516aac51695c70786",
+     "bytes": 466620,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen1_5b_ROME_cf200_r4of8.jsonl",
+     "sha256": "85fc56bfcfd72c2f0d76025f3227561a0b94227e864e2e18aa9a9bdb817a53f0",
+     "bytes": 398390,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen1_5b_ROME_cf200_r5of8.jsonl",
+     "sha256": "66a37c11079284e0b029208eb02d7a11a292c57580a57a9b9956811131e49696",
+     "bytes": 462242,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen1_5b_ROME_cf200_r6of8.jsonl",
+     "sha256": "7980a7c213f3248d4c08410a910b1a7256b35facd1e34c404f1556a86035366c",
+     "bytes": 757735,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen1_5b_ROME_cf200_r7of8.jsonl",
+     "sha256": "f3ff10540d028e5d87bb2c0c74b649618c953927244edc94992f1ed7fe09ec10",
+     "bytes": 614278,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    }
+   ],
+   "n_rows": 784,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  },
+  "Qwen-1.5B/base": {
+   "glob": "probe/r1qwen1_5b_BASE_cf200_r*.jsonl",
+   "labels": {
+    "model_tag": "r1qwen1_5b"
+   },
+   "files": [
+    {
+     "path": "probe/r1qwen1_5b_BASE_cf200_r0.jsonl",
+     "sha256": "9a79b42242c433cbb06dba5a35701b8bcd08b2e3a50ea9f6e87fcd131e591764",
+     "bytes": 292813,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen1_5b_BASE_cf200_r1.jsonl",
+     "sha256": "ff071693881f51c8d4e20fad3581a7bf09466f2374cf695621097281e1282763",
+     "bytes": 154400,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen1_5b_BASE_cf200_r2.jsonl",
+     "sha256": "34733c12ddcc3886643b1db53a369e19948249d2cb5c44759f47e5b49fb384a7",
+     "bytes": 220664,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen1_5b_BASE_cf200_r3.jsonl",
+     "sha256": "ddd84e3243db8c046eebf5f7584b30882d225254dfec969eceb1781fc7a81dfa",
+     "bytes": 232480,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen1_5b_BASE_cf200_r4.jsonl",
+     "sha256": "54d53a3d9f1ae6f51df0a2d04d0962b11dece64068e61ef6a806d70ea32d56fc",
+     "bytes": 128573,
+     "counts": {
+      "legacy": 48
+     }
+    },
+    {
+     "path": "probe/r1qwen1_5b_BASE_cf200_r5.jsonl",
+     "sha256": "2aa6325b0d99e436e77a47c8f79ad9bf94646e710e0e446199dc80d419aca499",
+     "bytes": 170910,
+     "counts": {
+      "legacy": 48
+     }
+    },
+    {
+     "path": "probe/r1qwen1_5b_BASE_cf200_r6.jsonl",
+     "sha256": "5e0875ce084cb8d78ceabcec407cf243022cfd2702b526d0cd3245d6fe0d71f8",
+     "bytes": 134444,
+     "counts": {
+      "legacy": 48
+     }
+    },
+    {
+     "path": "probe/r1qwen1_5b_BASE_cf200_r7.jsonl",
+     "sha256": "15b33f4071fb7154803b3ae6b116515a11cc1cea2a0a9453cf75fca353273aa2",
+     "bytes": 174658,
+     "counts": {
+      "legacy": 48
+     }
+    }
+   ],
+   "n_rows": 392,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  },
+  "Qwen-7B/edited": {
+   "glob": "pilot/r1qwen7b_ROME_cf200_r*of8.jsonl",
+   "labels": {
+    "model_tag": "r1qwen7b"
+   },
+   "files": [
+    {
+     "path": "pilot/r1qwen7b_ROME_cf200_r0of8.jsonl",
+     "sha256": "252d70a6f865be89ada3ef448516b161317ed6616791c9d8b5dd68bac28280b9",
+     "bytes": 1626097,
+     "counts": {
+      "legacy": 375,
+      "meta": 1
+     }
+    },
+    {
+     "path": "pilot/r1qwen7b_ROME_cf200_r1of8.jsonl",
+     "sha256": "d361529e5194955c3166eb3fb48b60ccd91273561ab2b0069b3764dcc078f8f2",
+     "bytes": 2113902,
+     "counts": {
+      "legacy": 375,
+      "meta": 1
+     }
+    },
+    {
+     "path": "pilot/r1qwen7b_ROME_cf200_r2of8.jsonl",
+     "sha256": "e84a71d7a3d1a47a59b3379a659b4b12fdefd2ea7175dbe9ec9696b822034324",
+     "bytes": 1687620,
+     "counts": {
+      "legacy": 375,
+      "meta": 1
+     }
+    },
+    {
+     "path": "pilot/r1qwen7b_ROME_cf200_r3of8.jsonl",
+     "sha256": "64301211bd385bac8b467ddee13cca1fe185adaca8feda59ac1b1a8bd8fe678a",
+     "bytes": 1544244,
+     "counts": {
+      "legacy": 375,
+      "meta": 1
+     }
+    },
+    {
+     "path": "pilot/r1qwen7b_ROME_cf200_r4of8.jsonl",
+     "sha256": "cd3886a05b989e006fa75ef4374ff7f9258edd2014da8b09556071b58767f85b",
+     "bytes": 2188885,
+     "counts": {
+      "legacy": 375,
+      "meta": 1
+     }
+    },
+    {
+     "path": "pilot/r1qwen7b_ROME_cf200_r5of8.jsonl",
+     "sha256": "cce08c5f03916b800aa58aac414c6425fb481e3209471429b84e5efed80eff42",
+     "bytes": 1859696,
+     "counts": {
+      "legacy": 375,
+      "meta": 1
+     }
+    },
+    {
+     "path": "pilot/r1qwen7b_ROME_cf200_r6of8.jsonl",
+     "sha256": "05d7966bd0a54935ec7b6b50a36ab15892c88f0eef976c29b72b745818bf1cab",
+     "bytes": 1727091,
+     "counts": {
+      "legacy": 375,
+      "meta": 1
+     }
+    },
+    {
+     "path": "pilot/r1qwen7b_ROME_cf200_r7of8.jsonl",
+     "sha256": "5d7038af9492678c8a633fdf92ef478409cdb365b6c6d683de83daac28b18b0c",
+     "bytes": 1885423,
+     "counts": {
+      "legacy": 375,
+      "meta": 1
+     }
+    }
+   ],
+   "n_rows": 3000,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  },
+  "Qwen-7B/base": {
+   "glob": "pilot/r1qwen7b_BASE_cf200_r*.jsonl",
+   "labels": {
+    "model_tag": "r1qwen7b"
+   },
+   "files": [
+    {
+     "path": "pilot/r1qwen7b_BASE_cf200_r0.jsonl",
+     "sha256": "46db94ac8182b48fbfcd15c2923ae720ac772261cf58ac3a40f75a4a71c63ff4",
+     "bytes": 132397,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "pilot/r1qwen7b_BASE_cf200_r1.jsonl",
+     "sha256": "78debfefa51d1d5775eea658d7cb178522ee3f39cb4f26ee826327d5aae026fd",
+     "bytes": 142118,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "pilot/r1qwen7b_BASE_cf200_r2.jsonl",
+     "sha256": "3d025412dc4b85d7914310110558dffdff0c308be3c36cea0fb3854641dbe32d",
+     "bytes": 139965,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "pilot/r1qwen7b_BASE_cf200_r3.jsonl",
+     "sha256": "0d3e2f790c0951fdedc2b28b62d9c561b30d8e79f8ab82b411b07f9f010810e9",
+     "bytes": 136936,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "pilot/r1qwen7b_BASE_cf200_r4.jsonl",
+     "sha256": "b9e9d330116e07402e59acd205bcc2bbb1aee8c620e8d022e4e30b73fae2ba42",
+     "bytes": 117209,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "pilot/r1qwen7b_BASE_cf200_r5.jsonl",
+     "sha256": "247ba3c5070c533d07545aec99abdc8f6fd466107a509193dcf704449cd35777",
+     "bytes": 106753,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "pilot/r1qwen7b_BASE_cf200_r6.jsonl",
+     "sha256": "3d655abd11dcaeffa5e628388f93d654ee9321579f31cbef076f4092ec250c3c",
+     "bytes": 88657,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "pilot/r1qwen7b_BASE_cf200_r7.jsonl",
+     "sha256": "468525d4987910b72c54775a819ab84a8097692244e22484712ace81aa4fbbdf",
+     "bytes": 192530,
+     "counts": {
+      "legacy": 50
+     }
+    }
+   ],
+   "n_rows": 400,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  },
+  "Qwen-14B/edited": {
+   "glob": "probe/r1qwen14b_ROME_cf200_r*.jsonl",
+   "labels": {
+    "model_tag": "r1qwen14b"
+   },
+   "files": [
+    {
+     "path": "probe/r1qwen14b_ROME_cf200_r0of8.jsonl",
+     "sha256": "9c5076c158aba5f32fd3337faeb157d887251d945176aba22ae83f170a7aeae5",
+     "bytes": 595170,
+     "counts": {
+      "legacy": 250,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen14b_ROME_cf200_r1of8.jsonl",
+     "sha256": "848c67c8149b86ff2b087576744712b2708025ff3af604f680943f9e0d1c21d4",
+     "bytes": 638491,
+     "counts": {
+      "legacy": 250,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen14b_ROME_cf200_r2of8.jsonl",
+     "sha256": "8a8974cf1760f0e1efebb53cbfb21cd84c1168f33b65d5e7b2aff7b45408f822",
+     "bytes": 600547,
+     "counts": {
+      "legacy": 250,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen14b_ROME_cf200_r3of8.jsonl",
+     "sha256": "83426e2803f342598a346786265c00554a6ba2268334703e91eea33c198ac193",
+     "bytes": 592717,
+     "counts": {
+      "legacy": 250,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen14b_ROME_cf200_r4of8.jsonl",
+     "sha256": "8945bb1cc22c2f629ff23e08497036e5eec0f6ea66171643bccce128d1a10c7c",
+     "bytes": 682474,
+     "counts": {
+      "legacy": 250,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen14b_ROME_cf200_r5of8.jsonl",
+     "sha256": "1b5665198309b4d138cab93c1bdc94df3eeca428585018bdea2189bbfa9233c7",
+     "bytes": 556699,
+     "counts": {
+      "legacy": 250,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen14b_ROME_cf200_r6of8.jsonl",
+     "sha256": "dcb190fb130055ae3a9c108d2357fe4d89c1cadb10d5b617c1a788f95ef09a68",
+     "bytes": 618838,
+     "counts": {
+      "legacy": 250,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen14b_ROME_cf200_r7of8.jsonl",
+     "sha256": "54e195206aba6bd70d75b827c9b1cf74c2391c6f248cb56b6711174bb3a471fc",
+     "bytes": 583914,
+     "counts": {
+      "legacy": 250,
+      "meta": 1
+     }
+    }
+   ],
+   "n_rows": 2000,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  },
+  "Qwen-14B/base": {
+   "glob": "probe/r1qwen14b_BASE_cf200_r*.jsonl",
+   "labels": {
+    "model_tag": "r1qwen14b"
+   },
+   "files": [
+    {
+     "path": "probe/r1qwen14b_BASE_cf200_r0.jsonl",
+     "sha256": "9d45032114e7a743fea2581504fb4a66c3ce6eda55e4d71efc0b2ee7eba8d74b",
+     "bytes": 88208,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen14b_BASE_cf200_r1.jsonl",
+     "sha256": "ccddb81534fe0c591634da02aa095fcbdbea8ff231fd81e70efd261856706583",
+     "bytes": 94737,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen14b_BASE_cf200_r2.jsonl",
+     "sha256": "602c3d62fd0dd5b395938deddb5aeca0ade5ac4cabb51961bbec5af022cfd3e3",
+     "bytes": 94291,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen14b_BASE_cf200_r3.jsonl",
+     "sha256": "1016cedd88eadb37dcba46427d644c4d98a73b020e27ba680bba07754b445db3",
+     "bytes": 101974,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen14b_BASE_cf200_r4.jsonl",
+     "sha256": "fe63700b163a066c37c04593c8a69005f1fc2835018cd7f1827e22bac8935d7f",
+     "bytes": 103969,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen14b_BASE_cf200_r5.jsonl",
+     "sha256": "1988f730b7324999ce72fcb7d8734ca27bc5a5a2ad3cd447fa7a4245056dadc1",
+     "bytes": 95164,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen14b_BASE_cf200_r6.jsonl",
+     "sha256": "7c854bc03663ebdba93d2806e51ad5e3eb1bd9d4d17bc56fbd4be4a9aed340d1",
+     "bytes": 99190,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen14b_BASE_cf200_r7.jsonl",
+     "sha256": "44a4150101835be063b61e4dbbeb104a1b56973914944c774e11b29473687992",
+     "bytes": 99303,
+     "counts": {
+      "legacy": 50
+     }
+    }
+   ],
+   "n_rows": 400,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  },
+  "Qwen-32B/edited": {
+   "glob": "probe/r1qwen32b_ROME_cf200_r*.jsonl",
+   "labels": {
+    "model_tag": "r1qwen32b"
+   },
+   "files": [
+    {
+     "path": "probe/r1qwen32b_ROME_cf200_r0of8.jsonl",
+     "sha256": "b0326e017dc31c6b25c165e6642da22cb27778921d9b1c03e1f0f9efdf9c76ad",
+     "bytes": 527479,
+     "counts": {
+      "error": 2,
+      "legacy": 244,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200_r1of8.jsonl",
+     "sha256": "2e51dd5745f1d75ae3ce17d918bd5e7abd9f5edfb36e923d7fe8d3ea0b299060",
+     "bytes": 542706,
+     "counts": {
+      "error": 2,
+      "legacy": 247,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200_r2of8.jsonl",
+     "sha256": "bb7de5308cbe59a6793e0026b4acd18e31a91d44aef20b1426b1f7c231ad030d",
+     "bytes": 562473,
+     "counts": {
+      "legacy": 250,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200_r3of8.jsonl",
+     "sha256": "932dd30430f8556bae25bd82633561b25f4b8e892df04aef7a398178cdf37b8c",
+     "bytes": 517427,
+     "counts": {
+      "error": 2,
+      "legacy": 241,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200_r4of8.jsonl",
+     "sha256": "19a97fac1e3d08498463702db58646a81bfb3283ee936b1a44749b65dc1f6b02",
+     "bytes": 537107,
+     "counts": {
+      "error": 3,
+      "legacy": 242,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200_r5of8.jsonl",
+     "sha256": "442117238900fde5e82d6bdf1efd4163563f4b103d6fcdcd7d166b9fe61d2b3f",
+     "bytes": 551358,
+     "counts": {
+      "error": 1,
+      "legacy": 248,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200_r6of8.jsonl",
+     "sha256": "18b8da758b303be44caf312e02396ce938142e8000598b20c2d52fa7418f51fc",
+     "bytes": 561123,
+     "counts": {
+      "legacy": 250,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200_r7of8.jsonl",
+     "sha256": "4998cbb1ca10a41341d5e89746fb2898157f08bb94993e08e10b0147731e16d4",
+     "bytes": 548342,
+     "counts": {
+      "legacy": 250,
+      "meta": 1
+     }
+    }
+   ],
+   "n_rows": 1972,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  },
+  "Qwen-32B/base": {
+   "glob": "probe/r1qwen32b_BASE_cf200_r*.jsonl",
+   "labels": {
+    "model_tag": "r1qwen32b"
+   },
+   "files": [
+    {
+     "path": "probe/r1qwen32b_BASE_cf200_r0.jsonl",
+     "sha256": "33c50a61bba92a72a7fd93b38b00a9f0a4f3d5ff3067b92db783133676d11239",
+     "bytes": 78607,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_BASE_cf200_r1.jsonl",
+     "sha256": "a72e5b50e68064ad0c90e65169d82f2956cf0baabf7596dfc6711da2918927a7",
+     "bytes": 86489,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_BASE_cf200_r2.jsonl",
+     "sha256": "6512700517df293521b2324f6168b8e6a5ec30cd6de6b00cf46e4b6156d373e6",
+     "bytes": 99186,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_BASE_cf200_r3.jsonl",
+     "sha256": "7b37f95e1ca733ea1bbd49e78e0c99628ba7ba18a9d7600a3fb700298159a643",
+     "bytes": 83964,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_BASE_cf200_r4.jsonl",
+     "sha256": "c2a33655d7893ac494fbc87131833aa3ef4447bb4305ca3251fb0bb9ececf670",
+     "bytes": 102233,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_BASE_cf200_r5.jsonl",
+     "sha256": "ca212b7a2ba4f803e88348cc9421433ca624a49f99189718b56c6380b353c86c",
+     "bytes": 94154,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_BASE_cf200_r6.jsonl",
+     "sha256": "3be31b38aa15d6eb2e23846821a765d986dc1d6b903baef2a0d704a6005eaa09",
+     "bytes": 91322,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_BASE_cf200_r7.jsonl",
+     "sha256": "958eb367298370ed8164bf58e8654e2f9e181469effe5445b38d3a6295a33c9a",
+     "bytes": 83848,
+     "counts": {
+      "error": 1,
+      "legacy": 49
+     }
+    }
+   ],
+   "n_rows": 399,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  },
+  "Llama-8B/edited": {
+   "glob": "probe/r1llama8b_ROME_cf200c2_r*.jsonl",
+   "labels": {
+    "model_tag": "r1llama8b"
+   },
+   "files": [
+    {
+     "path": "probe/r1llama8b_ROME_cf200c2_r0of8.jsonl",
+     "sha256": "7bacdbe5dd42e450c1b3b0f698923d1a5aed5508ea9f0946a431e7f8978fa1cf",
+     "bytes": 204087,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1llama8b_ROME_cf200c2_r1of8.jsonl",
+     "sha256": "79b76f285737856b8b667e34071912249230fab594c92e004764d0925440e0cf",
+     "bytes": 199445,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1llama8b_ROME_cf200c2_r2of8.jsonl",
+     "sha256": "ce8439e6e1604d47c847967ba1e02d463e2cb2dec1d8a578f248774484c35697",
+     "bytes": 207151,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1llama8b_ROME_cf200c2_r3of8.jsonl",
+     "sha256": "78a377b4d470a423eac721606193913320e4d74174dcb581b5f4104ec9115c21",
+     "bytes": 273744,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1llama8b_ROME_cf200c2_r4of8.jsonl",
+     "sha256": "850acecad52d09ca064e3332c1732415715c779e0eeb14d2ff8086cca49f2f05",
+     "bytes": 251734,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1llama8b_ROME_cf200c2_r5of8.jsonl",
+     "sha256": "bb7f3941718c938f8dc88afa69a81c775f948d166f2f86214e77092e2f675ebb",
+     "bytes": 197719,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1llama8b_ROME_cf200c2_r6of8.jsonl",
+     "sha256": "9b595ee78481012972f9d9557a0733408f900efec468b46f14ba38badc5f4338",
+     "bytes": 234176,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1llama8b_ROME_cf200c2_r7of8.jsonl",
+     "sha256": "2b5178fd955482eda891c59161eec09aa385743e3a90ddf3aa50a1ae0a764bfc",
+     "bytes": 212620,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    }
+   ],
+   "n_rows": 800,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  },
+  "Llama-8B/base": {
+   "glob": "probe/r1llama8b_BASE_cf200c2_r*.jsonl",
+   "labels": {
+    "model_tag": "r1llama8b"
+   },
+   "files": [
+    {
+     "path": "probe/r1llama8b_BASE_cf200c2_r0.jsonl",
+     "sha256": "18b05f93a177e771bfecb39050955c3455f6e7813ba004b9abbe0ffb15b0d6ac",
+     "bytes": 99002,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1llama8b_BASE_cf200c2_r1.jsonl",
+     "sha256": "0894f9a64847cbd20e4c0db94dfd57f03f166dd7e4b523c4164c505aa6efe0b7",
+     "bytes": 100462,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1llama8b_BASE_cf200c2_r2.jsonl",
+     "sha256": "a4612d142224bf115bd86f97eb175ee6c35ec834161924188914b062162b4ba9",
+     "bytes": 102981,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1llama8b_BASE_cf200c2_r3.jsonl",
+     "sha256": "c9156825941fc89d56a3de0e85fbd5525152dd374e79001e56131f7f67230f19",
+     "bytes": 110112,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1llama8b_BASE_cf200c2_r4.jsonl",
+     "sha256": "78e7aa466bb9268e0e8ca0f9b48b8fb516d861e6c1ee32fd927132999f129f06",
+     "bytes": 107057,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1llama8b_BASE_cf200c2_r5.jsonl",
+     "sha256": "236bc7e2da469d44f22a9e856f46374a184f08296e0f41c82f6a09c4f1addb83",
+     "bytes": 99078,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1llama8b_BASE_cf200c2_r6.jsonl",
+     "sha256": "ac1ebdf38d7c71840f48638afcf72c7eb3cc72719298633994f9147da3abf14d",
+     "bytes": 111533,
+     "counts": {
+      "legacy": 50
+     }
+    },
+    {
+     "path": "probe/r1llama8b_BASE_cf200c2_r7.jsonl",
+     "sha256": "5883a8679d61fb901e7c785805c09483753836a47e1019a72ec7976328ac0971",
+     "bytes": 104088,
+     "counts": {
+      "legacy": 50
+     }
+    }
+   ],
+   "n_rows": 400,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  },
+  "Llama-70B/edited": {
+   "glob": "probe/r1llama70b_ROME_cf100_r*.jsonl",
+   "labels": {
+    "model_tag": "r1llama70b"
+   },
+   "files": [
+    {
+     "path": "probe/r1llama70b_ROME_cf100_r0of2.jsonl",
+     "sha256": "66b97ae21afc6fbec38369297572544c8b56b41f3cdddbb2080fd9d8ce22c6c3",
+     "bytes": 1141109,
+     "counts": {
+      "legacy": 400,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1llama70b_ROME_cf100_r1of2.jsonl",
+     "sha256": "f5d0bc6eaf6f753e05dd9f789ff88d0517d4bbd2dc80f1c4042bab23bb0bd328",
+     "bytes": 980087,
+     "counts": {
+      "legacy": 400,
+      "meta": 1
+     }
+    }
+   ],
+   "n_rows": 800,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  },
+  "Llama-70B/base": {
+   "glob": "probe/r1llama70b_BASE_cf100_r*.jsonl",
+   "labels": {
+    "model_tag": "r1llama70b"
+   },
+   "files": [
+    {
+     "path": "probe/r1llama70b_BASE_cf100_r0.jsonl",
+     "sha256": "ea425b9ecac96084a8642378c408d09ce7bacddd55b69d70e3fe61f7455639a2",
+     "bytes": 794259,
+     "counts": {
+      "legacy": 400
+     }
+    }
+   ],
+   "n_rows": 400,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  },
+  "Qwen-32B/sampling": {
+   "glob": "probe/r1qwen32b_ROME_cf200samp_r*.jsonl",
+   "labels": {
+    "model_tag": "r1qwen32b"
+   },
+   "files": [
+    {
+     "path": "probe/r1qwen32b_ROME_cf200samp_r0of8.jsonl",
+     "sha256": "52f7924c7f63e5acc193b0f096910052221714a03a7da58b064eaff889114f79",
+     "bytes": 2050795,
+     "counts": {
+      "error": 3,
+      "legacy": 964,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200samp_r1of8.jsonl",
+     "sha256": "3788515d7ac94a7fc06f7ba3b88e48b3d11fd86301a381da122bde399487c52f",
+     "bytes": 2165020,
+     "counts": {
+      "error": 1,
+      "legacy": 997,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200samp_r2of8.jsonl",
+     "sha256": "799bbaef7f7e188abb6da406c3ee048b5efd099c0f133494e881d9456c535564",
+     "bytes": 2186912,
+     "counts": {
+      "error": 1,
+      "legacy": 992,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200samp_r3of8.jsonl",
+     "sha256": "a33378a2a0572993001516d0f33ec9d4f3dbb2f39d11760a5a688934dcbe7e85",
+     "bytes": 2047373,
+     "counts": {
+      "error": 3,
+      "legacy": 966,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200samp_r4of8.jsonl",
+     "sha256": "48cafbb78c521b82da165b3762f1e1c608e2288ba1ab9229f244b6dc781b86ea",
+     "bytes": 2053585,
+     "counts": {
+      "error": 4,
+      "legacy": 974,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200samp_r5of8.jsonl",
+     "sha256": "35cc31aee117dae97671ec726b9e52ff8f6cd90d5eaf09f08ae99c50c6925447",
+     "bytes": 2207004,
+     "counts": {
+      "legacy": 1000,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200samp_r6of8.jsonl",
+     "sha256": "63ac9d2231a75fd81eced01de77dc06cbf8a9c9da2649d931f4d6b762406c905",
+     "bytes": 2120015,
+     "counts": {
+      "error": 3,
+      "legacy": 989,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200samp_r7of8.jsonl",
+     "sha256": "49bb7a04813035dcbbf80c295c513d6f18a82c90006d17bef30e8b47c916a9ab",
+     "bytes": 2072201,
+     "counts": {
+      "error": 1,
+      "legacy": 981,
+      "meta": 1
+     }
+    }
+   ],
+   "n_rows": 7863,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  },
+  "Qwen-32B/arm_T": {
+   "glob": "probe/r1qwen32b_ROME_cf200sup_r*.jsonl",
+   "labels": {
+    "model_tag": "r1qwen32b",
+    "arm": "T"
+   },
+   "files": [
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_r0of8.jsonl",
+     "sha256": "a6691fccdd2c61a998c4826afc072c489dd44685d7e540fb4b40d9ebe32d84bc",
+     "bytes": 524792,
+     "counts": {
+      "error": 2,
+      "legacy": 244,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_r1of8.jsonl",
+     "sha256": "0b7a874ddabb34b376a34ede2acdfc4a7def53f95b0b39467f6f65bf4c6b38eb",
+     "bytes": 533495,
+     "counts": {
+      "error": 2,
+      "legacy": 247,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_r2of8.jsonl",
+     "sha256": "4df434c6761eab01e77adb5c86e250d364880cd2af06722aaf0e32d44d922dd9",
+     "bytes": 559429,
+     "counts": {
+      "legacy": 250,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_r3of8.jsonl",
+     "sha256": "95ff8ae301caed2e45afd3e68ba8bc64f51749b2ccf1a8857dc5d4c780507718",
+     "bytes": 520110,
+     "counts": {
+      "error": 2,
+      "legacy": 241,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_r4of8.jsonl",
+     "sha256": "1a197ab784964a871d91e7b85c521b746a6a32840589ffc9711172454b815704",
+     "bytes": 549431,
+     "counts": {
+      "error": 2,
+      "legacy": 247,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_r5of8.jsonl",
+     "sha256": "791083b5ca2281d0f94b3531b6d8d2259199aac2f6334e8dd5de374313fa59ef",
+     "bytes": 535702,
+     "counts": {
+      "error": 2,
+      "legacy": 243,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_r6of8.jsonl",
+     "sha256": "2a6a0cde54dffa6c56449ef12aa0a481adca0d2a0180d95c29c751c9703ef998",
+     "bytes": 561650,
+     "counts": {
+      "legacy": 250,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_r7of8.jsonl",
+     "sha256": "cf9670506d85bf77e9c0c5c845cebc0bfc95754d15e479558178e5904e55ced5",
+     "bytes": 547066,
+     "counts": {
+      "legacy": 250,
+      "meta": 1
+     }
+    }
+   ],
+   "n_rows": 1972,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  },
+  "Qwen-32B/arm_D": {
+   "glob": "probe/r1qwen32b_ROME_cf200sup_onew_r*.jsonl",
+   "labels": {
+    "model_tag": "r1qwen32b",
+    "arm": "D"
+   },
+   "files": [
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_onew_r0of8.jsonl",
+     "sha256": "ac362a1b450b315b34a05f03e04642675146a6219917b96aa1c4ad6b14d988b0",
+     "bytes": 177531,
+     "counts": {
+      "error": 1,
+      "legacy": 99,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_onew_r1of8.jsonl",
+     "sha256": "fb1c0fac459f7f87f4387b1c46c84412fc0b1f7028ebd7c58ce178ae502102b7",
+     "bytes": 203084,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_onew_r2of8.jsonl",
+     "sha256": "0a6da98e4c1a2a7ee1d86463c1981f5d90caf135a73058bba6207bee2a98cfa4",
+     "bytes": 179714,
+     "counts": {
+      "error": 1,
+      "legacy": 99,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_onew_r3of8.jsonl",
+     "sha256": "c29357887fe3e80bf6e2384e1e842e53e33d1c999799075103050013ea6a368d",
+     "bytes": 190261,
+     "counts": {
+      "error": 1,
+      "legacy": 99,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_onew_r4of8.jsonl",
+     "sha256": "db6c9059aae4bbbbbd9fdf974b65b5c68c8c6d51f050c39111069141a10787d0",
+     "bytes": 183102,
+     "counts": {
+      "error": 1,
+      "legacy": 98,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_onew_r5of8.jsonl",
+     "sha256": "11aa301363157b9fa387022ebe0bc417e922b8a1ab485a4e32cc6b1cd683b1f7",
+     "bytes": 185352,
+     "counts": {
+      "error": 1,
+      "legacy": 98,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_onew_r6of8.jsonl",
+     "sha256": "6585490b8bfd5eccd53af0522633b029237bebd6a3a7926e9f9def3e65e432bb",
+     "bytes": 192679,
+     "counts": {
+      "error": 2,
+      "legacy": 97,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_onew_r7of8.jsonl",
+     "sha256": "4be289d7a6654391eef3c950fcf5356b7f203380eedb9ee41aab1ddf4a6e812f",
+     "bytes": 199285,
+     "counts": {
+      "error": 1,
+      "legacy": 98,
+      "meta": 1
+     }
+    }
+   ],
+   "n_rows": 788,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  },
+  "Qwen-32B/arm_P": {
+   "glob": "probe/r1qwen32b_ROME_cf200sup_placebo_r*.jsonl",
+   "labels": {
+    "model_tag": "r1qwen32b",
+    "arm": "P"
+   },
+   "files": [
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_placebo_r0of8.jsonl",
+     "sha256": "d88cae6bad7e3c0fb506c5264f1aeadfda387720f2adf980420e111056d95c65",
+     "bytes": 179109,
+     "counts": {
+      "error": 1,
+      "legacy": 99,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_placebo_r1of8.jsonl",
+     "sha256": "8f2b56d84ff57b68ba4d4310c8752ea76dc8088ee935fd27afd6e5fae84f3480",
+     "bytes": 216369,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_placebo_r2of8.jsonl",
+     "sha256": "7a0d091e8d564eb4fd00388f1f92600063c5aa6fc8ad560df81f8990bbda5936",
+     "bytes": 182662,
+     "counts": {
+      "error": 1,
+      "legacy": 99,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_placebo_r3of8.jsonl",
+     "sha256": "99e6f656f50dd7f38b44ca9e6e06b541fc81145bd434474e4d4d2e81402da5cc",
+     "bytes": 189865,
+     "counts": {
+      "error": 1,
+      "legacy": 99,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_placebo_r4of8.jsonl",
+     "sha256": "47e567076b6efc2b73a9d2084c6587c1571e2a29800cad795f59ae55ca6b9c2c",
+     "bytes": 195707,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_placebo_r5of8.jsonl",
+     "sha256": "2626cb613762763f3469a44fa66b2c3af726190d5599c6c04299f09ec64793ee",
+     "bytes": 193068,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_placebo_r6of8.jsonl",
+     "sha256": "be4f74490b1ba5671bd0c25ebfbfe7aade836024a0afa0c541741bb087e81198",
+     "bytes": 194339,
+     "counts": {
+      "error": 1,
+      "legacy": 99,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_placebo_r7of8.jsonl",
+     "sha256": "97cc730dc2e80b5bc683c7557ca0d4d9395ba9b7fe90adf43ba881cce36864df",
+     "bytes": 194851,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    }
+   ],
+   "n_rows": 796,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  },
+  "Qwen-32B/arm_C": {
+   "glob": "probe/r1qwen32b_ROME_cf200sup_strong_r*.jsonl",
+   "labels": {
+    "model_tag": "r1qwen32b",
+    "arm": "C"
+   },
+   "files": [
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_strong_r0of8.jsonl",
+     "sha256": "a0283700437189f51205de619df2d62930df3e54ab3915b9849455b53f8e53f4",
+     "bytes": 178956,
+     "counts": {
+      "error": 1,
+      "legacy": 99,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_strong_r1of8.jsonl",
+     "sha256": "9b44039110142738d0665b28aac9f20940615e4f3eb2358e299039e562ecbdc5",
+     "bytes": 209546,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_strong_r2of8.jsonl",
+     "sha256": "4f2fa8fc50af9f4e1a1563239430391300c0a6d99fe7e2c0120d557bfacbf277",
+     "bytes": 183618,
+     "counts": {
+      "error": 1,
+      "legacy": 99,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_strong_r3of8.jsonl",
+     "sha256": "3f996dc95e3f291190c8fa248ebeac209e3ebde78f4f8e1c18b7864ded2459a6",
+     "bytes": 188769,
+     "counts": {
+      "error": 1,
+      "legacy": 99,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_strong_r4of8.jsonl",
+     "sha256": "e1534af6770f635ec81090595f91dc4cf1d58c94daec638825070a1954c74b67",
+     "bytes": 195621,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_strong_r5of8.jsonl",
+     "sha256": "e05818f8921cf496164693a568b819c291d89733a2563640469c4e1e31ce59ae",
+     "bytes": 194160,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_strong_r6of8.jsonl",
+     "sha256": "bb9f13b7f17d04c2f6d1c2226b71b87cb0f5dfaac95a045817d2cf0f1269beda",
+     "bytes": 192891,
+     "counts": {
+      "error": 1,
+      "legacy": 99,
+      "meta": 1
+     }
+    },
+    {
+     "path": "probe/r1qwen32b_ROME_cf200sup_strong_r7of8.jsonl",
+     "sha256": "f0c4d256c6fc30de7d0ca60229e1ff388c29d62589f110080c21c226ebed88db",
+     "bytes": 194771,
+     "counts": {
+      "legacy": 100,
+      "meta": 1
+     }
+    }
+   ],
+   "n_rows": 796,
+   "duplicate_audit": {
+    "status": "PASS",
+    "world_key": [
+     "model_tag",
+     "editor",
+     "target_tag",
+     "condition",
+     "arm",
+     "alpha",
+     "case_id",
+     "budget",
+     "probe",
+     "decode",
+     "seed",
+     "temperature",
+     "q"
+    ],
+    "n_duplicate_keys": 0,
+    "n_duplicate_rows_dropped": 0,
+    "duplicate_keys": []
+   }
+  }
+ },
+ "reproduction": [
+  {
+   "claim": "Qwen-1.5B es_drop",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 1.5B",
+   "kind": "point",
+   "target": -0.026,
+   "computed": -0.025510204081632654,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-1.5B rr",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 1.5B",
+   "kind": "point",
+   "target": 0.061,
+   "computed": 0.06140350877192982,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-1.5B clr",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 1.5B",
+   "kind": "point",
+   "target": 0.209,
+   "computed": 0.20918367346938777,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-1.5B es_b0",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 1.5B",
+   "kind": "point",
+   "target": 0.582,
+   "computed": 0.5816326530612245,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-1.5B es_b3",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 1.5B",
+   "kind": "point",
+   "target": 0.607,
+   "computed": 0.6071428571428571,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-1.5B base answer_old_b0",
+   "source": "results.json base_probe[1.5B]",
+   "kind": "point",
+   "target": 0.515,
+   "computed": 0.5153061224489796,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-7B es_drop",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 7B",
+   "kind": "point",
+   "target": -0.03,
+   "computed": -0.03,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-7B rr",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 7B",
+   "kind": "point",
+   "target": 0.08,
+   "computed": 0.08,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-7B clr",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 7B",
+   "kind": "point",
+   "target": 0.335,
+   "computed": 0.335,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-7B es_b0",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 7B",
+   "kind": "point",
+   "target": 0.5,
+   "computed": 0.5,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-7B es_b3",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 7B",
+   "kind": "point",
+   "target": 0.53,
+   "computed": 0.53,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-7B base answer_old_b0",
+   "source": "results.json base_probe[7B]",
+   "kind": "point",
+   "target": 0.59,
+   "computed": 0.59,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-14B es_drop",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 14B",
+   "kind": "point",
+   "target": 0.04,
+   "computed": 0.04,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-14B rr",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 14B",
+   "kind": "point",
+   "target": 0.162,
+   "computed": 0.16216216216216217,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-14B clr",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 14B",
+   "kind": "point",
+   "target": 0.475,
+   "computed": 0.475,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-14B es_b0",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 14B",
+   "kind": "point",
+   "target": 0.555,
+   "computed": 0.555,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-14B es_b3",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 14B",
+   "kind": "point",
+   "target": 0.515,
+   "computed": 0.515,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-14B base answer_old_b0",
+   "source": "results.json base_probe[14B]",
+   "kind": "point",
+   "target": 0.76,
+   "computed": 0.76,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-32B es_drop",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 32B",
+   "kind": "point",
+   "target": 0.106,
+   "computed": 0.10606060606060606,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-32B rr",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 32B",
+   "kind": "point",
+   "target": 0.193,
+   "computed": 0.19327731092436976,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-32B clr",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 32B",
+   "kind": "point",
+   "target": 0.545,
+   "computed": 0.5454545454545454,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-32B es_b0",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 32B",
+   "kind": "point",
+   "target": 0.595,
+   "computed": 0.595,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-32B es_b3",
+   "source": "results.json capability.families[R1-Distill-Qwen] @ 32B",
+   "kind": "point",
+   "target": 0.495,
+   "computed": 0.494949494949495,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-32B base answer_old_b0",
+   "source": "results.json base_probe[32B]",
+   "kind": "point",
+   "target": 0.765,
+   "computed": 0.765,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Llama-8B es_drop",
+   "source": "results.json capability.families[R1-Distill-Llama] @ 8B",
+   "kind": "point",
+   "target": 0.015,
+   "computed": 0.015,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Llama-8B rr",
+   "source": "results.json capability.families[R1-Distill-Llama] @ 8B",
+   "kind": "point",
+   "target": 0.144,
+   "computed": 0.144,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Llama-8B clr",
+   "source": "results.json capability.families[R1-Distill-Llama] @ 8B",
+   "kind": "point",
+   "target": 0.34,
+   "computed": 0.34,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Llama-8B es_b0",
+   "source": "results.json capability.families[R1-Distill-Llama] @ 8B",
+   "kind": "point",
+   "target": 0.625,
+   "computed": 0.625,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Llama-8B es_b3",
+   "source": "results.json capability.families[R1-Distill-Llama] @ 8B",
+   "kind": "point",
+   "target": 0.61,
+   "computed": 0.61,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Llama-8B base answer_old_b0",
+   "source": "results.json base_probe[8B]",
+   "kind": "point",
+   "target": 0.655,
+   "computed": 0.655,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Llama-70B|drop_degenerate es_drop",
+   "source": "results.json capability.families[R1-Distill-Llama] @ 70B",
+   "kind": "point",
+   "target": 0.107,
+   "computed": 0.10695187165775401,
+   "status": "MATCH",
+   "note": "results.json headline uses the n=187 early-stop filter"
+  },
+  {
+   "claim": "Llama-70B|drop_degenerate rr",
+   "source": "results.json capability.families[R1-Distill-Llama] @ 70B",
+   "kind": "point",
+   "target": 0.175,
+   "computed": 0.17543859649122806,
+   "status": "MATCH",
+   "note": "results.json headline uses the n=187 early-stop filter"
+  },
+  {
+   "claim": "Llama-70B|drop_degenerate clr",
+   "source": "results.json capability.families[R1-Distill-Llama] @ 70B",
+   "kind": "point",
+   "target": 0.529,
+   "computed": 0.5294117647058824,
+   "status": "MATCH",
+   "note": "results.json headline uses the n=187 early-stop filter"
+  },
+  {
+   "claim": "Llama-70B|drop_degenerate es_b0",
+   "source": "results.json capability.families[R1-Distill-Llama] @ 70B",
+   "kind": "point",
+   "target": 0.61,
+   "computed": 0.6096256684491979,
+   "status": "MATCH",
+   "note": "results.json headline uses the n=187 early-stop filter"
+  },
+  {
+   "claim": "Llama-70B|drop_degenerate es_b3",
+   "source": "results.json capability.families[R1-Distill-Llama] @ 70B",
+   "kind": "point",
+   "target": 0.503,
+   "computed": 0.5026737967914439,
+   "status": "MATCH",
+   "note": "results.json headline uses the n=187 early-stop filter"
+  },
+  {
+   "claim": "Llama-70B base answer_old_b0",
+   "source": "results.json base_probe[70B]",
+   "kind": "point",
+   "target": 0.785,
+   "computed": 0.785,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Llama-70B (unfiltered) es_drop",
+   "source": "results.json emergence.percase.cells_descriptive[Llama-70.0B]",
+   "kind": "point",
+   "target": 0.11,
+   "computed": 0.11,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Llama-70B (unfiltered) rr",
+   "source": "results.json emergence.percase.cells_descriptive[Llama-70.0B]",
+   "kind": "point",
+   "target": 0.1667,
+   "computed": 0.16666666666666666,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Llama-70B (unfiltered) clr",
+   "source": "results.json emergence.percase.cells_descriptive[Llama-70.0B]",
+   "kind": "point",
+   "target": 0.495,
+   "computed": 0.495,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Llama-70B filter drops 13 cases (n=187)",
+   "source": "results.json capability.families[R1-Distill-Llama].headline_n",
+   "kind": "point",
+   "target": 187,
+   "computed": 187,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Holm ES drop Llama-70B raw p",
+   "source": "REVISION.md §2",
+   "kind": "p",
+   "target": 0.0024,
+   "computed": 0.0036,
+   "status": "DIFFERS",
+   "note": "bootstrap-sequence dependent, point estimate matches: REVISION.md §2 came from an exploratory pass that resampled cases in shard-file order (random.Random(42); numpy default_rng(42) for the qualified CIs); study1 resamples in sorted case_id order as cross_arm does. Replaying the exploratory convention on the same per-case values returns the target exactly."
+  },
+  {
+   "claim": "Holm ES drop Llama-70B rejected at .05",
+   "source": "REVISION.md §2",
+   "kind": "conclusion",
+   "target": true,
+   "computed": true,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Holm ES drop Qwen-32B raw p",
+   "source": "REVISION.md §2",
+   "kind": "p",
+   "target": 0.0082,
+   "computed": 0.0066,
+   "status": "DIFFERS",
+   "note": "bootstrap-sequence dependent, point estimate matches: REVISION.md §2 came from an exploratory pass that resampled cases in shard-file order (random.Random(42); numpy default_rng(42) for the qualified CIs); study1 resamples in sorted case_id order as cross_arm does. Replaying the exploratory convention on the same per-case values returns the target exactly."
+  },
+  {
+   "claim": "Holm ES drop Qwen-32B rejected at .05",
+   "source": "REVISION.md §2",
+   "kind": "conclusion",
+   "target": true,
+   "computed": true,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Holm: only 70B and 32B rejected",
+   "source": "REVISION.md §2",
+   "kind": "conclusion",
+   "target": true,
+   "computed": true,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "retention Qwen-14B point",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 0.195,
+   "computed": 0.19540229885057472,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "retention Qwen-14B CI low",
+   "source": "REVISION.md §2",
+   "kind": "ci",
+   "target": 0.057,
+   "computed": 0.06896551724137931,
+   "status": "DIFFERS",
+   "note": "bootstrap-sequence dependent, point estimate matches: REVISION.md §2 came from an exploratory pass that resampled cases in shard-file order (random.Random(42); numpy default_rng(42) for the qualified CIs); study1 resamples in sorted case_id order as cross_arm does. Replaying the exploratory convention on the same per-case values returns the target exactly."
+  },
+  {
+   "claim": "retention Qwen-14B CI high",
+   "source": "REVISION.md §2",
+   "kind": "ci",
+   "target": 0.322,
+   "computed": 0.3218390804597701,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "retention Qwen-32B point",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 0.216,
+   "computed": 0.2159090909090909,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "retention Qwen-32B CI low",
+   "source": "REVISION.md §2",
+   "kind": "ci",
+   "target": 0.091,
+   "computed": 0.09090909090909091,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "retention Qwen-32B CI high",
+   "source": "REVISION.md §2",
+   "kind": "ci",
+   "target": 0.341,
+   "computed": 0.3409090909090909,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "retention Llama-70B point",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 0.234,
+   "computed": 0.23404255319148937,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "retention Llama-70B CI low",
+   "source": "REVISION.md §2",
+   "kind": "ci",
+   "target": 0.117,
+   "computed": 0.11702127659574468,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "retention Llama-70B CI high",
+   "source": "REVISION.md §2",
+   "kind": "ci",
+   "target": 0.351,
+   "computed": 0.35106382978723405,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "name containment count in the 200-case pool",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 46,
+   "computed": 46,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-32B RR among name-containment cases",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 0.6,
+   "computed": 0.6,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-32B RR among the rest",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 0.156,
+   "computed": 0.1559633027522936,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-32B ES drop excluding name containment",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 0.118,
+   "computed": 0.11842105263157894,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Qwen-32B ES drop excluding name containment: CI excludes 0",
+   "source": "REVISION.md §2",
+   "kind": "conclusion",
+   "target": true,
+   "computed": true,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Llama-70B ES drop excluding name containment",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 0.117,
+   "computed": 0.11688311688311688,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "Llama-70B ES drop excluding name containment: CI excludes 0",
+   "source": "REVISION.md §2",
+   "kind": "conclusion",
+   "target": true,
+   "computed": true,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "qualified ES drop Qwen-32B point",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 0.125,
+   "computed": 0.125,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "qualified ES drop Qwen-32B CI low",
+   "source": "REVISION.md §2",
+   "kind": "ci",
+   "target": 0.04,
+   "computed": 0.03289473684210526,
+   "status": "DIFFERS",
+   "note": "bootstrap-sequence dependent, point estimate matches: REVISION.md §2 came from an exploratory pass that resampled cases in shard-file order (random.Random(42); numpy default_rng(42) for the qualified CIs); study1 resamples in sorted case_id order as cross_arm does. Replaying the exploratory convention on the same per-case values returns the target exactly."
+  },
+  {
+   "claim": "qualified ES drop Qwen-32B CI high",
+   "source": "REVISION.md §2",
+   "kind": "ci",
+   "target": 0.217,
+   "computed": 0.21710526315789475,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "qualified ES drop Llama-70B point",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 0.153,
+   "computed": 0.15286624203821655,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "qualified ES drop Llama-70B CI low",
+   "source": "REVISION.md §2",
+   "kind": "ci",
+   "target": 0.076,
+   "computed": 0.07643312101910828,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "qualified ES drop Llama-70B CI high",
+   "source": "REVISION.md §2",
+   "kind": "ci",
+   "target": 0.229,
+   "computed": 0.22929936305732485,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "erosion Qwen-1.5B",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 0.128,
+   "computed": 0.12755102040816327,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "erosion Qwen-32B",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 0.207,
+   "computed": 0.20707070707070707,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "erosion CI excludes 0 in all six",
+   "source": "REVISION.md §2",
+   "kind": "conclusion",
+   "target": true,
+   "computed": true,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "repair Qwen-1.5B",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 0.153,
+   "computed": 0.15306122448979592,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "repair Qwen-32B",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 0.101,
+   "computed": 0.10101010101010101,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "repair Llama-70B",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 0.085,
+   "computed": 0.085,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "sampling: P(>=1 of 3 sampled B3 fails | greedy B0 ok)",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 0.605,
+   "computed": 0.6048387096774194,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "sampling: B0 noise floor",
+   "source": "REVISION.md §2",
+   "kind": "point",
+   "target": 0.339,
+   "computed": 0.3387096774193548,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N ES point",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "point",
+   "target": 0.1378,
+   "computed": 0.1378,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N ES p",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "p",
+   "target": 0.0,
+   "computed": 0.0,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N RR point",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "point",
+   "target": -0.1017,
+   "computed": -0.1017,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N RR p",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "p",
+   "target": 0.001,
+   "computed": 0.001,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N RRs point",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "point",
+   "target": -0.0508,
+   "computed": -0.0508,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N RRs p",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "p",
+   "target": 0.0732,
+   "computed": 0.0732,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N CLR point",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "point",
+   "target": -0.2755,
+   "computed": -0.2755,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N CLR p",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "p",
+   "target": 0.0,
+   "computed": 0.0,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm C-N ES point",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "point",
+   "target": 0.0152,
+   "computed": 0.0152,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm C-N ES p",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "p",
+   "target": 0.688,
+   "computed": 0.688,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm C-N RR point",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "point",
+   "target": 0.0,
+   "computed": 0.0,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm C-N RR p",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "p",
+   "target": 1.0,
+   "computed": 1.0,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm C-N RRs point",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "point",
+   "target": -0.0093,
+   "computed": -0.0093,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm C-N RRs p",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "p",
+   "target": 0.8282,
+   "computed": 0.8282,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm C-N CLR point",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "point",
+   "target": -0.0707,
+   "computed": -0.0707,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm C-N CLR p",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "p",
+   "target": 0.0074,
+   "computed": 0.0074,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-C ES point",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "point",
+   "target": 0.1212,
+   "computed": 0.1212,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-C ES p",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "p",
+   "target": 0.0004,
+   "computed": 0.0004,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-C RR point",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "point",
+   "target": -0.0943,
+   "computed": -0.0943,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-C RR p",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "p",
+   "target": 0.0062,
+   "computed": 0.0062,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-C RRs point",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "point",
+   "target": -0.0566,
+   "computed": -0.0566,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-C RRs p",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "p",
+   "target": 0.0324,
+   "computed": 0.0324,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-C CLR point",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "point",
+   "target": -0.2121,
+   "computed": -0.2121,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-C CLR p",
+   "source": "results.json rq3.sup_battery.cross_arm_paired_ci",
+   "kind": "p",
+   "target": 0.0,
+   "computed": 0.0,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-P ES point",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "point",
+   "target": 0.122,
+   "computed": 0.1212,
+   "status": "DIFFERS",
+   "note": "results.json sup_battery counts P n=199 and was computed from an earlier state of the P shards; the local P shards hold 200 B3 cases and reproduce results 2/esup_crossarm.json exactly; dropping any one of the four OOM-retried P cases does not recover the results.json values"
+  },
+  {
+   "claim": "arm T-P ES p",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "p",
+   "target": 0.002,
+   "computed": 0.0012,
+   "status": "DIFFERS",
+   "note": "results.json sup_battery counts P n=199 and was computed from an earlier state of the P shards; the local P shards hold 200 B3 cases and reproduce results 2/esup_crossarm.json exactly; dropping any one of the four OOM-retried P cases does not recover the results.json values"
+  },
+  {
+   "claim": "arm T-P RR point",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "point",
+   "target": -0.095,
+   "computed": -0.0943,
+   "status": "DIFFERS",
+   "note": "results.json sup_battery counts P n=199 and was computed from an earlier state of the P shards; the local P shards hold 200 B3 cases and reproduce results 2/esup_crossarm.json exactly; dropping any one of the four OOM-retried P cases does not recover the results.json values"
+  },
+  {
+   "claim": "arm T-P RR p",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "p",
+   "target": 0.01,
+   "computed": 0.0136,
+   "status": "DIFFERS",
+   "note": "results.json sup_battery counts P n=199 and was computed from an earlier state of the P shards; the local P shards hold 200 B3 cases and reproduce results 2/esup_crossarm.json exactly; dropping any one of the four OOM-retried P cases does not recover the results.json values"
+  },
+  {
+   "claim": "arm T-P RRs point",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "point",
+   "target": -0.057,
+   "computed": -0.0566,
+   "status": "MATCH",
+   "note": "results.json sup_battery counts P n=199 and was computed from an earlier state of the P shards; the local P shards hold 200 B3 cases and reproduce results 2/esup_crossarm.json exactly; dropping any one of the four OOM-retried P cases does not recover the results.json values"
+  },
+  {
+   "claim": "arm T-P RRs p",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "p",
+   "target": 0.029,
+   "computed": 0.0324,
+   "status": "DIFFERS",
+   "note": "results.json sup_battery counts P n=199 and was computed from an earlier state of the P shards; the local P shards hold 200 B3 cases and reproduce results 2/esup_crossarm.json exactly; dropping any one of the four OOM-retried P cases does not recover the results.json values"
+  },
+  {
+   "claim": "arm T-P CLR point",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "point",
+   "target": -0.228,
+   "computed": -0.2273,
+   "status": "DIFFERS",
+   "note": "results.json sup_battery counts P n=199 and was computed from an earlier state of the P shards; the local P shards hold 200 B3 cases and reproduce results 2/esup_crossarm.json exactly; dropping any one of the four OOM-retried P cases does not recover the results.json values"
+  },
+  {
+   "claim": "arm T-P CLR p",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "p",
+   "target": 0.0,
+   "computed": 0.0,
+   "status": "MATCH",
+   "note": "results.json sup_battery counts P n=199 and was computed from an earlier state of the P shards; the local P shards hold 200 B3 cases and reproduce results 2/esup_crossarm.json exactly; dropping any one of the four OOM-retried P cases does not recover the results.json values"
+  },
+  {
+   "claim": "arm D-N ES point",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "point",
+   "target": -0.217,
+   "computed": -0.2165,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N ES p",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "p",
+   "target": 0.0,
+   "computed": 0.0,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N RR point",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "point",
+   "target": 0.086,
+   "computed": 0.0857,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N RR p",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "p",
+   "target": 0.01,
+   "computed": 0.0102,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N RRs point",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "point",
+   "target": 0.095,
+   "computed": 0.0952,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N RRs p",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "p",
+   "target": 0.002,
+   "computed": 0.0024,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N CLR point",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "point",
+   "target": 0.041,
+   "computed": 0.0412,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N CLR p",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "p",
+   "target": 0.163,
+   "computed": 0.1628,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm P-N ES point",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "point",
+   "target": 0.015,
+   "computed": 0.0152,
+   "status": "MATCH",
+   "note": "results.json sup_battery counts P n=199 and was computed from an earlier state of the P shards; the local P shards hold 200 B3 cases and reproduce results 2/esup_crossarm.json exactly; dropping any one of the four OOM-retried P cases does not recover the results.json values"
+  },
+  {
+   "claim": "arm P-N ES p",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "p",
+   "target": 0.709,
+   "computed": 0.704,
+   "status": "DIFFERS",
+   "note": "results.json sup_battery counts P n=199 and was computed from an earlier state of the P shards; the local P shards hold 200 B3 cases and reproduce results 2/esup_crossarm.json exactly; dropping any one of the four OOM-retried P cases does not recover the results.json values"
+  },
+  {
+   "claim": "arm P-N RR point",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "point",
+   "target": 0.0,
+   "computed": 0.0,
+   "status": "MATCH",
+   "note": "results.json sup_battery counts P n=199 and was computed from an earlier state of the P shards; the local P shards hold 200 B3 cases and reproduce results 2/esup_crossarm.json exactly; dropping any one of the four OOM-retried P cases does not recover the results.json values"
+  },
+  {
+   "claim": "arm P-N RR p",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "p",
+   "target": 1.0,
+   "computed": 1.0,
+   "status": "MATCH",
+   "note": "results.json sup_battery counts P n=199 and was computed from an earlier state of the P shards; the local P shards hold 200 B3 cases and reproduce results 2/esup_crossarm.json exactly; dropping any one of the four OOM-retried P cases does not recover the results.json values"
+  },
+  {
+   "claim": "arm P-N RRs point",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "point",
+   "target": -0.009,
+   "computed": -0.0093,
+   "status": "MATCH",
+   "note": "results.json sup_battery counts P n=199 and was computed from an earlier state of the P shards; the local P shards hold 200 B3 cases and reproduce results 2/esup_crossarm.json exactly; dropping any one of the four OOM-retried P cases does not recover the results.json values"
+  },
+  {
+   "claim": "arm P-N RRs p",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "p",
+   "target": 0.828,
+   "computed": 0.8282,
+   "status": "MATCH",
+   "note": "results.json sup_battery counts P n=199 and was computed from an earlier state of the P shards; the local P shards hold 200 B3 cases and reproduce results 2/esup_crossarm.json exactly; dropping any one of the four OOM-retried P cases does not recover the results.json values"
+  },
+  {
+   "claim": "arm P-N CLR point",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "point",
+   "target": -0.051,
+   "computed": -0.0556,
+   "status": "DIFFERS",
+   "note": "results.json sup_battery counts P n=199 and was computed from an earlier state of the P shards; the local P shards hold 200 B3 cases and reproduce results 2/esup_crossarm.json exactly; dropping any one of the four OOM-retried P cases does not recover the results.json values"
+  },
+  {
+   "claim": "arm P-N CLR p",
+   "source": "results.json rq3.sup_battery.contrasts_B3_mean_ci_p",
+   "kind": "p",
+   "target": 0.054,
+   "computed": 0.0366,
+   "status": "DIFFERS",
+   "note": "results.json sup_battery counts P n=199 and was computed from an earlier state of the P shards; the local P shards hold 200 B3 cases and reproduce results 2/esup_crossarm.json exactly; dropping any one of the four OOM-retried P cases does not recover the results.json values"
+  },
+  {
+   "claim": "arm T-N ES point",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 0.1378,
+   "computed": 0.1378,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N ES p",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "p",
+   "target": 0.0,
+   "computed": 0.0,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N ES n",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 196,
+   "computed": 196,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N RR point",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": -0.1017,
+   "computed": -0.1017,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N RR p",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "p",
+   "target": 0.001,
+   "computed": 0.001,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N RR n",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 118,
+   "computed": 118,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N RRs point",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": -0.0508,
+   "computed": -0.0508,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N RRs p",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "p",
+   "target": 0.0732,
+   "computed": 0.0732,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N RRs n",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 118,
+   "computed": 118,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N CLR point",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": -0.2755,
+   "computed": -0.2755,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N CLR p",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "p",
+   "target": 0.0,
+   "computed": 0.0,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-N CLR n",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 196,
+   "computed": 196,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-P ES point",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 0.1212,
+   "computed": 0.1212,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-P ES p",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "p",
+   "target": 0.0012,
+   "computed": 0.0012,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-P ES n",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 198,
+   "computed": 198,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-P RR point",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": -0.0943,
+   "computed": -0.0943,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-P RR p",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "p",
+   "target": 0.0136,
+   "computed": 0.0136,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-P RR n",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 106,
+   "computed": 106,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-P RRs point",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": -0.0566,
+   "computed": -0.0566,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-P RRs p",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "p",
+   "target": 0.0324,
+   "computed": 0.0324,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-P RRs n",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 106,
+   "computed": 106,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-P CLR point",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": -0.2273,
+   "computed": -0.2273,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-P CLR p",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "p",
+   "target": 0.0,
+   "computed": 0.0,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm T-P CLR n",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 198,
+   "computed": 198,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N ES point",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": -0.2165,
+   "computed": -0.2165,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N ES p",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "p",
+   "target": 0.0,
+   "computed": 0.0,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N ES n",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 194,
+   "computed": 194,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N RR point",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 0.0857,
+   "computed": 0.0857,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N RR p",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "p",
+   "target": 0.0102,
+   "computed": 0.0102,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N RR n",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 105,
+   "computed": 105,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N RRs point",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 0.0952,
+   "computed": 0.0952,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N RRs p",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "p",
+   "target": 0.0024,
+   "computed": 0.0024,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N RRs n",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 105,
+   "computed": 105,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N CLR point",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 0.0412,
+   "computed": 0.0412,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N CLR p",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "p",
+   "target": 0.1628,
+   "computed": 0.1628,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm D-N CLR n",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 194,
+   "computed": 194,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm P-N ES point",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 0.0152,
+   "computed": 0.0152,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm P-N ES p",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "p",
+   "target": 0.704,
+   "computed": 0.704,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm P-N ES n",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 198,
+   "computed": 198,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm P-N RR point",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 0.0,
+   "computed": 0.0,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm P-N RR p",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "p",
+   "target": 1.0,
+   "computed": 1.0,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm P-N RR n",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 107,
+   "computed": 107,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm P-N RRs point",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": -0.0093,
+   "computed": -0.0093,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm P-N RRs p",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "p",
+   "target": 0.8282,
+   "computed": 0.8282,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm P-N RRs n",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 107,
+   "computed": 107,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm P-N CLR point",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": -0.0556,
+   "computed": -0.0556,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm P-N CLR p",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "p",
+   "target": 0.0366,
+   "computed": 0.0366,
+   "status": "MATCH",
+   "note": ""
+  },
+  {
+   "claim": "arm P-N CLR n",
+   "source": "results 2/esup_crossarm.json (cross_arm output on the local shards)",
+   "kind": "point",
+   "target": 198,
+   "computed": 198,
+   "status": "MATCH",
+   "note": ""
+  }
+ ]
+}

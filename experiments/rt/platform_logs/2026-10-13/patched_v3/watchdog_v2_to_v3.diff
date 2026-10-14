@@ -1,0 +1,104 @@
+--- watchdog.v2.py	2026-10-13 13:11:14
++++ v3/watchdog.py	2026-10-13 13:15:25
+@@ -50,9 +50,13 @@
+ 
+ def all_utils():
+     """return dict gpu_index -> util% (int); empty dict on failure."""
+-    r = subprocess.run(['bash','-c',
+-        'nvidia-smi --query-gpu=index,utilization.gpu --format=csv,noheader,nounits'],
+-        capture_output=True, text=True)
++    try:
++        r = subprocess.run(['bash','-c',
++            'nvidia-smi --query-gpu=index,utilization.gpu --format=csv,noheader,nounits'],
++            capture_output=True, text=True, timeout=60)
++    except subprocess.TimeoutExpired:
++        log_err('nvidia-smi timeout (all_utils)')
++        return {}
+     out = {}
+     try:
+         for line in r.stdout.strip().splitlines():
+@@ -69,25 +73,35 @@
+ 
+ def gpu_mem(gpus):
+     idx = ','.join(str(g) for g in gpus)
+-    r = subprocess.run(['bash','-c',
+-        f'nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -i {idx}'],
+-        capture_output=True, text=True)
+     try:
++        r = subprocess.run(['bash','-c',
++            f'nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -i {idx}'],
++            capture_output=True, text=True, timeout=60)
++    except subprocess.TimeoutExpired:
++        log_err(f'nvidia-smi timeout (gpu_mem {idx})')
++        return []                 # busy() treats [] as busy -> pause, never a restart onto unknown cards
++    try:
+         return [int(x.strip()) for x in r.stdout.split() if x.strip()]
+     except Exception:
+         return []
+ 
++def _run_quiet(args, timeout):
++    try:
++        subprocess.run(args, capture_output=True, timeout=timeout)
++    except subprocess.TimeoutExpired:
++        log_err(f'timeout {timeout}s: {str(args)[:120]}')
++
+ def collect_evidence(project, rank, pid):
+     ts = time.strftime('%Y%m%d_%H%M%S')
+     base = f'{POUTH}/hang_{safe_tag(project)}_r{safe_tag(rank)}_{ts}'
+-    subprocess.run(['bash','-c',
++    _run_quiet(['bash','-c',
+         f'if command -v py-spy >/dev/null 2>&1; then py-spy dump --pid {pid}; else echo "py-spy not installed -> skipped"; fi > {base}_pyspy.txt 2>&1'],
+-        capture_output=True)
+-    subprocess.run(['bash','-c',
+-        f'top -b -n1 -H -p {pid} 2>/dev/null | head -20 > {base}_top.txt'], capture_output=True)
+-    subprocess.run(['bash','-c',
++        120)
++    _run_quiet(['bash','-c',
++        f'top -b -n1 -H -p {pid} 2>/dev/null | head -20 > {base}_top.txt'], 120)
++    _run_quiet(['bash','-c',
+         f'nvidia-smi --query-gpu=index,utilization.gpu,memory.used --format=csv > {base}_smi.txt 2>&1; '
+-        f'nvidia-smi topo -m >> {base}_smi.txt 2>&1'], capture_output=True)
++        f'nvidia-smi topo -m >> {base}_smi.txt 2>&1'], 120)
+     return [f'{base}_pyspy.txt', f'{base}_top.txt', f'{base}_smi.txt']
+ 
+ def append_report(text):
+@@ -135,7 +149,7 @@
+     def busy():
+         m = gpu_mem(snap['gpus'])
+         return alive(pid) or not m or any(x >= 1000 for x in m), m
+-    subprocess.run(['kill', '-TERM', str(pid)], capture_output=True)
++    _run_quiet(['kill', '-TERM', str(pid)], 30)
+     b, m = True, []
+     for _ in range(60):
+         time.sleep(5)
+@@ -143,7 +157,7 @@
+         if not b:
+             break
+     if b:
+-        subprocess.run(['kill', '-KILL', str(pid)], capture_output=True)
++        _run_quiet(['kill', '-KILL', str(pid)], 30)
+         for _ in range(12):
+             time.sleep(5)
+             b, m = busy()
+@@ -179,7 +193,7 @@
+             save_state(st)
+             append_report(f"\n## {safe_tag(snap['project'])} ⏸ {utc()}\n待裁决：rank {snap['rank']} 重启命令未返回 NEWPID（或 120s 超时），未跟踪\n")
+             return
+-        rk.update(pid=newpid, restarts=rk.get('restarts', 0) + 1, zero_streak=0, started_at=now, status='running')
++        rk.update(pid=newpid, restarts=rk.get('restarts', 0) + 1, zero_streak=0, started_at=time.time(), status='running')
+         save_state(st)
+     append_report(
+         f"- {now_str()} | rank {snap['rank']} | GPU 全 0% 连续 ≥{ZERO_LIMIT}min | 自动重启 #{rk['restarts']}"
+@@ -189,10 +203,10 @@
+     while True:
+         hangs = []
+         try:
++            now = time.time()
++            utils = all_utils()       # sampled before taking the shared lock: a hung nvidia-smi must never hold it
+             with _Lock():
+                 st = load_state()
+-                now = time.time()
+-                utils = all_utils()
+                 dirty = False
+                 for rk in st.get('ranks', []):
+                     try:

@@ -126,3 +126,38 @@ pilot 主路径已自动接入，无需手动调用。
 
 **何时用**: MEMIT/AlphaEdit 任何会触发 mom2 的跑（pilot MEMIT 首条 edit / `gen_alphaedit_P.py`）。
 pilot 主路径已自动接入。注意 `gen_alphaedit_P.py` 不走 edit_loop —— 用前需自行先调本补丁 `apply()`。
+
+---
+
+## 4. AlphaEdit 的 `cache_c` 跨 `edit()` 累积（单条编辑协议后门；engine v2 已修）
+
+- **文件**: `source/EasyEdit/easyeditor/models/alphaedit/AlphaEdit_main.py`
+- **状态所在**: 模块全局 `cache_c_new = False`（L25）与 `cache_c`（L79-86 首次惰性建为
+  `zeros(len(layers), d, d)`）；求解用 `P @ (K Kᵀ + cache_c[i]) + L2·I`（L229-233），求解后
+  `cache_c[i] += K Kᵀ`（L257-259）。唯一复位是 `apply_AlphaEdit_to_model(reset_cache=True)`（L51-52），
+  而 `BaseEditor.edit_requests.edit_func`（editors/editor.py L337-345）**从不传 reset_cache**。
+- **后果**: 同一进程里第 n 条单条编辑是在前 n-1 条的键协方差上求解的 → 批量编辑干扰从后门进入单条协议，
+  且 ΔW 依赖分片顺序。
+- **修法（不改 source/）**: `easyedit_alphaedit_cache.py` 的 `reset()` 在每条 case 编辑前把
+  `cache_c_new` 置 False 并删掉旧 `cache_c`（等价于逐条 `reset_cache=True`）。P（`P`/`P_loaded`）是
+  每模型常量，不动。上游等价 diff 见该文件 docstring。
+- **接入**: `rt.deltas run --editor AlphaEdit` 每条 case 前自动调用；复位前状态记入 delta 的
+  `diag["reset"]`。**mock 单测**: `src/rt/tests/test_deltas.py::test_alphaedit_cache_reset_isolates_cases`
+  （同一条 case 在「先跑别的 case 再跑」与「单独跑」两种顺序下 ΔW 相同；不复位时 mock 复现泄漏）。
+- 旧 `edit_loop.py` 顶部的 TODO 注释针对 AAAI 期主循环，保持原样（该循环不跑 AlphaEdit）。
+
+## 5. 编辑进程内禁止现算 mom2（只许读预计算缓存）
+
+- **文件**: `source/EasyEdit/easyeditor/models/rome/layer_stats.py` L170：缓存文件缺失时 `get_ds()`
+  读语料并在**正被编辑的模型**上跑 `mom2_n_samples` 条前向。fp32 32B 进程里这一步放不下（2026-07
+  MEMIT-32B OOM），且语料取决于 `$WHYAAAI_WIKI_PARQUET` 碰巧 glob 到什么（曾误匹配 `20231101.ko`）。
+- **修法**: `easyedit_mom2_cache_only.py` 的 `apply()` 把该模块的 `load_dataset` 换成直接抛错的函数
+  （须在 `easyedit_mom2_dataset.apply()` 之后调用，二者替换同一名字）。缓存命中时 `get_ds` 不被调用，
+  行为不变；缓存缺失则该 case 记错误行而非现算。
+- **统计量从哪来**: `python -m rt.deltas precompute-stats`（`src/rt/mom2.py`）：bf16 前向、fp32 累加，
+  按 EasyEdit 的样本/分词/长度规则，写到 layer_stats 读取的**同名同格式** npz
+  （`mom2.constructor` / `mom2.count` / `mom2.mom2` / `sample_size`），merge 后用 EasyEdit 自己的
+  `layer_stats` 在「禁止重算」下加载验收。语料钉死英文子集（目录须为 `<日期>.en`，再加 ASCII 内容检查）。
+- **与 §1 的关系**: AlphaEdit 的 P 现由 `python -m rt.deltas alphaedit-P` 从同一份统计量生成到
+  `deltas_models.yaml` 里每模型的 `P_loc`（附 JSON sidecar：层、阈值、每层零空间维数），
+  `rt.deltas run` 启动前核对 sidecar 与 hparams 一致；`gen_alphaedit_P.py` 仅留作 AAAI 期记录。

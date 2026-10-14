@@ -2,16 +2,16 @@
 
 ## 这是什么项目
 
-AAAI-27 投稿项目，代号「越想越退」(Thinking Undoes Editing)：量化参数知识编辑（ROME/MEMIT/AlphaEdit）在 R1 式推理模型上随思考预算增加而被推翻的现象 + 机理 + training-free 修补。
+代号「越想越退」(Thinking Undoes Editing)：参数知识编辑（ROME/MEMIT/AlphaEdit）在 R1 式推理模型上，零思考下通过、原生推理后失效的现象 + 编辑特异性 + 链上因果控制点。AAAI-27 Phase-1 被拒（2026-09），**现改投 ARR 2026-10-12（NAACL/COLING 2027）**。
 
-**读单（按序）：`plan.md` 头部 v1.x 变更日志（当前 **v2.06**，本项目唯一权威计划）→ `paperwriting/WRITING_PLAN.md`（唯一有效写作计划）→ `paperwriting/results.json`（数字真源）→ `analysis/11–16_*.md` 与对应 prereg（X/P0/CPU closeout 最新证据）→ `RUNBOOK.md`（仅在确有 GPU 任务时）。** `sumandplan1.md` §5/§6 与 `phase-1.md` 是 6 月历史快照，不得覆盖 plan 头部或复活已停止队列。与 plan 冲突的一切行为都需要先升 plan 版本并写变更记录，再执行。
+**读单（按序）：`REVISION.md`（2026-09-28 起唯一权威）→ `official-review.md`（AAAI 审稿原文）→ `paperwriting/results.json`（Study 1 数字真源）→ `RUNBOOK.md`（仅在确有 GPU 任务时）。** `plan.md`、`paperwriting/WRITING_PLAN.md`、`sumandplan1.md`、`phase-1.md` 均为历史档，只作背景，不得约束当前工作。唯一原则：让论文变好。
 
 ## 硬约束（不可违反）
 
-1. **截止**（gap-review E1 多源亲核,2026-07-08 更新;OpenReview 上再终核）: abstract **2026-07-21**、全文 **2026-07-28**、supplementary+code **2026-07-31**（均 UTC-12）。**内部冻结**=abstract 7/18 / 全文 7/25（各留 3 天缓冲）。checklist 随全文 7/28 单独上传且计入决策。**Phase-1=3 人审全文 + AI 辅助评审、无 rebuttal**→全文数字一致性是生死件（详见 plan v1.67）。
-2. **单条编辑协议**（用户已签字）：主实验逐条 edit → 全预算档生成 → restore；批量编辑只作消融。还原机制证据见 `analysis/01_easyedit.md` §3。
+1. **截止**：ARR 2026-10-12 AoE。决策门与排期见 `REVISION.md` §3、§6。
+2. **单条编辑协议**：每个生成请求只见自己的那一条编辑，编辑之间不累积。引擎 v2 用按行 hook 注入秩 1 编辑，语义与"逐条 edit → 生成 → restore"等价；批量编辑只作消融。
 3. **`source/` 下第三方代码只读**。需要改动 → fork 相关文件进 `src/vendor_patches/` 并记录 diff。
-4. **口径纪律**: EasyEdit 自带 rewrite_acc（logits 口径）≠ 我们的 ES_b（生成式口径），两者永不混用混排。
+4. **口径纪律**: EasyEdit 自带 rewrite_acc（logits 口径）≠ 我们的 ES_b（生成式口径），两者永不混用混排；引擎 v2（bf16 批量）的数字与旧 HF 数字永不混在同一对比里。
 5. 所有长任务 ≤2h 粒度、jsonl 追加写、按 case_id 断点续跑（排队集群随时可能杀任务）。
 6. 环境一旦跑通立即 `pip freeze > env.lock` 并 commit。
 
@@ -19,28 +19,17 @@ AAAI-27 投稿项目，代号「越想越退」(Thinking Undoes Editing)：量�
 
 ```
 papers/   论文 PDF（repro_/ref_ 前缀）   source/  第三方仓库（只读, 各自带 .git）
-analysis/ 复现/实验/方法笔记 00–09      src/     我们的代码 + test_*（mock）+ vendor_patches/
+analysis/ 复现/实验/方法笔记 00–16      src/     我们的代码 + test_*（mock）+ vendor_patches/ + rt/（引擎 v2）
 data/     清洗数据(大文件 gitignore,     results/ 实验 jsonl（gitignore，脚本再生）
           build_dataset.py 再生)        experiments/ pilot.yaml（就位）   paperwriting/ 写作真源(results.json/WRITING_PLAN/LaTeX；原 paper/ 已更名防与 papers/ 混淆)
 ```
 
 若 papers/ 或 source/ 为空：`bash setup_workspace.sh`（幂等，已存在则跳过）。
 
-## 当前状态（2026-07-13；权威进度只看 `plan.md` 头部）
+## 当前状态（2026-09-28）
 
-- [x] X2/X3/P1 GPU 运行完成；X1 结果前指定的 fixed-replay 门为 **9/18 FAIL**，永久停止五臂，不筛 case。
-- [x] P0 membership/route/crosswalk 完成：corrected taxonomy n=41，Bridge/Recall/RO/Associative=27/11/3/0；logit-lens per-item crosswalk 仅因缺 raw 文件阻塞。
-- [x] Percase/B15-B0/Cap3/F3/X2/X3 CPU closeout 全部闭合；最终 audit PASS，B15-B0 两侧 duplicate audit 和 budget provenance 均 PASS。
-- [x] GPU 和服务器 CPU 科学队列清空；P0 logit-lens 只是缺 raw dependency 的非承重 optional block。
-- [x] 最终科学 review + 三方仲裁 + GPT-5.6 复核完成（v1.89 落库）。
-- [ ] **唯一当前任务 = 写作冲刺**，按 `paperwriting/WRITING_PLAN.md` 执行。
-
-## 立即任务队列 —— **以 `plan.md v2.06` + `paperwriting/WRITING_PLAN.md` 为准**
-
-1. **投稿前科学队列=零**（不跑 B15 interaction、不烧 X-A 池、不加任何新数字）。
-2. **摘要锁已关闭（v1.90③）**：v8.1=内部终版（SHA 见 v1.90①），OpenReview 暂留 v5；**正文完成前不再动摘要**；D1–D8/R1 债务在 §3–§5 成文冻结后才一次性替换表单。Title/TL;DR 永久冻结。
-3. **当前唯一任务 = W2 正文**（协作环：Fable 计划 → Codex 第一性审计划并执行 → Fable 复审 → Codex 终裁修订）：LaTeX 主文件（AuthorKit27 模板）→ §3 evaluation gap → §4 causal diagnosis（含 X1 紧邻披露 + cloze sanity 全 caveat）→ §5 bounded guard → §2/§6/§7（**全七节 + Ethics 已成文；正文实测 7 页**）；**债务台账 `paperwriting/delivery/abstract_v8_substance_ledger.json`（D1–D8/R1）+ 19 项 MAJOR（`delivery/fable_review_19majors_for_w2.md`）= 各节强制预置回答清单**；M16 checker 于 W2 期间建成。
-4. 旧 `paperwriting/draft.md` 是**违规数字的历史底稿**（≥15 处与真源不一致，X1 零披露）：只作素材参考，一切数字从 `paperwriting/results.json` 正向取。
+- Study 1（AAAI 数据）已完成零 GPU 重分析：Holm 过、留存对比（编辑特异性）14B/32B/70B 过、permissive RR 被名字泄题污染 → 见 `REVISION.md` §2。
+- 当前任务：引擎 v2（`src/rt/`）→ G0 一致性门 → 冻结 `prereg-arr.md` → Study 2 → 重写全文。细节与分工只看 `REVISION.md`。
 
 ## 防雷清单（前人血泪，违反必翻车）
 
@@ -52,8 +41,8 @@ data/     清洗数据(大文件 gitignore,     results/ 实验 jsonl（gitignor
 - DeepSeek 模板用**全角竖线** `<｜User｜>`(U+FF5C)，复制时极易被替换成半角导致静默错误；真 eos 是 `<｜end▁of▁sentence｜>`(151643)，`<think>`/`</think>` 是 special=false 原子 token(151648/151649)
 - `edit_loop.run` 的 `finally: restore(...)` 不许删——异常不还原会污染整个分片（真权重侧 08 已验还原正确）
 - jsonl 溯源头用 `git -C <项目根>`（`source/EasyEdit` 自带 .git，HEAD 不同，否则记错哈希）
-- 每周一执行 plan §8 的增量查新（本领域月产一篇近邻，撞车是头号风险）
+- 投稿前再查一次新文献（2026 年近邻：He et al. 2025、CODE 2026、Gao et al. 2026、ThinkEval、CRANE），撞车是头号风险
 
-## 与网页会话的同步纪律（plan §11.4）
+## 同步纪律
 
-本地仓库（本目录）是**唯一真源**。网页会话容器侧的产出经下载合入本地后必须 git commit。plan.md 版本号只增不减。
+本地仓库（本目录）是**唯一真源**。网页会话/服务器侧的产出经下载合入本地后必须 git commit。

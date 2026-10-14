@@ -1,0 +1,41 @@
+# Study 3 (prereg-arr-addendum-s3.md §4), R1-Distill-Qwen-32B on the extension pool (well-known facts
+# among the next 1600 candidates).  Identical to study3_r1qwen32b_fresh.yaml except run tag and manifest.
+# Probes: efficacy (primary) and para0 (paraphrase control), each at B0 and B3.
+# Layout (registered): H100 node, one GPU per process, --world 8 --device cuda, base and rome_N in one
+# invocation per rank (--conditions base,rome_N); OOM ladder of deviation D6 (--max-batch-tokens
+# 40000 -> 26000 -> 18000).  If the H100 node is unavailable the whole world moves to the 4090 node
+# (2 cards per process, --device auto), and the move is recorded in the registry.
+model_tag: r1qwen32b
+template: r1
+no_bos: true
+model:
+  path: null
+  dtype: bfloat16
+  device_map: null
+module_tmp: "model.layers.{}.mlp.down_proj"
+out_dir: results/rt/s3
+run_tag: s3ext
+
+dataset:
+  path: data/counterfact.jsonl
+  manifest: experiments/rt/pools/study3/manifest_r1qwen32b_ext.jsonl
+
+aliases: data/aliases.json
+probes: [efficacy, para0]
+decoding: {greedy: true}
+
+engine:
+  batch_size: 32
+  max_batch_tokens: 128000
+  answer_cap: 256
+  chunk_cases: 10
+
+conditions:
+  - name: base
+    editor: none
+    budgets: [B0, B3]
+  - name: rome_N
+    editor: ROME
+    target_tag: cf
+    deltas_dir: deltas/r1qwen32b/ROME/cf
+    budgets: [B0, B3]
